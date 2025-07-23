@@ -17,11 +17,8 @@ const server = new McpServer({
 });
 
 // Configuration for Excalibrr library paths
-const EXCALIBRR_LIBRARY_PATH =
-  process.env.EXCALIBRR_PATH || "/Users/rebecca.hirai/repos/excalibrr";
-const USAGE_EXAMPLES_PATH =
-  process.env.USAGE_EXAMPLES_PATH ||
-  "/Users/rebecca.hirai/repos/Gravitate.Dotnet.Next/frontend/src";
+const EXCALIBRR_LIBRARY_PATH = process.env.EXCALIBRR_PATH || "";
+const USAGE_EXAMPLES_PATH = process.env.USAGE_EXAMPLES_PATH || "";
 
 // Types for our component analysis
 interface ComponentInfo {
