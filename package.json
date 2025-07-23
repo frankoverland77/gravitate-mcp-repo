@@ -1,0 +1,45 @@
+{
+  "name": "excalibrr-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for the Excalibrr component library - enables AI-powered component discovery and usage",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "excalibrr-mcp-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "start": "node build/index.js",
+    "test": "node build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@gravitate-js/excalibrr": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@gravitate-js/excalibrr": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "excalibrr",
+    "components",
+    "design-system",
+    "ai-assistant"
+  ],
+  "author": "Rebecca",
+  "license": "MIT"
+}
