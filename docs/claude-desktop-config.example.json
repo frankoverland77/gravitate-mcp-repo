@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+      "excalibrr": {
+        "command": "node",
+        "args": ["/path/to/your/excalibrr-mcp-server/build/index.js"],
+        "env": {
+          "EXCALIBRR_PATH": "/path/to/your/excalibrr",
+          "USAGE_EXAMPLES_PATH": "/path/to/your/main-project/frontend/src"
+        }
+      }
+    }
+  }

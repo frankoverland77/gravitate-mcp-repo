@@ -11,7 +11,10 @@
     "build": "tsc && chmod 755 build/index.js",
     "dev": "tsc --watch",
     "start": "node build/index.js",
-    "test": "node build/index.js"
+    "test": "node scripts/test-server.sh",
+    "install:claude": "./scripts/install.sh",
+    "setup": "./scripts/install.sh",
+    "clean": "rm -rf build"
   },
   "files": [
     "build"
@@ -40,6 +43,6 @@
     "design-system",
     "ai-assistant"
   ],
-  "author": "Rebecca",
+  "author": "Rebecca Page",
   "license": "MIT"
 }
