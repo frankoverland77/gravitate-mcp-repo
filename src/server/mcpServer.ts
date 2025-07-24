@@ -5,6 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { SERVER_CONFIG } from "../utils/constants.js";
 import { registerDiscoveryTools } from "./tools/discovery.js";
 import { registerCodeGenerationTools } from "./tools/codeGeneration.js";
+import { registerVisualPreviewTools } from "./tools/visualPreview.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -13,6 +14,7 @@ export function createMcpServer(): McpServer {
   // Register all tool modules
   registerDiscoveryTools(server);
   registerCodeGenerationTools(server);
+  registerVisualPreviewTools(server);
 
   return server;
 }
