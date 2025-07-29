@@ -3,7 +3,10 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ComponentInfo } from "../../lib/types.js";
-import { findComponentByName, getAllComponents } from "../../lib/componentAnalysis.js";
+import {
+  findComponentByName,
+  getAllComponents,
+} from "../../lib/componentAnalysis.js";
 import {
   generatePreviewHTML,
   saveHTMLPreview,
@@ -11,10 +14,12 @@ import {
   PreviewOptions,
   ScreenshotResult,
   LivePreviewResult,
-} from "../../lib/visual/previewHelpers.js";
-import * as puppeteer from "puppeteer";
-import * as fs from "fs/promises";
-import * as path from "path";
+  generateComponentScreenshot,
+  generateComponentGallery,
+  generateShareablePreview,
+  type GalleryOptions,
+  type ShareableOptions,
+} from "../../lib/visual/index.js";
 
 export function registerVisualPreviewTools(server: McpServer): void {
   // Tool: Generate component screenshot
@@ -22,7 +27,9 @@ export function registerVisualPreviewTools(server: McpServer): void {
     "generate_component_screenshot",
     "Generate a visual screenshot of an Excalibrr component with specific props and styling",
     {
-      componentName: z.string().describe("The name of the component to screenshot"),
+      componentName: z
+        .string()
+        .describe("The name of the component to screenshot"),
       variant: z
         .enum(["basic", "with-data", "styled", "interactive"])
         .optional()
@@ -103,7 +110,9 @@ The screenshot shows the ${componentName} component rendered with the ${variant}
     "create_live_preview",
     "Create a live interactive HTML preview of an Excalibrr component that can be opened in a browser",
     {
-      componentName: z.string().describe("The name of the component to preview"),
+      componentName: z
+        .string()
+        .describe("The name of the component to preview"),
       variant: z
         .enum(["basic", "with-data", "styled", "interactive"])
         .optional()
@@ -216,7 +225,11 @@ The screenshot shows the ${componentName} component rendered with the ${variant}
         .optional()
         .describe("Generate screenshots for each component"),
     },
-    async ({ category = "all", theme = "light", includeScreenshots = true }) => {
+    async ({
+      category = "all",
+      theme = "light",
+      includeScreenshots = true,
+    }) => {
       try {
         const allComponents = await getAllComponents();
         const filteredComponents =
@@ -304,7 +317,9 @@ ${filteredComponents
     "create_shareable_preview",
     "Create a self-contained HTML file that can be shared with stakeholders via email or file sharing",
     {
-      componentName: z.string().describe("The name of the component to preview"),
+      componentName: z
+        .string()
+        .describe("The name of the component to preview"),
       variant: z
         .enum(["basic", "with-data", "styled", "interactive"])
         .optional()
@@ -337,21 +352,15 @@ ${filteredComponents
           };
         }
 
-        const shareableHtml = await generateShareablePreview(
+        const shareableResult = await generateShareablePreview(
           componentName,
           componentInfo,
-          { 
-            variant: variant as "basic" | "with-data" | "styled" | "interactive", 
-            theme: theme as "light" | "dark", 
-            includeCodeExample 
+          {
+            variant,
+            theme,
+            includeCodeExample,
           }
         );
-
-        const previewDir = await createPreviewDirectory();
-        const filename = `${componentName}-shareable-${Date.now()}.html`;
-        const filePath = path.join(previewDir, "html", filename);
-
-        await fs.writeFile(filePath, shareableHtml, "utf8");
 
         return {
           content: [
@@ -364,7 +373,7 @@ ${filteredComponents
 **Theme:** ${theme}
 **Code Examples:** ${includeCodeExample ? "Included" : "Not included"}
 
-**📁 Shareable File:** \`${filePath}\`
+**📁 Shareable File:** \`${shareableResult.filePath}\`
 
 **How to share:**
 1. **Email attachment:** Send the HTML file directly
@@ -376,13 +385,19 @@ ${filteredComponents
 - ✅ Live component preview
 - ✅ Professional presentation layout
 - ✅ Component documentation
-- ${includeCodeExample ? "✅ Code examples for developers" : "➖ No code examples"}
+- ${
+                includeCodeExample
+                  ? "✅ Code examples for developers"
+                  : "➖ No code examples"
+              }
 - ✅ Responsive design
 - ✅ No external dependencies
 
 **Perfect for:** Client presentations, stakeholder reviews, and design approvals!
 
-**File size:** ~${(await fs.stat(filePath)).size / 1024} KB (completely self-contained)`,
+**File size:** ~${
+                shareableResult.fileSize / 1024
+              } KB (completely self-contained)`,
             },
           ],
         };
@@ -397,314 +412,5 @@ ${filteredComponents
         };
       }
     }
-  );
-}
-
-/**
- * Generate component screenshot using Puppeteer
- */
-async function generateComponentScreenshot(
-  componentName: string,
-  componentInfo: ComponentInfo,
-  options: PreviewOptions
-): Promise<ScreenshotResult> {
-  const { variant = "basic", theme = "light", size = "desktop" } = options;
-
-  // Generate HTML for screenshot
-  const html = generatePreviewHTML(componentName, componentInfo, options);
-  const previewDir = await createPreviewDirectory();
-
-  // Save temporary HTML file
-  const tempHtmlPath = path.join(previewDir, "temp-screenshot.html");
-  await fs.writeFile(tempHtmlPath, html, "utf8");
-
-  // Launch Puppeteer and take screenshot
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-
-  // Set viewport based on size
-  const viewports = {
-    mobile: { width: 375, height: 667 },
-    tablet: { width: 768, height: 1024 },
-    desktop: { width: 1200, height: 800 },
-  };
-
-  const viewport = viewports[size] || viewports.desktop;
-  if (options.width && options.height) {
-    viewport.width = options.width;
-    viewport.height = options.height;
-  }
-
-  await page.setViewport(viewport);
-  await page.goto(`file://${tempHtmlPath}`, { waitUntil: "networkidle0" });
-
-  // Wait for React to render
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Take screenshot of the component preview area
-  const screenshotBuffer = await page.screenshot({
-    clip: {
-      x: 0,
-      y: 0,
-      width: viewport.width,
-      height: viewport.height,
-    },
-    type: "png",
-  });
-
-  await browser.close();
-
-  // Save screenshot
-  const screenshotFilename = `${componentName}-${variant}-${theme}-${Date.now()}.png`;
-  const screenshotPath = path.join(previewDir, "screenshots", screenshotFilename);
-  await fs.writeFile(screenshotPath, screenshotBuffer);
-
-  // Clean up temp file
-  await fs.unlink(tempHtmlPath);
-
-  return {
-    imagePath: screenshotPath,
-    componentName,
-    variant,
-    theme,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-/**
- * Generate component gallery HTML
- */
-async function generateComponentGallery(
-  components: ComponentInfo[],
-  options: { theme: string; includeScreenshots: boolean; category: string }
-): Promise<{ galleryUrl: string; htmlPath: string; timestamp: string }> {
-  const { theme, category } = options;
-
-  const galleryHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excalibrr Component Gallery - ${category}</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background-color: ${theme === "dark" ? "#0d1117" : "#ffffff"};
-            color: ${theme === "dark" ? "#f0f6fc" : "#24292f"};
-            line-height: 1.6;
-        }
-        
-        .gallery-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-        
-        .gallery-header {
-            text-align: center;
-            margin-bottom: 60px;
-            border-bottom: 1px solid ${theme === "dark" ? "#30363d" : "#d0d7de"};
-            padding-bottom: 40px;
-        }
-        
-        .gallery-title {
-            font-size: 48px;
-            font-weight: 700;
-            margin: 0 0 16px 0;
-            background: linear-gradient(135deg, #0969da, #1f883d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .gallery-subtitle {
-            font-size: 20px;
-            opacity: 0.7;
-            margin: 0;
-        }
-        
-        .components-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .component-card {
-            background-color: ${theme === "dark" ? "#161b22" : "#f6f8fa"};
-            border: 1px solid ${theme === "dark" ? "#30363d" : "#d0d7de"};
-            border-radius: 12px;
-            padding: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .component-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px ${theme === "dark" ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.1)"};
-        }
-        
-        .component-name {
-            font-size: 24px;
-            font-weight: 600;
-            margin: 0 0 8px 0;
-            color: #0969da;
-        }
-        
-        .component-category {
-            display: inline-block;
-            background-color: #0969da;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-        
-        .component-description {
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-        
-        .component-preview {
-            background-color: ${theme === "dark" ? "#0d1117" : "#ffffff"};
-            border: 1px solid ${theme === "dark" ? "#21262d" : "#d0d7de"};
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .component-props {
-            font-size: 14px;
-            opacity: 0.7;
-        }
-        
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 60px;
-            padding: 30px;
-            background-color: ${theme === "dark" ? "#161b22" : "#f6f8fa"};
-            border-radius: 12px;
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: #0969da;
-            display: block;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.7;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="gallery-container">
-        <div class="gallery-header">
-            <h1 class="gallery-title">Excalibrr Component Gallery</h1>
-            <p class="gallery-subtitle">
-                ${category === "all" ? "Complete Component Library" : `${category.charAt(0).toUpperCase() + category.slice(1)} Components`}
-            </p>
-        </div>
-        
-        <div class="components-grid">
-            ${components
-              .map(
-                (comp) => `
-                <div class="component-card">
-                    <h3 class="component-name">${comp.name}</h3>
-                    <span class="component-category">${comp.category}</span>
-                    
-                    <div class="component-description">
-                        ${comp.description || "No description available"}
-                    </div>
-                    
-                    <div class="component-preview">
-                        <div style="text-align: center; opacity: 0.6;">
-                            📋 ${comp.name} Preview
-                            <br><small>Interactive preview available</small>
-                        </div>
-                    </div>
-                    
-                    <div class="component-props">
-                        <strong>Props:</strong> ${Object.keys(comp.props || {}).length} properties
-                    </div>
-                </div>
-            `
-              )
-              .join("")}
-        </div>
-        
-        <div class="stats-bar">
-            <div class="stat">
-                <span class="stat-number">${components.length}</span>
-                <span class="stat-label">Components</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number">${
-                  new Set(components.map((c) => c.category)).size
-                }</span>
-                <span class="stat-label">Categories</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number">${components.reduce(
-                  (total, comp) => total + Object.keys(comp.props || {}).length,
-                  0
-                )}</span>
-                <span class="stat-label">Total Props</span>
-            </div>
-        </div>
-    </div>
-</body>
-</html>`;
-
-  const previewDir = await createPreviewDirectory();
-  const filename = `gallery-${category}-${Date.now()}.html`;
-  const filePath = path.join(previewDir, "galleries", filename);
-
-  await fs.writeFile(filePath, galleryHtml, "utf8");
-
-  return {
-    galleryUrl: `file://${filePath}`,
-    htmlPath: filePath,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-/**
- * Generate shareable preview with embedded assets
- */
-async function generateShareablePreview(
-  componentName: string,
-  componentInfo: ComponentInfo,
-  options: { variant: string; theme: string; includeCodeExample: boolean }
-): Promise<string> {
-  const { variant, theme, includeCodeExample } = options;
-  const html = generatePreviewHTML(componentName, componentInfo, {
-    variant: variant as "basic" | "with-data" | "styled" | "interactive",
-    theme: theme as "light" | "dark",
-  });
-
-  // Create a completely self-contained version
-  return html.replace(
-    '<title>',
-    `<title>📋 ${componentName} Preview - Excalibrr Design System | `
   );
 }
