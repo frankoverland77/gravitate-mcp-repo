@@ -1,4 +1,5 @@
 // MCP Server setup and configuration
+// src/server/mcpServer.ts
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -6,6 +7,7 @@ import { SERVER_CONFIG } from "../utils/constants.js";
 import { registerDiscoveryTools } from "./tools/discovery.js";
 import { registerCodeGenerationTools } from "./tools/codeGeneration.js";
 import { registerVisualPreviewTools } from "./tools/visualPreview.js";
+import { registerProductionCodeGenerationTools } from "./tools/productionCodeGeneration.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -15,6 +17,7 @@ export function createMcpServer(): McpServer {
   registerDiscoveryTools(server);
   registerCodeGenerationTools(server);
   registerVisualPreviewTools(server);
+  registerProductionCodeGenerationTools(server); // New production tools
 
   return server;
 }
