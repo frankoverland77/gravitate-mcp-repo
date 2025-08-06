@@ -205,7 +205,7 @@ The generated `actionMenu.tsx` can be customized:
 Add to the generated grid component:
 
 ```typescript
-<Horizontal gap={2} padding={2}>
+<Horizontal padding={2}>
   <DateRangePicker onChange={setDateRange} />
   <Select options={statusOptions} onChange={setStatus} />
 </Horizontal>

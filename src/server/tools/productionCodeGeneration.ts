@@ -192,7 +192,7 @@ export function {{FeatureName}}Grid() {
   }
 
   return (
-    <Vertical height="100%" gap={2}>
+    <Vertical height="100%">
       <Horizontal justify="space-between" align="center" padding={2}>
         <Texto size="xl" weight="bold">
           {{displayTitle}}

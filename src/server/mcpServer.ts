@@ -8,6 +8,7 @@ import { registerDiscoveryTools } from "./tools/discovery.js";
 import { registerCodeGenerationTools } from "./tools/codeGeneration.js";
 import { registerVisualPreviewTools } from "./tools/visualPreview.js";
 import { registerProductionCodeGenerationTools } from "./tools/productionCodeGeneration.js";
+import { registerFormGenerationTools } from "./tools/formGeneration.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -17,7 +18,8 @@ export function createMcpServer(): McpServer {
   registerDiscoveryTools(server);
   registerCodeGenerationTools(server);
   registerVisualPreviewTools(server);
-  registerProductionCodeGenerationTools(server); // New production tools
+  registerProductionCodeGenerationTools(server);
+  registerFormGenerationTools(server);
 
   return server;
 }
