@@ -4,23 +4,35 @@ An MCP (Model Context Protocol) server that enables AI assistants to discover, e
 
 ## 🚀 Quick Start
 
-### One-Command Installation
+### 🐳 Docker Setup (Recommended for Designers)
+
+**Super simple setup that works with both Claude Desktop and Cursor:**
 
 ```bash
-# Clone and install
+# Clone and setup everything
 git clone <your-repo-url>
 cd excalibrr-mcp-server
-npm run setup
+./setup-everything.sh
 ```
 
-This will:
+This creates Docker containers for:
 
-- Install dependencies
-- Build the server
-- Configure Claude Desktop
-- Test the installation
+- **Claude Desktop** (STDIO mode)
+- **Cursor** (HTTP mode)
 
-### Manual Installation
+See [DESIGNER_SETUP.md](DESIGNER_SETUP.md) for the complete step-by-step guide.
+
+### ⚡ Alternative Docker Setup
+
+Using docker-compose:
+
+```bash
+./setup-with-compose.sh
+```
+
+### 🔧 Development Setup
+
+For developers who want to run locally:
 
 ```bash
 # Install dependencies

@@ -20,20 +20,32 @@ async function writeProjectToFilesystem(
   projectName: string,
   files: Array<{ type: string; text: string }>
 ): Promise<string> {
-  const baseDir = "/Users/rebecca.hirai/repos";
+  // Put generated projects in the repos directory (parent of mcp-server)
+  const baseDir = process.env.OUTPUT_DIR || "/app/repos";
   const projectDir = path.join(baseDir, `${projectName}Demo`);
 
+  console.error(`🏗️  Creating project at: ${path.resolve(projectDir)}`);
+
   try {
+    // Ensure base directory exists first
+    await fs.mkdir(baseDir, { recursive: true });
+    console.error(`📁 Base directory ready: ${path.resolve(baseDir)}`);
+    
     // Create project directory
     await fs.mkdir(projectDir, { recursive: true });
+    console.error(`📂 Project directory created: ${path.resolve(projectDir)}`);
 
+    let filesWritten = 0;
     // Write each file
     for (const file of files) {
       // Extract filename and content from the file.text
       const fileMatch = file.text.match(
         /\*\*(.*?)\*\*\n```(?:\w+)?\n([\s\S]*?)\n```/
       );
-      if (!fileMatch) continue;
+      if (!fileMatch) {
+        console.error(`⚠️  Skipping file with invalid format`);
+        continue;
+      }
 
       const fileName = fileMatch[1];
       const fileContent = fileMatch[2];
@@ -45,8 +57,11 @@ async function writeProjectToFilesystem(
 
       // Write the file
       await fs.writeFile(filePath, fileContent, "utf-8");
+      filesWritten++;
+      console.error(`✅ Written: ${fileName}`);
     }
 
+    console.error(`🎉 Successfully created ${filesWritten} files in ${projectDir}`);
     return projectDir;
   } catch (error) {
     throw new Error(`Failed to create project: ${error}`);
@@ -60,8 +75,8 @@ async function readDependenciesFromMainRepo(): Promise<{
   resolutions?: Record<string, string>;
 }> {
   try {
-    const packageJsonPath =
-      "/Users/rebecca.hirai/repos/Gravitate.Dotnet.Next/frontend/package.json";
+    const packageJsonPath = process.env.MAIN_PROJECT_PACKAGE_JSON || 
+      "../Gravitate.Dotnet.Next/frontend/package.json";
     const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
     const packageJson = JSON.parse(packageJsonContent);
 
@@ -246,10 +261,13 @@ export function registerCodeGenerationTools(server: McpServer): void {
               type: "text" as const,
               text:
                 `🎉 **SUCCESS!** Complete ${featureName} React project created!\n\n` +
-                `📁 **Project Location:**\n\`${projectPath}\`\n\n` +
+                `📁 **Project Location:**\n` +
+                `On your machine: \`${projectPath.replace('/app/repos', '~/repos')}\`\n` +
+                `Docker path: \`${projectPath}\`\n\n` +
                 `🚀 **Ready to run:**\n` +
                 `\`\`\`bash\n` +
-                `cd "${projectPath}"\n` +
+                `# Navigate to your repos directory\n` +
+                `cd ~/repos/${featureName}Demo\n` +
                 `yarn install\n` +
                 `yarn dev\n` +
                 `\`\`\`\n\n` +
@@ -262,8 +280,9 @@ export function registerCodeGenerationTools(server: McpServer): void {
                 `• PE theme configuration\n` +
                 `• TypeScript throughout\n` +
                 `• Ready for real API integration\n\n` +
-                `🎯 **Perfect for your designer!** \n` +
-                `They can now navigate to the folder, run the commands above, and have a working demo in seconds.\n\n` +
+                `🎯 **Perfect for your designer!**\n` +
+                `The project folder should now appear in the same directory as your repos.\n` +
+                `Check: \`ls ~/repos/\` - you should see ${featureName}Demo/\n\n` +
                 `📋 **Files created:** ${files.length} files written to disk\n` +
                 `🏗️ **Project Structure:**\n` +
                 `\`\`\`\n` +

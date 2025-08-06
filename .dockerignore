@@ -1,0 +1,55 @@
+# Excalibrr MCP Server .dockerignore
+# Prevent copying heavy/unnecessary files to Docker build context
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs  
+dist/
+build/
+lib/
+out/
+coverage/
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env*
+
+# Temp files
+tmp/
+temp/
+
+# Test files
+test-results/
+
+# Build context copies (our local staging)
+# excalibrr-lib/  # COMMENTED OUT - we need this for the build
+
+# Large example files
+examples/
+docs/
+screenshots/
+previews/
+generated/

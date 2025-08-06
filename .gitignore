@@ -3,7 +3,7 @@
 # Build outputs
 build/
 dist/
-lib/
+/lib/
 out/
 
 # Node.js dependencies
@@ -83,6 +83,9 @@ test-results/
 
 # Claude Desktop config (contains personal paths)
 claude_desktop_config.json
+
+# Build context copies
+excalibrr-lib/
 
 # Local development scripts
 local-test.sh

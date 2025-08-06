@@ -1,11 +1,11 @@
 // Configuration constants for Excalibrr MCP Server
 
 export const EXCALIBRR_LIBRARY_PATH = 
-  process.env.EXCALIBRR_PATH || "/Users/rebecca.hirai/repos/excalibrr";
+  process.env.EXCALIBRR_PATH || "../excalibrr";
 
 export const USAGE_EXAMPLES_PATH = 
   process.env.USAGE_EXAMPLES_PATH || 
-  "/Users/rebecca.hirai/repos/Gravitate.Dotnet.Next/frontend/src";
+  "../Gravitate.Dotnet.Next/frontend/src";
 
 export const TEMP_PREVIEW_DIR = "temp-previews";
 

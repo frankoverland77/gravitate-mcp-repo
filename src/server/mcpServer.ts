@@ -2,7 +2,6 @@
 // src/server/mcpServer.ts
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { SERVER_CONFIG } from "../utils/constants.js";
 import { registerDiscoveryTools } from "./tools/discovery.js";
 import { registerCodeGenerationTools } from "./tools/codeGeneration.js";
@@ -14,21 +13,30 @@ import { registerFormGenerationTools } from "./tools/formGeneration.js";
 export function createMcpServer(): McpServer {
   const server = new McpServer(SERVER_CONFIG);
 
+  console.error(`🔧 Registering MCP tools...`);
+
   // Register all tool modules
-  registerDiscoveryTools(server);
-  registerCodeGenerationTools(server);
-  registerVisualPreviewTools(server);
-  registerProductionCodeGenerationTools(server);
-  registerFormGenerationTools(server);
+  try {
+    registerDiscoveryTools(server);
+    console.error(`✅ Discovery tools registered`);
+
+    registerCodeGenerationTools(server);
+    console.error(`✅ Code generation tools registered`);
+
+    registerVisualPreviewTools(server);
+    console.error(`✅ Visual preview tools registered`);
+
+    registerProductionCodeGenerationTools(server);
+    console.error(`✅ Production code tools registered`);
+
+    registerFormGenerationTools(server);
+    console.error(`✅ Form generation tools registered`);
+
+    console.error(`🎯 All tools registered successfully`);
+  } catch (error) {
+    console.error(`❌ Error registering tools:`, error);
+    throw error;
+  }
 
   return server;
-}
-
-// Start the server
-export async function startServer(): Promise<void> {
-  const server = createMcpServer();
-  const transport = new StdioServerTransport();
-
-  await server.connect(transport);
-  console.error("Excalibrr MCP Server running on stdio");
 }
