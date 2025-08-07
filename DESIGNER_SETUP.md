@@ -220,4 +220,45 @@ docker rm excalibrr-mcp-stdio excalibrr-mcp-http
 
 ---
 
-🎯 **That's it!** Docker handles all the dependencies, paths, and versions. Your designer just needs Docker, Claude Desktop, and Cursor.
+## 🔧 Alternative: Local Development Setup (No Docker)
+
+If you prefer to run without Docker:
+
+### Prerequisites
+
+- Node.js 16 or higher
+- Claude Desktop installed
+
+### Steps
+
+```bash
+# Install and build
+npm install
+npm run build
+
+# Test it works
+npm test
+```
+
+### Claude Desktop Config (Local)
+
+```json
+{
+  "mcpServers": {
+    "excalibrr": {
+      "command": "node",
+      "args": ["/absolute/path/to/excalibrr-mcp-server/build/index.js"],
+      "env": {
+        "EXCALIBRR_PATH": "/absolute/path/to/excalibrr",
+        "USAGE_EXAMPLES_PATH": "/absolute/path/to/your-main-project"
+      }
+    }
+  }
+}
+```
+
+**Important:** Use absolute paths and update them to match your system!
+
+---
+
+🎯 **Choose your preferred setup:** Docker (recommended for simplicity) or local development (for more control).

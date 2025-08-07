@@ -20,25 +20,31 @@ async function writeProjectToFilesystem(
   projectName: string,
   files: Array<{ type: string; text: string }>
 ): Promise<string> {
-  // Put generated projects in the repos directory (parent of mcp-server)
-  const baseDir = process.env.OUTPUT_DIR || "/app/repos";
-  const projectDir = path.join(baseDir, `${projectName}Demo`);
+  const isRunningInDocker = process.env.NODE_ENV === 'production';
+  
+  let baseDir, projectDir;
+  
+  if (isRunningInDocker) {
+    // Docker: Write to /app/repos (we'll copy out manually)
+    baseDir = "/app/repos";
+    projectDir = path.join(baseDir, `${projectName}Demo`);
+  } else {
+    // Local development: write directly to parent directory
+    baseDir = "../";
+    projectDir = path.resolve(baseDir, `${projectName}Demo`);
+  }
 
-  console.error(`🏗️  Creating project at: ${path.resolve(projectDir)}`);
+  console.error(`🏗️  Creating project at: ${projectDir}`);
+  console.error(`🐳 Running in Docker: ${isRunningInDocker}`);
 
   try {
-    // Ensure base directory exists first
-    await fs.mkdir(baseDir, { recursive: true });
-    console.error(`📁 Base directory ready: ${path.resolve(baseDir)}`);
-    
     // Create project directory
     await fs.mkdir(projectDir, { recursive: true });
-    console.error(`📂 Project directory created: ${path.resolve(projectDir)}`);
+    console.error(`📂 Project directory created: ${projectDir}`);
 
     let filesWritten = 0;
     // Write each file
     for (const file of files) {
-      // Extract filename and content from the file.text
       const fileMatch = file.text.match(
         /\*\*(.*?)\*\*\n```(?:\w+)?\n([\s\S]*?)\n```/
       );
@@ -49,21 +55,24 @@ async function writeProjectToFilesystem(
 
       const fileName = fileMatch[1];
       const fileContent = fileMatch[2];
-
-      // Create subdirectories if needed
       const filePath = path.join(projectDir, fileName);
       const fileDir = path.dirname(filePath);
+      
       await fs.mkdir(fileDir, { recursive: true });
-
-      // Write the file
       await fs.writeFile(filePath, fileContent, "utf-8");
       filesWritten++;
       console.error(`✅ Written: ${fileName}`);
     }
 
-    console.error(`🎉 Successfully created ${filesWritten} files in ${projectDir}`);
+    console.error(`🎉 Successfully created ${filesWritten} files`);
+    
+    if (isRunningInDocker) {
+      console.error(`📦 Project created in container. Use 'copy-projects-from-docker.sh' to copy to host.`);
+    }
+    
     return projectDir;
   } catch (error) {
+    console.error(`❌ Error creating project: ${error}`);
     throw new Error(`Failed to create project: ${error}`);
   }
 }
@@ -160,6 +169,56 @@ async function readDependenciesFromMainRepo(): Promise<{
 }
 
 export function registerCodeGenerationTools(server: McpServer): void {
+  // DEBUG TOOL: Test file generation
+  server.tool(
+    "test_file_generation",
+    "Test file generation capabilities - creates a simple test file",
+    {
+      testName: z.string().default("FileGenerationTest").describe("Name for the test")
+    },
+    async ({ testName }) => {
+      const isRunningInDocker = process.env.NODE_ENV === 'production';
+      
+      let baseDir;
+      let testPath;
+      
+      if (isRunningInDocker) {
+        baseDir = process.env.OUTPUT_DIR || "/app/repos";
+        testPath = path.join(baseDir, `${testName}.txt`);
+      } else {
+        baseDir = "../";
+        testPath = path.resolve(baseDir, `${testName}.txt`);
+      }
+
+      try {
+        const testContent = `Test file generated at: ${new Date().toISOString()}\nDocker: ${isRunningInDocker}\nBase dir: ${baseDir}\nFull path: ${testPath}`;
+        
+        await fs.mkdir(path.dirname(testPath), { recursive: true });
+        await fs.writeFile(testPath, testContent, 'utf-8');
+        
+        // Verify file exists
+        const exists = await fs.access(testPath).then(() => true).catch(() => false);
+        
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `🧪 Test File Generation\n\nStatus: ${exists ? '✅ SUCCESS' : '❌ FAILED'}\nFile: ${testPath}\nDocker: ${isRunningInDocker}\nBase Dir: ${baseDir}\n\n${exists ? 'Check your repos directory for: ' + path.basename(testPath) : 'File creation failed'}`
+            }
+          ]
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `❌ File generation test failed: ${error}\nPath attempted: ${testPath}\nDocker: ${isRunningInDocker}`
+            }
+          ]
+        };
+      }
+    }
+  );
   // Enhanced Grid Generation Tool with Complete React Project
   server.tool(
     "generate_grid_component",
@@ -261,13 +320,15 @@ export function registerCodeGenerationTools(server: McpServer): void {
               type: "text" as const,
               text:
                 `🎉 **SUCCESS!** Complete ${featureName} React project created!\n\n` +
-                `📁 **Project Location:**\n` +
-                `On your machine: \`${projectPath.replace('/app/repos', '~/repos')}\`\n` +
+                `📁 **Project Created In Docker Container**\n` +
                 `Docker path: \`${projectPath}\`\n\n` +
-                `🚀 **Ready to run:**\n` +
+                `🚀 **To access your project:**\n` +
                 `\`\`\`bash\n` +
-                `# Navigate to your repos directory\n` +
-                `cd ~/repos/${featureName}Demo\n` +
+                `# Copy project from Docker container to your machine\n` +
+                `./copy-projects-from-docker.sh\n` +
+                `\n` +
+                `# Then run the project\n` +
+                `cd ../${featureName}Demo\n` +
                 `yarn install\n` +
                 `yarn dev\n` +
                 `\`\`\`\n\n` +
@@ -280,10 +341,9 @@ export function registerCodeGenerationTools(server: McpServer): void {
                 `• PE theme configuration\n` +
                 `• TypeScript throughout\n` +
                 `• Ready for real API integration\n\n` +
-                `🎯 **Perfect for your designer!**\n` +
-                `The project folder should now appear in the same directory as your repos.\n` +
-                `Check: \`ls ~/repos/\` - you should see ${featureName}Demo/\n\n` +
-                `📋 **Files created:** ${files.length} files written to disk\n` +
+                `📦 **Important:** The project is created inside the Docker container.\n` +
+                `Run \`./copy-projects-from-docker.sh\` to copy it to your repos directory!\n\n` +
+                `📋 **Files created:** ${files.length} files written to container\n` +
                 `🏗️ **Project Structure:**\n` +
                 `\`\`\`\n` +
                 `${featureName}Demo/\n` +

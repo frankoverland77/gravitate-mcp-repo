@@ -49,7 +49,7 @@ RUN mkdir -p /app/screenshots /app/previews /app/generated
 ENV EXCALIBRR_PATH=/app/excalibrr
 ENV USAGE_EXAMPLES_PATH=/app/mcp-server/examples
 ENV NODE_ENV=production
-# MCP_TRANSPORT will be set by container runtime (stdio or http)
+# Default to STDIO for MCP (set MCP_TRANSPORT=http for HTTP mode)
 ENV PORT=3000
 
 # Security: non-root user
@@ -61,7 +61,7 @@ USER excalibrr
 
 EXPOSE 3000
 
-# Health check disabled for STDIO mode
+# Health check disabled for STDIO mode (enable for HTTP with MCP_TRANSPORT=http)
 # HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 #   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 

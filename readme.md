@@ -30,9 +30,9 @@ Using docker-compose:
 ./setup-with-compose.sh
 ```
 
-### 🔧 Development Setup
+### 🔧 Alternative: Local Development Setup
 
-For developers who want to run locally:
+For developers who prefer to run without Docker:
 
 ```bash
 # Install dependencies
@@ -44,7 +44,7 @@ npm run build
 # Test it works
 npm test
 
-# Configure Claude Desktop manually (see docs/SETUP.md)
+# Configure Claude Desktop manually (see DESIGNER_SETUP.md for path setup)
 ```
 
 ## 🎯 What It Does
@@ -177,9 +177,9 @@ npm test
 
 ## 📚 Documentation
 
-- **[Setup Guide](docs/SETUP.md)**: Detailed installation instructions
-- **[Designer Prompts](docs/DESIGNER_PROMPTS.md)**: Example questions and use cases
-- **[Config Template](docs/claude-desktop-config.example.json)**: Manual configuration reference
+- **[Setup Guide](DESIGNER_SETUP.md)**: Complete installation instructions
+- **[Designer Prompts](docs/designer_prompts.md)**: Example questions and use cases
+- **[Config Template](docs/claude-desktop-config.example.json)**: Configuration reference
 
 ## 🤝 Contributing
 
