@@ -8,6 +8,7 @@ import { registerCodeGenerationTools } from "./tools/codeGeneration.js";
 import { registerVisualPreviewTools } from "./tools/visualPreview.js";
 import { registerProductionCodeGenerationTools } from "./tools/productionCodeGeneration.js";
 import { registerFormGenerationTools } from "./tools/formGeneration.js";
+import { registerFigmaTools } from "./tools/figma.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -31,6 +32,9 @@ export function createMcpServer(): McpServer {
 
     registerFormGenerationTools(server);
     console.error(`✅ Form generation tools registered`);
+
+    registerFigmaTools(server);
+    console.error(`✅ Figma integration tools registered`);
 
     console.error(`🎯 All tools registered successfully`);
   } catch (error) {

@@ -1,8 +1,13 @@
 {
   "mcpServers": {
     "excalibrr": {
-      "command": "docker",
-      "args": ["exec", "-i", "excalibrr-mcp-stdio", "node", "build/index.js"]
+      "command": "node",
+      "args": ["/absolute/path/to/excalibrr-mcp-server/build/index.js"],
+      "env": {
+        "EXCALIBRR_PATH": "/absolute/path/to/excalibrr",
+        "USAGE_EXAMPLES_PATH": "/absolute/path/to/your-main-project",
+        "FIGMA_API_TOKEN": "your_figma_token_here"
+      }
     }
   }
 }
