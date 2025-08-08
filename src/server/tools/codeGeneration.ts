@@ -20,22 +20,53 @@ async function writeProjectToFilesystem(
   projectName: string,
   files: Array<{ type: string; text: string }>
 ): Promise<string> {
-  const isRunningInDocker = process.env.NODE_ENV === 'production';
-  
+  const isRunningInDocker = process.env.NODE_ENV === "production";
+
   let baseDir, projectDir;
-  
+
   if (isRunningInDocker) {
     // Docker: Write to /app/repos (we'll copy out manually)
     baseDir = "/app/repos";
     projectDir = path.join(baseDir, `${projectName}Demo`);
   } else {
-    // Local development: write directly to parent directory
-    baseDir = "../";
-    projectDir = path.resolve(baseDir, `${projectName}Demo`);
+    // Local development: Safer path resolution with fallbacks
+    try {
+      // First attempt: Go up one level from current directory
+      const currentDir = process.cwd();
+      const parentDir = path.dirname(currentDir);
+      projectDir = path.join(parentDir, `${projectName}Demo`);
+
+      // Validate that this path exists and is writable
+      await fs.access(parentDir, fs.constants.W_OK);
+    } catch (error) {
+      // Fallback 1: Use current directory
+      console.error(
+        `⚠️  Parent directory not writable, using current directory`
+      );
+      projectDir = path.join(process.cwd(), `${projectName}Demo`);
+
+      try {
+        await fs.access(process.cwd(), fs.constants.W_OK);
+      } catch (fallbackError) {
+        // Fallback 2: Use user's home directory
+        const homeDir = process.env.HOME || process.env.USERPROFILE;
+        if (homeDir) {
+          console.error(
+            `⚠️  Current directory not writable, using home directory`
+          );
+          projectDir = path.join(homeDir, `${projectName}Demo`);
+        } else {
+          throw new Error(
+            `Unable to find writable directory for project creation`
+          );
+        }
+      }
+    }
   }
 
   console.error(`🏗️  Creating project at: ${projectDir}`);
   console.error(`🐳 Running in Docker: ${isRunningInDocker}`);
+  console.error(`📁 Current working directory: ${process.cwd()}`);
 
   try {
     // Create project directory
@@ -57,7 +88,7 @@ async function writeProjectToFilesystem(
       const fileContent = fileMatch[2];
       const filePath = path.join(projectDir, fileName);
       const fileDir = path.dirname(filePath);
-      
+
       await fs.mkdir(fileDir, { recursive: true });
       await fs.writeFile(filePath, fileContent, "utf-8");
       filesWritten++;
@@ -65,11 +96,13 @@ async function writeProjectToFilesystem(
     }
 
     console.error(`🎉 Successfully created ${filesWritten} files`);
-    
+
     if (isRunningInDocker) {
-      console.error(`📦 Project created in container. Use 'copy-projects-from-docker.sh' to copy to host.`);
+      console.error(
+        `📦 Project created in container. Use 'copy-projects-from-docker.sh' to copy to host.`
+      );
     }
-    
+
     return projectDir;
   } catch (error) {
     console.error(`❌ Error creating project: ${error}`);
@@ -84,7 +117,8 @@ async function readDependenciesFromMainRepo(): Promise<{
   resolutions?: Record<string, string>;
 }> {
   try {
-    const packageJsonPath = process.env.MAIN_PROJECT_PACKAGE_JSON || 
+    const packageJsonPath =
+      process.env.MAIN_PROJECT_PACKAGE_JSON ||
       "../Gravitate.Dotnet.Next/frontend/package.json";
     const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
     const packageJson = JSON.parse(packageJsonContent);
@@ -174,14 +208,17 @@ export function registerCodeGenerationTools(server: McpServer): void {
     "test_file_generation",
     "Test file generation capabilities - creates a simple test file",
     {
-      testName: z.string().default("FileGenerationTest").describe("Name for the test")
+      testName: z
+        .string()
+        .default("FileGenerationTest")
+        .describe("Name for the test"),
     },
     async ({ testName }) => {
-      const isRunningInDocker = process.env.NODE_ENV === 'production';
-      
+      const isRunningInDocker = process.env.NODE_ENV === "production";
+
       let baseDir;
       let testPath;
-      
+
       if (isRunningInDocker) {
         baseDir = process.env.OUTPUT_DIR || "/app/repos";
         testPath = path.join(baseDir, `${testName}.txt`);
@@ -192,29 +229,38 @@ export function registerCodeGenerationTools(server: McpServer): void {
 
       try {
         const testContent = `Test file generated at: ${new Date().toISOString()}\nDocker: ${isRunningInDocker}\nBase dir: ${baseDir}\nFull path: ${testPath}`;
-        
+
         await fs.mkdir(path.dirname(testPath), { recursive: true });
-        await fs.writeFile(testPath, testContent, 'utf-8');
-        
+        await fs.writeFile(testPath, testContent, "utf-8");
+
         // Verify file exists
-        const exists = await fs.access(testPath).then(() => true).catch(() => false);
-        
+        const exists = await fs
+          .access(testPath)
+          .then(() => true)
+          .catch(() => false);
+
         return {
           content: [
             {
               type: "text" as const,
-              text: `🧪 Test File Generation\n\nStatus: ${exists ? '✅ SUCCESS' : '❌ FAILED'}\nFile: ${testPath}\nDocker: ${isRunningInDocker}\nBase Dir: ${baseDir}\n\n${exists ? 'Check your repos directory for: ' + path.basename(testPath) : 'File creation failed'}`
-            }
-          ]
+              text: `🧪 Test File Generation\n\nStatus: ${
+                exists ? "✅ SUCCESS" : "❌ FAILED"
+              }\nFile: ${testPath}\nDocker: ${isRunningInDocker}\nBase Dir: ${baseDir}\n\n${
+                exists
+                  ? "Check your repos directory for: " + path.basename(testPath)
+                  : "File creation failed"
+              }`,
+            },
+          ],
         };
       } catch (error) {
         return {
           content: [
             {
               type: "text" as const,
-              text: `❌ File generation test failed: ${error}\nPath attempted: ${testPath}\nDocker: ${isRunningInDocker}`
-            }
-          ]
+              text: `❌ File generation test failed: ${error}\nPath attempted: ${testPath}\nDocker: ${isRunningInDocker}`,
+            },
+          ],
         };
       }
     }
