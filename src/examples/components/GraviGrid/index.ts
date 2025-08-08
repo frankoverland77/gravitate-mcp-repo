@@ -1,6 +1,18 @@
 // GraviGrid Component Examples
 
-import type { ComponentExample } from "../../index.js";
+export interface ComponentExample {
+  id?: string;
+  name: string;
+  description: string;
+  code: string;
+  category?: string;
+  complexity: "simple" | "medium" | "complex";
+  tags?: string[];
+  props?: Record<string, any>;
+  dependencies?: string[];
+  notes?: string;
+  sourceFile?: string;
+}
 import { COLDEFS_EXAMPLES } from "./colDefs.js";
 
 export const GRAVI_GRID_EXAMPLES: ComponentExample[] = [
@@ -9,7 +21,7 @@ export const GRAVI_GRID_EXAMPLES: ComponentExample[] = [
     description:
       "Simple read-only grid showing pending orders with basic column definitions",
     category: "data",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["grid", "readonly", "dashboard", "simple"],
     code: `import { GraviGrid } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -62,7 +74,7 @@ export default PendingOrdersGrid;`,
     name: "Analytics Price Performance Grid",
     description: "Simple analytics grid with grouped data and basic filtering",
     category: "data",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["grid", "analytics", "grouping", "readonly"],
     code: `import { GraviGrid } from '@gravitate-js/excalibrr';
 import React, { useMemo } from 'react';
@@ -126,7 +138,7 @@ export default PricePerformanceGrid;`,
     description:
       "Simple data listing with minimal configuration and standard patterns",
     category: "data",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["grid", "list", "simple", "standard"],
     code: `import { GraviGrid } from '@gravitate-js/excalibrr';
 import React, { useMemo } from 'react';

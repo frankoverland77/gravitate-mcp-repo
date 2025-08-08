@@ -1,659 +1,392 @@
-// GraviButton Component Examples
-// This file contains comprehensive examples of various GraviButton configurations and patterns
+/**
+ * GraviButton Component Examples Database
+ *
+ * This file contains production-tested examples of the GraviButton component
+ * extracted from the Gravitate frontend codebase. These examples range from
+ * simple to complex implementations, covering various use cases and patterns.
+ *
+ * Used by the MCP server to generate high-quality GraviButton implementations.
+ */
 
-import type { ComponentExample } from "../../index.js";
+export interface GraviButtonExample {
+  id: string
+  name: string
+  description: string
+  complexity: 'simple' | 'medium' | 'complex'
+  category?: string
+  tags: string[]
+  code: string
+  props: Record<string, any>
+  dependencies?: string[]
+  notes?: string
+  sourceFile?: string
+}
 
-export const GRAVIBUTTON_EXAMPLES: ComponentExample[] = [
+export const GraviButtonExamples: GraviButtonExample[] = [
   {
-    name: "Basic GraviButton",
-    description: "Simple buttons with text and basic click handlers",
-    category: "interactive",
-    complexity: "basic",
-    tags: ["button", "basic", "text", "click"],
-    code: `// Basic button with just text
-<GraviButton buttonText='Cancel' />
-
-// Button with click handler
-<GraviButton 
-  buttonText='Save' 
-  onClick={() => console.log('Save clicked')}
-/>
-
-// Button with custom styling
-<GraviButton 
-  buttonText='Create Contract' 
-  onClick={() => console.log('Navigate to create')}
-  className='mr-3'
+    id: 'gravi_button_simple_01',
+    name: 'Basic Button',
+    description: 'Simple button with text only',
+    complexity: 'simple',
+    category: 'basic-usage',
+    tags: ['basic', 'minimal', 'text-only'],
+    code: `<GraviButton
+  buttonText='Clear Selection'
+  onClick={handleClearSelection}
 />`,
+    props: {
+      buttonText: 'Clear Selection',
+      onClick: 'handleClearSelection',
+    },
+    sourceFile: 'src/modules/SellingPlatform/BuyNow/Forwards/components/Grid/components/Grid.tsx',
+    notes: 'Perfect for simple action buttons with no special styling',
   },
 
   {
-    name: "Themed Buttons",
-    description: "Buttons with different color themes and appearances",
-    category: "interactive",
-    complexity: "intermediate",
-    tags: ["theme", "success", "error", "appearance"],
-    code: `// Success theme (green)
-<GraviButton 
-  buttonText='Create Contract' 
-  success 
-  onClick={() => console.log('Navigate to contract/create')}
-/>
-
-// Error theme (red)
-<GraviButton 
-  buttonText='Delete Selected' 
-  error 
-  onClick={() => console.log('Delete action')}
-/>
-
-// Theme1 (primary theme)
-<GraviButton 
-  buttonText='Edit Products' 
-  theme1 
-  onClick={() => console.log('Edit products')}
-/>
-
-// Theme2 (secondary theme)
-<GraviButton 
-  buttonText='Create Order' 
-  theme2 
-  onClick={() => console.log('Show modal')}
-/>
-
-// Ghost appearance (subtle)
-<GraviButton 
-  buttonText='Cancel' 
-  ghost 
-  onClick={() => console.log('Hide modal')}
-/>
-
-// Outline appearance
-<GraviButton 
-  buttonText='View Conflicts' 
-  appearance='outline' 
-  onClick={() => console.log('Show conflicts')}
-/>`,
-  },
-
-  {
-    name: "Buttons with Icons",
-    description: "Buttons featuring icons with or without text",
-    category: "interactive",
-    complexity: "intermediate",
-    tags: ["icons", "visual", "actions"],
-    code: `import { DownloadOutlined, SettingOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
-
-// Icon with text
-<GraviButton 
-  buttonText='Export to CSV' 
-  onClick={() => console.log('Export CSV')} 
+    id: 'gravi_button_simple_02',
+    name: 'Button with Icon',
+    description: 'Button with icon and text',
+    complexity: 'simple',
+    category: 'basic-usage',
+    tags: ['icon', 'text', 'download'],
+    code: `<GraviButton
+  buttonText='Export to CSV'
+  onClick={handleCSVExport}
   icon={<DownloadOutlined />}
-/>
+/>`,
+    props: {
+      buttonText: 'Export to CSV',
+      onClick: 'handleCSVExport',
+      icon: '<DownloadOutlined />',
+    },
+    dependencies: ['@ant-design/icons'],
+    sourceFile: 'src/modules/SellingPlatform/BuyNow/Forwards/components/Grid/components/Grid.tsx',
+    notes: 'Common pattern for export/download actions',
+  },
 
-// Icon only button
-<GraviButton 
-  onClick={() => console.log('Open settings')} 
+  {
+    id: 'gravi_button_simple_03',
+    name: 'Icon-Only Button',
+    description: 'Button with only an icon, no text',
+    complexity: 'simple',
+    category: 'basic-usage',
+    tags: ['icon-only', 'minimal', 'ghost'],
+    code: `<GraviButton 
+  onClick={() => openDrawer(title)} 
   icon={<SettingOutlined />} 
-  className='ghost-gravi-button'
-/>
-
-// Success icon button
-<GraviButton 
-  success 
-  htmlType='submit' 
-  icon={<CheckOutlined />} 
-  disabled={false}
-/>
-
-// Close button with styled icon
-<GraviButton 
-  icon={<CloseOutlined style={{ color: 'var(--gray-500)' }} />} 
-  onClick={() => console.log('Cancel action')}
-/>
-
-// Icon button with size
-<GraviButton 
-  size='large' 
-  icon={<CheckOutlined />} 
-  success 
-  htmlType='submit'
+  className='ghost-gravi-button' 
 />`,
+    props: {
+      onClick: '() => openDrawer(title)',
+      icon: '<SettingOutlined />',
+      className: 'ghost-gravi-button',
+    },
+    dependencies: ['@ant-design/icons'],
+    sourceFile: 'src/modules/CommandCenter/components/Grids/sharedComponents/ActionButtons.tsx',
+    notes: 'Great for compact interfaces and action bars',
   },
 
   {
-    name: "Loading and Disabled States",
-    description: "Buttons with loading spinners and disabled states",
-    category: "interactive",
-    complexity: "advanced",
-    tags: ["loading", "disabled", "state", "feedback"],
-    code: `// Mock state variables for examples
-const isFetchingData = false
-const selectedItems = [{ id: 1 }, { id: 2 }]
-const selectedPeriods = [{ id: 1 }]
-const canWrite = true
-const isFetching = false
-const hasEdits = false
-const isDeleting = false
-
-// Loading button
-<GraviButton 
-  buttonText='Duplicate' 
-  loading={isFetchingData} 
-  disabled={isFetchingData || !selectedItems?.length}
-  onClick={() => console.log('Duplicate items')}
-/>
-
-// Disabled button
-<GraviButton 
-  buttonText='Create Order' 
-  theme2 
-  disabled={!selectedPeriods?.length || !canWrite}
-  onClick={() => console.log('Show modal')}
-/>
-
-// Conditional disabled styling
-<GraviButton 
-  buttonText='Refresh Values' 
-  loading={isFetching} 
+    id: 'gravi_button_theme_01',
+    name: 'Success Theme Button',
+    description: 'Button with success theme styling',
+    complexity: 'simple',
+    category: 'themed',
+    tags: ['success', 'theme', 'create', 'positive-action'],
+    code: `<GraviButton
+  buttonText='Create Contract'
+  success
+  className='mr-3'
   onClick={() => {
-    if (!hasEdits) return console.log('Retrieve data')
-  }} 
-  className={hasEdits ? 'disabled-gravi-button' : ''}
-/>
-
-// Dynamic button text with loading
-<GraviButton 
-  buttonText={selectedItems?.length ? \`Delete (\${selectedItems.length})\` : 'Delete'} 
-  error 
-  loading={isDeleting} 
-  disabled={isDeleting || !selectedItems?.length}
-  onClick={() => console.log('Delete items:', selectedItems)}
+    navigate('/ContractManagement/createContract')
+  }}
 />`,
+    props: {
+      buttonText: 'Create Contract',
+      success: true,
+      className: 'mr-3',
+      onClick: 'navigation function',
+    },
+    sourceFile: 'src/components/shared/EntityReport/components/index.tsx',
+    notes: 'Use success theme for positive actions like create, save, confirm',
   },
 
   {
-    name: "Button Sizes and Forms",
-    description: "Buttons with different sizes and form integration",
-    category: "interactive",
-    complexity: "intermediate",
-    tags: ["size", "form", "submit", "small", "large"],
-    code: `import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
-import { Horizontal } from '@gravitate-js/excalibrr'
+    id: 'gravi_button_theme_02',
+    name: 'Error Theme Button',
+    description: 'Button with error theme for destructive actions',
+    complexity: 'simple',
+    category: 'themed',
+    tags: ['error', 'destructive', 'delete'],
+    code: `<GraviButton
+  buttonText={selectedDetails?.length ? \`Delete (\${selectedDetails?.length})\` : 'Delete'}
+  error
+  loading={isFetchingDetailValuation || isFetchingContractValuation}
+  disabled={isFetchingDetailValuation || isFetchingContractValuation || !selectedDetails?.length}
+/>`,
+    props: {
+      buttonText: 'Dynamic text with count',
+      error: true,
+      loading: 'boolean',
+      disabled: 'complex condition',
+    },
+    sourceFile:
+      'src/modules/ContractManagement/components/DetailsSection/AllDetailsGrid/components/AllDetailsGridActionButtons.tsx',
+    notes: 'Use error theme for destructive actions. Shows dynamic text and loading states.',
+  },
 
-// Small size buttons
-<GraviButton 
+  {
+    id: 'gravi_button_theme_03',
+    name: 'Theme2 Primary Button',
+    description: 'Button with theme2 styling for primary actions',
+    complexity: 'simple',
+    category: 'themed',
+    tags: ['theme2', 'primary', 'action'],
+    code: `<GraviButton
+  buttonText='Create Order'
+  onClick={() => setIsModalVisible(true)}
+  theme2
+  disabled={!selectedPeriodIds?.length || !canWrite}
+/>`,
+    props: {
+      buttonText: 'Create Order',
+      onClick: '() => setIsModalVisible(true)',
+      theme2: true,
+      disabled: '!selectedPeriodIds?.length || !canWrite',
+    },
+    sourceFile: 'src/modules/SellingPlatform/BuyNow/Forwards/components/Grid/components/Grid.tsx',
+    notes: 'Theme2 is commonly used for primary call-to-action buttons',
+  },
+
+  {
+    id: 'gravi_button_medium_01',
+    name: 'Loading State Button',
+    description: 'Button with loading state and dynamic text',
+    complexity: 'medium',
+    category: 'interactive',
+    tags: ['loading', 'dynamic-text', 'bulk-action'],
+    code: `<GraviButton
+  buttonText={selectedDetails?.length ? \`Duplicate (\${selectedDetails?.length})\` : 'Duplicate'}
+  loading={isFetchingDetailValuation || isFetchingContractValuation}
+  disabled={isFetchingDetailValuation || isFetchingContractValuation || !selectedDetails?.length}
+/>`,
+    props: {
+      buttonText: 'Dynamic with count',
+      loading: 'complex boolean condition',
+      disabled: 'multiple conditions',
+    },
+    sourceFile:
+      'src/modules/ContractManagement/components/DetailsSection/AllDetailsGrid/components/AllDetailsGridActionButtons.tsx',
+    notes: 'Good pattern for bulk operations with loading states and dynamic text',
+  },
+
+  {
+    id: 'gravi_button_medium_02',
+    name: 'Conditional Theme Button',
+    description: 'Button with conditional theme based on data state',
+    complexity: 'medium',
+    category: 'conditional',
+    tags: ['conditional', 'theme', 'data-driven', 'icons'],
+    code: `<GraviButton
+  icon={buttonTitle.includes('Save') ? <SaveOutlined /> : <ArrowRightOutlined />}
+  style={{
+    height: 35,
+    fontSize: 15,
+  }}
+  theme2={contract?.OrderStatusCodeValueDisplay !== 'Draft'}
+  loading={loading}
+  onClick={() => onClick('SaveChanges')}
+  disabled={disabled}
+  buttonText={buttonTitle}
+  className='px-4 mr-3'
+/>`,
+    props: {
+      icon: 'Conditional based on buttonTitle',
+      style: 'Custom height and fontSize',
+      theme2: 'Conditional based on contract status',
+      loading: 'boolean',
+      onClick: 'Function with parameter',
+      disabled: 'boolean',
+      buttonText: 'Dynamic',
+      className: 'Utility classes',
+    },
+    sourceFile: 'src/components/shared/Navigation/Footer/Footer.tsx',
+    notes: 'Shows conditional theming and icons based on data state',
+  },
+
+  {
+    id: 'gravi_button_medium_03',
+    name: 'Small Size Button',
+    description: 'Small-sized button for compact interfaces',
+    complexity: 'medium',
+    category: 'sizing',
+    tags: ['small', 'compact', 'bulk-actions'],
+    code: `<GraviButton 
   buttonText='Activate All' 
   success 
   size='small' 
-  onClick={() => console.log('Activate all')}
-/>
-
-// Large size button
-<GraviButton 
-  size='large' 
-  icon={<CloseOutlined style={{ color: 'var(--gray-500)' }} />} 
-  onClick={() => console.log('Cancel')}
-/>
-
-// Form submit button
-<GraviButton 
-  success 
-  htmlType='submit' 
-  icon={<CheckOutlined />} 
-  disabled={false}
-/>
-
-// Button group with different sizes
-<Horizontal style={{ gap: '8px' }}>
-  <GraviButton buttonText='Activate All' success size='small' onClick={() => console.log('Activate all')} />
-  <GraviButton buttonText='Deactivate All' size='small' onClick={() => console.log('Deactivate all')} />
-  <GraviButton buttonText='Edit Products' theme1 size='small' onClick={() => console.log('Edit products')} />
-  <GraviButton buttonText='Cancel' size='small' onClick={() => console.log('Cancel')} />
-</Horizontal>`,
-  },
-
-  {
-    name: "Custom Styling and Classes",
-    description: "Buttons with custom styles, classes, and CSS customization",
-    category: "styling",
-    complexity: "intermediate",
-    tags: ["styling", "classes", "custom", "css"],
-    code: `import { CheckOutlined, SettingOutlined } from '@ant-design/icons'
-
-// Mock state for examples
-const isFetching = false
-const hasEdits = false
-
-// Custom inline styles
-<GraviButton 
-  style={{ borderRadius: 0, minWidth: 125 }} 
-  success 
-  htmlType='submit' 
-  icon={<CheckOutlined />}
-/>
-
-// CSS class styling
-<GraviButton 
-  buttonText='Create Contract' 
-  success 
-  className='mr-3' 
-  onClick={() => console.log('Navigate to create')}
-/>
-
-// Ghost gravi button class
-<GraviButton 
-  className='ghost-gravi-button' 
-  icon={<SettingOutlined />} 
-  onClick={() => console.log('Open settings')}
-/>
-
-// Conditional styling
-<GraviButton 
-  buttonText='Refresh Values' 
-  loading={isFetching} 
-  className={hasEdits ? 'disabled-gravi-button' : ''}
-  onClick={() => console.log('Refresh data')}
-/>
-
-// Multiple classes with spacing
-<GraviButton 
-  buttonText='Cancel' 
-  size='small' 
-  onClick={() => console.log('Cancel action')} 
-  className='mr-5'
+  onClick={onActivateAll} 
+  className='mr-1' 
 />`,
+    props: {
+      buttonText: 'Activate All',
+      success: true,
+      size: 'small',
+      onClick: 'onActivateAll',
+      className: 'mr-1',
+    },
+    sourceFile:
+      'src/modules/Admin/ManagePriceNotifications/SubscriptionManagement/components/SubscriptionManagement/components/SubscriptionManagementActionButtons.tsx',
+    notes: 'Small size perfect for bulk action toolbars and compact interfaces',
   },
 
   {
-    name: "Modal and Dropdown Buttons",
-    description: "Buttons integrated with modals, tooltips, and dropdowns",
-    category: "interactive",
-    complexity: "advanced",
-    tags: ["modal", "tooltip", "dropdown", "integration"],
-    code: `import { Popconfirm, Tooltip, Dropdown, Menu } from 'antd'
-import { MoreOutlined } from '@ant-design/icons'
-
-// Mock state for examples
-const selectedDetails = [{ id: 1 }, { id: 2 }]
-const isDeleting = false
-const hasEdits = false
-const isFetching = false
-
-// Button with confirmation modal
-<Popconfirm
-  title="Are you sure you want to delete the selected details?"
-  okText="Delete"
-  cancelText="Cancel"
-  onConfirm={() => console.log('Delete details:', selectedDetails)}
->
-  <GraviButton
-    buttonText={selectedDetails?.length ? \`Delete (\${selectedDetails.length})\` : 'Delete'}
-    error
-    loading={isDeleting}
-    disabled={isDeleting || !selectedDetails?.length}
-  />
-</Popconfirm>
-
-// Button with tooltip
-<Tooltip title={hasEdits ? 'Please save changes to enable refresh.' : ''}>
-  <GraviButton
-    buttonText='Refresh Values'
-    loading={isFetching}
-    onClick={() => {
-      if (!hasEdits) return console.log('Retrieve data')
-    }}
-    className={hasEdits ? 'disabled-gravi-button' : ''}
-  />
-</Tooltip>
-
-// Dropdown menu button
-const menu = (
-  <Menu>
-    <Menu.Item key="edit" onClick={() => console.log('Edit')}>Edit</Menu.Item>
-    <Menu.Item key="duplicate" onClick={() => console.log('Duplicate')}>Duplicate</Menu.Item>
-    <Menu.Item key="delete" danger onClick={() => console.log('Delete')}>Delete</Menu.Item>
-  </Menu>
-)
-
-<Dropdown overlay={menu} trigger={['click']}>
-  <GraviButton icon={<MoreOutlined />} />
-</Dropdown>`,
+    id: 'gravi_button_complex_01',
+    name: 'Custom Styled Error Button',
+    description: 'Button with custom error styling using CSS variables',
+    complexity: 'complex',
+    category: 'custom-styling',
+    tags: ['custom-style', 'css-variables', 'error', 'themes'],
+    code: `<GraviButton
+  style={{
+    border: '1px solid var(--theme-error)',
+    color: 'var(--theme-error)',
+    backgroundColor: 'var(--theme-error-trans)',
+  }}
+  buttonText={\`Cancel \${orderDetails?.IsBidOrOffer ? 'Bid' : 'Order'}\`}
+  onClick={rejectOrder}
+  disabled={disableButtons || !canWrite}
+/>`,
+    props: {
+      style: 'Custom error styling with CSS variables',
+      buttonText: 'Dynamic text with conditional logic',
+      onClick: 'rejectOrder',
+      disabled: 'Multiple boolean conditions',
+    },
+    sourceFile:
+      'src/components/shared/EntityReport/components/EntityAction/components/ViewOnlineOrderDetails/components/Footer.tsx',
+    notes: 'Shows how to create custom error styling using theme CSS variables',
   },
 
   {
-    name: "Dynamic Button Content",
-    description: "Buttons with dynamic text, icons, and conditional rendering",
-    category: "interactive",
-    complexity: "advanced",
-    tags: ["dynamic", "conditional", "computed", "responsive"],
-    code: `import { PlusCircleOutlined, WarningOutlined } from '@ant-design/icons'
-import { Horizontal } from '@gravitate-js/excalibrr'
-
-// Mock state for examples
-const selectedItems = [{ id: 1 }, { id: 2 }]
-const isProcessing = false
-const isBulkEditMode = false
-const conflictCount = 3
-const conflicts = [{ id: 1 }, { id: 2 }, { id: 3 }]
-const hasBadSelection = false
-const canWrite = true
-
-// Dynamic button text based on selection
-<GraviButton
-  buttonText={selectedItems?.length ? \`Duplicate (\${selectedItems.length})\` : 'Duplicate'}
-  loading={isProcessing}
-  disabled={isProcessing || !selectedItems?.length}
-  onClick={() => console.log('Duplicate items:', selectedItems)}
-/>
-
-// Conditional button rendering
-{isBulkEditMode ? (
-  <Horizontal style={{ gap: 2 }}>
-    <GraviButton buttonText='Activate All' success size='small' onClick={() => console.log('Activate all')} />
-    <GraviButton buttonText='Deactivate All' size='small' onClick={() => console.log('Deactivate all')} />
-    <GraviButton buttonText='Cancel' size='small' onClick={() => console.log('Cancel')} />
+    id: 'gravi_button_complex_02',
+    name: 'Action Buttons with Permissions',
+    description: 'Button group with complex permission-based rendering',
+    complexity: 'complex',
+    category: 'permissions',
+    tags: ['permissions', 'conditional-rendering', 'action-group'],
+    code: `{canAcceptRejectOrder && orderDetails?.AreSetupsStillValid && (
+  <Horizontal verticalCenter style={{ gap: 20 }}>
+    <GraviButton
+      buttonText='Reject'
+      onClick={rejectOrder}
+      disabled={disableButtons || !canWrite}
+      style={{
+        border: '1px solid var(--theme-error)',
+        color: 'var(--theme-error)',
+        backgroundColor: 'var(--theme-error-trans)',
+      }}
+    />
+    <GraviButton
+      theme3
+      buttonText='Accept'
+      onClick={acceptOrder}
+      disabled={disableButtons || !canWrite || !canAcceptOrderDates}
+    />
   </Horizontal>
-) : (
-  <GraviButton 
-    buttonText='Create' 
-    success 
-    icon={<PlusCircleOutlined />} 
-    onClick={() => console.log('Open create modal')} 
-  />
-)}
-
-// Conflict button with dynamic count
-<GraviButton
-  buttonText={\`View \${conflictCount} Conflict\${conflictCount !== 1 ? 's' : ''}\`}
-  onClick={() => console.log('Show conflicts:', conflicts)}
-  appearance='outline'
-  size='small'
-/>
-
-// Conditional icon and disabled state
-<GraviButton
-  buttonText='Create Order'
-  theme2
-  disabled={hasBadSelection || !canWrite}
-  onClick={hasBadSelection ? undefined : () => console.log('Show modal')}
-  icon={hasBadSelection ? <WarningOutlined /> : undefined}
-/>`,
+)}`,
+    props: {
+      conditional: 'Complex permission and data checks',
+      buttonText: 'Accept/Reject',
+      onClick: 'Different handlers',
+      disabled: 'Complex permission logic',
+      style: 'Custom error styling',
+      theme3: 'For accept action',
+    },
+    sourceFile:
+      'src/components/shared/EntityReport/components/EntityAction/components/ViewOnlineOrderDetails/components/Footer.tsx',
+    notes: 'Complex example showing permission-based rendering with custom styling',
   },
 
   {
-    name: "Testing and Accessibility",
-    description: "Buttons with test attributes and accessibility features",
-    category: "testing",
-    complexity: "advanced",
-    tags: ["testing", "accessibility", "data-testid", "a11y"],
-    code: `import { DownloadOutlined, SettingOutlined } from '@ant-design/icons'
-import { useRef } from 'react'
-
-// Mock state for examples
-const selectedPeriods = [{ id: 1 }]
-const canWrite = true
-const csvResultsRef = useRef(null)
-
-// Buttons with test data attributes
-<GraviButton 
-  data-testid='clearSelectionButton' 
-  buttonText='Clear Selection' 
-  onClick={() => console.log('Clear selection')}
-/>
-
-<GraviButton 
-  data-testid='exportToCsvButton' 
-  buttonText='Export to CSV' 
-  onClick={() => console.log('Export CSV')} 
-  icon={<DownloadOutlined />}
-/>
-
-<div data-testid='createOrderButton'>
-  <GraviButton 
-    buttonText='Create Order' 
-    theme2 
-    disabled={!selectedPeriods?.length || !canWrite}
-    onClick={() => console.log('Show modal')}
+    id: 'gravi_button_complex_03',
+    name: 'Icon Buttons with Actions',
+    description: 'Icon-only buttons with different action types in grid cells',
+    complexity: 'complex',
+    category: 'grid-actions',
+    tags: ['icon-only', 'grid-cell', 'actions', 'transparent'],
+    code: `<Horizontal style={{ gap: '1rem', alignItems: 'center' }}>
+  <GraviButton
+    icon={<CloseCircleTwoTone style={{ fontSize: 24 }} twoToneColor={twoToneColorReject} />}
+    onClick={() => acceptOrRejectOrder(data, 'Withdraw')}
+    style={{ backgroundColor: 'transparent' }}
+    disabled={!canWrite}
   />
-</div>
-
-// Button with aria labels and accessibility
-<GraviButton 
-  buttonText='Settings' 
-  icon={<SettingOutlined />} 
-  aria-label='Open grid settings' 
-  onClick={() => console.log('Open settings')}
-/>
-
-// Hidden results container for testing
-<div data-testid='csvResults' style={{ display: 'none' }} ref={csvResultsRef} />`,
+  <GraviButton
+    icon={<CheckCircleTwoTone style={{ fontSize: 24 }} twoToneColor={twoToneColorSuccess} />}
+    onClick={() => acceptOrRejectOrder(data, 'Accept')}
+    style={{ backgroundColor: 'transparent' }}
+    disabled={!canWrite}
+  />
+</Horizontal>`,
+    props: {
+      icon: 'TwoTone icons with dynamic colors',
+      onClick: 'Functions with different actions',
+      style: 'Transparent background',
+      disabled: 'Permission-based',
+    },
+    sourceFile: 'src/modules/Dashboard/AdminDashboard/Tabs/PendingOrders/columnDefs.tsx',
+    notes: 'Perfect for grid cell actions with icon-only buttons and dynamic colors',
   },
 
   {
-    name: "Complete Real-World Button Implementation",
-    description:
-      "Comprehensive example showing all GraviButton patterns in a production component",
-    category: "complete",
-    complexity: "advanced",
-    tags: ["complete", "real-world", "production", "comprehensive"],
-    code: `import React, { useState } from 'react'
-import { 
-  DownloadOutlined, 
-  SettingOutlined, 
-  PlusCircleOutlined, 
-  EditOutlined, 
-  DeleteOutlined,
-  MoreOutlined,
-  WarningOutlined,
-  CheckOutlined,
-  CloseOutlined
-} from '@ant-design/icons'
-import { GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr'
-import { Popconfirm, Tooltip, Dropdown, Menu } from 'antd'
-
-// Complete button implementation component
-function ContractManagementActions({
-  selectedContracts,
-  isLoading,
-  canWrite,
-  hasUnsavedChanges,
-  onCreateContract,
-  onEditSelected,
-  onDeleteSelected,
-  onExportData,
-  onRefreshData,
-  onSaveChanges,
-  onCancelChanges
-}) {
-  // Helper functions for the example
-  const handleDuplicate = (contracts) => console.log('Duplicate contracts:', contracts)
-  const handleArchive = (contracts) => console.log('Archive contracts:', contracts)
-  const openSettings = () => console.log('Open settings')
-  const clearSelection = () => console.log('Clear selection')
-  const showValidationErrors = (contracts) => console.log('Show validation errors:', contracts)
-
-  const menu = (
-    <Menu>
-      <Menu.Item key="duplicate">
-        <GraviButton 
-          buttonText="Duplicate Selected" 
-          size="small" 
-          onClick={() => handleDuplicate(selectedContracts)}
-        />
-      </Menu.Item>
-      <Menu.Item key="archive">
-        <GraviButton 
-          buttonText="Archive Selected" 
-          size="small" 
-          onClick={() => handleArchive(selectedContracts)}
-        />
-      </Menu.Item>
-    </Menu>
-  )
-
-  return (
-    <Vertical style={{ gap: '16px' }}>
-      {/* Primary Actions Row */}
-      <Horizontal style={{ gap: '8px', justifyContent: 'space-between' }}>
-        {/* Left side - Create and Edit */}
-        <Horizontal style={{ gap: '8px' }}>
-          <GraviButton
-            buttonText="Create Contract"
-            success
-            icon={<PlusCircleOutlined />}
-            onClick={onCreateContract}
-            disabled={!canWrite}
-            data-testid="create-contract-button"
-          />
-          
-          <GraviButton
-            buttonText={\`Edit (\${selectedContracts?.length || 0})\`}
-            theme1
-            icon={<EditOutlined />}
-            onClick={() => onEditSelected(selectedContracts)}
-            disabled={!canWrite || !selectedContracts?.length}
-            loading={isLoading}
-          />
-        </Horizontal>
-
-        {/* Right side - Utility Actions */}
-        <Horizontal style={{ gap: '8px' }}>
-          <GraviButton
-            buttonText="Export CSV"
-            icon={<DownloadOutlined />}
-            onClick={onExportData}
-            size="small"
-            data-testid="export-button"
-          />
-          
-          <GraviButton
-            icon={<SettingOutlined />}
-            className="ghost-gravi-button"
-            onClick={() => openSettings()}
-            aria-label="Open grid settings"
-          />
-          
-          <Dropdown overlay={menu} trigger={['click']}>
-            <GraviButton 
-              icon={<MoreOutlined />} 
-              className="ghost-gravi-button"
-            />
-          </Dropdown>
-        </Horizontal>
-      </Horizontal>
-
-      {/* Secondary Actions Row - Bulk Operations */}
-      {selectedContracts?.length > 0 && (
-        <Horizontal style={{ gap: '8px' }}>
-          <Popconfirm
-            title={\`Are you sure you want to delete \${selectedContracts.length} contract(s)?\`}
-            okText="Delete"
-            cancelText="Cancel"
-            onConfirm={() => onDeleteSelected(selectedContracts)}
-          >
-            <GraviButton
-              buttonText={\`Delete (\${selectedContracts.length})\`}
-              error
-              icon={<DeleteOutlined />}
-              loading={isLoading}
-              disabled={!canWrite || isLoading}
-              size="small"
-            />
-          </Popconfirm>
-
-          <GraviButton
-            buttonText="Clear Selection"
-            size="small"
-            onClick={() => clearSelection()}
-            data-testid="clear-selection-button"
-          />
-        </Horizontal>
-      )}
-
-      {/* Save/Cancel Row - Conditional */}
-      {hasUnsavedChanges && (
-        <Horizontal style={{ gap: '8px', justifyContent: 'flex-end' }}>
-          <GraviButton
-            buttonText="Cancel Changes"
-            ghost
-            icon={<CloseOutlined style={{ color: 'var(--gray-500)' }} />}
-            onClick={onCancelChanges}
-          />
-          
-          <GraviButton
-            buttonText="Save Changes"
-            success
-            icon={<CheckOutlined />}
-            onClick={onSaveChanges}
-            loading={isLoading}
-            disabled={isLoading}
-          />
-        </Horizontal>
-      )}
-
-      {/* Status Actions Row */}
-      <Horizontal style={{ gap: '8px' }}>
-        <Tooltip title={hasUnsavedChanges ? 'Save changes before refreshing data' : ''}>
-          <GraviButton
-            buttonText="Refresh Data"
-            onClick={() => {
-              if (!hasUnsavedChanges) onRefreshData()
-            }}
-            loading={isLoading}
-            className={hasUnsavedChanges ? 'disabled-gravi-button' : ''}
-            size="small"
-          />
-        </Tooltip>
-
-        {selectedContracts?.some(c => c.hasValidationErrors) && (
-          <GraviButton
-            buttonText={\`View \${selectedContracts.filter(c => c.hasValidationErrors).length} Error(s)\`}
-            appearance="outline"
-            icon={<WarningOutlined />}
-            onClick={() => showValidationErrors(selectedContracts)}
-            size="small"
-          />
-        )}
-      </Horizontal>
-    </Vertical>
-  )
-}
-
-// Usage in main component
-function ContractManagementPage() {
-  const [selectedContracts, setSelectedContracts] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const canWrite = true // Mock permission for example
-
-  // Mock functions for the example
-  const handleEdit = (contracts) => console.log('Edit contracts:', contracts)
-  const handleDelete = (contracts) => console.log('Delete contracts:', contracts)
-  const exportToCSV = (contracts) => console.log('Export CSV:', contracts)
-  const refetchData = () => console.log('Refetch data')
-  const saveAll = () => console.log('Save all changes')
-  const revertChanges = () => console.log('Revert changes')
-
-  return (
-    <div>
-      <ContractManagementActions
-        selectedContracts={selectedContracts}
-        isLoading={isLoading}
-        canWrite={canWrite}
-        hasUnsavedChanges={hasUnsavedChanges}
-        onCreateContract={() => console.log('Navigate to /contracts/create')}
-        onEditSelected={(contracts) => handleEdit(contracts)}
-        onDeleteSelected={(contracts) => handleDelete(contracts)}
-        onExportData={() => exportToCSV(selectedContracts)}
-        onRefreshData={() => refetchData()}
-        onSaveChanges={() => saveAll()}
-        onCancelChanges={() => revertChanges()}
+    id: 'gravi_button_complex_04',
+    name: 'Edit Mode Buttons',
+    description: 'Buttons for edit/save/cancel operations with form submission',
+    complexity: 'complex',
+    category: 'form-actions',
+    tags: ['edit-mode', 'form', 'icons', 'save', 'cancel'],
+    code: `{editingGroupId === group.Value ? (
+  <Space>
+    <Form.Item>
+      <GraviButton
+        icon={<CloseOutlined style={{ color: 'var(--gray-500)' }} />}
+        onClick={() => {
+          setSaveDisabled(true)
+          setEditingGroupId(undefined)
+        }}
       />
-      
-      {/* Grid component would go here */}
-    </div>
-  )
-}`,
+    </Form.Item>
+    <Form.Item>
+      <GraviButton
+        style={{ borderRadius: 0 }}
+        success
+        htmlType='submit'
+        icon={<CheckOutlined />}
+        disabled={saveDisabled}
+      />
+    </Form.Item>
+  </Space>
+) : (
+  <Horizontal style={{ gap: 10 }}>
+    <GraviButton icon={<EditFilled onClick={() => setEditingGroupId(group.Value)} />} />
+    <GraviButton
+      icon={<DeleteFilled style={{ color: 'var(--theme-error)' }} onClick={() => handleDelete(group.Value)} />}
+    />
+  </Horizontal>
+)}`,
+    props: {
+      conditional: 'Edit mode vs view mode',
+      icon: 'Different icons for each action',
+      onClick: 'State management functions',
+      htmlType: 'submit for form',
+      success: 'For save action',
+      disabled: 'Based on form state',
+      style: 'Custom styling',
+    },
+    sourceFile: 'src/components/shared/GroupEditor/GroupEditor.tsx',
+    notes: 'Complex edit mode pattern with conditional rendering and form integration',
   },
-];
+]
+
+export default GraviButtonExamples

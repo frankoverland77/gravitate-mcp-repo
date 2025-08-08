@@ -1,6 +1,18 @@
 // Horizontal Component Examples
 
-import type { ComponentExample } from "../../index.js";
+export interface ComponentExample {
+  id?: string;
+  name: string;
+  description: string;
+  code: string;
+  category?: string;
+  complexity: "simple" | "medium" | "complex";
+  tags?: string[];
+  props?: Record<string, any>;
+  dependencies?: string[];
+  notes?: string;
+  sourceFile?: string;
+}
 
 export const HORIZONTAL_EXAMPLES: ComponentExample[] = [
   {
@@ -8,7 +20,7 @@ export const HORIZONTAL_EXAMPLES: ComponentExample[] = [
     description:
       "Basic horizontal layout combining an icon with text using vertical alignment",
     category: "layout",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["icon", "text", "alignment", "simple"],
     code: `import { Horizontal, Texto } from '@gravitate-js/excalibrr';
 import { CheckCircleOutlined } from '@ant-design/icons';
@@ -31,7 +43,7 @@ export default IconTextContainer;`,
     description:
       "Centered success message with icon and text using horizontal and vertical centering",
     category: "feedback",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["success", "message", "centered", "modal"],
     code: `import { Horizontal, Vertical, Texto } from '@gravitate-js/excalibrr';
 import { CheckCircleFilled } from '@ant-design/icons';
@@ -60,7 +72,7 @@ export default SuccessMessage;`,
     description:
       "Simple status bar with background color and justified content",
     category: "status",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["status", "bar", "background", "justify"],
     code: `import { Horizontal } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -85,7 +97,7 @@ export default StatusBar;`,
     description:
       "Complex header layout with nested horizontal containers for organized controls",
     category: "navigation",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["header", "controls", "nested", "responsive"],
     code: `import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { Switch } from 'antd';
@@ -129,7 +141,7 @@ export default HeaderControlBar;`,
     description:
       "Form layout with controlled spacing using gap and flex properties",
     category: "forms",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["form", "fields", "gap", "flex", "spacing"],
     code: `import { Horizontal } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -163,7 +175,7 @@ export default FormFieldLayout;`,
     description:
       "Toolbar with action buttons using consistent spacing and conditional rendering",
     category: "actions",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["toolbar", "buttons", "conditional", "spacing"],
     code: `import { Horizontal, GraviButton } from '@gravitate-js/excalibrr';
 import { DownloadOutlined } from '@ant-design/icons';
@@ -210,7 +222,7 @@ export default ActionButtonToolbar;`,
     description:
       "Card layout for displaying metrics with header and data sections",
     category: "data",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["metrics", "card", "data", "display"],
     code: `import { Horizontal, Vertical, Texto } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -245,7 +257,7 @@ export default DataMetricsCard;`,
     description:
       "Main page layout with sidebar and conditional content using flex ratios",
     category: "layout",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["sidebar", "layout", "conditional", "flex", "responsive"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { Empty } from 'antd';
@@ -283,7 +295,7 @@ export default SidebarLayout;`,
     description:
       "Dashboard layout with equal-width widgets and smart spacing distribution",
     category: "dashboard",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["dashboard", "widgets", "grid", "responsive", "mapping"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -324,7 +336,7 @@ export default DashboardWidgetGrid;`,
     description:
       "Complex modal layout with scrollable main content and fixed sidebar",
     category: "modal",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["modal", "steps", "scrollable", "sidebar", "complex"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -363,7 +375,7 @@ export default ModalStepLayout;`,
     description:
       "Split view with header display and tabbed content with conditional rendering",
     category: "detail",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["split", "tabs", "conditional", "detail", "view"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -405,7 +417,7 @@ export default DetailViewSplitLayout;`,
     description:
       "Form section with wrapping capability for responsive multi-line layouts",
     category: "forms",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["responsive", "wrap", "form", "multi-line", "adaptive"],
     code: `import { Horizontal } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -439,7 +451,7 @@ export default ResponsiveFormSection;`,
     description:
       "Form field pattern with controlled width ratios for labels and inputs",
     category: "forms",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["label", "input", "ratio", "form", "field"],
     code: `import { Horizontal, Texto } from '@gravitate-js/excalibrr';
 import { DatePicker } from 'antd';
@@ -470,7 +482,7 @@ export default LabelInputPair;`,
     description:
       "Nested horizontal and vertical layout with section headers and grouped controls",
     category: "layout",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["nested", "section", "header", "grouped", "spacing"],
     code: `import { Horizontal, Vertical, Texto } from '@gravitate-js/excalibrr';
 import React from 'react';

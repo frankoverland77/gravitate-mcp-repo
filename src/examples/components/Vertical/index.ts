@@ -1,6 +1,18 @@
 // Vertical Component Examples
 
-import type { ComponentExample } from "../../index.js";
+export interface ComponentExample {
+  id?: string;
+  name: string;
+  description: string;
+  code: string;
+  category?: string;
+  complexity: "simple" | "medium" | "complex";
+  tags?: string[];
+  props?: Record<string, any>;
+  dependencies?: string[];
+  notes?: string;
+  sourceFile?: string;
+}
 
 export const VERTICAL_EXAMPLES: ComponentExample[] = [
   {
@@ -8,7 +20,7 @@ export const VERTICAL_EXAMPLES: ComponentExample[] = [
     description:
       "Basic vertical container with flex property - simplest usage pattern",
     category: "layout",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["container", "flex", "simple", "wrapper"],
     code: `import { Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -28,7 +40,7 @@ export default SimpleContainer;`,
     name: "Label Value Display",
     description: "Simple label-value pattern common in forms and displays",
     category: "display",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["label", "value", "display", "text"],
     code: `import { Vertical, Texto } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -51,7 +63,7 @@ export default LabelValueDisplay;`,
     name: "Quick Metrics Display",
     description: "Vertical stack of metric components with consistent spacing",
     category: "metrics",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["metrics", "spacing", "gap", "stack"],
     code: `import { Vertical } from '@gravitate-js/excalibrr';
 import { DollarOutlined, LineChartOutlined, VerticalAlignBottomOutlined } from '@ant-design/icons';
@@ -90,7 +102,7 @@ export default QuickMetricsDisplay;`,
     description:
       "Form field with mapped radio options using consistent spacing",
     category: "forms",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["radio", "mapping", "form", "options"],
     code: `import { Vertical, Texto } from '@gravitate-js/excalibrr';
 import { Form, Radio } from 'antd';
@@ -134,7 +146,7 @@ export default RadioButtonGroup;`,
     name: "Form Field Container",
     description: "Structured form field with label and input components",
     category: "forms",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["form", "field", "label", "input", "structure"],
     code: `import { Vertical, Texto } from '@gravitate-js/excalibrr';
 import { Form, Input } from 'antd';
@@ -163,7 +175,7 @@ export default FormFieldContainer;`,
     description:
       "Layout building block using flex ratios for responsive design",
     category: "layout",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["layout", "flex", "ratio", "responsive", "columns"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -198,7 +210,7 @@ export default TwoColumnLayout;`,
     name: "Stacked Data Grids",
     description: "Vertical stack of data grids with equal heights and spacing",
     category: "data",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["grid", "stack", "data", "equal-height"],
     code: `import { Vertical, Horizontal, GraviGrid } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -245,7 +257,7 @@ export default StackedDataGrids;`,
     name: "Product Listing Container",
     description: "List container with header and scrollable mapped content",
     category: "list",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["list", "mapping", "scroll", "header"],
     code: `import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -284,7 +296,7 @@ export default ProductListingContainer;`,
     description:
       "Form section with styled container, header, and multiple field groups",
     category: "forms",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["form", "card", "styled", "groups", "complex"],
     code: `import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
 import { Form, Input, Select } from 'antd';
@@ -342,7 +354,7 @@ export default ComplexFormSection;`,
     description:
       "Structured header with multiple information rows and status display",
     category: "header",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["header", "multi-row", "status", "information"],
     code: `import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -390,7 +402,7 @@ export default MultiRowHeaderDisplay;`,
     name: "Split Pane Modal Layout",
     description: "Complex modal with scrollable main content and fixed sidebar",
     category: "modal",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["modal", "split", "scrollable", "sidebar", "complex"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -443,7 +455,7 @@ export default SplitPaneModalLayout;`,
     description:
       "Error display with conditional rendering and nested layout components",
     category: "feedback",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["error", "conditional", "nested", "feedback"],
     code: `import { Horizontal, Vertical, Texto } from '@gravitate-js/excalibrr';
 import { ClockCircleFilled } from '@ant-design/icons';
@@ -485,7 +497,7 @@ export default ConditionalErrorDisplay;`,
     name: "Dashboard Widget Grid Columns",
     description: "Dashboard layout with mapped widgets and dynamic spacing",
     category: "dashboard",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["dashboard", "widgets", "mapping", "spacing", "dynamic"],
     code: `import { Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import React from 'react';
@@ -539,7 +551,7 @@ export default DashboardWidgetGrid;`,
     description:
       "Advanced form layout with conditional sections and mixed content types",
     category: "forms",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["form", "conditional", "sections", "complex", "mixed"],
     code: `import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
 import { Form, Tooltip } from 'antd';
@@ -627,7 +639,7 @@ export default ComplexConditionalForm;`,
     name: "Footer Button Groups",
     description: "Footer layout with button groups and conditional rendering",
     category: "navigation",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["footer", "buttons", "conditional", "groups"],
     code: `import { Horizontal, Vertical, GraviButton } from '@gravitate-js/excalibrr';
 import { SaveOutlined, ArrowRightOutlined, UploadOutlined } from '@ant-design/icons';
@@ -690,7 +702,7 @@ export default FooterButtonGroups;`,
     name: "Empty Vertical Spacer",
     description: "Using empty Vertical component as a spacer element",
     category: "layout",
-    complexity: "basic",
+    complexity: "simple",
     tags: ["spacer", "empty", "layout", "spacing"],
     code: `import { Horizontal, Vertical, GraviButton } from '@gravitate-js/excalibrr';
 import React from 'react';

@@ -8,7 +8,7 @@ export const DASHBOARD_PATTERNS: ComponentExample[] = [
     description:
       "Complete dashboard layout with key performance metrics and data visualization",
     category: "patterns",
-    complexity: "advanced",
+    complexity: "complex",
     tags: ["dashboard", "metrics", "kpi", "layout"],
     code: `import { 
   Vertical, 
@@ -178,7 +178,7 @@ export default MetricsDashboard;`,
     name: "Simple Status Dashboard",
     description: "Minimal dashboard focusing on system status and alerts",
     category: "patterns",
-    complexity: "intermediate",
+    complexity: "medium",
     tags: ["dashboard", "status", "monitoring", "alerts"],
     code: `import { 
   Vertical, 
