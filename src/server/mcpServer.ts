@@ -9,6 +9,7 @@ import { registerVisualPreviewTools } from "./tools/visualPreview.js";
 import { registerProductionCodeGenerationTools } from "./tools/productionCodeGeneration.js";
 import { registerFormGenerationTools } from "./tools/formGeneration.js";
 import { registerFigmaTools } from "./tools/figma.js";
+import { registerDesignIterationTools } from "./tools/designIteration.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -35,6 +36,9 @@ export function createMcpServer(): McpServer {
 
     registerFigmaTools(server);
     console.error(`✅ Figma integration tools registered`);
+
+    registerDesignIterationTools(server);
+    console.error(`✅ Design iteration tools registered`);
 
     console.error(`🎯 All tools registered successfully`);
   } catch (error) {
