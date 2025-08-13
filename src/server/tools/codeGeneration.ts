@@ -14,6 +14,16 @@ import {
 } from "../../lib/codeGenerators.js";
 import * as fs from "fs/promises";
 import * as path from "path";
+import {
+  createDirectoryPrompt,
+  suggestDirectory,
+  validateDirectoryPath,
+} from "../../lib/utils/userPrompts.js";
+import {
+  writeProjectToUserDirectory,
+  testDirectoryAccess,
+  inspectDirectory,
+} from "../../lib/utils/fileSystemHelpers.js";
 
 // Helper function to write React project files to filesystem
 async function writeProjectToFilesystem(
@@ -203,6 +213,80 @@ async function readDependenciesFromMainRepo(): Promise<{
 }
 
 export function registerCodeGenerationTools(server: McpServer): void {
+  // Directory Selection Helper Tool
+  server.tool(
+    "choose_output_directory",
+    "Help choose and test an output directory for file generation",
+    {
+      directoryPath: z
+        .string()
+        .optional()
+        .describe(
+          "Directory path to test (e.g., '/Users/rebecca.hirai/workspace'). If not provided, shows directory selection guide."
+        ),
+      operation: z
+        .string()
+        .default("File Generation")
+        .describe("Type of operation (for context in suggestions)"),
+    },
+    async ({ directoryPath, operation }) => {
+      if (!directoryPath) {
+        const suggested = suggestDirectory(operation);
+        const prompt = createDirectoryPrompt(operation, suggested);
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: prompt,
+            },
+          ],
+        };
+      }
+
+      // Test the provided directory
+      const accessTest = await testDirectoryAccess(directoryPath);
+      const inspection = await inspectDirectory(directoryPath);
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `📁 **Directory Test Results**
+
+**Path:** \`${directoryPath}\`
+
+${accessTest.message}
+${inspection.message}
+
+${accessTest.success
+                ? `✅ **Ready for file generation!**
+You can use this directory in other tools by specifying:
+\`outputDirectory='${directoryPath}'\``
+                : `❌ **Cannot use this directory**
+Please try a different path or create the directory manually first.`
+              }
+
+${
+                inspection.exists && inspection.contents
+                  ? `**Current Contents:**
+${inspection.contents
+                      .slice(0, 10)
+                      .map((item) => `• ${item}`)
+                      .join("\n")}${
+                      inspection.contents.length > 10
+                        ? "\n• ... and " +
+                          (inspection.contents.length - 10) +
+                          " more items"
+                        : ""
+                    }`
+                  : ""
+              }`,
+          },
+        ],
+      };
+    }
+  );
+
   // DEBUG TOOL: Test file generation
   server.tool(
     "test_file_generation",
@@ -212,25 +296,49 @@ export function registerCodeGenerationTools(server: McpServer): void {
         .string()
         .default("FileGenerationTest")
         .describe("Name for the test"),
+      outputDirectory: z
+        .string()
+        .optional()
+        .describe(
+          "Directory where to create the test file. If not provided, you'll be prompted."
+        ),
     },
-    async ({ testName }) => {
-      const isRunningInDocker = process.env.NODE_ENV === "production";
+    async ({ testName, outputDirectory }) => {
+      // Handle directory prompt
+      if (!outputDirectory) {
+        const suggested = suggestDirectory("Test File Generation");
+        const prompt = createDirectoryPrompt("Test File Generation", suggested);
+        
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: prompt + "\n\n**To proceed, run this tool again with the 'outputDirectory' parameter.**\n\nExample:\n```\ntest_file_generation with outputDirectory='/Users/rebecca.hirai/workspace'\n```",
+            },
+          ],
+        };
+      }
 
-      let baseDir;
-      let testPath;
-
-      if (isRunningInDocker) {
-        baseDir = process.env.OUTPUT_DIR || "/app/repos";
-        testPath = path.join(baseDir, `${testName}.txt`);
-      } else {
-        baseDir = "../";
-        testPath = path.resolve(baseDir, `${testName}.txt`);
+      // Test directory access
+      const accessTest = await testDirectoryAccess(outputDirectory);
+      if (!accessTest.success) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `❌ **Cannot access directory:** ${outputDirectory}\n\n${accessTest.message}\n\nPlease use the 'choose_output_directory' tool to find a valid directory.`,
+            },
+          ],
+        };
       }
 
       try {
-        const testContent = `Test file generated at: ${new Date().toISOString()}\nDocker: ${isRunningInDocker}\nBase dir: ${baseDir}\nFull path: ${testPath}`;
+        const validation = validateDirectoryPath(outputDirectory);
+        const testPath = path.join(validation.normalizedPath, `${testName}.txt`);
+        
+        const testContent = `Test file generated at: ${new Date().toISOString()}\nTest name: ${testName}\nOutput directory: ${outputDirectory}\nFull path: ${testPath}\n\nThis confirms that the MCP server can write files to your specified directory!`;
 
-        await fs.mkdir(path.dirname(testPath), { recursive: true });
+        await fs.mkdir(validation.normalizedPath, { recursive: true });
         await fs.writeFile(testPath, testContent, "utf-8");
 
         // Verify file exists
@@ -243,12 +351,12 @@ export function registerCodeGenerationTools(server: McpServer): void {
           content: [
             {
               type: "text" as const,
-              text: `🧪 Test File Generation\n\nStatus: ${
+              text: `🧪 **Test File Generation Results**\n\nStatus: ${
                 exists ? "✅ SUCCESS" : "❌ FAILED"
-              }\nFile: ${testPath}\nDocker: ${isRunningInDocker}\nBase Dir: ${baseDir}\n\n${
+              }\n**File:** \`${testPath}\`\n**Directory:** \`${outputDirectory}\`\n\n${
                 exists
-                  ? "Check your repos directory for: " + path.basename(testPath)
-                  : "File creation failed"
+                  ? "✨ **Great!** File generation is working correctly.\nYou can now use this directory path in other MCP tools.\n\n**File Contents:**\n\n" + testContent
+                  : "File creation failed - please check directory permissions."
               }`,
             },
           ],
@@ -258,7 +366,7 @@ export function registerCodeGenerationTools(server: McpServer): void {
           content: [
             {
               type: "text" as const,
-              text: `❌ File generation test failed: ${error}\nPath attempted: ${testPath}\nDocker: ${isRunningInDocker}`,
+              text: `❌ **File generation test failed:** ${error}\n\nPlease verify the directory path and permissions.`,
             },
           ],
         };
@@ -297,6 +405,12 @@ export function registerCodeGenerationTools(server: McpServer): void {
         .describe(
           "The field name that uniquely identifies each row (for getRowId)"
         ),
+      outputDirectory: z
+        .string()
+        .optional()
+        .describe(
+          "Full path where to create the project (e.g., '/Users/rebecca.hirai/workspace'). If not provided, you'll be prompted to choose."
+        ),
       title: z
         .string()
         .optional()
@@ -314,9 +428,42 @@ export function registerCodeGenerationTools(server: McpServer): void {
         columns,
         sampleData,
         uniqueIdField,
+        outputDirectory,
         title,
         generateFullProject,
       } = args;
+
+      // Handle output directory - prompt user if not provided
+      let targetDirectory = outputDirectory;
+      if (!targetDirectory) {
+        const suggested = suggestDirectory("React Project", featureName);
+        const prompt = createDirectoryPrompt(
+          `${featureName} React Project Generation`,
+          suggested
+        );
+        
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: prompt + "\n\n**To proceed, please run this tool again with the 'outputDirectory' parameter specified.**\n\nExample:\n```\ngenerate_grid_component with outputDirectory='/Users/rebecca.hirai/workspace'\n```",
+            },
+          ],
+        };
+      }
+
+      // Test directory access
+      const accessTest = await testDirectoryAccess(targetDirectory);
+      if (!accessTest.success) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `❌ **Cannot access directory:** ${targetDirectory}\n\n${accessTest.message}\n\nPlease check the path and try again with a different directory.`,
+            },
+          ],
+        };
+      }
 
       // Validate uniqueIdField exists in sample data
       if (
@@ -357,8 +504,15 @@ export function registerCodeGenerationTools(server: McpServer): void {
         // Generate React project with dependencies
         const files = generateReactProject(config, dependencyData);
 
-        // Write files to filesystem
-        const projectPath = await writeProjectToFilesystem(featureName, files);
+        // Write files to user-specified directory
+        const result = await writeProjectToUserDirectory(
+          {
+            outputDirectory: targetDirectory,
+            projectName: featureName,
+            operation: "React Project Generation",
+          },
+          files
+        );
 
         return {
           content: [
@@ -366,15 +520,10 @@ export function registerCodeGenerationTools(server: McpServer): void {
               type: "text" as const,
               text:
                 `🎉 **SUCCESS!** Complete ${featureName} React project created!\n\n` +
-                `📁 **Project Created In Docker Container**\n` +
-                `Docker path: \`${projectPath}\`\n\n` +
-                `🚀 **To access your project:**\n` +
+                result.message +
+                `\n\n🚀 **To run your project:**\n` +
                 `\`\`\`bash\n` +
-                `# Copy project from Docker container to your machine\n` +
-                `./copy-projects-from-docker.sh\n` +
-                `\n` +
-                `# Then run the project\n` +
-                `cd ../${featureName}Demo\n` +
+                `cd ${result.projectPath}\n` +
                 `yarn install\n` +
                 `yarn dev\n` +
                 `\`\`\`\n\n` +
@@ -387,9 +536,7 @@ export function registerCodeGenerationTools(server: McpServer): void {
                 `• PE theme configuration\n` +
                 `• TypeScript throughout\n` +
                 `• Ready for real API integration\n\n` +
-                `📦 **Important:** The project is created inside the Docker container.\n` +
-                `Run \`./copy-projects-from-docker.sh\` to copy it to your repos directory!\n\n` +
-                `📋 **Files created:** ${files.length} files written to container\n` +
+                `📋 **Files created:** ${result.filesWritten.length}\n` +
                 `🏗️ **Project Structure:**\n` +
                 `\`\`\`\n` +
                 `${featureName}Demo/\n` +

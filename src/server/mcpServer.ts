@@ -10,6 +10,8 @@ import { registerProductionCodeGenerationTools } from "./tools/productionCodeGen
 import { registerFormGenerationTools } from "./tools/formGeneration.js";
 import { registerFigmaTools } from "./tools/figma.js";
 import { registerDesignIterationTools } from "./tools/designIteration.js";
+import { registerThemeIntegrationTools } from "./tools/themeIntegration.js";
+import { registerEnhancedVisualPreviewTools } from "./tools/enhancedVisualPreview.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -39,6 +41,13 @@ export function createMcpServer(): McpServer {
 
     registerDesignIterationTools(server);
     console.error(`✅ Design iteration tools registered`);
+
+    registerThemeIntegrationTools(server);
+    console.error(`✅ Theme integration tools registered`);
+
+    // registerEnhancedVisualPreviewTools(server);
+    // console.error(`✅ Enhanced visual preview tools registered`);
+    // Note: Enhanced visual preview tools temporarily disabled to avoid duplicate tool registration
 
     console.error(`🎯 All tools registered successfully`);
   } catch (error) {

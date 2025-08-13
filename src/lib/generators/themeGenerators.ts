@@ -62,51 +62,63 @@ export default DarkTheme;`;
 
 // NEW: Theme LESS files (basic theming structure)
 export function generateCoreLess() {
-  return `/* Core Theming Variables */
+  return `/* Core Theming Variables with Lato Font Integration */
+
+/* Font-face declarations using Google Fonts CDN for reliability */
 @font-face {
   font-family: 'Lato';
-  src: url('@assets/fonts/Lato-Regular.ttf') format('truetype');
-  font-weight: normal;
+  src: url('https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wXiWtFCc.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lato';
-  src: url('@assets/fonts/Lato-Italic.ttf') format('truetype');
-  font-weight: normal;
+  src: url('https://fonts.gstatic.com/s/lato/v24/S6u8w4BMUTPHjxsAXC-qNiXg7Q.woff2') format('woff2');
+  font-weight: 400;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lato';
-  src: url('@assets/fonts/Lato-Bold.ttf') format('truetype');
+  src: url('https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lato';
-  src: url('@assets/fonts/Lato-Bold.ttf') format('truetype');
-  font-weight: bold;
+  src: url('https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2') format('woff2');
+  font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lato';
-  src: url('@assets/fonts/Lato-BlackItalic.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: 'Lato';
-  src: url('@assets/fonts/Lato-Italic.ttf') format('truetype');
+  src: url('https://fonts.gstatic.com/s/lato/v24/S6u_w4BMUTPHjxsI5wq_FQftx9897sxZ.woff2') format('woff2');
   font-weight: 600;
   font-style: italic;
+  font-display: swap;
 }
 
+/* Global font application */
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Lato', sans-serif !important;
+}
+
+/* ag-Grid specific font styling */
+.ag-theme-alpine,
+.ag-theme-alpine-dark {
+  font-family: 'Lato', sans-serif !important;
+  --ag-font-family: 'Lato', sans-serif !important;
+  --ag-font-size: 12px !important;
+  --ag-header-font-family: 'Lato', sans-serif !important;
+  --ag-header-font-size: 12px !important;
+  --ag-header-font-weight: 600 !important;
 }
 
 .ag-theme-alpine .ag-ltr .ag-cell,
@@ -116,6 +128,23 @@ body {
   justify-content: center;
   padding: 8px;
   line-height: 1.5;
+  font-family: 'Lato', sans-serif !important;
+  font-size: 12px !important;
+}
+
+/* Header cells with proper Lato font */
+.ag-header-cell,
+.ag-header-group-cell {
+  font-family: 'Lato', sans-serif !important;
+}
+
+.ag-header-cell-label,
+.ag-header-cell-text {
+  font-family: 'Lato', sans-serif !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.5px !important;
 }
 
 .ag-header-cell-filtered {
@@ -131,8 +160,15 @@ body {
   align-items: center;
 }
 
+/* Force Lato font on all ag-Grid elements */
+.ag-root-wrapper,
+.ag-root-wrapper * {
+  font-family: 'Lato', sans-serif !important;
+}
+
 input[type='number'] {
   border: none;
+  font-family: 'Lato', sans-serif !important;
 }`;
 }
 
@@ -215,7 +251,7 @@ export default DarkTheme;`;
 export function generateThemeBaseLess() {
   return `@import '../core.less';
 @border-radius-base: 0px;
-@font-size-base: 12px;
+@font-size-base: 14px; /* FIXED: Changed from 12px to normal 14px */
 @font-family: 'lato';
 @text-color: var(--gray-700);
 
@@ -548,7 +584,7 @@ tr.ant-table-row.ant-table-row-level-0 {
   --ag-secondary-foreground-color: var(--gray-500);
   --ag-border-color: var(--gray-300);
   --ag-border-radius: 5px;
-  --ag-font-size: 11px;
+  --ag-font-size: 1em; /* FIXED: Changed from 11px to 1em to match light theme */
   --ag-background-color: var(--bg-1);
   --ag-control-panel-background-color: var(--bg-2);
   --ag-header-background-color: var(--bg-2);
@@ -560,7 +596,7 @@ tr.ant-table-row.ant-table-row-level-0 {
   .ag-cell-wrapper.ag-row-group {
     align-items: center;
   }
-  font-size: 11px;
+  font-size: 1em; /* FIXED: Changed from 11px to 1em */
 }
 .ag-header-cell-text {
   text-transform: uppercase;
