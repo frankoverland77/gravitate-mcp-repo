@@ -12,6 +12,7 @@ import { registerFigmaTools } from "./tools/figma.js";
 import { registerDesignIterationTools } from "./tools/designIteration.js";
 import { registerThemeIntegrationTools } from "./tools/themeIntegration.js";
 import { registerEnhancedVisualPreviewTools } from "./tools/enhancedVisualPreview.js";
+import { registerOrchestrationTools } from "./tools/orchestration.js";
 
 // Create and configure the MCP server
 export function createMcpServer(): McpServer {
@@ -48,6 +49,9 @@ export function createMcpServer(): McpServer {
     // registerEnhancedVisualPreviewTools(server);
     // console.error(`✅ Enhanced visual preview tools registered`);
     // Note: Enhanced visual preview tools temporarily disabled to avoid duplicate tool registration
+
+    registerOrchestrationTools(server);
+    console.error(`✅ Orchestration tools registered - INTELLIGENT MODE ACTIVE 🤖`);
 
     console.error(`🎯 All tools registered successfully`);
   } catch (error) {
