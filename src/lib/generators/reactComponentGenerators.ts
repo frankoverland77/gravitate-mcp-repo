@@ -97,7 +97,7 @@ export function ${componentName}() {
 
   const agPropOverrides = useMemo(
     () => ({
-      getRowId: (row) => row.data.${uniqueIdField},
+      getRowId: (params) => params.data.${uniqueIdField},
     }),
     []
   );
@@ -110,39 +110,101 @@ export function ${componentName}() {
     []
   );
 
-  const data: ${featureName}Row[] = ${getDataFunctionName}({});
+  const data: ${featureName}Row[] = ${getDataFunctionName}();
 
   return (
-    <GraviGrid
-      controlBarProps={controlBarProps}
-      agPropOverrides={agPropOverrides}
-      columnDefs={columnDefs}
-      rowData={data}
-      storageKey={storageKey}
-    />
+    <div
+      style={{
+        height: "calc(100vh - 140px)",
+        width: "100%",
+        position: "relative",
+      }}
+    >
+      <GraviGrid
+        controlBarProps={controlBarProps}
+        agPropOverrides={agPropOverrides}
+        columnDefs={columnDefs}
+        rowData={data}
+        storageKey={storageKey}
+      />
+    </div>
   );
 }`;
 }
 
-// FIXED: Removed type properties from column definitions
+// FIXED: Enhanced column definitions with proper ag-Grid properties
 function generateColumnDefs(
   featureName: string,
   columns: Array<{ field: string; headerName: string; type?: string }>
 ) {
   const columnDefsArray = columns
     .map((col) => {
-      // CRITICAL FIX: Never include type property
-      const colDef = `{ field: "${col.field}", headerName: "${col.headerName}" }`;
+      // Determine width and special properties
+      let width = 150; // default width
+      let extraProps = "";
+
+      // Set width based on field type or name (only set once!)
+      if (
+        col.type === "numericColumn" ||
+        col.field.toLowerCase().includes("id")
+      ) {
+        width = 120;
+      } else if (
+        col.field.toLowerCase().includes("name") ||
+        col.field.toLowerCase().includes("title")
+      ) {
+        width = 180;
+      } else if (col.field.toLowerCase().includes("date")) {
+        width = 120;
+      } else if (
+        col.type === "booleanColumn" ||
+        col.field.toLowerCase().includes("active") ||
+        col.field.toLowerCase().includes("enabled")
+      ) {
+        width = 100;
+      }
+
+      // Add special formatters
+      if (
+        col.field.toLowerCase().includes("salary") ||
+        col.field.toLowerCase().includes("price") ||
+        col.field.toLowerCase().includes("cost") ||
+        col.field.toLowerCase().includes("revenue")
+      ) {
+        extraProps += `,
+      valueFormatter: (params) => params.value ? \`$\${params.value.toLocaleString()}\` : ""`;
+        if (width === 150) width = 120; // Set smaller width for currency fields if not already set
+      }
+
+      if (
+        col.type === "booleanColumn" ||
+        col.field.toLowerCase().includes("active") ||
+        col.field.toLowerCase().includes("enabled") ||
+        col.field.toLowerCase().includes("achieved")
+      ) {
+        extraProps += `,
+      cellRenderer: (params) => (params.value ? "Yes" : "No")`;
+      }
+
+      // Build the complete column definition
+      const colDef = `{
+      field: "${col.field}",
+      headerName: "${col.headerName}",
+      width: ${width},
+      sortable: true,
+      filter: true${extraProps}
+    }`;
+
       return `    ${colDef}`;
     })
     .join(",\n");
 
   return `import { ColDef } from "ag-grid-community";
 
-export function get${featureName}ColumnDefs() {
+export function get${featureName}ColumnDefs(): ColDef[] {
   return [
 ${columnDefsArray},
-  ] as ColDef[];
+  ];
 }`;
 }
 
@@ -164,8 +226,7 @@ function generateApiHook(config: {
 }) {
   const { featureName, hookName, getDataFunctionName, dataConstName } = config;
 
-  return `import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { ${dataConstName} } from "../data/dummyData";
+  return `import { ${dataConstName} } from "../data/dummyData";
 import {
   ${featureName}DataResponse,
   ${featureName}Request
@@ -178,19 +239,12 @@ const endpoints = {
 const USE_DUMMY_DATA = true;
 
 export function ${hookName}() {
-  const ${getDataFunctionName} = (payload: ${featureName}Request) =>
-    USE_DUMMY_DATA
-      ? ${dataConstName}
-      : useQuery([endpoints.${getDataFunctionName}, payload], () => 
-          fetch(endpoints.${getDataFunctionName}, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          }).then(res => res.json())
-        ) as UseQueryResult<${featureName}DataResponse, Error>;
+  const ${getDataFunctionName} = () => {
+    return ${dataConstName};
+  };
 
   return {
-    ${getDataFunctionName}
+    ${getDataFunctionName},
   };
 }`;
 }

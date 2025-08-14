@@ -130,6 +130,7 @@ async function readDependenciesFromMainRepo(): Promise<{
     const packageJsonPath =
       process.env.MAIN_PROJECT_PACKAGE_JSON ||
       "../Gravitate.Dotnet.Next/frontend/package.json";
+    console.warn("DEBUG - Reading dependencies from:", packageJsonPath);
     const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
     const packageJson = JSON.parse(packageJsonContent);
 
@@ -141,9 +142,11 @@ async function readDependenciesFromMainRepo(): Promise<{
 
     // Get core dependencies from gravitate project with cleaned versions
     const coreDependencies = {
-      "@gravitate-js/excalibrr": cleanVersion(
-        packageJson.dependencies["@gravitate-js/excalibrr"]
-      ),
+      "@gravitate-js/excalibrr": packageJson.dependencies[
+        "@gravitate-js/excalibrr"
+      ]
+        ? cleanVersion(packageJson.dependencies["@gravitate-js/excalibrr"])
+        : "4.0.34-osp", // Always ensure Excalibrr is included
       "ag-grid-community": cleanVersion(
         packageJson.dependencies["ag-grid-community"]
       ),
@@ -167,6 +170,9 @@ async function readDependenciesFromMainRepo(): Promise<{
       lodash: cleanVersion(packageJson.dependencies["lodash"]),
       moment: cleanVersion(packageJson.dependencies["moment"]),
       axios: cleanVersion(packageJson.dependencies["axios"]),
+      color: packageJson.dependencies["color"]
+        ? cleanVersion(packageJson.dependencies["color"])
+        : "4.2.3", // For theme color manipulation
       // ADD MISSING VITE DEPENDENCIES - These are critical!
       vite: "^7.0.6",
       "@vitejs/plugin-react": "^4.7.0",
@@ -194,9 +200,32 @@ async function readDependenciesFromMainRepo(): Promise<{
     // Get resolutions if they exist
     const resolutions = packageJson.resolutions || {};
 
+    // Filter out any undefined dependencies, but always ensure critical ones are included
+    const filteredDependencies = Object.fromEntries(
+      Object.entries(coreDependencies).filter(([key, value]) => value != null)
+    );
+    const filteredDevDependencies = Object.fromEntries(
+      Object.entries(coreDevDependencies).filter(
+        ([key, value]) => value != null
+      )
+    );
+
+    // CRITICAL FIX: Force inclusion of essential dependencies even if filtered out
+    if (!filteredDependencies["@gravitate-js/excalibrr"]) {
+      filteredDependencies["@gravitate-js/excalibrr"] = "4.0.34-osp";
+    }
+    if (!filteredDependencies["color"]) {
+      filteredDependencies["color"] = "4.2.3";
+    }
+
+    console.warn(
+      "DEBUG - Final dependencies being returned:",
+      filteredDependencies
+    );
+
     return {
-      dependencies: coreDependencies,
-      devDependencies: coreDevDependencies,
+      dependencies: filteredDependencies,
+      devDependencies: filteredDevDependencies,
       resolutions,
     };
   } catch (error) {
@@ -206,9 +235,11 @@ async function readDependenciesFromMainRepo(): Promise<{
     );
     // FIXED: Use the proper getDynamicDependencies as fallback
     const { getDynamicDependencies } = await import(
-      "../../lib/codeGenerators.js"
+      "../../lib/generators/types.js"
     );
-    return getDynamicDependencies();
+    const fallbackDeps = getDynamicDependencies();
+    console.warn("DEBUG - Using fallback dependencies:", fallbackDeps);
+    return fallbackDeps;
   }
 }
 
@@ -258,29 +289,28 @@ export function registerCodeGenerationTools(server: McpServer): void {
 ${accessTest.message}
 ${inspection.message}
 
-${accessTest.success
-                ? `✅ **Ready for file generation!**
+${
+  accessTest.success
+    ? `✅ **Ready for file generation!**
 You can use this directory in other tools by specifying:
 \`outputDirectory='${directoryPath}'\``
-                : `❌ **Cannot use this directory**
+    : `❌ **Cannot use this directory**
 Please try a different path or create the directory manually first.`
-              }
+}
 
 ${
-                inspection.exists && inspection.contents
-                  ? `**Current Contents:**
+  inspection.exists && inspection.contents
+    ? `**Current Contents:**
 ${inspection.contents
-                      .slice(0, 10)
-                      .map((item) => `• ${item}`)
-                      .join("\n")}${
-                      inspection.contents.length > 10
-                        ? "\n• ... and " +
-                          (inspection.contents.length - 10) +
-                          " more items"
-                        : ""
-                    }`
-                  : ""
-              }`,
+  .slice(0, 10)
+  .map((item) => `• ${item}`)
+  .join("\n")}${
+        inspection.contents.length > 10
+          ? "\n• ... and " + (inspection.contents.length - 10) + " more items"
+          : ""
+      }`
+    : ""
+}`,
           },
         ],
       };
@@ -308,12 +338,14 @@ ${inspection.contents
       if (!outputDirectory) {
         const suggested = suggestDirectory("Test File Generation");
         const prompt = createDirectoryPrompt("Test File Generation", suggested);
-        
+
         return {
           content: [
             {
               type: "text" as const,
-              text: prompt + "\n\n**To proceed, run this tool again with the 'outputDirectory' parameter.**\n\nExample:\n```\ntest_file_generation with outputDirectory='/Users/rebecca.hirai/workspace'\n```",
+              text:
+                prompt +
+                "\n\n**To proceed, run this tool again with the 'outputDirectory' parameter.**\n\nExample:\n```\ntest_file_generation with outputDirectory='/Users/rebecca.hirai/workspace'\n```",
             },
           ],
         };
@@ -334,8 +366,11 @@ ${inspection.contents
 
       try {
         const validation = validateDirectoryPath(outputDirectory);
-        const testPath = path.join(validation.normalizedPath, `${testName}.txt`);
-        
+        const testPath = path.join(
+          validation.normalizedPath,
+          `${testName}.txt`
+        );
+
         const testContent = `Test file generated at: ${new Date().toISOString()}\nTest name: ${testName}\nOutput directory: ${outputDirectory}\nFull path: ${testPath}\n\nThis confirms that the MCP server can write files to your specified directory!`;
 
         await fs.mkdir(validation.normalizedPath, { recursive: true });
@@ -355,7 +390,8 @@ ${inspection.contents
                 exists ? "✅ SUCCESS" : "❌ FAILED"
               }\n**File:** \`${testPath}\`\n**Directory:** \`${outputDirectory}\`\n\n${
                 exists
-                  ? "✨ **Great!** File generation is working correctly.\nYou can now use this directory path in other MCP tools.\n\n**File Contents:**\n\n" + testContent
+                  ? "✨ **Great!** File generation is working correctly.\nYou can now use this directory path in other MCP tools.\n\n**File Contents:**\n\n" +
+                    testContent
                   : "File creation failed - please check directory permissions."
               }`,
             },
@@ -441,12 +477,14 @@ ${inspection.contents
           `${featureName} React Project Generation`,
           suggested
         );
-        
+
         return {
           content: [
             {
               type: "text" as const,
-              text: prompt + "\n\n**To proceed, please run this tool again with the 'outputDirectory' parameter specified.**\n\nExample:\n```\ngenerate_grid_component with outputDirectory='/Users/rebecca.hirai/workspace'\n```",
+              text:
+                prompt +
+                "\n\n**To proceed, please run this tool again with the 'outputDirectory' parameter specified.**\n\nExample:\n```\ngenerate_grid_component with outputDirectory='/Users/rebecca.hirai/workspace'\n```",
             },
           ],
         };
@@ -498,11 +536,27 @@ ${inspection.contents
       };
 
       if (generateFullProject) {
-        // Read dependencies from main repo
-        const dependencyData = await readDependenciesFromMainRepo();
+        // TEMPORARY FIX: Force use fallback dependencies to ensure @gravitate-js/excalibrr is included
+        const { getDynamicDependencies } = await import(
+          "../../lib/generators/types.js"
+        );
+        const dependencyData = getDynamicDependencies();
+        console.warn(
+          "DEBUG - Using forced fallback dependencies:",
+          dependencyData
+        );
 
         // Generate React project with dependencies
-        const files = generateReactProject(config, dependencyData);
+        const projectFiles = generateReactProject(config, dependencyData);
+
+        // CRITICAL FIX: Also generate the actual component files using our clean generators
+        const { generateComponentFiles } = await import(
+          "../../lib/codeGenerators.js"
+        );
+        const componentFiles = generateComponentFiles(config);
+
+        // Combine project infrastructure files with component files
+        const files = [...projectFiles, ...componentFiles];
 
         // Write files to user-specified directory
         const result = await writeProjectToUserDirectory(

@@ -12,9 +12,12 @@ export function generatePackageJson(
     private: true,
     scripts: {
       dev: "vite",
+      "dev:clean": `pkill -f 'vite.*${featureName.toLowerCase()}' || true && vite`,
+      "dev:check": `ps aux | grep vite | grep ${featureName.toLowerCase()} || echo 'No servers running for ${featureName}'`,
       build: "vite build",
       preview: "vite preview",
       start: "vite",
+      stop: `pkill -f 'vite.*${featureName.toLowerCase()}' || true`,
       "build:tsc": "tsc",
       lint: "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
       "lint:fix": "eslint . --ext ts,tsx --fix",

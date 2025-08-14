@@ -3,6 +3,11 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { RelationshipInfo, PatternInfo } from "../types.js";
+import {
+  ProjectComponentRegistry,
+  ProjectComponent,
+} from "../projectComponents.js";
+import { ProjectComponentScanner } from "../projectComponentScanner.js";
 
 export interface WorkflowStep {
   tool: string;
@@ -17,6 +22,7 @@ export interface WorkflowContext {
   featureName?: string;
   theme?: string;
   components?: string[];
+  query?: string; // User's original query for component discovery
   gridConfig?: {
     columns?: any[];
     apiEndpoint?: string;
@@ -35,8 +41,10 @@ export interface WorkflowDefinition {
 
 export class WorkflowOrchestrator {
   private workflows: Map<string, WorkflowDefinition> = new Map();
+  private projectScanner: ProjectComponentScanner;
 
   constructor(private server: McpServer) {
+    this.projectScanner = new ProjectComponentScanner();
     this.registerBuiltInWorkflows();
   }
 
@@ -136,34 +144,51 @@ export class WorkflowOrchestrator {
     // Workflow: Discover and suggest components
     this.registerWorkflow({
       name: "smart-discovery",
-      description: "Intelligently discovers components based on use case",
+      description:
+        "Intelligently discovers Excalibrr and project components based on use case",
       steps: [
         {
           tool: "search_components",
           params: {}, // query from context
           processResult: (result) => {
-            const components = this.parseComponentList(result);
-            return { searchResults: components };
+            const excalibrComponents = this.parseComponentList(result);
+            return { excalibrComponents };
           },
         },
         {
           tool: "find_component_relationships",
           params: {}, // componentName from context
-          skipIf: (ctx) => !ctx.results.searchResults?.length,
+          skipIf: (ctx) => !ctx.results.excalibrComponents?.length,
           processResult: (result) => {
-            return { relationships: result };
+            return { excalibrRelationships: result };
           },
         },
       ],
-      outputFormatter: (context) => {
-        const components = context.results.searchResults || [];
-        const relationships = context.results.relationships;
+      outputFormatter: async (context) => {
+        const excalibrComponents = context.results.excalibrComponents || [];
+        const excalibrRelationships = context.results.excalibrRelationships;
+
+        // Get project components that match the query
+        const projectComponents = await this.discoverProjectComponents(
+          context.query || ""
+        );
+
+        // Generate enhanced recommendations
+        const recommendations = this.generateEnhancedRecommendations(
+          excalibrComponents,
+          projectComponents,
+          excalibrRelationships,
+          context.query || ""
+        );
 
         return {
-          recommendedComponents: components,
-          commonlyUsedWith: relationships?.commonlyUsedWith || [],
-          patterns: relationships?.patterns || [],
-          suggestion: this.generateSmartSuggestion(components, relationships),
+          excalibrComponents,
+          projectComponents,
+          recommendations,
+          smartSuggestion: this.generateSmartSuggestion(
+            [...excalibrComponents, ...projectComponents],
+            excalibrRelationships
+          ),
         };
       },
     });
@@ -381,6 +406,207 @@ export class WorkflowOrchestrator {
     }
 
     return suggestion;
+  }
+
+  // Enhanced project component discovery
+  private async discoverProjectComponents(
+    query: string
+  ): Promise<ProjectComponent[]> {
+    try {
+      // First check the manual registry for exact matches
+      const registryMatches = ProjectComponentRegistry.findForUseCase(query);
+
+      if (registryMatches.length > 0) {
+        return registryMatches;
+      }
+
+      // If no manual registry matches, try automated discovery
+      const discoveredComponents =
+        await this.projectScanner.discoverAllComponents();
+
+      // Filter discovered components by query relevance
+      const lowerQuery = query.toLowerCase();
+      const relevantComponents = discoveredComponents.filter(
+        (comp) =>
+          comp.name.toLowerCase().includes(lowerQuery) ||
+          comp.description?.toLowerCase().includes(lowerQuery) ||
+          comp.commonUseCases.some((useCase) =>
+            useCase.toLowerCase().includes(lowerQuery)
+          ) ||
+          comp.usageContext.toLowerCase().includes(lowerQuery)
+      );
+
+      return relevantComponents.slice(0, 10); // Limit results
+    } catch (error) {
+      console.error(`Error discovering project components: ${error}`);
+      return [];
+    }
+  }
+
+  // Generate enhanced recommendations combining Excalibrr and project components
+  private generateEnhancedRecommendations(
+    excalibrComponents: any[],
+    projectComponents: ProjectComponent[],
+    relationships: any,
+    query: string
+  ): any {
+    const recommendations: any = {
+      primaryRecommendation: null,
+      excalibrComponents: [],
+      projectComponents: [],
+      completeExample: null,
+      imports: [],
+    };
+
+    // Determine primary component based on query intent
+    if (query.toLowerCase().includes("grid")) {
+      recommendations.primaryRecommendation = {
+        component: "GraviGrid",
+        type: "excalibrr",
+        reason: "Core grid component from Excalibrr library",
+      };
+
+      // Add relevant project components for grids
+      const gridProjectComponents = projectComponents.filter(
+        (comp) =>
+          comp.projectCategory === "cell-editors" ||
+          comp.projectCategory === "bulk-editors" ||
+          comp.projectCategory === "column-defs"
+      );
+      recommendations.projectComponents = gridProjectComponents;
+    }
+
+    // Add compatible project components for primary Excalibrr components
+    excalibrComponents.forEach((excalibrComp) => {
+      const compatibleProjectComps =
+        ProjectComponentRegistry.findCompatibleComponents(excalibrComp.name);
+      recommendations.projectComponents.push(...compatibleProjectComps);
+    });
+
+    // Generate import statements
+    const excalibrImports = excalibrComponents.map((comp) => comp.name);
+    const projectImports = recommendations.projectComponents.map(
+      (comp: ProjectComponent) => comp.name
+    );
+
+    if (excalibrImports.length > 0) {
+      recommendations.imports.push(
+        `import { ${excalibrImports.join(
+          ", "
+        )} } from '@gravitate-js/excalibrr';`
+      );
+    }
+
+    if (projectImports.length > 0) {
+      recommendations.imports.push(
+        ProjectComponentRegistry.generateImports(projectImports)
+      );
+    }
+
+    // Generate a complete usage example
+    if (recommendations.primaryRecommendation?.component === "GraviGrid") {
+      recommendations.completeExample =
+        this.generateGridExample(recommendations);
+    }
+
+    return recommendations;
+  }
+
+  // Generate a complete grid example with project components
+  private generateGridExample(recommendations: any): string {
+    const cellEditors = recommendations.projectComponents
+      .filter(
+        (comp: ProjectComponent) => comp.projectCategory === "cell-editors"
+      )
+      .slice(0, 2);
+
+    const columnDefs = recommendations.projectComponents
+      .filter(
+        (comp: ProjectComponent) => comp.projectCategory === "column-defs"
+      )
+      .slice(0, 1);
+
+    let example = `// Complete grid setup with project components
+import { GraviGrid, Vertical, Horizontal } from '@gravitate-js/excalibrr';`;
+
+    if (cellEditors.length > 0) {
+      const cellEditorNames = cellEditors.map(
+        (comp: ProjectComponent) => comp.name
+      );
+      example += `\nimport { ${cellEditorNames.join(
+        ", "
+      )} } from '@components/shared/Grid/cellEditors';`;
+    }
+
+    if (columnDefs.length > 0) {
+      const columnDefNames = columnDefs.map(
+        (comp: ProjectComponent) => comp.name
+      );
+      example += `\nimport { ${columnDefNames.join(
+        ", "
+      )} } from '@components/shared/Grid/sharedColumnDefs';`;
+    }
+
+    example += `
+
+const columnDefs = [
+  {
+    field: 'name',
+    headerName: 'Name',
+    editable: true
+  },`;
+
+    if (
+      cellEditors.some(
+        (comp: ProjectComponent) => comp.name === "SearchableSelect"
+      )
+    ) {
+      example += `
+  {
+    field: 'category',
+    headerName: 'Category', 
+    cellEditor: SearchableSelect,
+    cellEditorParams: {
+      options: categoryOptions,
+      showSearch: true
+    }
+  },`;
+    }
+
+    if (
+      cellEditors.some(
+        (comp: ProjectComponent) => comp.name === "NumberCellEditor"
+      )
+    ) {
+      example += `
+  {
+    field: 'price',
+    headerName: 'Price',
+    cellEditor: NumberCellEditor,
+    cellEditorParams: {
+      precision: 2,
+      min: 0
+    }
+  },`;
+    }
+
+    example += `
+];
+
+export function MyGrid() {
+  return (
+    <Vertical>
+      <GraviGrid
+        columnDefs={columnDefs}
+        rowData={data}
+        enableBulkEdit={true}
+        storageKey="my-grid"
+      />
+    </Vertical>
+  );
+}`;
+
+    return example;
   }
 
   // Public method to list available workflows

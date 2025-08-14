@@ -5,6 +5,10 @@ import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WorkflowOrchestrator } from "../../lib/workflows/workflowOrchestrator.js";
 import { ResponseFormatter } from "../../lib/responseFormatter.js";
+import {
+  ProjectComponentRegistry,
+  PROJECT_COMPONENTS,
+} from "../../lib/projectComponents.js";
 
 let orchestrator: WorkflowOrchestrator;
 
@@ -17,78 +21,101 @@ export function registerOrchestrationTools(server: McpServer): void {
     "execute_workflow",
     "Intelligently executes a multi-step workflow to accomplish complex tasks",
     {
-      request: z.string().describe("Natural language description of what you want to accomplish"),
-      module: z.string().optional().describe("Module name (e.g., Admin, PricingEngine)"),
-      feature: z.string().optional().describe("Feature name (e.g., ManageProducts)"),
-      theme: z.enum(["OSP", "PE", "BP", "default"]).optional().describe("Gravitate theme to apply"),
-      gridConfig: z.object({
-        columns: z.array(z.object({
-          field: z.string(),
-          headerName: z.string(),
-          type: z.string().optional(),
-          width: z.number().optional()
-        })).optional(),
-        apiEndpoint: z.string().optional(),
-        title: z.string().optional(),
-        uniqueIdField: z.string().optional()
-      }).optional().describe("Configuration for grid components")
+      request: z
+        .string()
+        .describe(
+          "Natural language description of what you want to accomplish"
+        ),
+      module: z
+        .string()
+        .optional()
+        .describe("Module name (e.g., Admin, PricingEngine)"),
+      feature: z
+        .string()
+        .optional()
+        .describe("Feature name (e.g., ManageProducts)"),
+      theme: z
+        .enum(["OSP", "PE", "BP", "default"])
+        .optional()
+        .describe("Gravitate theme to apply"),
+      gridConfig: z
+        .object({
+          columns: z
+            .array(
+              z.object({
+                field: z.string(),
+                headerName: z.string(),
+                type: z.string().optional(),
+                width: z.number().optional(),
+              })
+            )
+            .optional(),
+          apiEndpoint: z.string().optional(),
+          title: z.string().optional(),
+          uniqueIdField: z.string().optional(),
+        })
+        .optional()
+        .describe("Configuration for grid components"),
     },
     async ({ request, module, feature, theme, gridConfig }) => {
       try {
         console.error(`🤖 Intelligent request: "${request}"`);
-        
+
         // Analyze the request to determine the best workflow
         const suggestedWorkflow = orchestrator.suggestWorkflow(request);
-        
+
         if (!suggestedWorkflow) {
           // Fallback to analyzing keywords
           const workflows = orchestrator.getAvailableWorkflows();
           return {
-            content: [{
-              type: "text",
-              text: `I couldn't determine the exact workflow for: "${request}"\n\n` +
-                    `Available workflows:\n${workflows.map(w => 
-                      `- **${w.name}**: ${w.description}`
-                    ).join("\n")}\n\n` +
-                    `Please be more specific or try:\n` +
-                    `- "Create a product management grid with OSP theme"\n` +
-                    `- "Apply PE theme to my components"\n` +
-                    `- "Discover grid components for data display"`
-            }]
+            content: [
+              {
+                type: "text",
+                text:
+                  `I couldn't determine the exact workflow for: "${request}"\n\n` +
+                  `Available workflows:\n${workflows
+                    .map((w) => `- **${w.name}**: ${w.description}`)
+                    .join("\n")}\n\n` +
+                  `Please be more specific or try:\n` +
+                  `- "Create a product management grid with OSP theme"\n` +
+                  `- "Apply PE theme to my components"\n` +
+                  `- "Discover grid components for data display"`,
+              },
+            ],
           };
         }
 
         console.error(`✨ Selected workflow: ${suggestedWorkflow}`);
-        
+
         // Execute the workflow with context
         const result = await orchestrator.executeWorkflow(suggestedWorkflow, {
           moduleName: module,
           featureName: feature,
           theme: theme || "default",
           gridConfig,
-          components: []
+          components: [],
         });
 
         // Format the response
         const formatted = ResponseFormatter.format(suggestedWorkflow, result, {
           moduleName: module,
           featureName: feature,
-          theme
+          theme,
         });
 
         // Build the response text
         let responseText = "";
-        
+
         if (formatted.changePlan) {
           responseText += `## 📋 Change Plan\n\n`;
           responseText += `**Summary:** ${formatted.changePlan.summary}\n\n`;
           responseText += `**Changes:**\n`;
-          formatted.changePlan.changes.forEach(change => {
+          formatted.changePlan.changes.forEach((change) => {
             responseText += `- ${change.type.toUpperCase()}: ${change.path}\n`;
             responseText += `  ${change.description}\n`;
           });
           responseText += `\n**Impacts:**\n`;
-          formatted.changePlan.impacts.forEach(impact => {
+          formatted.changePlan.impacts.forEach((impact) => {
             responseText += `- ${impact}\n`;
           });
           responseText += "\n---\n\n";
@@ -97,8 +124,8 @@ export function registerOrchestrationTools(server: McpServer): void {
         if (formatted.code) {
           responseText += `## 💻 Generated Code\n\n`;
           responseText += `Generated ${formatted.code.files.length} file(s):\n\n`;
-          
-          formatted.code.files.forEach(file => {
+
+          formatted.code.files.forEach((file) => {
             responseText += `### ${file.path}\n`;
             responseText += `*${file.purpose}*\n\n`;
             responseText += `\`\`\`${file.language}\n${file.content}\n\`\`\`\n\n`;
@@ -106,21 +133,23 @@ export function registerOrchestrationTools(server: McpServer): void {
 
           if (formatted.code.setupInstructions) {
             responseText += `### Setup Instructions\n\n`;
-            formatted.code.setupInstructions.forEach(instruction => {
+            formatted.code.setupInstructions.forEach((instruction) => {
               responseText += `${instruction}\n`;
             });
             responseText += "\n";
           }
-          
+
           responseText += "---\n\n";
         }
 
         if (formatted.validationReport) {
           responseText += `## ✅ Validation Report\n\n`;
-          responseText += `**Status:** ${formatted.validationReport.passed ? "✅ PASSED" : "❌ FAILED"}\n\n`;
-          
+          responseText += `**Status:** ${
+            formatted.validationReport.passed ? "✅ PASSED" : "❌ FAILED"
+          }\n\n`;
+
           responseText += `**Checks:**\n`;
-          formatted.validationReport.checks.forEach(check => {
+          formatted.validationReport.checks.forEach((check) => {
             responseText += `- ${check.passed ? "✅" : "❌"} ${check.name}`;
             if (check.message) {
               responseText += `: ${check.message}`;
@@ -130,18 +159,18 @@ export function registerOrchestrationTools(server: McpServer): void {
 
           if (formatted.validationReport.warnings.length > 0) {
             responseText += `\n**⚠️ Warnings:**\n`;
-            formatted.validationReport.warnings.forEach(warning => {
+            formatted.validationReport.warnings.forEach((warning) => {
               responseText += `- ${warning}\n`;
             });
           }
 
           if (formatted.validationReport.errors.length > 0) {
             responseText += `\n**❌ Errors:**\n`;
-            formatted.validationReport.errors.forEach(error => {
+            formatted.validationReport.errors.forEach((error) => {
               responseText += `- ${error}\n`;
             });
           }
-          
+
           responseText += "\n---\n\n";
         }
 
@@ -149,27 +178,33 @@ export function registerOrchestrationTools(server: McpServer): void {
           responseText += `## 🚀 Pull Request Ready\n\n`;
           responseText += `**Title:** ${formatted.prPayload.title}\n`;
           responseText += `**Branch:** ${formatted.prPayload.branch}\n`;
-          responseText += `**Labels:** ${formatted.prPayload.labels.join(", ")}\n\n`;
+          responseText += `**Labels:** ${formatted.prPayload.labels.join(
+            ", "
+          )}\n\n`;
           responseText += `<details>\n<summary>PR Description</summary>\n\n`;
           responseText += formatted.prPayload.description;
           responseText += `\n</details>\n`;
         }
 
         return {
-          content: [{
-            type: "text",
-            text: responseText || "Workflow completed successfully."
-          }]
+          content: [
+            {
+              type: "text",
+              text: responseText || "Workflow completed successfully.",
+            },
+          ],
         };
-        
       } catch (error) {
         console.error("❌ Workflow execution error:", error);
         return {
-          content: [{
-            type: "text",
-            text: `Error executing workflow: ${error}\n\n` +
-                  `Please check your request and try again.`
-          }]
+          content: [
+            {
+              type: "text",
+              text:
+                `Error executing workflow: ${error}\n\n` +
+                `Please check your request and try again.`,
+            },
+          ],
         };
       }
     }
@@ -181,17 +216,20 @@ export function registerOrchestrationTools(server: McpServer): void {
     "Intelligently suggests components based on your use case",
     {
       useCase: z.string().describe("Describe what you're trying to build"),
-      currentComponents: z.array(z.string()).optional().describe("Components you're already using")
+      currentComponents: z
+        .array(z.string())
+        .optional()
+        .describe("Components you're already using"),
     },
     async ({ useCase, currentComponents = [] }) => {
       try {
         const result = await orchestrator.executeWorkflow("smart-discovery", {
           components: currentComponents,
-          results: { query: useCase }
+          results: { query: useCase },
         });
 
         let responseText = `## 🎯 Component Suggestions for: "${useCase}"\n\n`;
-        
+
         if (result.recommendedComponents?.length > 0) {
           responseText += `### Recommended Components\n\n`;
           result.recommendedComponents.forEach((comp: any) => {
@@ -212,7 +250,9 @@ export function registerOrchestrationTools(server: McpServer): void {
           responseText += `### Common Patterns\n\n`;
           result.patterns.forEach((pattern: any) => {
             responseText += `- **${pattern.name}**: ${pattern.useCase}\n`;
-            responseText += `  Components: ${pattern.components.join(" + ")}\n\n`;
+            responseText += `  Components: ${pattern.components.join(
+              " + "
+            )}\n\n`;
           });
         }
 
@@ -221,17 +261,21 @@ export function registerOrchestrationTools(server: McpServer): void {
         }
 
         return {
-          content: [{
-            type: "text",
-            text: responseText
-          }]
+          content: [
+            {
+              type: "text",
+              text: responseText,
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{
-            type: "text",
-            text: `Error suggesting components: ${error}`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Error suggesting components: ${error}`,
+            },
+          ],
         };
       }
     }
@@ -244,19 +288,41 @@ export function registerOrchestrationTools(server: McpServer): void {
     {
       module: z.string().describe("Module name (e.g., Admin, PricingEngine)"),
       feature: z.string().describe("Feature name (e.g., ManageProducts)"),
-      columns: z.array(z.object({
-        field: z.string(),
-        headerName: z.string(),
-        type: z.string().optional(),
-        editable: z.boolean().optional(),
-        width: z.number().optional()
-      })).describe("Column definitions for the grid"),
-      apiEndpoint: z.string().describe("API endpoint for data (e.g., 'Admin/Products/Read')"),
+      columns: z
+        .array(
+          z.object({
+            field: z.string(),
+            headerName: z.string(),
+            type: z.string().optional(),
+            editable: z.boolean().optional(),
+            width: z.number().optional(),
+          })
+        )
+        .describe("Column definitions for the grid"),
+      apiEndpoint: z
+        .string()
+        .describe("API endpoint for data (e.g., 'Admin/Products/Read')"),
       theme: z.enum(["OSP", "PE", "BP", "default"]).optional().default("OSP"),
-      includeForm: z.boolean().optional().default(true).describe("Include create/edit form"),
-      includeBulkActions: z.boolean().optional().default(true).describe("Include bulk actions")
+      includeForm: z
+        .boolean()
+        .optional()
+        .default(true)
+        .describe("Include create/edit form"),
+      includeBulkActions: z
+        .boolean()
+        .optional()
+        .default(true)
+        .describe("Include bulk actions"),
     },
-    async ({ module, feature, columns, apiEndpoint, theme, includeForm, includeBulkActions }) => {
+    async ({
+      module,
+      feature,
+      columns,
+      apiEndpoint,
+      theme,
+      includeForm,
+      includeBulkActions,
+    }) => {
       try {
         // This is a convenience wrapper that sets up everything
         const context = {
@@ -266,20 +332,27 @@ export function registerOrchestrationTools(server: McpServer): void {
           gridConfig: {
             columns,
             apiEndpoint,
-            title: feature.replace(/([A-Z])/g, ' $1').trim(),
+            title: feature.replace(/([A-Z])/g, " $1").trim(),
             uniqueIdField: columns[0]?.field || "id",
-            includeBulkActions
-          }
+            includeBulkActions,
+          },
         };
 
-        const result = await orchestrator.executeWorkflow("production-grid", context);
-        
+        const result = await orchestrator.executeWorkflow(
+          "production-grid",
+          context
+        );
+
         // Format as production-ready output
-        const formatted = ResponseFormatter.format("create_smart_grid", result, context);
-        
+        const formatted = ResponseFormatter.format(
+          "create_smart_grid",
+          result,
+          context
+        );
+
         let responseText = `# 🚀 Smart Grid Generation Complete!\n\n`;
         responseText += `Created **${feature}** in **${module}** module with **${theme}** theme.\n\n`;
-        
+
         // Show file structure
         responseText += `## 📁 Generated Structure\n\n`;
         responseText += "```\n";
@@ -297,19 +370,21 @@ export function registerOrchestrationTools(server: McpServer): void {
         responseText += `└── api/\n`;
         responseText += `    └── use${feature}.tsx    # React Query hooks\n`;
         responseText += "```\n\n";
-        
+
         // Show key code snippets
         if (formatted.code?.files && formatted.code.files.length > 0) {
           responseText += `## 💻 Key Components\n\n`;
-          
+
           // Show main index file
-          const mainFile = formatted.code.files.find(f => f.path.endsWith("index.tsx"));
+          const mainFile = formatted.code.files.find((f) =>
+            f.path.endsWith("index.tsx")
+          );
           if (mainFile) {
             responseText += `### Main Component\n\n`;
             responseText += `\`\`\`tsx\n${mainFile.content}\n\`\`\`\n\n`;
           }
         }
-        
+
         // Setup instructions
         responseText += `## 🔧 Setup Instructions\n\n`;
         responseText += `1. Files have been generated in \`src/modules/${module}/${feature}/\`\n`;
@@ -320,15 +395,15 @@ export function registerOrchestrationTools(server: McpServer): void {
         responseText += `// In your routes\n`;
         responseText += `<Route path="/${module.toLowerCase()}/${feature.toLowerCase()}" element={<${feature} />} />\n`;
         responseText += `\`\`\`\n\n`;
-        
+
         // Validation results
         if (formatted.validationReport) {
           responseText += `## ✅ Quality Checks\n\n`;
-          formatted.validationReport.checks.forEach(check => {
+          formatted.validationReport.checks.forEach((check) => {
             responseText += `${check.passed ? "✅" : "⚠️"} ${check.name}\n`;
           });
         }
-        
+
         responseText += `\n## 🎉 Ready to Use!\n\n`;
         responseText += `Your grid is ready with:\n`;
         responseText += `- ✅ ${columns.length} configured columns\n`;
@@ -341,18 +416,215 @@ export function registerOrchestrationTools(server: McpServer): void {
         responseText += `- ✅ No Tailwind (using proper themes)\n`;
 
         return {
-          content: [{
-            type: "text", 
-            text: responseText
-          }]
+          content: [
+            {
+              type: "text",
+              text: responseText,
+            },
+          ],
         };
-        
       } catch (error) {
         return {
-          content: [{
-            type: "text",
-            text: `Error creating smart grid: ${error}`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Error creating smart grid: ${error}`,
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  // Tool: Discover Project Components
+  server.tool(
+    "discover_project_components",
+    "Discover and analyze project-specific components from Gravitate.Dotnet.Next",
+    {
+      query: z
+        .string()
+        .optional()
+        .describe("Search query for specific component types or use cases"),
+      category: z
+        .enum([
+          "cell-editors",
+          "bulk-editors",
+          "column-defs",
+          "grid-messages",
+          "action-buttons",
+          "grid-utilities",
+          "shared-ui",
+          "all",
+        ])
+        .optional()
+        .default("all")
+        .describe("Filter by component category"),
+      includeExamples: z
+        .boolean()
+        .optional()
+        .default(true)
+        .describe("Include usage examples with discovered components"),
+    },
+    async ({ query = "", category = "all", includeExamples = true }) => {
+      try {
+        console.error(
+          `🔍 Discovering project components: query="${query}", category="${category}"`
+        );
+
+        let projectComponents;
+
+        if (category === "all") {
+          // Get components from manual registry that match the query
+          projectComponents = query
+            ? ProjectComponentRegistry.findForUseCase(query)
+            : PROJECT_COMPONENTS;
+        } else {
+          // Get components by specific category
+          const categoryComponents =
+            ProjectComponentRegistry.findByCategory(category);
+          projectComponents = query
+            ? categoryComponents.filter(
+                (comp) =>
+                  comp.name.toLowerCase().includes(query.toLowerCase()) ||
+                  comp.description
+                    ?.toLowerCase()
+                    .includes(query.toLowerCase()) ||
+                  comp.commonUseCases.some((useCase) =>
+                    useCase.toLowerCase().includes(query.toLowerCase())
+                  )
+              )
+            : categoryComponents;
+        }
+
+        // Get related Excalibrr components for context
+        const relatedExcalibrComponents = new Set<string>();
+        projectComponents.forEach((comp) => {
+          comp.relatedExcalibrComponents.forEach((exc) =>
+            relatedExcalibrComponents.add(exc)
+          );
+        });
+
+        let responseText = `# 🔧 Project Components Discovery\n\n`;
+        responseText += `**Query:** "${query}" | **Category:** ${category}\n`;
+        responseText += `**Found:** ${projectComponents.length} project-specific components\n\n`;
+
+        if (projectComponents.length === 0) {
+          responseText += `No project components found for your criteria. Try:\n`;
+          responseText += `- Using broader search terms\n`;
+          responseText += `- Trying category "all" to see all available components\n`;
+          responseText += `- Checking component categories: cell-editors, bulk-editors, column-defs\n`;
+        } else {
+          responseText += `## 📦 Available Components\n\n`;
+
+          // Group by category for better organization
+          const groupedComponents = projectComponents.reduce(
+            (groups: any, comp) => {
+              const cat = comp.projectCategory;
+              if (!groups[cat]) groups[cat] = [];
+              groups[cat].push(comp);
+              return groups;
+            },
+            {}
+          );
+
+          for (const [cat, components] of Object.entries(groupedComponents)) {
+            responseText += `### ${cat.replace("-", " ").toUpperCase()}\n\n`;
+
+            (components as any[]).forEach((comp) => {
+              responseText += `**${comp.name}**\n`;
+              responseText += `- *Purpose:* ${comp.description}\n`;
+              responseText += `- *Context:* ${comp.usageContext}\n`;
+              responseText += `- *File:* \`${comp.file}\`\n`;
+
+              if (comp.commonUseCases.length > 0) {
+                responseText += `- *Common Use Cases:*\n`;
+                comp.commonUseCases.forEach((useCase: string) => {
+                  responseText += `  - ${useCase}\n`;
+                });
+              }
+
+              if (comp.relatedExcalibrComponents.length > 0) {
+                responseText += `- *Works with Excalibrr:* ${comp.relatedExcalibrComponents.join(
+                  ", "
+                )}\n`;
+              }
+
+              if (includeExamples && Object.keys(comp.props).length > 0) {
+                responseText += `- *Key Props:*\n`;
+                Object.entries(comp.props)
+                  .slice(0, 3)
+                  .forEach(([name, info]: [string, any]) => {
+                    const required = info.required
+                      ? "(required)"
+                      : "(optional)";
+                    responseText += `  - \`${name}\`: ${info.type} ${required}\n`;
+                  });
+              }
+
+              responseText += `\n`;
+            });
+          }
+
+          responseText += `## 🔗 Related Excalibrr Components\n\n`;
+          responseText += `Your project components work best with these Excalibrr components:\n`;
+          Array.from(relatedExcalibrComponents).forEach((comp) => {
+            responseText += `- **${comp}**\n`;
+          });
+
+          responseText += `\n## 💡 Usage Recommendations\n\n`;
+
+          if (query.toLowerCase().includes("grid")) {
+            responseText += `For grid-related functionality, consider this combination:\n`;
+            responseText += `\`\`\`typescript\n`;
+            responseText += `import { GraviGrid, Vertical } from '@gravitate-js/excalibrr';\n`;
+
+            const cellEditors = projectComponents.filter(
+              (comp) => comp.projectCategory === "cell-editors"
+            );
+            if (cellEditors.length > 0) {
+              responseText += `import { ${cellEditors
+                .map((c) => c.name)
+                .join(", ")} } from '@components/shared/Grid/cellEditors';\n`;
+            }
+
+            responseText += `\n// Use in your grid column definitions\n`;
+            responseText += `const columnDefs = [\n`;
+            responseText += `  {\n`;
+            responseText += `    field: 'yourField',\n`;
+            responseText += `    headerName: 'Your Field',\n`;
+
+            if (cellEditors.length > 0) {
+              responseText += `    cellEditor: ${cellEditors[0].name},\n`;
+              responseText += `    cellEditorParams: { /* your config */ }\n`;
+            }
+
+            responseText += `  }\n`;
+            responseText += `];\n`;
+            responseText += `\`\`\`\n`;
+          }
+
+          responseText += `\n## 🚀 Next Steps\n\n`;
+          responseText += `1. Use \`generate_component_code\` to generate usage examples\n`;
+          responseText += `2. Use \`execute_workflow\` with "smart-discovery" for complete recommendations\n`;
+          responseText += `3. Use \`create_smart_grid\` for complete grid features with these components\n`;
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: responseText,
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Error discovering project components: ${error}`,
+            },
+          ],
         };
       }
     }

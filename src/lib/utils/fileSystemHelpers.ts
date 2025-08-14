@@ -78,6 +78,7 @@ export async function writeProjectToUserDirectory(
       const fileDir = path.dirname(filePath);
 
       await fs.mkdir(fileDir, { recursive: true });
+
       await fs.writeFile(filePath, fileContent, "utf-8");
       filesWritten.push(fileName);
       console.error(`✅ Written: ${fileName}`);

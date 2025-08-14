@@ -36,6 +36,7 @@ export function getDynamicDependencies(): DependencyData {
       "ag-grid-react": "30.2.1",
       antd: "4.20",
       axios: "0.21.1",
+      color: "4.2.3",
       lodash: "4.17.15",
       moment: "2.24.0",
       react: "18.2.0",

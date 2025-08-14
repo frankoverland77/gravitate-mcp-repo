@@ -154,11 +154,11 @@ export function generateMainComponent(config: {
     getDataFunctionName,
   } = config;
 
-  return `import { GraviGrid } from '@gravitate-js/excalibrr'
-import { ColDef } from 'ag-grid-community'
-import { useMemo } from 'react'
-import { get${featureName}ColumnDefs } from './columnDefs'
-import { ${hookName} } from '../api/${hookName}'
+  return `import { GraviGrid } from "@gravitate-js/excalibrr";
+import { useMemo } from "react";
+import { get${featureName}ColumnDefs } from "./columnDefs";
+import { ${hookName} } from "../api/${hookName}";
+import { ${featureName}Row } from "../api/types";
 
 export function ${componentName}() {
   const storageKey = '${storageKey}'
@@ -166,9 +166,12 @@ export function ${componentName}() {
 
   const columnDefs = useMemo(() => get${featureName}ColumnDefs(), [])
 
-  const agPropOverrides = useMemo(() => ({ 
-    getRowId: (row) => row.data.${uniqueIdField} 
-  }), [])
+  const agPropOverrides = useMemo(
+    () => ({
+      getRowId: (params) => params.data.${uniqueIdField},
+    }),
+    []
+  )
 
   const controlBarProps = useMemo(
     () => ({
@@ -178,16 +181,24 @@ export function ${componentName}() {
     []
   )
 
-  const rowData = ${getDataFunctionName}({})
+  const data: ${featureName}Row[] = ${getDataFunctionName}()
 
   return (
-    <GraviGrid
-      controlBarProps={controlBarProps}
-      agPropOverrides={agPropOverrides}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      storageKey={storageKey}
-    />
+    <div
+      style={{
+        height: "calc(100vh - 140px)",
+        width: "100%",
+        position: "relative",
+      }}
+    >
+      <GraviGrid
+        controlBarProps={controlBarProps}
+        agPropOverrides={agPropOverrides}
+        columnDefs={columnDefs}
+        rowData={data}
+        storageKey={storageKey}
+      />
+    </div>
   )
 }`;
 }
@@ -198,18 +209,31 @@ export function generateColumnDefs(
 ) {
   const columnDefsArray = columns
     .map((col) => {
-      // CRITICAL FIX: Never include type property
-      const colDef = `{ field: '${col.field}', headerName: '${col.headerName}' }`;
+      let colDef = `{
+      field: "${col.field}",
+      headerName: "${col.headerName}",
+      width: 120,
+      sortable: true,
+      filter: true`;
+
+      // Add special formatting for price fields
+      if (col.field.toLowerCase().includes("price")) {
+        colDef += `,
+      valueFormatter: (params) => params.value ? \`$\${params.value.toLocaleString()}\` : ""`;
+      }
+
+      colDef += `
+    }`;
       return `    ${colDef}`;
     })
     .join(",\n");
 
-  return `import { ColDef } from 'ag-grid-community'
+  return `import { ColDef } from "ag-grid-community";
 
-export function get${featureName}ColumnDefs() {
+export function get${featureName}ColumnDefs(): ColDef[] {
   return [
 ${columnDefsArray},
-  ] as ColDef[]
+  ];
 }`;
 }
 

@@ -19,6 +19,10 @@ import {
   generateReadme,
 } from "./staticFileGenerators.js";
 import {
+  generateServerManagementREADME,
+  generateServerCheckScript,
+} from "./serverManagementGuide.js";
+import {
   generateIndexJs,
   generateAppTsx,
   generateStylesCss,
@@ -30,6 +34,10 @@ import {
 } from "./mockDataGenerators.js";
 import {
   generateThemeConfig,
+  generateOSPTheme,
+  generatePELightTheme,
+  generatePEDarkTheme,
+  generateBPTheme,
   generateLightTheme,
   generateDarkTheme,
   generateCoreLess,
@@ -37,10 +45,9 @@ import {
   generateDarkThemeLess,
   generateLightThemeJsx,
   generateDarkThemeJsx,
-  generateThemeBaseLess,
-  generateThemeBaseLightLess,
-  generateThemeBaseDarkLess,
-  generateDarkMapThemeJs,
+  generateOSPThemeCSS,
+  generatePELightThemeCSS,
+  generateBPThemeCSS,
 } from "./themeGenerators.js";
 import { generateComponentFiles } from "./reactComponentGenerators.js";
 
@@ -141,62 +148,22 @@ export function generateReactProject(
       text: `📄 **src/components/themeConfig.ts**\n\`\`\`typescript\n${generateThemeConfig()}\n\`\`\``,
     },
 
-    // Theme Components - NEW
+    // Theme Components - ADDED BACK: Required for proper navigation theming
     {
       type: "text" as const,
-      text: `📄 **src/components/ThemeComponents/LightTheme.tsx**\n\`\`\`typescript\n${generateLightTheme()}\n\`\`\``,
+      text: `📄 **src/components/ThemeComponents/OSPTheme.tsx**\n\`\`\`typescript\n${generateOSPTheme()}\n\`\`\``,
     },
-
     {
       type: "text" as const,
-      text: `📄 **src/components/ThemeComponents/DarkTheme.tsx**\n\`\`\`typescript\n${generateDarkTheme()}\n\`\`\``,
+      text: `📄 **src/components/ThemeComponents/PELightTheme.tsx**\n\`\`\`typescript\n${generatePELightTheme()}\n\`\`\``,
     },
-
-    // Theming folder structure - NEW
     {
       type: "text" as const,
-      text: `📄 **src/Theming/core.less**\n\`\`\`less\n${generateCoreLess()}\n\`\`\``,
+      text: `📄 **src/components/ThemeComponents/PEDarkTheme.tsx**\n\`\`\`typescript\n${generatePEDarkTheme()}\n\`\`\``,
     },
-
-    // Theme Base files - CRITICAL FIX: Add the missing theme base files
     {
       type: "text" as const,
-      text: `📄 **src/Theming/ThemeBase/base.less**\n\`\`\`less\n${generateThemeBaseLess()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/ThemeBase/light.less**\n\`\`\`less\n${generateThemeBaseLightLess()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/ThemeBase/dark.less**\n\`\`\`less\n${generateThemeBaseDarkLess()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/ThemeBase/darkMapTheme.js**\n\`\`\`javascript\n${generateDarkMapThemeJs()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/Themes/Light/light-theme.less**\n\`\`\`less\n${generateLightThemeLess()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/Themes/Light/Light.jsx**\n\`\`\`jsx\n${generateLightThemeJsx()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/Themes/Dark/dark-theme.less**\n\`\`\`less\n${generateDarkThemeLess()}\n\`\`\``,
-    },
-
-    {
-      type: "text" as const,
-      text: `📄 **src/Theming/Themes/Dark/Dark.jsx**\n\`\`\`jsx\n${generateDarkThemeJsx()}\n\`\`\``,
+      text: `📄 **src/components/ThemeComponents/BPTheme.tsx**\n\`\`\`typescript\n${generateBPTheme()}\n\`\`\``,
     },
 
     // Vite config
@@ -249,6 +216,36 @@ export function generateReactProject(
     {
       type: "text" as const,
       text: `📄 **src/assets/fonts/.gitkeep**\n\`\`\`\n# Placeholder for custom fonts\n\`\`\``,
+    },
+
+    // Theming directory structure to match Apple Test Demo
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/core.less**\n\`\`\`less\n${generateCoreLess()}\n\`\`\``,
+    },
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/ThemeBase/base.less**\n\`\`\`less\n${generateLightThemeLess()}\n\`\`\``,
+    },
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/ThemeBase/light.less**\n\`\`\`less\n${generateLightThemeLess()}\n\`\`\``,
+    },
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/ThemeBase/dark.less**\n\`\`\`less\n${generateDarkThemeLess()}\n\`\`\``,
+    },
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/Themes/OSP/osp-theme.less**\n\`\`\`less\n${generateOSPThemeCSS()}\n\`\`\``,
+    },
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/Themes/PE/light-theme.less**\n\`\`\`less\n${generatePELightThemeCSS()}\n\`\`\``,
+    },
+    {
+      type: "text" as const,
+      text: `📄 **src/Theming/Themes/BP/bp-theme.less**\n\`\`\`less\n${generateBPThemeCSS()}\n\`\`\``,
     },
   ];
 }

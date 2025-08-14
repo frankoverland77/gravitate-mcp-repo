@@ -177,8 +177,12 @@ npm test
 
 ## 📚 Documentation
 
-- **[Setup Guide](DESIGNER_SETUP.md)**: Complete installation instructions
-- **[Designer Prompts](docs/designer_prompts.md)**: Example questions and use cases
+- **[Setup Guide](docs/designer-setup.md)**: Complete installation instructions
+- **[Production Guide](docs/production-guide.md)**: Advanced development workflows
+- **[Form Generation Guide](docs/form-generation-guide.md)**: Form creation tools and patterns
+- **[Intelligent Mode Guide](docs/intelligent-mode-guide.md)**: Natural language usage examples
+- **[Figma Integration](docs/figma-setup.md)**: Design token extraction and component mapping
+- **[Designer Prompts](docs/designer-prompts.md)**: Example questions and use cases
 - **[Config Template](docs/claude-desktop-config.example.json)**: Configuration reference
 
 ## 🤝 Contributing

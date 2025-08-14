@@ -22,7 +22,7 @@ root.render(
 );`;
 }
 
-// FIXED: Updated to match the working Lemonade Competitors structure
+// UPGRADED: App.tsx with full navigation and proper theme integration
 export function generateAppTsx(featureName: string, componentName: string) {
   return `import React, { useEffect, useMemo } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -30,9 +30,9 @@ import {
   ThemeContextProvider,
   NavigationContextProvider,
 } from "@gravitate-js/excalibrr";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ${componentName} } from "./components/${componentName}";
-import { mockPageConfig } from "./mocks/mockPageConfig";
+import { createPageConfig } from "./mocks/mockPageConfig";
 import { mockScopes } from "./mocks/mockScopes";
 import { MockUserControlPanel } from "./mocks/MockUserControlPanel";
 import { themeConfigs, getFilteredThemes } from "./components/themeConfig";
@@ -46,7 +46,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function ThemeWrapper({ themeConfigs }) {
+function ThemeWrapper() {
   const filteredConfigs = useMemo(() => getFilteredThemes(), []);
 
   useEffect(() => {
@@ -65,30 +65,34 @@ function ThemeWrapper({ themeConfigs }) {
     return <div>Loading themes...</div>;
   }
 
-  console.log("ThemeWrapper: Using theme configs:", filteredConfigs);
+
 
   return (
     <ThemeContextProvider themeConfigs={filteredConfigs}>
       <NavigationContextProvider
         getScopes={async () => mockScopes}
         handleLogout={() => console.log("Logout clicked")}
-        pageConfig={mockPageConfig}
+        pageConfig={createPageConfig()}
         userControlPane={<MockUserControlPanel />}
         navStyle="vertical"
       >
-        <${componentName} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/PricingEngine/Prices" replace />} />
+          <Route path="/PricingEngine/Prices" element={<${componentName} />} />
+          <Route path="/PricingEngine/*" element={<Outlet />} />
+          <Route path="/SalesManagement" element={<${componentName} />} />
+          <Route path="/Admin/*" element={<Outlet />} />
+        </Routes>
       </NavigationContextProvider>
     </ThemeContextProvider>
   );
 }
 
 export function App() {
-  console.log("App component rendering with theme config:", themeConfigs);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <ThemeWrapper themeConfigs={themeConfigs} />
+        <ThemeWrapper />
       </Router>
     </QueryClientProvider>
   );
@@ -96,7 +100,134 @@ export function App() {
 }
 
 export function generateStylesCss() {
-  return `/* Critical Font Fix for ag-Grid Components */
+  return `/* Import Excalibrr styles */
+@import "@gravitate-js/excalibrr/dist/index.css";
+
+/* Additional utility classes for better layout */
+.flex {
+  display: flex;
+}
+
+.vertical-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical-flex-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.pr-2 {
+  padding-right: 0.5rem;
+}
+
+.pl-3 {
+  padding-left: 0.75rem;
+}
+
+.mr-0 {
+  margin-right: 0;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+/* PE Light Theme Specific Styles */
+.pe-light-theme {
+  /* Navigation theming */
+  --nav-bg-color: var(--theme-color-1);
+  --nav-text-color: #ffffff;
+  --nav-hover-bg: var(--theme-color-2);
+}
+
+/* Apply theme colors to navigation components */
+.ant-layout-sider {
+  background: var(--theme-color-1) !important;
+}
+
+.ant-layout-sider .ant-menu {
+  background: var(--theme-color-1) !important;
+  color: #ffffff !important;
+}
+
+.ant-layout-sider .ant-menu-item {
+  color: #ffffff !important;
+}
+
+.ant-layout-sider .ant-menu-item:hover {
+  background-color: var(--theme-color-2) !important;
+  color: #ffffff !important;
+}
+
+.ant-layout-sider .ant-menu-item-selected {
+  background-color: var(--theme-color-2) !important;
+  color: #ffffff !important;
+}
+
+/* Theme the top header */
+.ant-layout-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--gray-300) !important;
+}
+
+/* User control panel theming */
+.control-panel-trigger {
+  background: transparent !important;
+}
+
+/* Ensure avatar uses primary gradient */
+.ant-avatar[style*="--primary-gradient"] {
+  background: var(--primary-gradient) !important;
+  color: #ffffff !important;
+  border: 2px solid var(--theme-color-2) !important;
+}
+
+/* Navigation icons and text sizing */
+.ant-layout-sider .ant-menu-item {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 8px 16px !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+
+.ant-layout-sider .anticon {
+  font-size: 14px !important;
+  margin-right: 8px !important;
+}
+
+/* Navigation header alignment */
+.ant-layout-sider .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Grid container theming */
+.ag-root-wrapper {
+  border: 1px solid var(--gray-300) !important;
+  border-radius: 4px !important;
+}
+
+.ag-header {
+  background: var(--bg-2) !important;
+  border-bottom: 1px solid var(--gray-300) !important;
+}
+
+.ag-header-cell {
+  background: var(--bg-2) !important;
+  border-right: 1px solid var(--gray-300) !important;
+}
+
+/* Critical Font Fix for ag-Grid Components */
 
 /* 1. Font-face declarations - MUST come first */
 @font-face {

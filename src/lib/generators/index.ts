@@ -63,6 +63,10 @@ export {
   generateDarkThemeJsx,
 } from "./themeGenerators.js";
 export { generateComponentFiles } from "./reactComponentGenerators.js";
+export {
+  generateServerManagementREADME,
+  generateServerCheckScript,
+} from "./serverManagementGuide.js";
 
 // Re-export types for convenience
 export type { ComponentInfo, UseCase } from "../types.js";

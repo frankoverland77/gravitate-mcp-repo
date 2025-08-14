@@ -1,8 +1,13 @@
 {
   "mcpServers": {
     "excalibrr": {
-      "command": "docker",
-      "args": ["exec", "-i", "excalibrr-mcp-stdio", "node", "build/index.js"]
+      "command": "node",
+      "args": [
+        "/Users/rebecca.hirai/repos/excalibrr-mcp-server/build/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
     }
   }
 }

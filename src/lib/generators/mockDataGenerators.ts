@@ -15,116 +15,180 @@ export function generateMockPageConfig(
 ) {
   return `import React from "react";
 import { ${componentName} } from "../components/${componentName}";
-import {
-  CalculatorOutlined,
+import { 
+  DashboardOutlined,
+  CalculatorOutlined, 
   SettingOutlined,
-  TrophyOutlined,
+  LineChartOutlined,
+  BookOutlined,
+  ControlOutlined
 } from "@ant-design/icons";
+import { Navigate } from "react-router-dom";
 
-export const mockPageConfig = {
-  ${featureName}: {
-    hasPermission: () => true,
-    key: "${featureName}",
-    title: "${featureName}",
-    element: <${componentName} />,
-    index: 0,
-    icon: <TrophyOutlined />,
-    query_page: "",
-  },
+// Page configuration matching real Gravitate application structure
+export const createPageConfig = () => ({
   PricingEngine: {
     hasPermission: () => true,
     key: "PricingEngine",
-    title: "Pricing Engine",
-    index: 1,
-    icon: <CalculatorOutlined />,
+    title: "PRICING ENGINE",
+    index: 0,
+    icon: <DashboardOutlined />,
+    element: <Navigate to="/PricingEngine/QuoteBook" replace />,
     query_page: "",
     routes: [
       {
         hasPermission: () => true,
-        key: "Publishers",
-        title: "Price Publishers",
+        key: "QuoteBook",
+        title: "Quote Book",
         element: (
-          <div style={{ padding: "20px" }}>
-            Mock Pricing Engine - Publishers
+          <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
+            <h2>Quote Book</h2>
+            <p>Real pricing quote management interface would be here.</p>
           </div>
         ),
         index: 0,
         query_page: "",
+        path: "QuoteBook"
       },
       {
         hasPermission: () => true,
-        key: "Instruments",
-        title: "Price Instruments",
+        key: "CommandCenter",
+        title: "Command Center",
         element: (
-          <div style={{ padding: "20px" }}>
-            Mock Pricing Engine - Instruments
+          <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
+            <h2>Command Center</h2>
+            <p>Pricing command center interface would be here.</p>
           </div>
         ),
         index: 1,
         query_page: "",
+        path: "CommandCenter"
       },
-    ],
+      {
+        hasPermission: () => true,
+        key: "Calculations",
+        title: "Calculations",
+        element: (
+          <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
+            <h2>Calculations</h2>
+            <p>Pricing calculations interface would be here.</p>
+          </div>
+        ),
+        index: 2,
+        query_page: "",
+        path: "Calculations"
+      },
+      {
+        hasPermission: () => true,
+        key: "Prices",
+        title: "Prices",
+        element: <${componentName} />,
+        index: 3,
+        query_page: "",
+        path: "Prices"
+      },
+      {
+        hasPermission: () => true,
+        key: "AllPrices",
+        title: "All Prices",
+        element: (
+          <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
+            <h2>All Prices</h2>
+            <p>All prices overview would be here.</p>
+          </div>
+        ),
+        index: 4,
+        query_page: "",
+        path: "AllPrices"
+      }
+    ]
+  },
+  ${featureName}: {
+    hasPermission: () => true,
+    key: "${featureName}",
+    title: "${featureName.toUpperCase()}",
+    index: 1,
+    icon: <BookOutlined />,
+    element: <${componentName} />,
+    query_page: "",
   },
   Admin: {
     hasPermission: () => true,
-    key: "Admin",
-    title: "Admin",
+    key: "Admin", 
+    title: "ADMIN",
     index: 2,
     icon: <SettingOutlined />,
+    element: <Navigate to="/Admin/Users" replace />,
     query_page: "",
     routes: [
       {
         hasPermission: () => true,
         key: "Users",
         title: "Users",
-        element: <div style={{ padding: "20px" }}>Mock Admin - Users</div>,
+        element: (
+          <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
+            <h2>User Management</h2>
+            <p>User administration interface would be here.</p>
+          </div>
+        ),
         index: 0,
         query_page: "",
+        path: "Users"
       },
       {
         hasPermission: () => true,
         key: "Settings",
-        title: "Settings",
-        element: <div style={{ padding: "20px" }}>Mock Admin - Settings</div>,
+        title: "Settings", 
+        element: (
+          <div style={{ padding: "20px", background: "#f5f5f5", minHeight: "100vh" }}>
+            <h2>System Settings</h2>
+            <p>System configuration interface would be here.</p>
+          </div>
+        ),
         index: 1,
         query_page: "",
-      },
-    ],
-  },
-};`;
+        path: "Settings"
+      }
+    ]
+  }
+});
+
+// For backward compatibility
+export const mockPageConfig = createPageConfig();`;
 }
 
 // FIXED: Updated to use Horizontal and Vertical components from Excalibrr
 export function generateMockUserControlPanel() {
-  return `import { Horizontal, Texto, Vertical } from "@gravitate-js/excalibrr";
+  return `import { UserOutlined } from "@ant-design/icons";
+import { Horizontal, Texto } from "@gravitate-js/excalibrr";
+import { Avatar } from "antd";
 
 export function MockUserControlPanel() {
   return (
-    <Horizontal style={{ gap: "5px" }} verticalCenter>
-      <Vertical verticalCenter alignItems="flex-end">
-        <Texto>capspire support</Texto>
-        <Texto>All Companies</Texto>
-      </Vertical>
-      <div
-        style={{
-          width: "32px",
-          height: "32px",
-          background: "#666",
-          borderRadius: "4px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "white",
-          fontSize: "12px",
-          fontWeight: "bold",
-        }}
-        onClick={() => {
-          console.log("Mock For Demo Purposes");
-        }}
-      >
-        CS
+    <div className="flex ml-4">
+      <div className="vertical-flex pr-2">
+        <Texto align="right" category="p2" weight="bold">
+          capspire support
+        </Texto>
+        <Horizontal className="mr-0 mt-1" alignItems="center" style={{ justifyContent: "space-evenly" }}>
+          <UserOutlined className="pr-2" />
+          All Companies
+        </Horizontal>
       </div>
-    </Horizontal>
+      <div className="vertical-flex-center pl-3">
+        <Avatar
+          shape="square"
+          style={{ 
+            borderRadius: 5, 
+            background: "var(--primary-gradient)", 
+            textTransform: "uppercase" 
+          }}
+          size={36}
+        >
+          CS
+        </Avatar>
+      </div>
+    </div>
   );
 }`;
 }
