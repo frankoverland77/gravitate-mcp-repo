@@ -1,0 +1,133 @@
+:root {
+  /* GRAY SCALE*/
+  --dark-gray: @dark-gray;
+  --gray-100: lighten(@dark-gray, 5%);
+  --gray-200: lighten(@dark-gray, 16%);
+  --gray-300: lighten(@dark-gray, 28%);
+  --gray-400: lighten(@dark-gray, 45%);
+  --gray-500: lighten(@dark-gray, 52%);
+  --gray-600: lighten(@dark-gray, 65%);
+  --gray-700: lighten(@dark-gray, 72%);
+  --gray-800: lighten(@dark-gray, 80%);
+
+  --bg-1: @bg-1;
+  --bg-2: @bg-2;
+  --bg-3: @bg-3;
+
+  --theme-color-1: @theme-color-1;
+  --theme-color-2: @theme-color-2;
+  --theme-color-3: @theme-color-3;
+  --theme-color-4: @theme-color-4;
+  --theme-optimal: @theme-optimal;
+
+  /* CONTROL COLORS*/
+  --theme-error: @theme-error;
+  --theme-success: @theme-success;
+  --theme-warning: @theme-warning;
+  --theme-info: @theme-info;
+  --theme-option: @theme-option;
+
+  --theme-color-1-dim: fade(@theme-color-1, 15%);
+  --theme-color-2-dim: fade(@theme-color-2, 15%);
+  --theme-color-3-dim: fade(@theme-color-3, 15%);
+  --theme-color-4-dim: fade(@theme-color-4, 15%);
+  --theme-success-dim: fade(@theme-success, 15%);
+  --theme-warning-dim: fade(@theme-warning, 15%);
+  --theme-error-dim: fade(@theme-error, 15%);
+  --theme-optimal-dim: fade(@theme-optimal, 15%);
+
+  --theme-color-1-trans: fade(@theme-color-1, 15%);
+  --theme-color-2-trans: fade(@theme-color-2, 15%);
+  --theme-color-3-trans: fade(@theme-color-3, 15%);
+  --theme-color-4-trans: fade(@theme-color-4, 15%);
+  --theme-success-trans: fade(@theme-success, 15%);
+  --theme-warning-trans: fade(@theme-warning, 15%);
+  --theme-error-trans: fade(@theme-error, 15%);
+
+  /* THEME GRADIENTS*/
+  --primary-gradient: linear-gradient(@theme-color-1 0%, lighten(@theme-color-1, 15%) 100%);
+  --secondary-gradient: linear-gradient(@theme-color-2 0%, lighten(@theme-color-2, 10%) 100%);
+  --third-gradient: linear-gradient(@theme-color-3 0%, lighten(@theme-color-3, 10%) 100%);
+  --success-gradient: linear-gradient(@theme-success 0%, lighten(@theme-success, 10%) 100%);
+  --warning-gradient: linear-gradient(@theme-warning 0%, lighten(@theme-warning, 10%) 100%);
+  --error-gradient: linear-gradient(@theme-error 0%, lighten(@theme-error, 10%) 100%);
+
+  /* NON-COLOR VARIABLES*/
+  --container-border-radius: 7px;
+  --button-border-radius: 30px;
+  --box-shadow: 0 10px 20px rgb(0 2 15 / 34%);
+  --box-shadow-light: 0 10px 20px rgb(0 2 15 / 14%);
+
+  /* Theme Root Vars */
+  --nav-background: var(--primary-gradient);
+  --nav-highlight: var(--theme-color-3);
+}
+
+.ant-layout .page-toolbar {
+  background-color: var(--bg-1);
+}
+.rdrDateRangePickerWrapper,
+.rdrCalendarWrapper,
+.rdrDateDisplayWrapper,
+.rdrDateDisplayItem,
+.rdrDefinedRangesWrapper,
+.rdrStaticRangeLabel {
+  background: var(--bg-2);
+}
+.rdrCalendarWrapper {
+  color: var(--gray-700);
+}
+.rdrMonthName,
+.rdrDayNumber span,
+.rdrMonthAndYearPickers select,
+.rdrDateDisplayItemActive input,
+.rdrDateDisplayItem input {
+  color: var(--gray-700);
+}
+.rdrStaticRange:hover .rdrStaticRangeLabel {
+  background-color: var(--bg-3);
+}
+.rdrInputRange .rdrInputRangeInput {
+  background: var(--bg-3);
+  color: var(--gray-700);
+}
+.rdrMonthAndYearWrapper .rdrNextPrevButton {
+  background: var(---theme-color-2-dim);
+  color: var(---theme-color-2);
+  border: solid 1px var(--theme-color-2);
+}
+.rdrMonthAndYearPickers .rdrPprevButton i,
+.rdrMonthAndYearPickers .rdrNextButton i {
+  border-color: transparent transparent transparent var(--theme-color-2);
+}
+.rdrNextPrevButton.rdrPprevButton {
+  background: var(--bg-2);
+  color: var(--gray-800);
+}
+tr.ant-table-row.ant-table-row-level-0 {
+  background: var(--bg-2);
+}
+
+.ag-theme-alpine-dark {
+  /* use theme parameters where possible */
+  --ag-foreground-color: var(--gray-700);
+  --ag-secondary-foreground-color: var(--gray-500);
+  --ag-border-color: var(--gray-300);
+  --ag-border-radius: 5px;
+  --ag-font-size: 11px;
+  --ag-background-color: var(--bg-1);
+  --ag-control-panel-background-color: var(--bg-2);
+  --ag-header-background-color: var(--bg-2);
+  --ag-odd-row-background-color: var(--bg-1);
+  font-family: 'Lato';
+  .ag-row {
+    font-size: 1em;
+  }
+  .ag-cell-wrapper.ag-row-group {
+    align-items: center;
+  }
+  font-size: 11px;
+}
+.ag-header-cell-text {
+  text-transform: uppercase;
+}

@@ -1,0 +1,37 @@
+.alert-card {
+  background: var(--gray-100);
+  border: solid 1px var(--gray-200);
+  border-radius: 3px;
+}
+.alert-card.warning {
+  border: solid 1px var(--theme-warning-dim);
+}
+.alert-card.critical {
+  border: solid 1px var(--theme-error-dim);
+}
+.alert-card.error {
+  border: solid 1px var(--theme-color-3-dim);
+}
+.alert-icon {
+  background: var(--gray-700);
+  height: 24px;
+  width: 24px;
+  color: var(--gray-100);
+  border-radius: 5px;
+}
+.alert-icon.resolved {
+  background: var(--gray-300);
+  color: var(--gray-600);
+}
+.alert-icon.warning {
+  background: var(--theme-warning-dim);
+  color: var(--theme-warning);
+}
+.notification-icon {
+  font-size: 1.4em;
+}
+.alert-button {
+  font-size: 0.9em;
+  height: 25px;
+  padding: 0;
+}

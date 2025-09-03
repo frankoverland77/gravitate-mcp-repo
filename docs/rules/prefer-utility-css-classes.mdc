@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When styling UI, prefer to use already defined classes over inline styles in .jsx and .tsx files
+
+Use props over inline styles: 
+example: prefer the justifyContent prop with Horizontal elements over style={{ justifyContent: 'value' }}
+
+instead of creating inline styles, create a css class in the css file for the feature
+
+when making new css do not add !important
+
+check styles in 
+Gravitate.Dotnet.Next/frontend/src/components/shared/Theming/core.less
+Gravitate.Dotnet.Next/frontend/src/styles.css
+excalibrr 

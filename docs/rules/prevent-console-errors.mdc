@@ -1,0 +1,69 @@
+# Prevent Console Errors Rule
+
+## Rule: Code must not generate console errors
+
+### Why
+- Console errors indicate broken functionality
+- They create poor developer experience  
+- Can cause white screens and app crashes
+- Make debugging actual issues harder
+
+### Common Causes & Solutions
+
+#### 1. Duplicate Route Entries
+**Problem**: Same path registered multiple times
+```tsx
+// ❌ BAD - Duplicate paths
+{ path: '/demos/product-form', component: ComponentA },
+{ path: '/demos/product-form', component: ComponentB }, // Error!
+```
+
+**Solution**: Check for duplicates before adding
+```tsx
+// ✅ GOOD - Check and remove duplicates first
+if (configContent.includes(`path: '${routePath}'`)) {
+  // Remove duplicate before adding new one
+}
+```
+
+#### 2. Invalid Component Props
+**Problem**: Using props that don't exist on components
+```tsx
+// ❌ BAD - GraviButton doesn't have htmlType
+<GraviButton htmlType="submit" theme1 />
+```
+
+**Solution**: Use correct props from component knowledge base
+```tsx
+// ✅ GOOD - Use valid props
+<GraviButton success onClick={() => form.submit()} />
+```
+
+#### 3. Missing Exports
+**Problem**: Importing components that aren't exported
+```tsx
+// ❌ BAD - Default export when using named
+import ProductForm from './ProductForm'; // Error if named export
+```
+
+**Solution**: Match import style to export style
+```tsx
+// ✅ GOOD - Named import for named export
+import { ProductForm } from './ProductForm';
+```
+
+### Prevention Checklist
+- [ ] Test generated code immediately after creation
+- [ ] Check browser console for errors
+- [ ] Validate props against component documentation
+- [ ] Ensure unique route paths
+- [ ] Match import/export styles
+- [ ] Handle async operations properly
+- [ ] Check for null/undefined before using values
+
+### Testing
+Always run the app and check console after:
+- Generating new demos
+- Modifying component props
+- Updating route configurations
+- Changing imports/exports

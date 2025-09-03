@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Prefer using theme colors variables - found in the directory: src/components/shared/Theming

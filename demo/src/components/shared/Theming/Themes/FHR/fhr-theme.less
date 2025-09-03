@@ -1,0 +1,36 @@
+// light-theme.less
+
+@import 'antd/lib/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/lib/style/themes/default.less';
+
+/*** Theme YOUR Colors here!! **/
+
+@bg-1: #ffffff;
+@bg-2: #f8f9fa;
+@bg-3: #eef0f8;
+
+@theme-color-1: #2B2F35;
+@theme-color-2: #BCB694;
+@theme-color-3: #C9964A;
+@theme-color-4: #725ac1;
+@theme-optimal: #c79c02;
+
+@theme-error: #f22939;
+@theme-success: #64d28d;
+@theme-warning: #f26e29;
+@theme-info: #cce5ff;
+@theme-option: #8dabc4;
+
+/*** Theme color generation and 3rd party overrides **/
+@import url('../../ThemeBase/light.less');
+/*** Base styles and overrides **/
+@import url('../../ThemeBase/base.less');
+
+.horizontal-nav .logo {
+  background-image: url('../../../../../assets/fhr/fhr-logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 200px;
+}

@@ -1,0 +1,36 @@
+// light-theme.less
+
+@import 'antd/lib/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/lib/style/themes/default.less';
+
+/*** Theme YOUR Colors here!! **/
+
+@bg-1: #ffffff;
+@bg-2: #f8f9fa;
+@bg-3: #eef0f8;
+
+@theme-color-1: #00326d;
+@theme-color-2: #00c6ab;
+@theme-color-3: #a30029;
+@theme-color-4: #725ac1;
+@theme-optimal: #8ad7cb;
+
+@theme-error: #f22939;
+@theme-success: #64d28d;
+@theme-warning: #f26e29;
+@theme-info: #cce5ff;
+@theme-option: #8dabc4;
+
+/*** Theme color generation and 3rd party overrides **/
+@import url('../../ThemeBase/light.less');
+/*** Base styles and overrides **/
+@import url('../../ThemeBase/base.less');
+
+.horizontal-nav .logo {
+  background-image: url('../../../../../assets/dkb/dkb-logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 200px;
+}

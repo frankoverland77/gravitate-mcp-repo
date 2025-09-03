@@ -1,0 +1,48 @@
+// light-theme.less
+
+@import 'antd/lib/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/lib/style/themes/default.less';
+
+/*** Theme YOUR Colors here!! **/
+
+@bg-1: #ffffff;
+@bg-2: #f8f9fa;
+@bg-3: #eef0f8;
+
+@theme-color-1: #000000;
+@theme-color-2: #D50032;
+@theme-color-3: #1677FF;
+@theme-color-4: #666666;
+@theme-optimal: #c79c02;
+
+@theme-error: #E42A11;
+@theme-success: #23A217;
+@theme-warning: #FF9900;
+@theme-info: #74CDD7;
+@theme-option: #8dabc4;
+
+/*** Theme color generation and 3rd party overrides **/
+@import url('../../ThemeBase/light.less');
+/*** Base styles and overrides **/
+@import url('../../ThemeBase/base.less');
+
+:root {
+  --primary-gradient: linear-gradient(#111 0%, #000 100%);
+  --theme-color-1-dim: lighten(@theme-color-1, 90%);
+}
+
+@primary-color: @theme-color-1;
+
+span.ant-tag.theme-2-tag {
+  color: var(--theme-color-3) !important;
+  background: var(--theme-color-3-dim);
+}
+
+.horizontal-nav .logo {
+  background-image: url('../../../../../assets/growmark/growmark-logo-light.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 200px;
+}

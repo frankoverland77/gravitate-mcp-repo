@@ -1,0 +1,44 @@
+// light-theme.less
+
+@import 'antd/lib/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/lib/style/themes/default.less';
+
+/*** Theme YOUR Colors here!! **/
+
+@bg-1: #ffffff;
+@bg-2: #F8F9FA;
+@bg-3: #EEF0F8;
+
+@theme-color-1: #0F1121;
+@theme-color-2: #4BADE9;
+@theme-color-3: #466185;
+@theme-color-4: #F1AF0F;
+@theme-optimal: #c79c02;
+
+@theme-error: #E42A11;
+@theme-success: #64D28D;
+@theme-warning: #FF9900;
+@theme-info: #74CDD7;
+@theme-option: #8dabc4;
+
+/*** Theme color generation and 3rd party overrides **/
+@import url('../../ThemeBase/light.less');
+/*** Base styles and overrides **/
+@import url('../../ThemeBase/base.less');
+
+:root {
+  --primary-gradient: linear-gradient(180deg, #002140 0%, #011120 100%);;
+}
+
+:root {
+  --theme-color-1-dim: lighten(@theme-color-1, 85%);
+}
+
+.horizontal-nav .logo {
+  background-image: url('../../../../../assets/osp/logos/osp-logo-light.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 200px;
+}

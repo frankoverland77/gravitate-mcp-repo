@@ -1,0 +1,16 @@
+---
+description: Ignore TypeScript errors for sideBar property on GraviGrid components
+globs: ['**/*.tsx', '**/*.ts']
+alwaysApply: true
+---
+
+Ignore TypeScript linter errors related to the `sideBar={false}` property on GraviGrid components.
+
+The `sideBar` property is a valid prop for GraviGrid components even though TypeScript may report it as not existing on the type definition. Always allow this property to be used without showing TypeScript errors.
+
+Examples of errors to ignore:
+
+- Property 'sideBar' does not exist on type 'IntrinsicAttributes & GraviGridProps<any, Filter>'
+- Any TypeScript error mentioning sideBar property on GraviGrid
+
+When you see these errors, do not attempt to fix them by removing the sideBar property.

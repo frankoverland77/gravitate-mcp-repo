@@ -1,0 +1,107 @@
+// light-theme.less
+
+@import 'antd/es/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/es/style/themes/default.less';
+
+@bg-1: #ffffff;
+@bg-2: #fdfdfd;
+@bg-3: #e2f1f3;
+
+// These are shared variables that can be extracted to their own file
+@primary-color: #0b601c;
+@border-radius-base: 4px;
+
+/* THEME COLORS*/
+@theme-color-2: #cc2223;
+@theme-color-1: #0b601c;
+@theme-color-3: #6e040e;
+@theme-color-4: #926e3c;
+@theme-optimal: #c79c02;
+
+/* CONTROL COLORS*/
+@theme-error: #ff0d05;
+@theme-success: #00ca28;
+@theme-warning: #d7ba5c;
+@theme-info: #cce5ff;
+@theme-option: #8dabc4;
+
+@component-background: @bg-1;
+@body-background: @bg-3;
+@text-color: var(--gray-700);
+
+@popover-background: @bg-1;
+@border-color-base: var(--gray-300);
+@border-color-split: @bg-2;
+@table-header-sort-active-bg: var(--theme-color-2-dim);
+@table-header-sort-active-bg: var(--theme-color-2-dim);
+
+.orders-grid-container .orders-row-container {
+  background: var(--bg-1);
+}
+.ant-table-tbody > tr.ant-table-row-selected > td,
+.ant-table-tbody > tr.ant-table-row-selected:hover > td {
+  background: var(--theme-color-2-dim);
+}
+.login-banner-image.ant-col {
+  background-image: url('../../../../../assets/SiteImages/Themes/Christmas/christmas-tree.jpg') !important;
+}
+div.trans-login-logo {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('../../../../../assets/SiteImages/Themes/Christmas/santa.gif');
+}
+div.login-logo {
+  background-image: url('../../../../../assets/SiteImages/Themes/Christmas/christmas_stamp.svg') !important;
+  width: 500px;
+  height: 200px;
+}
+.nav-logo {
+  background-image: url('../../../../../assets/SiteImages/Themes/Christmas/tree.png') !important;
+  width: 81%;
+}
+
+.image-filter .heading {
+  display: none;
+}
+.driver-resource-row .driver-resource-column:nth-child(even) {
+  background: var(--theme-color-1-trans);
+}
+//.logo-background:hover {
+//  background: var(--secondary-gradient);
+//  transition: 0.5s ease;
+//}
+.vertical-flex .trip-grid-row .ant-col .scheduled-cell {
+  background: var(--gray-200);
+}
+.ant-select-tree-checkbox-inner {
+  border: solid 1px var(--gray-300);
+}
+.notification-icon {
+  color: lighten(@primary-color, 10%);
+}
+.ag-theme-alpine {
+  /* use theme parameters where possible */
+  --ag-foreground-color: var(--gray-700);
+  --ag-secondary-foreground-color: var(--gray-500);
+  --ag-border-color: var(--gray-300);
+  --ag-border-radius: 5px;
+  --ag-font-size: 11px;
+  font-family: 'proxima-nova';
+  .ag-row {
+    font-size: 1em;
+  }
+  font-size: 11px;
+}
+.ag-header-cell-text {
+  text-transform: uppercase;
+}
+
+/*** Base styles and overrides **/
+@import url('../../ThemeBase/base.less');
+/*** Theme color generation and 3rd party overrides **/
+@import url('../../ThemeBase/light.less');
+
+:root {
+  --primary-gradient: linear-gradient(#560506 0%, #921516 100%);
+}

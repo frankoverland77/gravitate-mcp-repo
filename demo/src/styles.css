@@ -1,0 +1,82 @@
+.detail-tabs .ant-tabs-tab.ant-tabs-tab-active {
+  background: var(--theme-color-2) !important;
+  color: var(--gray-100) !important;
+  border-radius: 6px;
+}
+
+.detail-tabs-draft .ant-tabs-tab.ant-tabs-tab-active {
+  background: var(--theme-option) !important;
+  color: var(--gray-100) !important;
+  border-radius: 6px;
+}
+
+.detail-tabs .ant-tabs-tab {
+  background-color: var(--bg-1) !important;
+  border-radius: 10px 10px 0 0 !important;
+  border: 1px solid var(--gray-300) !important;
+}
+
+.detail-tabs-draft .ant-tabs-tab {
+  background-color: var(--bg-1) !important;
+  border-radius: 10px 10px 0 0 !important;
+  border: 1px solid var(--gray-300) !important;
+}
+
+.detail-tabs .ant-tabs-tab-active button.ant-tabs-tab-remove {
+  color: var(--gray-100);
+}
+
+.date-range-select {
+  padding: 0.555em 1em !important;
+  margin-left: 0 !important;
+  display: flex;
+  align-items: center;
+}
+
+.filter-drawer .ant-form.ant-form-inline.search-grid-form {
+  align-items: center;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.disable-select {
+  background-color: red !important;
+  pointer-events: none;
+}
+
+.ghost-gravi-button {
+  background: transparent !important;
+  border: none;
+  box-shadow: none !important;
+}
+
+.disabled-gravi-button {
+  background: var(--gray-300) !important;
+  color: var(--gray-100) !important;
+  border: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.border-radius-5 {
+  border-radius: 5px !important;
+}
+.hint {
+  color: var(--gray-400) !important;
+}
+.gap-16 {
+  gap: 16px;
+}
+.gap-10 {
+  gap: 10px;
+}
+@media only screen and (max-width: 1440px) {
+  body {
+    font-size: 10px !important;
+  }
+}
+
+@media only screen and (max-width: 1960px) {
+  body {
+    font-size: 11px !important;
+  }
+}

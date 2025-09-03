@@ -1,0 +1,46 @@
+// light-theme.less
+
+@import 'antd/lib/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/lib/style/themes/default.less';
+
+/*** Theme YOUR Colors here!! **/
+
+@bg-1: #ffffff;
+@bg-2: #f8f9fa;
+@bg-3: #eef0f8;
+
+@theme-color-1: #262F47;
+@theme-color-2: #F04B34;
+@theme-color-3: #47c2d0;
+@theme-color-4: #F1AF0F;
+@theme-optimal: #c79c02;
+
+@theme-error: #E42A11;
+@theme-success: #23A217;
+@theme-warning: #FF9900;
+@theme-info: #74CDD7;
+@theme-option: #8dabc4;
+
+/*** Theme color generation and 3rd party overrides **/
+@import url('../../ThemeBase/light.less');
+/*** Base styles and overrides **/
+@import url('../../ThemeBase/base.less');
+
+:root {
+  --primary-gradient: linear-gradient(#262F47 0%, #161B28 100%);
+}
+
+
+span.ant-tag.theme-2-tag {
+  color: var(--theme-color-3) !important;
+  background: var(--theme-color-3-dim);
+}
+
+.horizontal-nav .logo {
+  background-image: url('../../../../../assets/sunoco/logos/sunoco-lp-logo-light.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 200px;
+}

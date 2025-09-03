@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When creating UI, prefer using elements from these libraries over native HTML elements: 
+first: @gravitate-js/excalibrr
+second: AntD
+
+Layout:  Prefer Horizontal and Vertical over div
+Text: Prefer Texto over p, h1, etc

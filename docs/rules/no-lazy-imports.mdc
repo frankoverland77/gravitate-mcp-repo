@@ -1,0 +1,32 @@
+# No Lazy Imports Rule
+
+## Rule: Never use React.lazy() for component imports
+
+### Why
+- React.lazy() can cause duplicate component mounting issues
+- Console errors occur when components are lazily loaded multiple times
+- Creates white screen issues when routes have duplicate entries
+- Direct imports are more predictable and easier to debug
+
+### Instead
+```tsx
+// ❌ BAD - Don't use React.lazy
+component: React.lazy(() => import('./pages/demos/ProductForm'))
+
+// ✅ GOOD - Use direct imports
+import { ProductForm } from './pages/demos/ProductForm';
+// ...
+component: ProductForm
+```
+
+### Implementation Guidelines
+1. Always use named exports for components
+2. Import components at the top of the file
+3. Reference imported components directly in route configurations
+4. Remove any Suspense wrappers when not using lazy imports
+
+### Prevention
+- Check for duplicate route paths before adding new routes
+- Use a Map or Set to track existing paths
+- Validate that component imports resolve correctly
+- Test routes immediately after generation

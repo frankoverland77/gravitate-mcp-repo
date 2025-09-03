@@ -1,0 +1,27 @@
+{
+  "name": "excalibrr-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Excalibrr component library",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "excalibrr-mcp-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc --watch",
+    "clean": "rm -rf build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@babel/core": "^7.20.0",
+    "@babel/parser": "^7.20.0",
+    "axios": "^1.6.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

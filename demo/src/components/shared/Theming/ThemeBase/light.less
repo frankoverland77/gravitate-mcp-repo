@@ -1,0 +1,196 @@
+:root {
+  /* GRAY SCALE*/
+  --gray-900: lighten(@dark-gray, 2%);
+  --gray-800: lighten(@dark-gray, 5%);
+  --gray-700: lighten(@dark-gray, 16%);
+  --gray-600: lighten(@dark-gray, 28%);
+  --gray-500: lighten(@dark-gray, 45%);
+  --gray-400: lighten(@dark-gray, 58%);
+  --gray-300: lighten(@dark-gray, 68%);
+  --gray-200: lighten(@dark-gray, 72%);
+  --gray-100: lighten(@dark-gray, 80%);
+  --dark-gray: @dark-gray;
+
+  --bg-1: @bg-1;
+  --bg-2: @bg-2;
+  --bg-3: @bg-3;
+  --site-bg: #f5f6fa;
+  /* THEME COLORS*/
+  --theme-color-1: @theme-color-1;
+  --theme-color-2: @theme-color-2;
+  --theme-color-3: @theme-color-3;
+  --theme-color-4: @theme-color-4;
+  --theme-optimal: @theme-optimal;
+
+  /* CONTROL COLORS*/
+  --theme-error: @theme-error;
+  --theme-success: @theme-success;
+  --theme-warning: @theme-warning;
+  --theme-info: @theme-info;
+  --theme-option: @theme-option;
+
+  --theme-color-1-dim: lighten(@theme-color-1, 70%);
+  --theme-color-2-dim: lighten(@theme-color-2, 70%);
+  --theme-color-3-dim: lighten(@theme-color-3, 40%);
+  --theme-color-4-dim: lighten(@theme-color-4, 40%);
+  --theme-success-dim: #DBF4E4;
+  --theme-warning-dim: #FCE0D1;
+  --theme-error-dim: #FCD1D5;
+  --theme-optimal-dim: lighten(@theme-optimal, 40%);
+
+  --theme-color-1-trans: fade(@theme-color-1, 15%);
+  --theme-color-2-trans: fade(@theme-color-2, 15%);
+  --theme-color-3-trans: fade(@theme-color-3, 15%);
+  --theme-color-4-trans: fade(@theme-color-4, 15%);
+  --theme-success-trans: fade(@theme-success, 15%);
+  --theme-warning-trans: fade(@theme-warning, 15%);
+  --theme-error-trans: fade(@theme-error, 15%);
+
+  /* THEME GRADIENTS*/
+  --primary-gradient: linear-gradient(darken(@theme-color-1, 10%) 0%, lighten(@theme-color-1, 0%) 100%);
+  --secondary-gradient: linear-gradient(@theme-color-2 0%, lighten(@theme-color-2, 10%) 100%);
+  --third-gradient: linear-gradient(@theme-color-3 0%, lighten(@theme-color-3, 10%) 100%);
+  --success-gradient: linear-gradient(@theme-success 0%, lighten(@theme-success, 10%) 100%);
+  --warning-gradient: linear-gradient(@theme-warning 0%, lighten(@theme-warning, 10%) 100%);
+  --error-gradient: linear-gradient(@theme-error 0%, lighten(@theme-error, 10%) 100%);
+
+  /* NON-COLOR VARIABLES*/
+  --container-border-radius: @border-radius-base;
+  --button-border-radius: 2px;
+  --box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15);
+  --box-shadow-light: 0px 2px 6px rgba(0, 0, 0, 0.05);
+
+  /* Theme Root Vars */
+  --nav-background: var(--primary-gradient);
+  --nav-highlight: var(--theme-color-2);
+}
+
+.orders-grid-container .orders-row-container {
+  background: var(--bg-1);
+}
+
+.trip-grid-row .ant-col .scheduled-cell {
+  background: var(--gray-200);
+  border-right: solid 1px var(--gray-400);
+}
+
+.ant-select-tree-checkbox-inner {
+  border: solid 1px var(--gray-300);
+}
+
+.notification-icon {
+  color: lighten(@primary-color, 10%);
+}
+
+.ag-theme-alpine {
+  /* use theme parameters where possible */
+  --ag-foreground-color: var(--gray-900);
+  --ag-secondary-foreground-color: var(--gray-700);
+  --ag-border-color: var(--gray-300);
+  --ag-border-radius: 5px;
+  --ag-font-size: 1em;
+  font-family: 'Lato';
+  --ag-selected-row-background-color: var(--theme-color-1-trans);
+  --ag-range-selection-border-color: var(--theme-color-1);
+  --ag-row-hover-color: var(--theme-color-1-trans);
+  --ag-checkbox-checked-color: var(--theme-color-2);
+  --ag-checkbox-unchecked-color: var(--gray-200);
+
+  --ag-range-selection-background-color: var(--theme-color-1-trans);
+
+  .ag-cell-wrapper.ag-row-group {
+    align-items: center;
+  }
+
+  .ag-row {
+    font-size: 1em;
+  }
+
+  font-size: 1em;
+}
+
+.ag-header-cell-text {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.site-toolbar {
+  h5 {
+    padding: 0.25em 1em;
+  }
+
+  .selected-group {
+    background: var(--theme-color-1);
+    color: white;
+    font-weight: 600;
+    border-radius: 6px;
+  }
+
+  .selected-group a {
+    color: white;
+  }
+
+  h5,
+  h5 a {
+    color: var(--gray-600);
+  }
+
+  .heading {
+    font-size: 1.3em;
+  }
+
+  .submenu-links a {
+    color: var(--gray-600);
+  }
+
+  .submenu-links a:hover {
+    color: var(--theme-color-2);
+  }
+
+  .submenu-links a.selected {
+    font-weight: bold;
+    color: var(--theme-color-2);
+  }
+
+  .submenu-dropdown-link {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--gray-600);
+    transition: 0.5s ease;
+  }
+
+  .submenu-dropdown-link:hover {
+    color: var(--theme-color-2);
+  }
+}
+
+
+.control-panel-trigger {
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.control-panel-trigger:hover {
+  background: var(--gray-200);
+}
+
+.trans-login-logo {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+.login-logo {
+  width: 350px;
+  height: 100px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.nav-logo {
+  background-image: url('../../../../assets/SiteImages/grav-logo.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+}

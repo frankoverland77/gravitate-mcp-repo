@@ -1,0 +1,128 @@
+// light-theme.less
+
+@import 'antd/lib/style/color/colorPalette.less';
+@import 'antd/dist/antd.less';
+@import 'antd/lib/style/themes/default.less';
+
+@bg-1: #ffffff;
+@bg-2: #fff5f0;
+@bg-3: #fdefd5;
+
+// These are shared variables that can be extracted to their own file
+@primary-color: #ed732e;
+@border-radius-base: 4px;
+
+@nav-background:linear-gradient(#532d08 0%, rgb(90, 41, 0) 100%);
+@nav-highlight:linear-gradient(180deg, #F8B12C 0%, #996236 100%), #bf2a45;
+
+:root {
+  /* GRAY SCALE*/
+  --white: #ffffff;
+  --dark-gray: #303030;
+  --gray-000: #ffffff;
+  --gray-800: #343a40;
+  --gray-700: #495057;
+  --gray-600: #6c757d;
+  --gray-500: #adb5bd;
+  --gray-400: #ced4da;
+  --gray-300: #dee2e6;
+  --gray-200: #e9ecef;
+  --gray-100: #f8f9fa;
+
+  --bg-1: @bg-1;
+  --bg-2: @bg-2;
+  --bg-3: @bg-3;
+  /* THEME COLORS*/
+  --theme-color-1: #996236;
+  --theme-color-2: #ed732e;
+  --theme-color-3: #f8b12c;
+  --theme-color-4: #859d3c;
+
+  --theme-color-1-dim: #f1dfd1;
+  --theme-color-2-dim: #ffccae;
+  --theme-color-3-dim: #fddda1;
+  --theme-color-4-dim: #e9fab7;
+  --theme-success-dim: #eafaba;
+  --theme-warning-dim: #fde7be;
+  --theme-error-dim: #fac6c4;
+
+  --theme-color-1-trans: rgba(0, 33, 64, 0.15);
+  --theme-color-2-trans: rgba(118, 171, 243, 0.15);
+  --theme-color-3-trans: rgba(191, 42, 69, 0.15);
+  --theme-color-4-trans: rgba(114, 90, 193, 0.15);
+  --theme-success-trans: rgba(100, 210, 141, 0.15);
+  --theme-warning-trans: rgba(242, 110, 41, 0.15);
+  --theme-error-trans: rgba(242, 41, 57, 0.15);
+
+  /* CONTROL COLORS*/
+  --theme-error: #9d221e;
+  --theme-success: #859d3c;
+  --theme-warning: #f8b12c;
+  --theme-info: #cce5ff;
+  --theme-option: #8dabc4;
+
+  /* THEME GRADIENTS*/
+  --primary-gradient: linear-gradient(#532d08 0%, rgb(156, 73, 5) 100%);
+  --secondary-gradient: linear-gradient(rgba(118, 171, 243, 1) 0%, rgba(167, 202, 250, 1) 100%);
+  --third-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.26) 100%), #bf2a45;
+  --success-gradient: linear-gradient(rgba(100, 210, 141, 1) 0%, rgba(155, 255, 192, 1) 100%);
+  --warning-gradient: linear-gradient(rgba(242, 110, 41, 1) 0%, rgba(249, 172, 132, 1) 100%);
+  --error-gradient: linear-gradient(rgba(242, 41, 57, 1) 0%, rgba(254, 120, 130, 1) 100%);
+
+  /* NON-COLOR VARIABLES*/
+  --container-border-radius: 7px;
+  --button-border-radius: 30px;
+  --box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15);
+  --box-shadow-light: 0px 2px 6px rgba(0, 0, 0, 0.05);
+
+  /* Theme Root Vars */
+  --nav-background: @nav-background;
+  --nav-highlight: @nav-highlight;
+}
+
+@component-background: @bg-1;
+@body-background: @bg-3;
+@text-color: var(--gray-700);
+
+@popover-background: @bg-1;
+@border-color-base: var(--gray-300);
+@border-color-split: @bg-2;
+@table-header-sort-active-bg: var(--theme-color-2-dim);
+@table-header-sort-active-bg: var(--theme-color-2-dim);
+.orders-grid-container .orders-row-container {
+  background: var(--bg-1);
+}
+.login-banner-image.ant-col {
+  background-image: url('../../../../../assets/SiteImages/Themes/Thanksgiving/thanksgiving-side.jpg');
+}
+div.trans-login-logo {
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url('../../../../../assets/SiteImages/Themes/Thanksgiving/thanksgiving-thumb.png');
+}
+div.login-logo {
+  background-image: url('../../../../../assets/SiteImages/Themes/Thanksgiving/thanksgiving-logo.png');
+  width: 500px;
+  height: 200px;
+}
+.logo-background .nav-logo {
+  background-image: url('../../../../../assets/SiteImages/Themes/Thanksgiving/turkey.png');
+  width: 81%;
+}
+//.logo-background:hover {
+//  background: var(--secondary-gradient);
+//  transition: 0.5s ease;
+//}
+.vertical-flex .trip-grid-row .ant-col .scheduled-cell {
+  background: var(--gray-200);
+}
+.ant-select-tree-checkbox-inner {
+  border: solid 1px var(--gray-300);
+}
+.notification-icon {
+  color: lighten(@primary-color, 10%);
+}
+.logo-background {
+  margin-bottom: 2em !important;
+}

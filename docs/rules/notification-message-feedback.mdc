@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+All backend save and delete operations must provide user feedback using the NotificationMessage component.
+
+**Success Pattern:**
+```
+NotificationMessage('Success.', 'descriptive success message', false)
+```
+
+**Error Pattern:**
+```
+NotificationMessage('Error.', 'descriptive error message', true)
+```
+
+**Implementation:**
+- Always wrap backend operations in try-catch blocks
+- Provide success feedback in the try block after successful operation
+- Provide error feedback in the catch block with descriptive error message
+- Use consistent messaging format for better user experience
