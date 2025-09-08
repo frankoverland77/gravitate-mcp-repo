@@ -1,7 +1,9 @@
 import React, { useMemo } from "react";
-import { GraviGrid } from "@gravitate-js/excalibrr";
+import { GraviGrid, Horizontal } from "@gravitate-js/excalibrr";
 import { mockData } from "./ProductGrid.data";
 import { ColDef } from "ag-grid-community";
+import { Switch } from "antd";
+import { NumberCellEditor } from "@components/shared/Grid/cellEditors/NumberCellEditor";
 
 export function ProductGrid() {
   const storageKey = "productgrid-grid";
@@ -31,9 +33,31 @@ export function ProductGrid() {
           headerName: "Grade",
         },
         {
+          field: "Price",
+          headerName: "Price",
+          filter: "agNumberColumnFilter",
+          valueFormatter: (params: any) =>
+            params.value ? `$${params.value.toFixed(2)}` : "",
+          cellEditor: NumberCellEditor,
+        },
+        {
           field: "IsActive",
           headerName: "Status",
-          cellRenderer: (params: any) => (params.value ? "Active" : "Inactive"),
+          editable: false,
+          cellRenderer: (params: any) => {
+            return (
+              <Horizontal>
+                <Switch
+                  checked={params.value}
+                  checkedChildren="Active"
+                  unCheckedChildren="Inactive"
+                  onChange={(checked) => {
+                    params.setValue(checked);
+                  }}
+                />
+              </Horizontal>
+            );
+          },
         },
       ] as ColDef[],
     []
@@ -54,6 +78,12 @@ export function ProductGrid() {
     []
   );
 
+  const updateEP = async (params: any) => {
+    // Empty function for now - will handle updates
+    console.log("Update called with:", params);
+    return Promise.resolve();
+  };
+
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <GraviGrid
@@ -62,6 +92,7 @@ export function ProductGrid() {
         columnDefs={columnDefs}
         agPropOverrides={agPropOverrides}
         controlBarProps={controlBarProps}
+        updateEP={updateEP}
       />
     </div>
   );

@@ -97,28 +97,28 @@ export const COLDEFS_EXAMPLES: ColumnDefsExample[] = [
 
   {
     id: "column_defs_simple_03",
-    name: "Right-Aligned Number Columns",
-    description: "Number columns with right alignment and currency formatting",
+    name: "Number Columns with Formatting",
+    description: "Number columns with currency formatting and number filters",
     complexity: "simple",
     category: "data-display",
-    tags: ["numbers", "currency", "alignment", "formatting"],
+    tags: ["numbers", "currency", "formatting", "filters"],
     code: `[
   {
     headerName: 'Market Price',
     field: 'Market',
     valueFormatter: fmt.currency,
-    type: 'rightAligned',
+    filter: 'agNumberColumnFilter',
   },
   {
     headerName: 'Full Price',
     field: 'FullPrice',
     valueFormatter: fmt.currency,
-    type: 'rightAligned',
+    filter: 'agNumberColumnFilter',
   }
 ]`,
     props: {
       valueFormatter: "fmt.currency for currency display",
-      type: '"rightAligned" for number alignment',
+      filter: '"agNumberColumnFilter" for numeric filtering',
       field: "numeric data property",
       headerName: "column display title",
     },
@@ -126,7 +126,7 @@ export const COLDEFS_EXAMPLES: ColumnDefsExample[] = [
     sourceFile:
       "/src/modules/SellingPlatform/CalculatedValueReport/colDefs.tsx",
     notes:
-      'Use type: "rightAligned" for numeric data. fmt.currency provides consistent currency formatting.',
+      'Use filter: "agNumberColumnFilter" for numeric data. fmt.currency provides consistent currency formatting.',
   },
 
   {

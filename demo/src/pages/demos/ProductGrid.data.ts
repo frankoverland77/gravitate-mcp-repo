@@ -6,6 +6,7 @@ export const mockData = [
     "Abbreviation": "PRD001",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 7.25,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-04-08T05:56:29.882Z"
@@ -16,6 +17,7 @@ export const mockData = [
     "Abbreviation": "PRD002",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 3.45,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2025-03-14T05:52:08.439Z"
@@ -26,6 +28,7 @@ export const mockData = [
     "Abbreviation": "PRD003",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 8.92,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2025-06-19T01:16:29.586Z"
@@ -36,6 +39,7 @@ export const mockData = [
     "Abbreviation": "PRD004",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 5.67,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-08-22T17:17:37.371Z"
@@ -46,6 +50,7 @@ export const mockData = [
     "Abbreviation": "PRD005",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 2.18,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2024-12-28T09:25:35.899Z"
@@ -56,6 +61,7 @@ export const mockData = [
     "Abbreviation": "PRD006",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 9.33,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2025-07-05T23:24:35.086Z"
@@ -66,6 +72,7 @@ export const mockData = [
     "Abbreviation": "PRD007",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 4.75,
     "IsActive": false,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-02-12T18:08:44.578Z"
@@ -76,6 +83,7 @@ export const mockData = [
     "Abbreviation": "PRD008",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 6.89,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2025-06-14T21:08:49.234Z"
@@ -86,6 +94,7 @@ export const mockData = [
     "Abbreviation": "PRD009",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 1.52,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2024-11-29T06:11:37.810Z"
@@ -96,6 +105,7 @@ export const mockData = [
     "Abbreviation": "PRD010",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 8.14,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-05-27T00:53:31.258Z"
@@ -106,6 +116,7 @@ export const mockData = [
     "Abbreviation": "PRD011",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 3.91,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2025-07-16T18:40:20.762Z"
@@ -116,6 +127,7 @@ export const mockData = [
     "Abbreviation": "PRD012",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 7.63,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2024-11-28T19:29:05.539Z"
@@ -126,6 +138,7 @@ export const mockData = [
     "Abbreviation": "PRD013",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 5.28,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-04-23T02:26:39.484Z"
@@ -136,6 +149,7 @@ export const mockData = [
     "Abbreviation": "PRD014",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 9.05,
     "IsActive": false,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2024-12-09T21:15:21.415Z"
@@ -146,6 +160,7 @@ export const mockData = [
     "Abbreviation": "PRD015",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 2.76,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2024-10-07T18:16:43.663Z"
@@ -156,6 +171,7 @@ export const mockData = [
     "Abbreviation": "PRD016",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 6.41,
     "IsActive": false,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-06-20T05:02:02.527Z"
@@ -166,6 +182,7 @@ export const mockData = [
     "Abbreviation": "PRD017",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 4.32,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2024-12-16T12:57:15.168Z"
@@ -176,6 +193,7 @@ export const mockData = [
     "Abbreviation": "PRD018",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 8.57,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2024-12-14T16:35:26.656Z"
@@ -186,6 +204,7 @@ export const mockData = [
     "Abbreviation": "PRD019",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 1.89,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-05-06T16:36:32.833Z"
@@ -196,6 +215,7 @@ export const mockData = [
     "Abbreviation": "PRD020",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 7.98,
     "IsActive": false,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2025-04-25T01:29:46.609Z"
@@ -206,6 +226,7 @@ export const mockData = [
     "Abbreviation": "PRD021",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 3.64,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2025-08-20T08:37:21.016Z"
@@ -216,6 +237,7 @@ export const mockData = [
     "Abbreviation": "PRD022",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 5.93,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2024-10-29T14:55:00.745Z"
@@ -226,6 +248,7 @@ export const mockData = [
     "Abbreviation": "PRD023",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
+    "Price": 9.21,
     "IsActive": false,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2025-08-25T13:43:08.523Z"
@@ -236,6 +259,7 @@ export const mockData = [
     "Abbreviation": "PRD024",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
+    "Price": 4.17,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2025-05-01T21:25:18.907Z"
@@ -246,6 +270,7 @@ export const mockData = [
     "Abbreviation": "PRD025",
     "Commodity": "Diesel",
     "Grade": "#2",
+    "Price": 6.72,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-05-10T20:58:08.125Z"

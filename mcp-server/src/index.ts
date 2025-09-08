@@ -104,12 +104,31 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 "modify_column",
                 "add_renderer",
                 "change_props",
+                "make_editable",
               ],
               description: "Type of modification to make",
             },
             config: {
               type: "object",
-              description: "Configuration for the modification",
+              description: "Configuration for the modification. For add_column: include field, headerName, type, editable (boolean), etc.",
+              properties: {
+                field: {
+                  type: "string",
+                  description: "Field name for the column",
+                },
+                headerName: {
+                  type: "string",
+                  description: "Display name for the column header",
+                },
+                type: {
+                  type: "string",
+                  description: "Column type (e.g., 'number', 'date', 'string')",
+                },
+                editable: {
+                  type: "boolean",
+                  description: "Whether the column should be editable. If true for number columns, NumberCellEditor will be added automatically.",
+                },
+              },
             },
           },
           required: ["demoName", "action", "config"],

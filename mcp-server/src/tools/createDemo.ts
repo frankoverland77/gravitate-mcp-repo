@@ -167,16 +167,25 @@ function generateGridComponent(
 ): string {
   const columnDefs = generateColumnDefs(parsed.name);
   const idField = getIdField(parsed.name);
+  
+  // Check if we need NumberCellEditor import
+  const hasNumberColumns = columnDefs.some((col: any) => col.cellEditor === 'NumberCellEditor');
 
   // Convert columnDefs to proper JavaScript with functions
-  const columnDefsString = JSON.stringify(columnDefs, null, 4).replace(
-    /"cellRenderer":\s*"([^"]+)"/g,
-    '"cellRenderer": $1'
-  );
+  const columnDefsString = JSON.stringify(columnDefs, null, 4)
+    .replace(/"cellRenderer":\s*"([^"]+)"/g, '"cellRenderer": $1')
+    .replace(/"cellEditor":\s*"NumberCellEditor"/g, '"cellEditor": NumberCellEditor');
 
-  return `import React, { useMemo } from 'react';
+  const imports = hasNumberColumns 
+    ? `import React, { useMemo } from 'react';
 import { GraviGrid } from '@gravitate-js/excalibrr';
 import { mockData } from './${componentName}.data';
+import { NumberCellEditor } from '@components/shared/Grid/cellEditors/NumberCellEditor';`
+    : `import React, { useMemo } from 'react';
+import { GraviGrid } from '@gravitate-js/excalibrr';
+import { mockData } from './${componentName}.data';`;
+
+  return `${imports}
 
 export function ${componentName}() {
   const storageKey = '${componentName.toLowerCase()}-grid';
@@ -192,6 +201,12 @@ export function ${componentName}() {
     hideActiveFilters: false,
   }), []);
   
+  const updateEP = async (params: any) => {
+    // Empty function for now - will handle updates
+    console.log('Update called with:', params);
+    return Promise.resolve();
+  };
+  
   return (
     <div style={{ height: '100%' }}>
       <GraviGrid
@@ -200,6 +215,7 @@ export function ${componentName}() {
         columnDefs={columnDefs}
         agPropOverrides={agPropOverrides}
         controlBarProps={controlBarProps}
+        updateEP={updateEP}
       />
     </div>
   );
@@ -376,7 +392,9 @@ function generateColumnDefs(componentName: string) {
       {
         field: "Quantity",
         headerName: "Quantity",
-        type: "rightAligned",
+        filter: 'agNumberColumnFilter',
+        cellEditor: 'NumberCellEditor',
+        editable: true,
       },
       {
         field: "LocationName",
@@ -406,7 +424,7 @@ function generateColumnDefs(componentName: string) {
       {
         field: "value",
         headerName: "Value",
-        type: "rightAligned",
+        filter: 'agNumberColumnFilter',
       },
       {
         field: "createdAt",

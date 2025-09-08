@@ -3,7 +3,7 @@ import path from "path";
 
 interface ModifyGridArgs {
   demoName: string;
-  action: "add_column" | "modify_column" | "add_renderer" | "change_props";
+  action: "add_column" | "modify_column" | "add_renderer" | "change_props" | "make_editable";
   config: any;
 }
 
@@ -78,7 +78,7 @@ async function addColumnToGrid(
   htmlContent: string,
   config: any
 ): Promise<string> {
-  const { field, headerName, type, width, cellRenderer } = config;
+  const { field, headerName, type, width, cellRenderer, editable } = config;
 
   // Find the columnDefs array in the HTML
   const columnDefsMatch = htmlContent.match(
@@ -100,6 +100,28 @@ async function addColumnToGrid(
   if (width) newColumn.width = width;
   if (type) newColumn.type = type;
   if (cellRenderer) newColumn.cellRenderer = cellRenderer;
+  
+  // Check if this is a number column (but not IDs)
+  const isNumberColumn = type === 'number' || field.toLowerCase().includes('price') || 
+      field.toLowerCase().includes('quantity') || field.toLowerCase().includes('amount') ||
+      field.toLowerCase().includes('value');
+  
+  // Auto-add number filter for number columns
+  if (isNumberColumn) {
+    newColumn.filter = 'agNumberColumnFilter';
+  }
+  
+  // Handle editable configuration
+  if (editable !== undefined) {
+    newColumn.editable = editable;
+    // If editable and number column, add NumberCellEditor
+    if (editable && isNumberColumn) {
+      newColumn.cellEditor = 'NumberCellEditor';
+    }
+  } else {
+    // If editable not specified, log a reminder
+    console.log(`Note: 'editable' not specified for column '${field}'. Column will be read-only by default.`);
+  }
 
   // Add the new column
   existingColumnDefs.push(newColumn);
