@@ -312,10 +312,33 @@ async function testChangeTheme() {
       theme: "BP"
     });
     
-    log(result.content[0].text, 'info');
-    
-    // Since theme changes might be in a different place, just check the result
-    return !result.isError;
+    // Check if the theme change was successful
+    if (!result.isError) {
+      log('Theme change successful', 'success');
+      
+      // Verify the theme script was added to the file
+      const content = await fs.readFile(DEMO_PATH, 'utf-8');
+      
+      const checks = [
+        { name: 'useEffect import added', test: () => content.includes('useEffect') },
+        { name: 'Theme script present', test: () => content.includes('/* MCP Theme Script */') },
+        { name: 'localStorage.setItem for BP', test: () => content.includes('localStorage.setItem("TYPE_OF_THEME", "BP")') },
+        { name: 'Theme useEffect added', test: () => content.includes('useEffect(() => {') && content.includes('localStorage') }
+      ];
+      
+      for (const check of checks) {
+        if (check.test()) {
+          log(`  ✓ ${check.name}`, 'success');
+        } else {
+          log(`  ✗ ${check.name}`, 'error');
+        }
+      }
+      
+      return true;
+    } else {
+      log('Theme change returned error', 'error');
+      return false;
+    }
   } catch (error) {
     log(`Change theme failed: ${error.message}`, 'error');
     return false;

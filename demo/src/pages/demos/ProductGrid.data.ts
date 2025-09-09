@@ -7,6 +7,7 @@ export const mockData = [
     "Commodity": "Diesel",
     "Grade": "#2",
     "Price": 7.25,
+    "volumeAvailable": 15750,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-04-08T05:56:29.882Z"
@@ -18,6 +19,7 @@ export const mockData = [
     "Commodity": "Heating Oil",
     "Grade": "Premium",
     "Price": 3.45,
+    "volumeAvailable": 22300,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2025-03-14T05:52:08.439Z"
@@ -29,6 +31,7 @@ export const mockData = [
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
     "Price": 8.92,
+    "volumeAvailable": 8950,
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
     "CreatedDateTime": "2025-06-19T01:16:29.586Z"
@@ -40,6 +43,7 @@ export const mockData = [
     "Commodity": "Diesel",
     "Grade": "#2",
     "Price": 5.67,
+    "volumeAvailable": 31200,
     "IsActive": true,
     "ProductGroup": "Distillates",
     "CreatedDateTime": "2025-08-22T17:17:37.371Z"
@@ -51,6 +55,7 @@ export const mockData = [
     "Commodity": "Heating Oil",
     "Grade": "Premium",
     "Price": 2.18,
+    "volumeAvailable": 18750,
     "IsActive": true,
     "ProductGroup": "Chemicals",
     "CreatedDateTime": "2024-12-28T09:25:35.899Z"

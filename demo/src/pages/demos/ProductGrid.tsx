@@ -18,7 +18,6 @@ export function ProductGrid() {
         {
           field: "Name",
           headerName: "Product Name",
-          resizable: true,
         },
         {
           field: "Abbreviation",
@@ -39,6 +38,15 @@ export function ProductGrid() {
           valueFormatter: (params: any) =>
             params.value ? `$${params.value.toFixed(2)}` : "",
           cellEditor: NumberCellEditor,
+        },
+        {
+          field: "volumeAvailable",
+          headerName: "Volume Available",
+          filter: "agNumberColumnFilter",
+          editable: true,
+          cellEditor: NumberCellEditor,
+          valueFormatter: (params: any) =>
+            params.value ? `${params.value.toLocaleString()} gal` : "",
         },
         {
           field: "IsActive",

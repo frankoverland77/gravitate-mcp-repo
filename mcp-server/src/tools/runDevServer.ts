@@ -1,6 +1,7 @@
 import { spawn, exec } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
+import { handleToolError } from "../utils/demoUtils.js";
 
 interface RunDevServerArgs {
   demoName: string;
@@ -23,27 +24,25 @@ const runningServers = new Map<string, any>();
 export async function runDevServerTool(args: RunDevServerArgs) {
   const { demoName, action = "start", port } = args;
 
-  const demoPath = path.join(process.cwd(), "demos", demoName);
-
-  // Check if demo exists
   try {
-    await fs.access(demoPath);
-  } catch {
-    throw new Error(
-      `Demo '${demoName}' not found. Create it first with create_demo.`
-    );
-  }
+    const demoPath = path.join(process.cwd(), "demos", demoName);
 
-  switch (action) {
-    case "start":
-      return await startDevServer(demoName, demoPath, port);
-    case "stop":
-      return await stopDevServer(demoName);
-    case "restart":
-      await stopDevServer(demoName);
-      return await startDevServer(demoName, demoPath, port);
-    default:
-      throw new Error(`Unknown action: ${action}`);
+    // Check if demo exists
+    await fs.access(demoPath);
+
+    switch (action) {
+      case "start":
+        return await startDevServer(demoName, demoPath, port);
+      case "stop":
+        return await stopDevServer(demoName);
+      case "restart":
+        await stopDevServer(demoName);
+        return await startDevServer(demoName, demoPath, port);
+      default:
+        throw new Error(`Unknown action: ${action}`);
+    }
+  } catch (error) {
+    return handleToolError(`Run dev server for ${demoName}`, error);
   }
 }
 

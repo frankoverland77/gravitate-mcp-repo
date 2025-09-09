@@ -26,6 +26,7 @@ export default defineConfig({
       { find: "@utils", replacement: getRootAlias("utils") },
       { find: "@api", replacement: getRootAlias("api") },
       { find: "@styles", replacement: getRootAlias("styles") },
+      { find: "@assets", replacement: getRootAlias("assets") },
     ],
   },
   css: {

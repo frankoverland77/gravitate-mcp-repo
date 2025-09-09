@@ -1,8 +1,15 @@
 import React from "react";
 import { Vertical, Horizontal, Texto, BBDTag } from "@gravitate-js/excalibrr";
 
+type Demo = {
+  path: string;
+  name: string;
+  description?: string;
+  created: string;
+};
+
 export function WelcomePage() {
-  const recentDemos = [];
+  const recentDemos: Demo[] = [];
 
   return (
     <Vertical style={{ padding: "32px", maxWidth: "800px" }}>

@@ -1,6 +1,11 @@
 import { promises as fs } from "fs";
-import path from "path";
-import { getThemeCSS } from "../utils/gridFontFix.js";
+import { 
+  validateGridDemo, 
+  addReactHook, 
+  findReturnStatement, 
+  createToolResponse, 
+  handleToolError 
+} from "../utils/demoUtils.js";
 
 interface ChangeThemeArgs {
   demoName: string;
@@ -10,64 +15,63 @@ interface ChangeThemeArgs {
 /**
  * Changes the theme of an existing demo
  *
- * This updates:
- * - CSS variables for colors
- * - Font configurations
- * - Theme-specific styling
+ * This follows the same pattern as the ControlPanel component:
+ * - Sets localStorage.setItem("TYPE_OF_THEME", theme) 
+ * - Lets the ThemeContextProvider handle theme application
  */
 export async function changeThemeTool(args: ChangeThemeArgs) {
   const { demoName, theme } = args;
 
-  // Align with createDemo tool - demos are in demo/src/pages/demos/
-  const demoPath = path.join(process.cwd(), "demo", "src", "pages", "demos", `${demoName}.tsx`);
-
-  // Check if demo exists
   try {
-    await fs.access(demoPath);
-  } catch {
-    throw new Error(
-      `Demo '${demoName}' not found at ${demoPath}. Create it first with create_demo.`
+    const { path: demoPath, content: tsxContent } = await validateGridDemo(demoName);
+    
+    // Add theme script to the demo
+    const updatedContent = await addThemeScriptToDemo(tsxContent, theme);
+    
+    // Write the updated content back
+    await fs.writeFile(demoPath, updatedContent);
+    
+    return createToolResponse(
+      `Changed ${demoName} theme to ${theme}`,
+      demoName,
+      `🎨 Theme: ${theme}\n\nThe demo will now automatically use the ${theme} theme when viewed. This follows the same pattern as the main app's theme system using localStorage.`
     );
+
+  } catch (error) {
+    return handleToolError(`Change ${demoName} theme to ${theme}`, error);
   }
+}
 
-  // For TSX demos, theme changes would need to be applied differently
-  // Since TSX demos use CSS-in-JS or external stylesheets, not inline <style> tags
-  // For now, let's just return a success message indicating theme would be changed
-  // In a real implementation, this might:
-  // 1. Update a theme context or provider
-  // 2. Modify CSS variables in a stylesheet
-  // 3. Change theme props passed to GraviGrid
+/**
+ * Add theme-setting script to a demo
+ * This follows the same pattern as the ControlPanel: set localStorage
+ */
+async function addThemeScriptToDemo(
+  tsxContent: string, 
+  theme: "OSP" | "PE" | "BP" | "default"
+): Promise<string> {
+  let updatedContent = tsxContent;
   
-  // Read the TSX file to verify it exists and get info
-  const tsxContent = await fs.readFile(demoPath, "utf-8");
+  // Check if theme script already exists
+  const hasThemeScript = tsxContent.includes('/* MCP Theme Script */');
   
-  // Check if it's a GraviGrid component
-  if (!tsxContent.includes('GraviGrid')) {
-    throw new Error(`${demoName} is not a grid demo. Theme changes are only supported for grid demos.`);
+  if (hasThemeScript) {
+    // Replace existing theme script - just update the theme value in useEffect
+    updatedContent = updatedContent.replace(
+      /localStorage\.setItem\("TYPE_OF_THEME", "[^"]+"\)/,
+      `localStorage.setItem("TYPE_OF_THEME", "${theme}")`
+    );
+  } else {
+    // Add useEffect import if not present
+    updatedContent = addReactHook(updatedContent, 'useEffect');
+    
+    // Add useEffect to set theme on component mount
+    const { index: returnInsertPoint } = findReturnStatement(updatedContent);
+    updatedContent = 
+      updatedContent.substring(0, returnInsertPoint) + 
+      `  /* MCP Theme Script */\n  // Set ${theme} theme for this demo (follows ControlPanel pattern)\n  useEffect(() => {\n    if (typeof localStorage !== 'undefined') {\n      localStorage.setItem("TYPE_OF_THEME", "${theme}");\n    }\n  }, []);\n  /* End MCP Theme Script */\n\n` +
+      updatedContent.substring(returnInsertPoint);
   }
-
-  // TODO: Implement actual theme changing for TSX files
-  // This would require:
-  // - Adding theme prop to GraviGrid component
-  // - Or updating CSS variables in a global stylesheet
-  // - Or modifying theme context
   
-  console.log(`Note: Theme changing for TSX demos is not yet fully implemented.`);
-  console.log(`Would change ${demoName} to ${theme} theme.`);
-  
-  return {
-    content: [
-      {
-        type: "text",
-        text: `✅ Theme change requested for ${demoName}
-
-🎨 Target Theme: ${theme}
-📁 Location: ${demoPath}
-
-Note: Theme changing for TSX demos is not yet fully implemented.
-This would require updating the GraviGrid theme props or CSS variables.
-The demo structure has been verified and the request was processed successfully.`,
-      },
-    ],
-  };
+  return updatedContent;
 }
