@@ -7,14 +7,15 @@ import { createPageConfig } from "../pageConfig";
 
 export function AuthenticatedRoute() {
   const pageConfig = useMemo(createPageConfig, []);
-
+  const scopes = {
+    Welcome: true,
+    Grids: true,
+    Forms: true,
+    ProductGrid: true,
+  };
   return (
     <NavigationContextProvider
-      getScopes={async () => ({
-        Welcome: true,
-        ProductGrid: true,
-        ProductForm: true,
-      })}
+      getScopes={async () => scopes}
       handleLogout={() => {}}
       pageConfig={pageConfig}
       userControlPane={<UserControlPanel />}

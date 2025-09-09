@@ -1,18 +1,7 @@
-import {
-  DashboardOutlined,
-  SlidersOutlined,
-  MoneyCollectFilled,
-  FileOutlined,
-  FileSyncOutlined,
-  FileProtectOutlined,
-  LineChartOutlined,
-  DiffOutlined,
-  SmileFilled,
-} from "@ant-design/icons";
+import { SmileFilled, TableOutlined, EditOutlined } from "@ant-design/icons";
 
 import { WelcomePage } from "./pages/WelcomePage";
 import { ProductGrid } from "./pages/demos/ProductGrid";
-import { ProductForm } from "./pages/demos/ProductForm";
 
 export const createPageConfig = () => ({
   Welcome: {
@@ -20,20 +9,21 @@ export const createPageConfig = () => ({
     key: "Sandbox",
     icon: <SmileFilled />,
     title: "Sandbox",
-    element: <WelcomePage />,
+    element: <WelcomePage />
   },
-  ProductGrid: {
+  Grids: {
     hasPermission: () => true,
-    key: "ProductGrid",
-    icon: <FileOutlined />,
-    title: "Product Grid",
+    key: "Grids",
+    icon: <TableOutlined />,
+    title: "Grids",
     element: <ProductGrid />,
-  },
-  ProductForm: {
-    hasPermission: () => true,
-    key: "ProductForm",
-    icon: <FileOutlined />,
-    title: "Product Form",
-    element: <ProductForm />,
-  },
+    routes: [
+      {
+        hasPermission: () => true,
+        key: "ProductGrid",
+        title: "Product Grid",
+        element: <ProductGrid />
+      }
+    ]
+  }
 });

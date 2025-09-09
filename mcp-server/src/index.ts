@@ -12,6 +12,8 @@ import { createDemoTool } from "./tools/createDemo.js";
 import { modifyGridTool } from "./tools/modifyGrid.js";
 import { changeThemeTool } from "./tools/changeTheme.js";
 import { runDevServerTool } from "./tools/runDevServer.js";
+import { createFormDemo } from "./tools/createFormDemo.js";
+import { cleanupDemo } from "./tools/cleanupDemo.js";
 
 /**
  * Excalibrr MCP Server v2 - Clean, Focused Implementation
@@ -177,6 +179,94 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["demoName"],
         },
       },
+      {
+        name: "create_form_demo",
+        description: "Create a form demo with real Excalibrr components based on Gravitate patterns",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Name for the form demo (e.g., 'ProductForm', 'UserManagement')",
+            },
+            type: {
+              type: "string",
+              enum: ["simple", "management", "bulk-edit", "inline-edit"],
+              description: "Type of form to create",
+              default: "simple",
+            },
+            title: {
+              type: "string",
+              description: "Display title for the form",
+            },
+            fields: {
+              type: "array",
+              description: "Form fields configuration",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string", description: "Field name" },
+                  label: { type: "string", description: "Field label" },
+                  type: { 
+                    type: "string", 
+                    enum: ["text", "email", "number", "select", "date", "dateRange", "switch", "checkbox"],
+                    description: "Field type" 
+                  },
+                  required: { type: "boolean", description: "Whether field is required" },
+                  placeholder: { type: "string", description: "Placeholder text" },
+                  options: { 
+                    type: "array", 
+                    items: { type: "string" },
+                    description: "Options for select fields"
+                  }
+                },
+                required: ["name", "label", "type"]
+              }
+            },
+            actions: {
+              type: "array",
+              description: "Form action buttons",
+              items: {
+                type: "object",
+                properties: {
+                  type: { 
+                    type: "string", 
+                    enum: ["submit", "cancel", "reset"],
+                    description: "Action type"
+                  },
+                  label: { type: "string", description: "Button label" },
+                  theme: { 
+                    type: "string", 
+                    enum: ["success", "theme1", "default"],
+                    description: "Button theme"
+                  }
+                },
+                required: ["type", "label"]
+              }
+            }
+          },
+          required: ["name", "fields"]
+        }
+      },
+      {
+        name: "cleanup_demo",
+        description: "Remove a demo and clean up all references (pageConfig, scopes, files)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Name of the demo to remove (e.g., 'ProductForm', 'CustomerForm')",
+            },
+            force: {
+              type: "boolean",
+              description: "Skip confirmation and force removal",
+              default: false,
+            }
+          },
+          required: ["name"]
+        }
+      },
     ],
   };
 });
@@ -194,6 +284,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await changeThemeTool(args as any);
       case "run_dev_server":
         return await runDevServerTool(args as any);
+      case "create_form_demo":
+        return { content: [{ type: "text", text: await createFormDemo(args as any) }] };
+      case "cleanup_demo":
+        return { content: [{ type: "text", text: await cleanupDemo(args as any) }] };
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
