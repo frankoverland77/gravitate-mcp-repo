@@ -8,13 +8,8 @@ interface ModifyGridArgs {
 }
 
 /**
- * Modifies an existing grid demo by updating the HTML file
- *
- * This tool allows iterative changes to grids:
- * - Add new columns
- * - Modify existing columns
- * - Add custom cell renderers
- * - Change grid properties
+ * Simplified version of modifyGrid that works with string manipulation
+ * instead of trying to parse TypeScript as JSON
  */
 export async function modifyGridTool(args: ModifyGridArgs) {
   const { demoName, action, config } = args;
@@ -51,10 +46,7 @@ export async function modifyGridTool(args: ModifyGridArgs) {
       break;
     case "make_editable":
       // Handle make_editable as a special case of modify_column
-      updatedContent = await modifyColumnInGrid(tsxContent, {
-        field: config.field,
-        updates: { editable: config.editable || true }
-      });
+      updatedContent = await makeColumnEditable(tsxContent, config);
       break;
     default:
       throw new Error(`Unknown action: ${action}`);
@@ -79,7 +71,7 @@ The demo will hot-reload automatically if the dev server is running.`,
 }
 
 /**
- * Add a new column to the grid
+ * Add a new column to the grid using string manipulation
  */
 async function addColumnToGrid(
   tsxContent: string,
@@ -87,78 +79,75 @@ async function addColumnToGrid(
 ): Promise<string> {
   const { field, headerName, type, width, cellRenderer, editable } = config;
 
-  // Find the end of columnDefs array to insert new column
+  // Find the end of columnDefs array (look for the last closing brace before the closing bracket)
   const columnDefsMatch = tsxContent.match(/const columnDefs\s*=\s*\[([\s\S]*?)\];/);
   if (!columnDefsMatch) {
     throw new Error("Could not find columnDefs in the demo file");
   }
 
-  // Don't try to parse as JSON - work with the string directly
-  const columnDefsContent = columnDefsMatch[1];
-
-  // Build new column definition as a string
-  let newColumnStr = `    {\n`;
-  newColumnStr += `        "field": "${field}",\n`;
-  newColumnStr += `        "headerName": "${headerName}"`;
+  // Create new column definition as a string
+  let newColumn = `    {\n`;
+  newColumn += `        "field": "${field}",\n`;
+  newColumn += `        "headerName": "${headerName}"`;
   
   if (width) {
-    newColumnStr += `,\n        "width": ${width}`;
+    newColumn += `,\n        "width": ${width}`;
   }
   
-  // Check if this is a number column (but not IDs)
-  const isNumberColumn = type === 'number' || field.toLowerCase().includes('price') || 
-      field.toLowerCase().includes('quantity') || field.toLowerCase().includes('amount') ||
-      field.toLowerCase().includes('value');
+  // Check if this is a number column
+  const isNumberColumn = type === 'number' || 
+    field.toLowerCase().includes('price') || 
+    field.toLowerCase().includes('quantity') || 
+    field.toLowerCase().includes('amount') ||
+    field.toLowerCase().includes('value');
   
   // Auto-add number filter for number columns
   if (isNumberColumn) {
-    newColumnStr += `,\n        "filter": "agNumberColumnFilter"`;
+    newColumn += `,\n        "filter": "agNumberColumnFilter"`;
   }
   
   // Handle editable configuration
   if (editable !== undefined) {
-    newColumnStr += `,\n        "editable": ${editable}`;
-    // If editable and number column, add NumberCellEditor
     if (editable && isNumberColumn) {
-      newColumnStr += `,\n        "cellEditor": NumberCellEditor`;
+      // For editable number columns, add NumberCellEditor
+      newColumn += `,\n        "cellEditor": NumberCellEditor`;
+      newColumn += `,\n        "editable": true`;
       
-      // Ensure NumberCellEditor is imported if not already
+      // Ensure NumberCellEditor is imported
       if (!tsxContent.includes('NumberCellEditor')) {
         tsxContent = tsxContent.replace(
           /import { GraviGrid } from '@gravitate-js\/excalibrr';/,
           `import { GraviGrid } from '@gravitate-js/excalibrr';\nimport { NumberCellEditor } from '@components/shared/Grid/cellEditors/NumberCellEditor';`
         );
       }
+    } else {
+      newColumn += `,\n        "editable": ${editable}`;
     }
-  } else {
-    // If editable not specified, log a reminder
-    console.log(`Note: 'editable' not specified for column '${field}'. Column will be read-only by default.`);
   }
   
   if (cellRenderer && typeof cellRenderer === 'string') {
     // If it's a function string, add it without quotes
     if (cellRenderer.includes('=>') || cellRenderer.includes('function')) {
-      newColumnStr += `,\n        "cellRenderer": ${cellRenderer}`;
+      newColumn += `,\n        "cellRenderer": ${cellRenderer}`;
     } else {
-      newColumnStr += `,\n        "cellRenderer": "${cellRenderer}"`;
+      newColumn += `,\n        "cellRenderer": "${cellRenderer}"`;
     }
   }
   
-  newColumnStr += `\n    }`;
+  newColumn += `\n    }`;
 
-  // Insert the new column before the closing bracket
-  // Check if there are existing columns
-  const hasExistingColumns = columnDefsContent.trim().length > 0;
+  // Insert the new column before the closing bracket of columnDefs
+  const insertPosition = columnDefsMatch[0].lastIndexOf(']');
+  const beforeBracket = columnDefsMatch[0].substring(0, insertPosition);
+  const afterBracket = columnDefsMatch[0].substring(insertPosition);
   
-  if (hasExistingColumns) {
-    // Add comma after last existing column and then new column
-    const updatedColumnDefs = `const columnDefs = [${columnDefsContent},\n${newColumnStr}\n];`;
-    return tsxContent.replace(columnDefsMatch[0], updatedColumnDefs);
-  } else {
-    // First column
-    const updatedColumnDefs = `const columnDefs = [\n${newColumnStr}\n];`;
-    return tsxContent.replace(columnDefsMatch[0], updatedColumnDefs);
-  }
+  // Add comma after the last column if there are existing columns
+  const hasExistingColumns = beforeBracket.includes('{');
+  const newColumnDefs = hasExistingColumns 
+    ? `${beforeBracket},\n${newColumn}${afterBracket}`
+    : `${beforeBracket}\n${newColumn}${afterBracket}`;
+  
+  return tsxContent.replace(columnDefsMatch[0], newColumnDefs);
 }
 
 /**
@@ -170,10 +159,9 @@ async function modifyColumnInGrid(
 ): Promise<string> {
   const { field, updates } = config;
 
-  // Find the specific column definition for this field
-  // Match a column object that contains this field
+  // Find the column definition for the specified field
   const columnRegex = new RegExp(
-    `{[^{}]*"field"\\s*:\\s*"${field}"[^{}]*}`,
+    `{[^}]*"field"\\s*:\\s*"${field}"[^}]*}`,
     's'
   );
   
@@ -190,7 +178,7 @@ async function modifyColumnInGrid(
     
     let newValue: string;
     if (typeof value === 'string') {
-      // Check if it's a function or a component reference (starts with capital letter)
+      // Check if it's a function or reference
       if (value.includes('=>') || value.includes('function') || /^[A-Z]/.test(value)) {
         newValue = `"${key}": ${value}`;
       } else {
@@ -208,25 +196,9 @@ async function modifyColumnInGrid(
     } else {
       // Add new property before the closing brace
       const insertPos = updatedColumn.lastIndexOf('}');
-      // Check if there's already a trailing comma, if not add one to the previous line
-      let beforeInsert = updatedColumn.substring(0, insertPos);
-      const afterInsert = updatedColumn.substring(insertPos);
-      
-      // Ensure proper comma placement
-      if (!beforeInsert.trim().endsWith(',')) {
-        // Find the last property and add comma after it
-        beforeInsert = beforeInsert.replace(/(["\w\d)]+)\s*$/m, '$1,');
-      }
-      
-      updatedColumn = beforeInsert + `\n        ${newValue}` + afterInsert;
-    }
-    
-    // Handle special case for NumberCellEditor
-    if (key === 'cellEditor' && value === 'NumberCellEditor' && !tsxContent.includes('NumberCellEditor')) {
-      tsxContent = tsxContent.replace(
-        /import { GraviGrid } from '@gravitate-js\/excalibrr';/,
-        `import { GraviGrid } from '@gravitate-js/excalibrr';\nimport { NumberCellEditor } from '@components/shared/Grid/cellEditors/NumberCellEditor';`
-      );
+      updatedColumn = updatedColumn.substring(0, insertPos) + 
+        `,\n        ${newValue}` + 
+        updatedColumn.substring(insertPos);
     }
   }
 
@@ -249,6 +221,38 @@ async function addRendererToGrid(
 }
 
 /**
+ * Make a column editable
+ */
+async function makeColumnEditable(
+  tsxContent: string,
+  config: any
+): Promise<string> {
+  const { field, editable = true } = config;
+  
+  // Check if it's a number field
+  const isNumberField = field.toLowerCase().includes('price') || 
+    field.toLowerCase().includes('quantity') || 
+    field.toLowerCase().includes('amount') ||
+    field.toLowerCase().includes('value');
+  
+  const updates: any = { editable };
+  
+  if (editable && isNumberField) {
+    updates.cellEditor = 'NumberCellEditor';
+    
+    // Ensure NumberCellEditor is imported
+    if (!tsxContent.includes('NumberCellEditor')) {
+      tsxContent = tsxContent.replace(
+        /import { GraviGrid } from '@gravitate-js\/excalibrr';/,
+        `import { GraviGrid } from '@gravitate-js/excalibrr';\nimport { NumberCellEditor } from '@components/shared/Grid/cellEditors/NumberCellEditor';`
+      );
+    }
+  }
+  
+  return modifyColumnInGrid(tsxContent, { field, updates });
+}
+
+/**
  * Change grid properties
  */
 async function changeGridProps(
@@ -256,7 +260,7 @@ async function changeGridProps(
   config: any
 ): Promise<string> {
   // This would modify the GraviGrid props in the React component
-  // For now, return unchanged - this is more complex and would need AST parsing
+  // For now, return unchanged - this is more complex and would need more sophisticated parsing
   console.log("Grid props change not yet implemented:", config);
   return tsxContent;
 }

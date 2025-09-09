@@ -8,7 +8,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2024-10-17T10:26:37.552Z"
+    "CreatedDateTime": "2025-06-11T00:26:37.005Z"
   },
   {
     "ProductId": 2,
@@ -18,7 +18,7 @@ export const mockData = [
     "Grade": "Premium",
     "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2025-05-29T19:03:29.822Z"
+    "CreatedDateTime": "2025-04-01T01:49:01.675Z"
   },
   {
     "ProductId": 3,
@@ -28,7 +28,7 @@ export const mockData = [
     "Grade": "87 Octane",
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2025-05-08T12:09:20.979Z"
+    "CreatedDateTime": "2024-09-29T02:49:35.107Z"
   },
   {
     "ProductId": 4,
@@ -38,7 +38,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2024-12-05T12:23:33.738Z"
+    "CreatedDateTime": "2025-01-06T14:17:34.214Z"
   },
   {
     "ProductId": 5,
@@ -48,7 +48,7 @@ export const mockData = [
     "Grade": "Premium",
     "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2024-10-11T14:27:33.858Z"
+    "CreatedDateTime": "2024-11-30T02:47:45.706Z"
   },
   {
     "ProductId": 6,
@@ -56,9 +56,9 @@ export const mockData = [
     "Abbreviation": "PRD006",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
-    "IsActive": true,
+    "IsActive": false,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2025-08-21T01:57:37.255Z"
+    "CreatedDateTime": "2025-02-27T01:48:22.875Z"
   },
   {
     "ProductId": 7,
@@ -68,7 +68,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2024-11-04T22:39:53.129Z"
+    "CreatedDateTime": "2025-06-22T03:27:53.472Z"
   },
   {
     "ProductId": 8,
@@ -76,9 +76,9 @@ export const mockData = [
     "Abbreviation": "PRD008",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
-    "IsActive": false,
+    "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2024-10-31T19:54:40.179Z"
+    "CreatedDateTime": "2024-09-29T03:31:26.741Z"
   },
   {
     "ProductId": 9,
@@ -88,7 +88,7 @@ export const mockData = [
     "Grade": "87 Octane",
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2024-10-12T06:38:14.370Z"
+    "CreatedDateTime": "2025-06-02T20:12:59.576Z"
   },
   {
     "ProductId": 10,
@@ -98,7 +98,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2024-10-18T13:09:38.561Z"
+    "CreatedDateTime": "2024-09-12T16:51:34.771Z"
   },
   {
     "ProductId": 11,
@@ -108,7 +108,7 @@ export const mockData = [
     "Grade": "Premium",
     "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2024-12-27T02:41:49.820Z"
+    "CreatedDateTime": "2025-04-23T21:22:16.673Z"
   },
   {
     "ProductId": 12,
@@ -118,7 +118,7 @@ export const mockData = [
     "Grade": "87 Octane",
     "IsActive": false,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2024-11-19T03:15:12.082Z"
+    "CreatedDateTime": "2025-01-13T01:58:22.156Z"
   },
   {
     "ProductId": 13,
@@ -126,9 +126,9 @@ export const mockData = [
     "Abbreviation": "PRD013",
     "Commodity": "Diesel",
     "Grade": "#2",
-    "IsActive": true,
+    "IsActive": false,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2025-05-28T01:03:33.255Z"
+    "CreatedDateTime": "2025-02-04T16:01:47.052Z"
   },
   {
     "ProductId": 14,
@@ -136,9 +136,9 @@ export const mockData = [
     "Abbreviation": "PRD014",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
-    "IsActive": false,
+    "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2024-09-09T04:24:42.887Z"
+    "CreatedDateTime": "2025-08-12T03:42:52.179Z"
   },
   {
     "ProductId": 15,
@@ -146,9 +146,9 @@ export const mockData = [
     "Abbreviation": "PRD015",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
-    "IsActive": false,
+    "IsActive": true,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2025-05-19T17:28:55.410Z"
+    "CreatedDateTime": "2025-08-09T18:50:49.577Z"
   },
   {
     "ProductId": 16,
@@ -158,7 +158,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2025-04-12T15:51:37.311Z"
+    "CreatedDateTime": "2025-04-01T15:01:24.801Z"
   },
   {
     "ProductId": 17,
@@ -166,9 +166,9 @@ export const mockData = [
     "Abbreviation": "PRD017",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
-    "IsActive": false,
+    "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2024-12-20T01:28:38.345Z"
+    "CreatedDateTime": "2025-03-24T15:19:52.207Z"
   },
   {
     "ProductId": 18,
@@ -176,9 +176,9 @@ export const mockData = [
     "Abbreviation": "PRD018",
     "Commodity": "Gasoline",
     "Grade": "87 Octane",
-    "IsActive": false,
+    "IsActive": true,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2025-06-03T04:55:37.583Z"
+    "CreatedDateTime": "2025-03-22T16:49:15.661Z"
   },
   {
     "ProductId": 19,
@@ -188,7 +188,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2024-11-13T23:31:45.381Z"
+    "CreatedDateTime": "2025-02-01T15:55:28.834Z"
   },
   {
     "ProductId": 20,
@@ -196,9 +196,9 @@ export const mockData = [
     "Abbreviation": "PRD020",
     "Commodity": "Heating Oil",
     "Grade": "Premium",
-    "IsActive": true,
+    "IsActive": false,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2024-12-07T08:39:49.057Z"
+    "CreatedDateTime": "2024-12-27T09:46:47.565Z"
   },
   {
     "ProductId": 21,
@@ -208,7 +208,7 @@ export const mockData = [
     "Grade": "87 Octane",
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2025-01-21T05:51:25.160Z"
+    "CreatedDateTime": "2024-10-23T13:32:50.426Z"
   },
   {
     "ProductId": 22,
@@ -218,7 +218,7 @@ export const mockData = [
     "Grade": "#2",
     "IsActive": true,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2025-03-06T16:58:54.418Z"
+    "CreatedDateTime": "2025-05-19T11:52:44.366Z"
   },
   {
     "ProductId": 23,
@@ -228,7 +228,7 @@ export const mockData = [
     "Grade": "Premium",
     "IsActive": true,
     "ProductGroup": "Chemicals",
-    "CreatedDateTime": "2025-02-01T11:23:42.915Z"
+    "CreatedDateTime": "2025-02-27T01:09:57.976Z"
   },
   {
     "ProductId": 24,
@@ -238,7 +238,7 @@ export const mockData = [
     "Grade": "87 Octane",
     "IsActive": true,
     "ProductGroup": "Motor Fuels",
-    "CreatedDateTime": "2025-06-28T18:20:51.090Z"
+    "CreatedDateTime": "2025-01-03T22:43:47.935Z"
   },
   {
     "ProductId": 25,
@@ -246,8 +246,8 @@ export const mockData = [
     "Abbreviation": "PRD025",
     "Commodity": "Diesel",
     "Grade": "#2",
-    "IsActive": true,
+    "IsActive": false,
     "ProductGroup": "Distillates",
-    "CreatedDateTime": "2025-05-12T03:49:53.574Z"
+    "CreatedDateTime": "2024-12-17T18:06:58.139Z"
   }
 ];

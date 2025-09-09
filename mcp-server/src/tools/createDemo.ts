@@ -76,16 +76,18 @@ Please check the instruction and try again. Examples:
 function parseInstruction(instruction: string): ParsedInstruction {
   const lowered = instruction.toLowerCase();
 
-  // Determine type
+  // Determine type - be more specific about what makes something a form vs grid
   let type: ParsedInstruction["type"] = "grid";
   if (
     lowered.includes("form") ||
-    lowered.includes("create") ||
-    lowered.includes("edit")
+    (lowered.includes("create") && !lowered.includes("grid")) ||
+    (lowered.includes("edit") && !lowered.includes("editable") && !lowered.includes("inline"))
   ) {
     type = "form";
   } else if (lowered.includes("dashboard") || lowered.includes("analytics")) {
     type = "dashboard";
+  } else if (lowered.includes("grid") || lowered.includes("table") || lowered.includes("list")) {
+    type = "grid";
   }
 
   // Extract name
@@ -187,10 +189,10 @@ import { mockData } from './${componentName}.data';`;
 
   return `${imports}
 
+const columnDefs = ${columnDefsString};
+
 export function ${componentName}() {
   const storageKey = '${componentName.toLowerCase()}-grid';
-  
-  const columnDefs = useMemo(() => columnDefs(), []);
   
   const agPropOverrides = useMemo(() => ({
     getRowId: (params: any) => params.data.${idField},
