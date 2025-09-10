@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { generateComponentProps } from "../utils/cssUtils.js";
 
 interface CreateDemoArgs {
   instruction: string;
@@ -78,15 +79,24 @@ function parseInstruction(instruction: string): ParsedInstruction {
 
   // Determine type - be more specific about what makes something a form vs grid
   let type: ParsedInstruction["type"] = "grid";
+  
+  // Form indicators (highest priority)
   if (
     lowered.includes("form") ||
-    (lowered.includes("create") && !lowered.includes("grid")) ||
-    (lowered.includes("edit") && !lowered.includes("editable") && !lowered.includes("inline"))
+    lowered.includes("entry") ||
+    lowered.includes("input") ||
+    lowered.includes("create") && (lowered.includes("record") || lowered.includes("item")) ||
+    lowered.includes("add") && !lowered.includes("column") ||
+    lowered.includes("edit") && !lowered.includes("editable") && !lowered.includes("inline")
   ) {
     type = "form";
-  } else if (lowered.includes("dashboard") || lowered.includes("analytics")) {
+  }
+  // Dashboard indicators
+  else if (lowered.includes("dashboard") || lowered.includes("analytics") || lowered.includes("metrics")) {
     type = "dashboard";
-  } else if (lowered.includes("grid") || lowered.includes("table") || lowered.includes("list")) {
+  }
+  // Grid indicators (default)
+  else if (lowered.includes("grid") || lowered.includes("table") || lowered.includes("list") || lowered.includes("display") || lowered.includes("show")) {
     type = "grid";
   }
 
@@ -95,7 +105,7 @@ function parseInstruction(instruction: string): ParsedInstruction {
   if (lowered.includes("product")) {
     name = type === "form" ? "Product Form" : "Product Grid";
   } else if (lowered.includes("inventory")) {
-    name = "Inventory Grid";
+    name = type === "form" ? "Inventory Form" : "Inventory Grid";
   } else if (lowered.includes("customer")) {
     name = type === "form" ? "Customer Form" : "Customer Grid";
   } else if (lowered.includes("trading")) {
@@ -141,6 +151,16 @@ function parseInstruction(instruction: string): ParsedInstruction {
     } else if (type === "form") {
       features.push("Form inputs", "Validation", "Submit handling");
     }
+  }
+
+  // Validation: Ensure name matches detected type
+  const nameLower = name.toLowerCase();
+  if (type === "form" && !nameLower.includes("form")) {
+    // Fix mismatched names
+    name = name.replace(/grid/gi, "Form").replace(/Grid/g, "Form");
+  } else if (type === "grid" && !nameLower.includes("grid") && !nameLower.includes("table")) {
+    // Fix mismatched names  
+    name = name.replace(/form/gi, "Grid").replace(/Form/g, "Grid");
   }
 
   return {
@@ -245,8 +265,8 @@ export function ${componentName}() {
   };
 
   return (
-    <Vertical style={{ height: '100%', padding: '16px', maxWidth: '600px' }}>
-      <Horizontal justifyContent="space-between" alignItems="center" style={{ marginBottom: '24px' }}>
+    <Vertical className="p-2" style={{ height: '100%', maxWidth: '600px' }}>
+      <Horizontal justifyContent="space-between" alignItems="center" className="mb-3">
         <Texto category="h4" style={{ color: 'var(--theme-color-2)' }}>
           ${parsed.name}
         </Texto>

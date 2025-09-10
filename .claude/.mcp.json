@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "excalibrr": {
-      "command": "./excalibrr-mcp-server/build/index.js",
-      "args": [],
+      "command": "node",
+      "args": ["./mcp-server/build/index.js"],
       "env": {}
     }
   }

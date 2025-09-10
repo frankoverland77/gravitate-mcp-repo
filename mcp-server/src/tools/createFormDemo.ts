@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { generateComponentProps } from "../utils/cssUtils.js";
 
 export interface FormField {
   name: string;
@@ -122,7 +123,7 @@ function generateActions(actions: FormAction[] = []): string {
   }).join('\n');
   
   return `        <Form.Item>
-          <Horizontal style={{ gap: "12px", justifyContent: "flex-end" }}>
+          <Horizontal className="gap-10" style={{ justifyContent: "flex-end" }}>
 ${buttons}
           </Horizontal>
         </Form.Item>`;
@@ -191,8 +192,8 @@ export function ${name}() {
   };
 
   return (
-    <Vertical style={{ padding: "24px", maxWidth: "600px" }}>
-      <Texto category="h4" style={{ marginBottom: "24px" }}>
+    <Vertical className="p-3" style={{ maxWidth: "600px" }}>
+      <Texto category="h4" className="mb-3">
         ${title || name}
       </Texto>
       

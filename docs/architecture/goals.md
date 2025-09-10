@@ -3,6 +3,7 @@
 ### **Phase 1: Architecture & Setup** (Day 1 Morning)
 
 #### 1.1 **Directory Structure**
+
 ```
 excalibrr-design-system/                 # Parent workspace
 ├── shared/
@@ -46,16 +47,17 @@ excalibrr-design-system/                 # Parent workspace
 └── claude-code-config/                 # Claude Code setup
     ├── .claude/
     │   └── config.yaml                 # MCP server config
-    └── README.md                       # Setup instructions for Frank
+    └── README.md                       # Setup instructions for user
 ```
 
 #### 1.2 **Shared Dependencies Package**
+
 ```json
 {
   "name": "excalibrr-shared-deps",
   "version": "1.0.0",
   "dependencies": {
-    "@gravitate-js/excalibrr": "4.0.34-osp",  // CRITICAL: Specific version
+    "@gravitate-js/excalibrr": "4.0.34-osp", // CRITICAL: Specific version
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ag-grid-community": "^30.2.1",
@@ -63,7 +65,7 @@ excalibrr-design-system/                 # Parent workspace
     "ag-grid-react": "^30.2.1",
     "@tanstack/react-query": "^4.10.3",
     "antd": "4.20",
-    "react-router-dom": "6.16.0",
+    "react-router-dom": "6.16.0"
     // ... rest from your list
   }
 }
@@ -74,6 +76,7 @@ excalibrr-design-system/                 # Parent workspace
 ### **Phase 2: Core MCP Tools** (Day 1 Afternoon)
 
 #### 2.1 **Tool: Create Demo**
+
 ```typescript
 // Purpose: Create a lightweight shell demo
 interface CreateDemoParams {
@@ -94,11 +97,12 @@ interface CreateDemoParams {
 ```
 
 #### 2.2 **Tool: Modify Component**
+
 ```typescript
 // Purpose: Iterate on existing demos
 interface ModifyComponentParams {
   demo: string;           // "FlowerInventory"
-  action: 'add_column' | 'edit_column' | 'add_button' | 
+  action: 'add_column' | 'edit_column' | 'add_button' |
           'add_cell_renderer' | 'change_props';
   target?: string;        // Component or file to modify
   changes: any;           // Specific changes
@@ -112,8 +116,9 @@ interface ModifyComponentParams {
 ```
 
 #### 2.3 **Tool: Manage Server**
+
 ```typescript
-// Purpose: Start/stop dev servers (no terminal for Frank)
+// Purpose: Start/stop dev servers (no terminal for user)
 interface ManageServerParams {
   demo: string;
   action: 'start' | 'stop' | 'restart' | 'status';
@@ -127,6 +132,7 @@ interface ManageServerParams {
 ```
 
 #### 2.4 **Tool: Switch Theme**
+
 ```typescript
 // Purpose: Change theme without regenerating
 interface SwitchThemeParams {
@@ -145,6 +151,7 @@ interface SwitchThemeParams {
 ### **Phase 3: Knowledge Base Migration** (Day 1 Evening)
 
 #### 3.1 **Extract from Old Server**
+
 ```
 Old Server → New Server
 ├── examples/components/GraviGrid/* → knowledge/examples/grid/
@@ -155,24 +162,25 @@ Old Server → New Server
 ```
 
 #### 3.2 **Create Anti-Patterns Database**
+
 ```typescript
 // knowledge/antipatterns.ts
 export const NEVER_DO = {
   tailwind: {
     wrong: `<div className="flex gap-4">`,
     right: `<Horizontal gap={16}>`,
-    reason: "Always use Excalibrr layout components"
+    reason: "Always use Excalibrr layout components",
   },
   mockComponents: {
     wrong: `const GraviGrid = () => <div>Mock Grid</div>`,
     right: `import { GraviGrid } from '@gravitate-js/excalibrr'`,
-    reason: "Always import real components"
+    reason: "Always import real components",
   },
   wrongVersion: {
     wrong: `"@gravitate-js/excalibrr": "latest"`,
     right: `"@gravitate-js/excalibrr": "4.0.34-osp"`,
-    reason: "Must use specific version"
-  }
+    reason: "Must use specific version",
+  },
 };
 ```
 
@@ -181,11 +189,12 @@ export const NEVER_DO = {
 ### **Phase 4: Template System** (Day 2 Morning)
 
 #### 4.1 **Lightweight Shell Template**
+
 ```typescript
 // templates/shell.ts
 export function generateShell(name: string, theme: string) {
   return {
-    'index.html': `<!DOCTYPE html>
+    "index.html": `<!DOCTYPE html>
 <html>
   <head>
     <title>${name} Demo</title>
@@ -195,8 +204,8 @@ export function generateShell(name: string, theme: string) {
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>`,
-    
-    'vite.config.js': `import { defineConfig } from 'vite';
+
+    "vite.config.js": `import { defineConfig } from 'vite';
 import baseConfig from '../../shared/vite.config.base';
 
 export default defineConfig({
@@ -206,8 +215,8 @@ export default defineConfig({
     port: ${getNextPort()}
   }
 });`,
-    
-    'src/main.tsx': `import React from 'react';
+
+    "src/main.tsx": `import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import '@gravitate-js/excalibrr/dist/index.css';
@@ -218,8 +227,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
   </React.StrictMode>
 );`,
-    
-    'src/App.tsx': `import React from 'react';
+
+    "src/App.tsx": `import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Demo } from './Demo';
 import { MockNav } from './MockNav';
@@ -237,12 +246,13 @@ export function App() {
       </div>
     </QueryClientProvider>
   );
-}`
+}`,
   };
 }
 ```
 
 #### 4.2 **Mock Navigation (Looks Real, Simple)**
+
 ```typescript
 // templates/mockNav.ts
 export function generateMockNav(theme: string) {
@@ -283,29 +293,28 @@ export function MockNav({ theme }: { theme: string }) {
 ### **Phase 5: AST-Based Modifications** (Day 2 Afternoon)
 
 #### 5.1 **Safe File Modification**
+
 ```typescript
 // utils/astModifier.ts
-import * as babel from '@babel/core';
-import traverse from '@babel/traverse';
+import * as babel from "@babel/core";
+import traverse from "@babel/traverse";
 
 export class ASTModifier {
   // Add column to existing grid
   addColumnToGrid(filePath: string, column: ColumnDef) {
     const ast = this.parseFile(filePath);
-    
+
     traverse(ast, {
       ArrayExpression(path) {
         if (this.isColumnDefsArray(path)) {
-          path.node.elements.push(
-            this.createColumnAST(column)
-          );
+          path.node.elements.push(this.createColumnAST(column));
         }
-      }
+      },
     });
-    
+
     return this.generateCode(ast);
   }
-  
+
   // Change component props
   updateComponentProps(filePath: string, props: any) {
     // Similar AST manipulation
@@ -318,8 +327,9 @@ export class ASTModifier {
 ### **Phase 6: Testing & Validation** (Day 2 Evening)
 
 #### 6.1 **Test Scenarios**
+
 ```typescript
-// Frank's typical workflows to test:
+// user's typical workflows to test:
 
 // Workflow 1: Create Grid
 1. "Create an inventory grid with 5 columns"
@@ -340,6 +350,7 @@ export class ASTModifier {
 ```
 
 #### 6.2 **Validation Checklist**
+
 - [ ] Demos use shared node_modules (no duplication)
 - [ ] Real Excalibrr components imported correctly
 - [ ] Fonts display as Lato
@@ -351,9 +362,10 @@ export class ASTModifier {
 
 ---
 
-### **Phase 7: Frank's Setup** (Day 3 Morning)
+### **Phase 7: user's Setup** (Day 3 Morning)
 
 #### 7.1 **One-Time Setup Script**
+
 ```bash
 #!/bin/bash
 # setup.sh
@@ -387,16 +399,19 @@ echo "  2. In terminal: claude --chat"
 echo "  3. Say: Create a product grid"
 ```
 
-#### 7.2 **Frank's Workflow Documentation**
+#### 7.2 **user's Workflow Documentation**
+
 ```markdown
-# Frank's Excalibrr Designer Workflow
+# user's Excalibrr Designer Workflow
 
 ## Starting a New Design
+
 1. Open Cursor
 2. Terminal: `claude --chat`
 3. "Create a [type] demo called [name]"
 
 ## Common Commands
+
 - "Create a product grid with 5 columns"
 - "Add editing to the price column"
 - "Add a create button with modal"
@@ -404,6 +419,7 @@ echo "  3. Say: Create a product grid"
 - "Add a sparkline renderer to sales column"
 
 ## No Need To:
+
 - Run yarn/npm commands (Claude does it)
 - Switch windows (stay in Cursor)
 - Know React (just describe what you want)
@@ -413,15 +429,15 @@ echo "  3. Say: Create a product grid"
 
 ### **Phase 8: Implementation Timeline**
 
-| Day | Phase | Deliverable | Testing |
-|-----|-------|------------|---------|
-| **Day 1 AM** | Architecture | Workspace structure | Verify paths work |
-| **Day 1 PM** | Core Tools | 4 MCP tools | Manual tool tests |
-| **Day 1 Eve** | Knowledge Migration | Examples moved | Verify imports |
-| **Day 2 AM** | Templates | Shell generator | Generate test demo |
-| **Day 2 PM** | AST Mods | File modification | Test iterations |
-| **Day 2 Eve** | Integration | Full workflow | End-to-end test |
-| **Day 3 AM** | Frank Setup | Setup script | Frank tests it |
+| Day           | Phase               | Deliverable         | Testing            |
+| ------------- | ------------------- | ------------------- | ------------------ |
+| **Day 1 AM**  | Architecture        | Workspace structure | Verify paths work  |
+| **Day 1 PM**  | Core Tools          | 4 MCP tools         | Manual tool tests  |
+| **Day 1 Eve** | Knowledge Migration | Examples moved      | Verify imports     |
+| **Day 2 AM**  | Templates           | Shell generator     | Generate test demo |
+| **Day 2 PM**  | AST Mods            | File modification   | Test iterations    |
+| **Day 2 Eve** | Integration         | Full workflow       | End-to-end test    |
+| **Day 3 AM**  | user Setup          | Setup script        | user tests it      |
 
 ---
 
@@ -432,29 +448,30 @@ echo "  3. Say: Create a product grid"
 3. **Accuracy**: 100% real Excalibrr components
 4. **Iteration**: Modifications apply in < 1 second
 5. **Appearance**: Matches production exactly
-6. **Simplicity**: Frank never uses terminal directly
+6. **Simplicity**: user never uses terminal directly
 
 ---
 
 ### **Risk Mitigation**
 
-| Risk | Mitigation |
-|------|------------|
-| Shared node_modules breaks | Fallback to standalone mode |
-| AST modifications fail | Keep backup, use string replace |
-| Port conflicts | Dynamic port allocation |
-| Theme doesn't apply | Inline critical styles |
-| Frank's machine differs | Docker as Plan B |
+| Risk                       | Mitigation                      |
+| -------------------------- | ------------------------------- |
+| Shared node_modules breaks | Fallback to standalone mode     |
+| AST modifications fail     | Keep backup, use string replace |
+| Port conflicts             | Dynamic port allocation         |
+| Theme doesn't apply        | Inline critical styles          |
+| user's machine differs     | Docker as Plan B                |
 
 ---
 
 ## **Next Step: Start Phase 1?**
 
 This plan gives us:
+
 - ✅ Lightweight shells (no 500MB duplicates)
 - ✅ Real Excalibrr components only
 - ✅ Fast iteration with AST
-- ✅ Simple for Frank
+- ✅ Simple for user
 - ✅ Keeps valuable knowledge
 
 **Ready to begin Phase 1: Architecture & Setup?**

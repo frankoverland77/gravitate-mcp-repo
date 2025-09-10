@@ -14,11 +14,17 @@ import { changeThemeTool } from "./tools/changeTheme.js";
 import { runDevServerTool } from "./tools/runDevServer.js";
 import { createFormDemo } from "./tools/createFormDemo.js";
 import { cleanupDemo } from "./tools/cleanupDemo.js";
+import { importFromFigma, listFigmaComponents } from "./tools/figmaTools.js";
+import { helpTool } from "./tools/helpTool.js";
+import {
+  processSafeguards,
+  formatSafeguardResponse,
+} from "./utils/safeguards.js";
 
 /**
  * Excalibrr MCP Server v2 - Clean, Focused Implementation
  *
- * This server provides tools for Frank's workflow:
+ * This server provides tools for user's workflow:
  * 1. Create lightweight demo shells with real Excalibrr components
  * 2. Iteratively modify grids and components
  * 3. Switch themes (OSP, PE, BP)
@@ -112,7 +118,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             config: {
               type: "object",
-              description: "Configuration for the modification. For add_column: include field, headerName, type, editable (boolean), etc.",
+              description:
+                "Configuration for the modification. For add_column: include field, headerName, type, editable (boolean), etc.",
               properties: {
                 field: {
                   type: "string",
@@ -128,7 +135,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 },
                 editable: {
                   type: "boolean",
-                  description: "Whether the column should be editable. If true for number columns, NumberCellEditor will be added automatically.",
+                  description:
+                    "Whether the column should be editable. If true for number columns, NumberCellEditor will be added automatically.",
                 },
               },
             },
@@ -181,13 +189,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "create_form_demo",
-        description: "Create a form demo with real Excalibrr components based on Gravitate patterns",
+        description:
+          "Create a form demo with real Excalibrr components based on Gravitate patterns",
         inputSchema: {
           type: "object",
           properties: {
             name: {
               type: "string",
-              description: "Name for the form demo (e.g., 'ProductForm', 'UserManagement')",
+              description:
+                "Name for the form demo (e.g., 'ProductForm', 'UserManagement')",
             },
             type: {
               type: "string",
@@ -207,21 +217,36 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 properties: {
                   name: { type: "string", description: "Field name" },
                   label: { type: "string", description: "Field label" },
-                  type: { 
-                    type: "string", 
-                    enum: ["text", "email", "number", "select", "date", "dateRange", "switch", "checkbox"],
-                    description: "Field type" 
+                  type: {
+                    type: "string",
+                    enum: [
+                      "text",
+                      "email",
+                      "number",
+                      "select",
+                      "date",
+                      "dateRange",
+                      "switch",
+                      "checkbox",
+                    ],
+                    description: "Field type",
                   },
-                  required: { type: "boolean", description: "Whether field is required" },
-                  placeholder: { type: "string", description: "Placeholder text" },
-                  options: { 
-                    type: "array", 
+                  required: {
+                    type: "boolean",
+                    description: "Whether field is required",
+                  },
+                  placeholder: {
+                    type: "string",
+                    description: "Placeholder text",
+                  },
+                  options: {
+                    type: "array",
                     items: { type: "string" },
-                    description: "Options for select fields"
-                  }
+                    description: "Options for select fields",
+                  },
                 },
-                required: ["name", "label", "type"]
-              }
+                required: ["name", "label", "type"],
+              },
             },
             actions: {
               type: "array",
@@ -229,43 +254,107 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               items: {
                 type: "object",
                 properties: {
-                  type: { 
-                    type: "string", 
+                  type: {
+                    type: "string",
                     enum: ["submit", "cancel", "reset"],
-                    description: "Action type"
+                    description: "Action type",
                   },
                   label: { type: "string", description: "Button label" },
-                  theme: { 
-                    type: "string", 
+                  theme: {
+                    type: "string",
                     enum: ["success", "theme1", "default"],
-                    description: "Button theme"
-                  }
+                    description: "Button theme",
+                  },
                 },
-                required: ["type", "label"]
-              }
-            }
+                required: ["type", "label"],
+              },
+            },
           },
-          required: ["name", "fields"]
-        }
+          required: ["name", "fields"],
+        },
       },
       {
         name: "cleanup_demo",
-        description: "Remove a demo and clean up all references (pageConfig, scopes, files)",
+        description:
+          "Remove a demo and clean up all references (pageConfig, scopes, files)",
         inputSchema: {
           type: "object",
           properties: {
             name: {
               type: "string",
-              description: "Name of the demo to remove (e.g., 'ProductForm', 'CustomerForm')",
+              description:
+                "Name of the demo to remove (e.g., 'ProductForm', 'CustomerForm')",
             },
             force: {
               type: "boolean",
               description: "Skip confirmation and force removal",
               default: false,
-            }
+            },
           },
-          required: ["name"]
-        }
+          required: ["name"],
+        },
+      },
+      {
+        name: "import_from_figma",
+        description:
+          "Import a component or design from Figma and convert to React/Excalibrr code",
+        inputSchema: {
+          type: "object",
+          properties: {
+            fileUrl: {
+              type: "string",
+              description: "Figma file URL (can paste directly from browser)",
+            },
+            fileId: {
+              type: "string",
+              description: "Figma file ID (alternative to fileUrl)",
+            },
+            nodeId: {
+              type: "string",
+              description: "Specific node/component ID to import",
+            },
+            componentName: {
+              type: "string",
+              description: "Name of component to import",
+            },
+          },
+        },
+      },
+      {
+        name: "list_figma_components",
+        description: "List all available components in a Figma file",
+        inputSchema: {
+          type: "object",
+          properties: {
+            fileUrl: {
+              type: "string",
+              description: "Figma file URL (can paste directly from browser)",
+            },
+            fileId: {
+              type: "string",
+              description: "Figma file ID (alternative to fileUrl)",
+            },
+          },
+        },
+      },
+      {
+        name: "help",
+        description:
+          "Get help when you're not sure what to do or if I don't understand your request",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description:
+                "What you're trying to accomplish or what you need help with",
+            },
+            context: {
+              type: "string",
+              description: "Additional context about your situation",
+            },
+          },
+        },
       },
     ],
   };
@@ -285,11 +374,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "run_dev_server":
         return await runDevServerTool(args as any);
       case "create_form_demo":
-        return { content: [{ type: "text", text: await createFormDemo(args as any) }] };
+        return {
+          content: [{ type: "text", text: await createFormDemo(args as any) }],
+        };
       case "cleanup_demo":
-        return { content: [{ type: "text", text: await cleanupDemo(args as any) }] };
+        return {
+          content: [{ type: "text", text: await cleanupDemo(args as any) }],
+        };
+      case "import_from_figma":
+        return {
+          content: [{ type: "text", text: await importFromFigma(args as any) }],
+        };
+      case "list_figma_components":
+        return {
+          content: [
+            { type: "text", text: await listFigmaComponents(args as any) },
+          ],
+        };
+      case "help":
+        return {
+          content: [{ type: "text", text: await helpTool(args as any) }],
+        };
       default:
-        throw new Error(`Unknown tool: ${name}`);
+        // Use safeguards for unknown tools
+        const safeguardResult = processSafeguards(`Unknown tool: ${name}`);
+        const response =
+          formatSafeguardResponse(safeguardResult) ||
+          `Unknown tool: ${name}. Available tools: create_demo, modify_grid, change_theme, run_dev_server, create_form_demo, cleanup_demo, import_from_figma, list_figma_components, help`;
+        return {
+          content: [{ type: "text", text: response }],
+          isError: true,
+        };
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

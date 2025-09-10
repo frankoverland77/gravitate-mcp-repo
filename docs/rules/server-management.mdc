@@ -1,0 +1,69 @@
+# Development Server Management Rules
+
+When managing development servers for demos, ALWAYS follow these operational rules to prevent port conflicts and server management issues.
+
+## ONE SERVER PER PROJECT
+
+NEVER run multiple dev servers for the same project.
+
+- Before starting any server, check if one is already running for that project
+- If a server exists, kill it first, then start a new one
+- Use clean restart patterns by default
+- Track all running servers to prevent conflicts
+
+## SERVER STARTUP PROCESS
+
+When starting development servers:
+
+1. **Check existing servers first**
+   - Verify no server is already running for the project
+   - Check both tracked servers and system processes
+
+2. **Clean shutdown existing servers**
+   - Kill any existing server for the same project
+   - Wait for clean shutdown before proceeding
+
+3. **Start fresh server**
+   - Use automatic port detection starting from 3000
+   - Handle port conflicts by auto-incrementing
+   - Provide clear output with actual port used
+
+## PORT MANAGEMENT
+
+Handle ports dynamically and transparently:
+
+- Auto-detect available ports starting from 3000
+- Never assume default ports (3001, 3002, etc.)
+- Always show the ACTUAL port in output messages
+- Handle port conflicts gracefully with auto-increment
+- Update any browser URLs to match actual assigned port
+
+## PROCESS TRACKING
+
+Maintain accurate server state:
+
+- Track all running servers in memory
+- Store server process, port, and start time
+- Clean up tracking on server shutdown
+- Handle orphaned processes appropriately
+
+## ERROR PREVENTION
+
+Common issues to prevent:
+
+- **"Port 3001 is in use"** → Always use clean restart approach
+- **Multiple tabs on different ports** → Kill old servers before starting new ones
+- **Orphaned processes** → Track and clean up properly
+- **Assumed ports** → Always show actual assigned port
+
+## IMPLEMENTATION REQUIREMENTS
+
+When using the runDevServer MCP tool:
+
+- Default to "restart" action rather than "start" to ensure clean state
+- Provide clear feedback about server status and URLs
+- Handle dependency installation gracefully
+- Monitor server startup and provide clear success/failure feedback
+- Maintain server registry for proper cleanup
+
+These rules ensure reliable development server management and prevent the common issues that occur when multiple servers compete for resources.

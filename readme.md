@@ -2,7 +2,7 @@
 
 **Monorepo for Excalibrr MCP Server and Demo Project**
 
-This workspace enables Frank to generate production-quality Excalibrr demos using natural language in Claude Code.
+This workspace enables user to generate production-quality Excalibrr demos using natural language in Claude Code.
 
 ## 🚀 Quick Start
 
@@ -27,7 +27,7 @@ excalibrr-workspace/
 │   │   └── templates/     # Code templates
 │   └── package.json
 │
-├── demo/                  # Demo project (Frank works here)
+├── demo/                  # Demo project (user works here)
 │   ├── src/
 │   │   ├── components/shared/  # Theme system from production
 │   │   └── pages/demos/        # Generated demos
@@ -39,7 +39,7 @@ excalibrr-workspace/
     └── development/       # Coding conventions
 ```
 
-## 🎯 For Frank
+## 🎯 For user
 
 **Your workflow:**
 1. Open Cursor: `code .`

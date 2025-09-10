@@ -73,7 +73,7 @@ async function startDevServer(
   // Find an available port
   const port = requestedPort || (await findAvailablePort(3000));
 
-  // Install dependencies if needed (using yarn as per Frank's preference)
+  // Install dependencies if needed (using yarn as per user's preference)
   try {
     await new Promise<void>((resolve, reject) => {
       exec("yarn install", { cwd: demoPath }, (error) => {

@@ -52,7 +52,7 @@ export async function ensureSharedDependencies(): Promise<void> {
 
   await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
-  // Install dependencies using yarn (Frank's preference)
+  // Install dependencies using yarn (user's preference)
   try {
     console.log("🔄 Installing shared dependencies with yarn...");
     execSync("yarn install", {

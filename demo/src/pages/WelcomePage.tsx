@@ -9,6 +9,11 @@ type Demo = {
 };
 
 export function WelcomePage() {
+  // Available demos from pageConfig
+  const availableDemos = [
+    { name: "Product Grid", type: "Grid", description: "Editable product data grid with real-time updates" }
+  ];
+  
   const recentDemos: Demo[] = [];
 
   return (
@@ -17,13 +22,13 @@ export function WelcomePage() {
       <Vertical style={{ marginBottom: "32px" }}>
         <Texto
           category="heading"
-          style={{ color: "var(--theme-color-2)", marginBottom: "8px" }}
+          className="mb-2"
         >
           Excalibrr Demo Showcase
         </Texto>
         <Texto
           category="p1"
-          style={{ color: "var(--theme-color-3)", lineHeight: "1.6" }}
+          style={{ lineHeight: "1.6" }}
         >
           Interactive demonstrations of Excalibrr components using production
           patterns and themes. Generate new demos using Claude Code in the
@@ -38,16 +43,57 @@ export function WelcomePage() {
       >
         <Vertical style={{ minWidth: "120px" }}>
           <BBDTag theme2 className="p-2 text-center">
-            {recentDemos.length} Demos
+            {availableDemos.length} Demo{availableDemos.length !== 1 ? 's' : ''}
           </BBDTag>
         </Vertical>
 
         <Vertical style={{ minWidth: "120px" }}>
           <BBDTag success className="p-2 text-center">
-            3 Themes
+            14 Themes
           </BBDTag>
         </Vertical>
       </Horizontal>
+
+      {/* Available Demos */}
+      <Vertical style={{ marginBottom: "32px" }}>
+        <Texto
+          category="h5"
+          className="mb-3"
+          style={{ color: "var(--theme-color-2)" }}
+        >
+          Available Demos
+        </Texto>
+        {availableDemos.map((demo, index) => (
+          <Horizontal
+            key={index}
+            style={{
+              padding: "12px",
+              border: "1px solid var(--theme-color-3)",
+              borderRadius: "6px",
+              marginBottom: "8px",
+              backgroundColor: "var(--theme-bg-elevated)",
+            }}
+          >
+            <Vertical style={{ flex: 1 }}>
+              <Texto
+                category="p1"
+                style={{ fontWeight: "500", marginBottom: "4px" }}
+              >
+                {demo.name}
+              </Texto>
+              <Texto
+                category="p2"
+                style={{ color: "var(--theme-color-3)" }}
+              >
+                {demo.description}
+              </Texto>
+            </Vertical>
+            <BBDTag theme2 style={{ alignSelf: "flex-start" }}>
+              {demo.type}
+            </BBDTag>
+          </Horizontal>
+        ))}
+      </Vertical>
 
       {/* Recent demos */}
       {recentDemos.length > 0 && (
@@ -109,7 +155,7 @@ export function WelcomePage() {
           category="h5"
           style={{ marginBottom: "12px", color: "var(--theme-color-2)" }}
         >
-          Create Your First Demo
+          Create More Demos
         </Texto>
         <Texto
           category="p2"

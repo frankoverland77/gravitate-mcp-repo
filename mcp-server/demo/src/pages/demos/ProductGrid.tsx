@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { GraviGrid } from '@gravitate-js/excalibrr';
 import { mockData } from './ProductGrid.data';
 
@@ -27,7 +27,7 @@ const columnDefs = [
     {
         "field": "IsActive",
         "headerName": "Status",
-        "cellRenderer": (params: any) => params.value ? "Active" : "Inactive"
+        "cellRenderer": (params: any) => params.value ? \Active\" : \"Inactive\""
     }
 ];
 
@@ -49,15 +49,6 @@ export function ProductGrid() {
     return Promise.resolve();
   };
   
-  /* MCP Theme Script */
-  // Set PE theme for this demo (follows ControlPanel pattern)
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem("TYPE_OF_THEME", "BP");
-    }
-  }, []);
-  /* End MCP Theme Script */
-
   return (
     <div style={{ height: '100%' }}>
       <GraviGrid

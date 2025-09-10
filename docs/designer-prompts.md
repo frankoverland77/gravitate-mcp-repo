@@ -1,44 +1,44 @@
 # Example Designer Prompts for Excalibrr MCP Server
 
-These are example questions your designer can ask Claude to explore and use the Excalibrr component library effectively.
+These are example prompts user can use with Claude Code to create demos and work with the Excalibrr component library effectively.
 
-## 🔍 Discovery & Exploration
+## 🚀 Demo Creation
 
-### Getting Started
+### Creating Form Demos
 
-- **"What components are available in the Excalibrr library?"**
-- **"Show me all components organized by category"**
-- **"List the most commonly used components with examples"**
+- **"Create a product form with name, price, category, and description fields"**
+- **"Make a customer registration form with validation"**
+- **"Build an inventory management form with SKU, quantity, and location"**
+- **"Create a user profile form with email, phone, and preferences"**
 
-### Category Exploration
+### Creating Grid Demos
 
-- **"What layout components do we have?"**
-- **"Show me all data/grid components"**
-- **"What form components are available?"**
-- **"List all interactive components"**
+- **"Create a product inventory grid with editable quantity columns"**
+- **"Make a customer management grid showing name, email, status, and signup date"**
+- **"Build a simple data grid for displaying order information"**
 
-### Search & Find
+### Working with Themes
 
-- **"Find components related to grids"**
-- **"Search for authentication components"**
-- **"What components can I use for displaying data?"**
-- **"Find all button components"**
+- **"Change the ProductGrid theme to PE"**
+- **"Apply BP theme to my form demo"**
+- **"Switch the current demo to OSP theme"**
+- **"Show me all available themes"**
 
-## 📖 Detailed Information
+## 📖 Component Information
 
-### Component Details
+### Learning About Components
 
-- **"Show me details about the GraviGrid component"**
-- **"What are the props for the Horizontal layout component?"**
-- **"How do I use the DeltaTag component?"**
-- **"Give me the complete API for the Vertical component"**
+- **"Show me how to use the GraviGrid component"**
+- **"What are the main props for Horizontal and Vertical layout components?"**
+- **"How do I use GraviButton with different themes?"**
+- **"Show me examples of Texto component usage"**
 
-### Props & Usage
+### Form Components
 
-- **"What props does the LoadingAnimation component accept?"**
-- **"Show me usage examples for the BigButton component"**
-- **"How do I center content with the Horizontal component?"**
-- **"What styling props are available for layout components?"**
+- **"How do I create form fields using Excalibrr components?"**
+- **"What validation options work with form demos?"**
+- **"Show me proper form layout patterns"**
+- **"How do I handle form submissions in demos?"**
 
 ## 🎨 Design-Focused Questions
 
@@ -63,28 +63,28 @@ These are example questions your designer can ask Claude to explore and use the 
 - **"Show me button variations"**
 - **"How do I handle form validation?"**
 
-## 🛠️ Implementation Help
+## 🛠️ Demo Management
 
-### Code Generation
+### Managing Existing Demos
 
-- **"Generate code for a basic grid layout"**
-- **"Create a form with validation using Excalibrr components"**
-- **"Show me how to build a data dashboard"**
-- **"Generate a login form component"**
+- **"Clean up the test demo I created"**
+- **"Remove the ProductForm demo"**
+- **"List all available demos"**
+- **"Show me what demos are currently in the project"**
 
-### Best Practices
+### Modifying Demos
 
-- **"What's the recommended way to structure layouts?"**
-- **"How should I combine Horizontal and Vertical components?"**
-- **"What are common patterns for data display?"**
-- **"Show me examples of component composition"**
+- **"Add an editable quantity column to the ProductGrid"**
+- **"Make the price column editable with number validation"**
+- **"Add a new field to the inventory form"**
+- **"Change the form layout to horizontal"**
 
 ### Troubleshooting
 
-- **"The GraviGrid isn't displaying properly, what props am I missing?"**
-- **"How do I fix alignment issues with Horizontal components?"**
-- **"What's the difference between these layout components?"**
-- **"Why isn't my component rendering correctly?"**
+- **"Fix the syntax error in my ProductGrid column definitions"**
+- **"Why isn't my form demo showing up in the navigation?"**
+- **"The theme isn't applying correctly to my demo"**
+- **"Help me debug the column renderer issue"**
 
 ## 🚀 Advanced Usage
 
@@ -122,25 +122,28 @@ These are example questions your designer can ask Claude to explore and use the 
 - **"Design a settings panel with multiple sections"**
 - **"Build a notification system UI"**
 
-## 🎯 Pro Tips for Designers
+## 🎯 Pro Tips for user
 
-1. **Be Specific**: Instead of "show me buttons", ask "show me all button variations with their props"
+1. **Be Specific**: Instead of "create a form", ask "create a product form with name, price, and category fields"
 
-2. **Ask for Examples**: Always ask for real usage examples from your codebase
+2. **Include Field Details**: "Create an inventory form with SKU (text), quantity (number), and active status (switch)"
 
-3. **Combine Questions**: "Show me the GraviGrid component and how it's used with layout components"
+3. **Specify Themes**: "Apply OSP theme to my demo" rather than just "change the theme"
 
-4. **Request Code**: "Generate the code I need to implement this design"
+4. **Use Clear Names**: "ProductForm" and "CustomerGrid" are clearer than "MyForm" or "TestGrid"
 
-5. **Explore Categories**: Start broad ("show me layout components") then drill down
+5. **Test Incrementally**: Start with simple demos, then add complexity with modify tools
 
 ---
 
-## 🔧 Technical Notes
+## 🔧 Available MCP Tools
 
-- All examples will show real props and TypeScript interfaces
-- Usage examples come from your actual project codebase
-- Components are categorized as: data, forms, layout, interactive, ui
-- The server analyzes 112+ components from your Excalibrr library
+The current MCP server provides these tools:
 
-**Happy designing! 🎨**
+- **create_form_demo** - Creates form components with validation
+- **create_demo** - Creates grid/form demos from natural language
+- **change_theme** - Switches themes (OSP, PE, BP)
+- **modify_grid** - Adds columns and makes grids editable
+- **cleanup_demo** - Removes demos and cleans up references
+
+**Happy demo building! 🎨**
