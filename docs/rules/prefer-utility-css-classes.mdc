@@ -1,18 +1,136 @@
 ---
-description: 
-globs: 
+description: Prefer utility classes and component props over inline styles
+globs: ["**/*.tsx", "**/*.jsx"]
 alwaysApply: true
 ---
-When styling UI, prefer to use already defined classes over inline styles in .jsx and .tsx files
 
-Use props over inline styles: 
-example: prefer the justifyContent prop with Horizontal elements over style={{ justifyContent: 'value' }}
+# Prefer Utility CSS Classes Rule
 
-instead of creating inline styles, create a css class in the css file for the feature
+When styling UI components, always prefer utility classes and component props over inline styles.
 
-when making new css do not add !important
+## 🎯 Priority Order
 
-check styles in 
-Gravitate.Dotnet.Next/frontend/src/components/shared/Theming/core.less
-Gravitate.Dotnet.Next/frontend/src/styles.css
-excalibrr 
+1. **Component Props** (highest priority)
+2. **Utility Classes** (second priority)
+3. **Inline Styles** (only when necessary)
+
+## 📋 Available Utility Classes
+
+### Spacing Classes
+```tsx
+// ❌ Avoid inline styles
+style={{ marginBottom: "4px" }}   →  ✅ className="mb-1"
+style={{ marginBottom: "8px" }}   →  ✅ className="mb-1"
+style={{ marginBottom: "12px" }}  →  ✅ className="mb-2"
+style={{ marginBottom: "16px" }}  →  ✅ className="mb-2"
+style={{ marginBottom: "32px" }}  →  ✅ className="mb-4"
+
+style={{ marginTop: "4px" }}      →  ✅ className="mt-1"
+style={{ marginTop: "8px" }}      →  ✅ className="mt-1"
+
+style={{ marginLeft: "16px" }}    →  ✅ className="ml-2"
+
+style={{ padding: "16px" }}       →  ✅ className="p-2"
+style={{ padding: "20px" }}       →  ✅ className="p-3"
+style={{ padding: "24px" }}       →  ✅ className="p-3"
+```
+
+### Layout Classes
+```tsx
+// ❌ Avoid inline styles
+style={{ borderRadius: "5px" }}   →  ✅ className="border-radius-5"
+style={{ borderRadius: "6px" }}   →  ✅ className="border-radius-5"
+style={{ borderRadius: "8px" }}   →  ✅ className="border-radius-5"
+
+style={{ textAlign: "center" }}   →  ✅ className="text-center"
+
+style={{ gap: "16px" }}           →  ✅ className="gap-16"
+style={{ gap: "10px" }}           →  ✅ className="gap-10"
+```
+
+## 🧩 Component Props (Highest Priority)
+
+### Horizontal/Vertical Components
+```tsx
+// ❌ Avoid inline styles
+<Horizontal style={{ justifyContent: "center" }}>
+// ✅ Use component props
+<Horizontal justifyContent="center">
+
+// ❌ Avoid inline styles
+<Horizontal style={{ alignItems: "center" }}>
+// ✅ Use component props
+<Horizontal alignItems="center">
+
+// Available props:
+// - justifyContent: "flex-start" | "center" | "flex-end" | "space-between" | "space-around"
+// - alignItems: "flex-start" | "center" | "flex-end" | "stretch"
+```
+
+## ✅ When Inline Styles Are Acceptable
+
+Only use inline styles for:
+
+1. **Theme Variables**: `style={{ color: "var(--theme-color-2)" }}`
+2. **Background Colors**: `style={{ backgroundColor: "var(--theme-bg-elevated)" }}`
+3. **Complex Properties**: `style={{ gap: "12px", maxWidth: "600px" }}`
+4. **Dynamic Values**: `style={{ width: `${progress}%` }}`
+
+## 📝 Examples
+
+### ❌ Bad - Multiple Inline Styles
+```tsx
+<Vertical style={{
+  padding: "24px",
+  marginBottom: "16px",
+  borderRadius: "8px",
+  backgroundColor: "var(--theme-bg-elevated)"
+}}>
+```
+
+### ✅ Good - Utility Classes + Selective Inline Styles
+```tsx
+<Vertical
+  className="p-3 mb-2 border-radius-5"
+  style={{ backgroundColor: "var(--theme-bg-elevated)" }}
+>
+```
+
+### ❌ Bad - Inline Layout Styles
+```tsx
+<Horizontal style={{
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "12px"
+}}>
+```
+
+### ✅ Good - Component Props + Gap Style
+```tsx
+<Horizontal
+  justifyContent="space-between"
+  alignItems="center"
+  style={{ gap: "12px" }}
+>
+```
+
+## 🛠 Automatic Cleanup
+
+Use the `cleanup_styles` MCP tool to automatically clean up code:
+
+```bash
+# Clean all TSX/JSX files
+cleanup_styles
+
+# Clean specific file
+cleanup_styles --filePath="src/components/MyComponent.tsx"
+```
+
+## 🚫 Never Do
+
+- Create new CSS classes for one-off spacing
+- Use `!important` in CSS
+- Mix utility classes and inline styles for the same property
+- Hardcode colors instead of using theme variables
+
+This rule ensures consistent, maintainable styling across all components. 

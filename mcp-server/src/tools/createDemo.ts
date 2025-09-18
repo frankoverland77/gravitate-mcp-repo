@@ -11,6 +11,7 @@ interface ParsedInstruction {
   type: "grid" | "form" | "dashboard";
   description: string;
   features: string[];
+  category: "grids" | "forms" | "dashboards";
 }
 
 /**
@@ -41,7 +42,7 @@ export async function createDemoTool(args: CreateDemoArgs) {
 
 📁 Location: ${demoPath}
 🎯 Type: ${parsed.type}
-🔗 URL: http://localhost:3000/demos/${parsed.name
+🔗 URL: http://localhost:3000/demos/${parsed.category}/${parsed.name
             .toLowerCase()
             .replace(/\s+/g, "-")}
 
@@ -168,6 +169,7 @@ function parseInstruction(instruction: string): ParsedInstruction {
     type,
     description: `${name} - ${instruction}`,
     features,
+    category: (type + "s") as "grids" | "forms" | "dashboards", // "grid" -> "grids"
   };
 }
 
@@ -198,12 +200,12 @@ function generateGridComponent(
     .replace(/"cellRenderer":\s*"([^"]+)"/g, '"cellRenderer": $1')
     .replace(/"cellEditor":\s*"NumberCellEditor"/g, '"cellEditor": NumberCellEditor');
 
-  const imports = hasNumberColumns 
-    ? `import React, { useMemo } from 'react';
+  const imports = hasNumberColumns
+    ? `import React, { useMemo, useEffect } from 'react';
 import { GraviGrid } from '@gravitate-js/excalibrr';
 import { mockData } from './${componentName}.data';
 import { NumberCellEditor } from '@components/shared/Grid/cellEditors/NumberCellEditor';`
-    : `import React, { useMemo } from 'react';
+    : `import React, { useMemo, useEffect } from 'react';
 import { GraviGrid } from '@gravitate-js/excalibrr';
 import { mockData } from './${componentName}.data';`;
 
@@ -228,7 +230,16 @@ export function ${componentName}() {
     console.log('Update called with:', params);
     return Promise.resolve();
   };
-  
+
+  /* MCP Theme Script */
+  // Set theme for this demo (follows ControlPanel pattern)
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem("TYPE_OF_THEME", "BP");
+    }
+  }, []);
+  /* End MCP Theme Script */
+
   return (
     <div style={{ height: '100%' }}>
       <GraviGrid
@@ -248,7 +259,7 @@ function generateFormComponent(
   componentName: string,
   parsed: ParsedInstruction
 ): string {
-  return `import React, { useState } from 'react';
+  return `import React, { useState, useEffect } from 'react';
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { Form, Input, Select, Switch } from 'antd';
 
@@ -264,14 +275,23 @@ export function ${componentName}() {
     setLoading(false);
   };
 
+  /* MCP Theme Script */
+  // Set theme for this demo (follows ControlPanel pattern)
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem("TYPE_OF_THEME", "BP");
+    }
+  }, []);
+  /* End MCP Theme Script */
+
   return (
     <Vertical className="p-2" style={{ height: '100%', maxWidth: '600px' }}>
-      <Horizontal justifyContent="space-between" alignItems="center" className="mb-3">
+      <Horizontal justifyContent="space-between" alignItems="center" className="mb-2">
         <Texto category="h4" style={{ color: 'var(--theme-color-2)' }}>
           ${parsed.name}
         </Texto>
       </Horizontal>
-      
+
       <Form
         form={form}
         layout="vertical"
@@ -296,7 +316,7 @@ export function ${componentName}() {
 
         <Form.Item>
           <Horizontal justifyContent="flex-end" style={{ gap: '12px' }}>
-            <GraviButton 
+            <GraviButton
               buttonText="Cancel"
               onClick={() => form.resetFields()}
             />
@@ -475,20 +495,20 @@ async function createDemoFile(
   const componentName = parsed.name.replace(/\s+/g, "");
   const fileName = componentName + ".tsx";
   const dataFileName = componentName + ".data.ts";
-  const demoPath = path.resolve(
+
+  // Create organized directory structure: demos/[category]/[ComponentName]/
+  const componentDir = path.resolve(
     process.cwd(),
     "demo/src/pages/demos",
-    fileName
-  );
-  const dataPath = path.resolve(
-    process.cwd(),
-    "demo/src/pages/demos",
-    dataFileName
+    parsed.category,
+    componentName
   );
 
-  // Ensure demos directory exists
-  const demosDir = path.dirname(demoPath);
-  await fs.mkdir(demosDir, { recursive: true });
+  const demoPath = path.resolve(componentDir, fileName);
+  const dataPath = path.resolve(componentDir, dataFileName);
+
+  // Ensure component directory exists
+  await fs.mkdir(componentDir, { recursive: true });
 
   // Write the demo component file
   await fs.writeFile(demoPath, code);
@@ -503,88 +523,56 @@ async function createDemoFile(
 async function updateDemoConfig(parsed: ParsedInstruction): Promise<void> {
   const configPath = path.resolve(process.cwd(), "demo/src/pageConfig.tsx");
   const componentName = parsed.name.replace(/\s+/g, "");
-  const routePath = `/demos/${parsed.name.toLowerCase().replace(/\s+/g, "-")}`;
+  const routePath = `/demos/${parsed.category}/${parsed.name.toLowerCase().replace(/\s+/g, "-")}`;
 
   // Read current config
   const configContent = await fs.readFile(configPath, "utf-8");
 
-  // Add import for the new component
-  const importStatement = `import { ${componentName} } from './pages/demos/${componentName}';`;
+  // Create import statement for the new component with organized path
+  const importStatement = `import { ${componentName} } from "./pages/demos/${parsed.category}/${componentName}/${componentName}";`;
   let updatedContent = configContent;
 
   // Add import if it doesn't exist
   if (!updatedContent.includes(importStatement)) {
-    updatedContent = updatedContent.replace(
-      "import React from 'react';",
-      `import React from 'react';\n${importStatement}`
-    );
+    // Find the last import statement and add after it
+    const lastImportMatch = updatedContent.match(/import.*from.*;\s*$/m);
+    if (lastImportMatch) {
+      const insertIndex = updatedContent.indexOf(lastImportMatch[0]) + lastImportMatch[0].length;
+      updatedContent = updatedContent.slice(0, insertIndex) + '\n' + importStatement + updatedContent.slice(insertIndex);
+    }
   }
 
-  // Create new route object
-  const newRoute = {
-    path: routePath,
-    name: parsed.name,
-    component: componentName,
-    created: new Date().toISOString(),
-    description: parsed.description,
-  };
+  // Create new demo registry entry
+  const newDemoEntry = `  {
+    key: "${componentName}",
+    title: "${parsed.name}",
+    element: <${componentName} />,
+    path: "${routePath}",
+    description: "${parsed.description}",
+    created: "${new Date().toISOString()}",
+    category: "${parsed.category}"
+  }`;
 
-  // Find and replace the array content properly
-  const arrayRegex =
-    /(export const demoRoutes: DemoRoute\[\] = \[)([\s\S]*?)(\];)/;
-  const match = updatedContent.match(arrayRegex);
+  // Find the demoRegistry array and add the new entry
+  const registryRegex = /(export const demoRegistry: DemoRoute\[\] = \[)([\s\S]*?)(\s+\/\/ MCP server will add more demos here automatically\s*\];)/;
+  const match = updatedContent.match(registryRegex);
 
   if (match) {
-    const [, arrayStart, arrayContent, arrayEnd] = match;
+    const [fullMatch, arrayStart, existingEntries, arrayEnd] = match;
 
-    // Parse existing routes (simple approach - look for existing objects)
-    let routes = [];
+    // Check if this demo already exists
+    const existingEntryRegex = new RegExp(`key:\\s*"${componentName}"`, 'g');
+    if (!existingEntryRegex.test(existingEntries)) {
+      // Add the new entry
+      const updatedEntries = existingEntries.trim()
+        ? existingEntries.trimEnd() + ',\n' + newDemoEntry + '\n'
+        : '\n' + newDemoEntry + '\n';
 
-    // Add new route at the beginning
-    routes.push(newRoute);
-
-    // Add back existing routes that don't have the same path
-    const existingRouteRegex = /{\s*path:\s*'([^']*)'[^}]*}/g;
-    let routeMatch;
-    while ((routeMatch = existingRouteRegex.exec(arrayContent)) !== null) {
-      if (routeMatch[1] !== routePath) {
-        // Extract the full route object
-        const fullRouteRegex = new RegExp(
-          `{[^}]*path:\\s*'${routeMatch[1].replace(
-            /[.*+?^${}()|[\]\\]/g,
-            "\\$&"
-          )}'[^}]*}`,
-          "g"
-        );
-        const fullMatch = arrayContent.match(fullRouteRegex);
-        if (fullMatch && fullMatch[0]) {
-          // Keep existing route as string for now
-          routes.push(fullMatch[0]);
-        }
-      }
+      updatedContent = updatedContent.replace(
+        fullMatch,
+        arrayStart + updatedEntries + arrayEnd
+      );
     }
-
-    // Reconstruct the array
-    const newArrayContent = routes
-      .map((route, index) => {
-        if (typeof route === "string") {
-          return `  ${route}${index < routes.length - 1 ? "," : ""}`;
-        } else {
-          return `  {
-    path: '${route.path}',
-    name: '${route.name}',
-    component: ${route.component},
-    created: '${route.created}',
-    description: '${route.description}'
-  }${index < routes.length - 1 ? "," : ""}`;
-        }
-      })
-      .join("\n");
-
-    updatedContent = updatedContent.replace(
-      arrayRegex,
-      `${arrayStart}\n${newArrayContent}\n  // MCP server will add demo routes here automatically\n${arrayEnd}`
-    );
   }
 
   // Write updated config

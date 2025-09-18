@@ -3,6 +3,7 @@
 import { GRAVI_GRID_EXAMPLES } from "./components/GraviGrid/index.js";
 import { COLDEFS_EXAMPLES } from "./components/GraviGrid/colDefs.js";
 import { GraviButtonExamples } from "./components/GraviButton/index.js";
+import { BBDTagExamples } from "./components/BBDTag/index.js";
 import { ModalExamples } from "./components/Modal/index.js";
 import { PopoverExamples } from "./components/Popover/index.js";
 import { HORIZONTAL_EXAMPLES } from "./components/Horizontal/index.js";
@@ -47,6 +48,7 @@ export function getExamplesForComponent(
   const exampleMap: Record<string, ComponentExample[]> = {
     GraviGrid: GRAVI_GRID_EXAMPLES,
     GraviButton: GraviButtonExamples,
+    BBDTag: BBDTagExamples,
     Modal: ModalExamples,
     Popover: PopoverExamples,
     Horizontal: HORIZONTAL_EXAMPLES,
@@ -67,6 +69,7 @@ export function getAllExamples(): ComponentExample[] {
   return [
     ...GRAVI_GRID_EXAMPLES,
     ...GraviButtonExamples,
+    ...BBDTagExamples,
     ...ModalExamples,
     ...PopoverExamples,
     ...HORIZONTAL_EXAMPLES,
@@ -118,6 +121,7 @@ export {
   GRAVI_GRID_EXAMPLES,
   COLDEFS_EXAMPLES,
   GraviButtonExamples,
+  BBDTagExamples,
   ModalExamples,
   PopoverExamples,
   HORIZONTAL_EXAMPLES,

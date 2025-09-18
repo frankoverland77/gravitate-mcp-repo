@@ -14,6 +14,7 @@ import { changeThemeTool } from "./tools/changeTheme.js";
 import { runDevServerTool } from "./tools/runDevServer.js";
 import { createFormDemo } from "./tools/createFormDemo.js";
 import { cleanupDemo } from "./tools/cleanupDemo.js";
+import { cleanupStylesTool } from "./tools/cleanupStyles.js";
 import { importFromFigma, listFigmaComponents } from "./tools/figmaTools.js";
 import { helpTool } from "./tools/helpTool.js";
 import {
@@ -338,6 +339,25 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
+        name: "cleanup_styles",
+        description:
+          "Automatically clean up inline styles and replace with utility classes following the prefer-utility-css-classes rule",
+        inputSchema: {
+          type: "object",
+          properties: {
+            filePath: {
+              type: "string",
+              description: "Specific file to clean up (optional - if not provided, processes all TSX/JSX files in demo/src)",
+            },
+            pattern: {
+              type: "string",
+              description: "File pattern to match (default: **/*.{tsx,jsx})",
+              default: "**/*.{tsx,jsx}",
+            },
+          },
+        },
+      },
+      {
         name: "help",
         description:
           "Get help when you're not sure what to do or if I don't understand your request",
@@ -381,6 +401,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [{ type: "text", text: await cleanupDemo(args as any) }],
         };
+      case "cleanup_styles":
+        return await cleanupStylesTool(args as any);
       case "import_from_figma":
         return {
           content: [{ type: "text", text: await importFromFigma(args as any) }],
@@ -400,7 +422,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const safeguardResult = processSafeguards(`Unknown tool: ${name}`);
         const response =
           formatSafeguardResponse(safeguardResult) ||
-          `Unknown tool: ${name}. Available tools: create_demo, modify_grid, change_theme, run_dev_server, create_form_demo, cleanup_demo, import_from_figma, list_figma_components, help`;
+          `Unknown tool: ${name}. Available tools: create_demo, modify_grid, change_theme, run_dev_server, create_form_demo, cleanup_demo, cleanup_styles, import_from_figma, list_figma_components, help`;
         return {
           content: [{ type: "text", text: response }],
           isError: true,
