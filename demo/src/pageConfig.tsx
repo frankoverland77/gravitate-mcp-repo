@@ -8,6 +8,7 @@ import {
 import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
 import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
 import { CustomerForm } from "./pages/demos/forms/CustomerForm/CustomerForm";
+import { TabbedView } from "./pages/demos/dashboards/TabbedView/TabbedView";
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -39,6 +40,15 @@ export const demoRegistry: DemoRoute[] = [
     description: "Customer management form with validation",
     created: new Date().toISOString(),
     category: "forms",
+  },
+  {
+    key: "TabbedView",
+    title: "Tabbed View",
+    element: <TabbedView />,
+    path: "/demos/dashboards/tabbed-view",
+    description: "Interactive dashboard with tabbed navigation",
+    created: new Date().toISOString(),
+    category: "dashboards",
   },
   // MCP server will add more demos here automatically
 ];

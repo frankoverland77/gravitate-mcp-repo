@@ -22,6 +22,12 @@ import {
   formatSafeguardResponse,
 } from "./utils/safeguards.js";
 
+// Import component registry tools
+import { listComponentsTool } from "./tools/listComponents.js";
+import { searchComponentsTool } from "./tools/searchComponents.js";
+import { getComponentTool } from "./tools/getComponent.js";
+import { installComponentTool } from "./tools/installComponent.js";
+
 /**
  * Excalibrr MCP Server v2 - Clean, Focused Implementation
  *
@@ -376,6 +382,111 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: "list_components",
+        description:
+          "Browse all available Excalibrr components from the registry. Filter by category, complexity, or tags.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            category: {
+              type: "string",
+              description: "Filter by category (e.g., 'data', 'forms', 'layout', 'overlay')",
+            },
+            complexity: {
+              type: "string",
+              enum: ["simple", "medium", "complex"],
+              description: "Filter by complexity level",
+            },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              description: "Filter by tags (e.g., 'grid', 'button', 'form')",
+            },
+            limit: {
+              type: "number",
+              description: "Limit the number of results",
+            },
+          },
+        },
+      },
+      {
+        name: "search_components",
+        description:
+          "Search for Excalibrr components by name, description, or tags. Returns matching components with details.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query (matches name, description, tags)",
+            },
+            category: {
+              type: "string",
+              description: "Filter results by category",
+            },
+            complexity: {
+              type: "string",
+              enum: ["simple", "medium", "complex"],
+              description: "Filter by complexity level",
+            },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              description: "Filter by specific tags",
+            },
+            limit: {
+              type: "number",
+              description: "Limit the number of results (default: 10)",
+              default: 10,
+            },
+          },
+          required: ["query"],
+        },
+      },
+      {
+        name: "get_component",
+        description:
+          "Get full details for a specific component including props, examples, and usage instructions.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            componentId: {
+              type: "string",
+              description: "Component ID (e.g., 'gravi-grid', 'gravi-button')",
+            },
+          },
+          required: ["componentId"],
+        },
+      },
+      {
+        name: "install_component",
+        description:
+          "Install an Excalibrr component into your project. Shows usage instructions and checks dependencies.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            componentId: {
+              type: "string",
+              description: "Component ID to install",
+            },
+            projectPath: {
+              type: "string",
+              description: "Target project path (defaults to demo workspace)",
+            },
+            installDependencies: {
+              type: "boolean",
+              description: "Check and report missing dependencies",
+              default: true,
+            },
+            customName: {
+              type: "string",
+              description: "Custom name for the component (optional)",
+            },
+          },
+          required: ["componentId"],
+        },
+      },
     ],
   };
 });
@@ -417,12 +528,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [{ type: "text", text: await helpTool(args as any) }],
         };
+      case "list_components":
+        return await listComponentsTool(args as any);
+      case "search_components":
+        return await searchComponentsTool(args as any);
+      case "get_component":
+        return await getComponentTool(args as any);
+      case "install_component":
+        return await installComponentTool(args as any);
       default:
         // Use safeguards for unknown tools
         const safeguardResult = processSafeguards(`Unknown tool: ${name}`);
         const response =
           formatSafeguardResponse(safeguardResult) ||
-          `Unknown tool: ${name}. Available tools: create_demo, modify_grid, change_theme, run_dev_server, create_form_demo, cleanup_demo, cleanup_styles, import_from_figma, list_figma_components, help`;
+          `Unknown tool: ${name}. Available tools: create_demo, modify_grid, change_theme, run_dev_server, create_form_demo, cleanup_demo, cleanup_styles, import_from_figma, list_figma_components, help, list_components, search_components, get_component, install_component`;
         return {
           content: [{ type: "text", text: response }],
           isError: true,

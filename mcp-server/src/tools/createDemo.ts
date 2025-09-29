@@ -34,6 +34,9 @@ export async function createDemoTool(args: CreateDemoArgs) {
     // 4. Update the demo configuration
     await updateDemoConfig(parsed);
 
+    // 5. Update AuthenticatedRoute.jsx to add scope
+    await updateAuthenticatedRoute(parsed);
+
     return {
       content: [
         {
@@ -52,7 +55,11 @@ ${parsed.features.map((f) => `  • ${f}`).join("\n")}
 🚀 Start the demo server:
   yarn dev
 
-📝 Open in Cursor to see the generated code!`,
+📝 Configuration updated:
+  ✅ Page config with route
+  ✅ Authenticated route with scope
+
+Open in Cursor to see the generated code!`,
         },
       ],
     };
@@ -577,4 +584,38 @@ async function updateDemoConfig(parsed: ParsedInstruction): Promise<void> {
 
   // Write updated config
   await fs.writeFile(configPath, updatedContent);
+}
+
+/**
+ * Update AuthenticatedRoute.jsx to add the new demo scope
+ */
+async function updateAuthenticatedRoute(parsed: ParsedInstruction): Promise<void> {
+  const authRoutePath = path.resolve(
+    process.cwd(),
+    "demo/src/_Main/AuthenticatedRoute.jsx"
+  );
+
+  try {
+    // Read current AuthenticatedRoute file
+    let authRoute = await fs.readFile(authRoutePath, "utf-8");
+
+    // Find the scopes object and add the new scope if it doesn't exist
+    const scopesRegex = /const scopes = \{([^}]*)\}/;
+    const scopesMatch = authRoute.match(scopesRegex);
+    const componentName = parsed.name.replace(/\s+/g, "");
+
+    if (scopesMatch && !authRoute.includes(`${componentName}: true`)) {
+      const existingScopes = scopesMatch[1];
+      const newScope = `    ${componentName}: true,`;
+      const updatedScopes = existingScopes.trimEnd() + "\n" + newScope;
+      authRoute = authRoute.replace(
+        scopesRegex,
+        `const scopes = {${updatedScopes}\n  }`
+      );
+      await fs.writeFile(authRoutePath, authRoute);
+    }
+  } catch (error) {
+    console.error("Warning: Could not update AuthenticatedRoute.jsx:", error);
+    // Don't fail the entire operation if this update fails
+  }
 }

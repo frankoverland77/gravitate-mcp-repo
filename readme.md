@@ -1,8 +1,15 @@
-# Excalibrr Workspace
+# Excalibrr MCP Server
 
-**Monorepo for Excalibrr MCP Server and Demo Project**
+**Component Registry & Demo Generator for Excalibrr**
 
-This workspace enables user to generate production-quality Excalibrr demos using natural language in Claude Code.
+An MCP (Model Context Protocol) server that provides AI assistants with direct access to the Excalibrr component library. Browse components, generate demos, and build production-quality UIs using natural language.
+
+**Key Features:**
+- 📦 **Component Registry** - Browse and search 9+ Excalibrr components
+- 🎨 **Demo Generation** - Create working demos instantly
+- 🔍 **Smart Search** - Find components by name, category, or tags
+- 💡 **Usage Examples** - Every component includes multiple examples
+- 🎯 **Like shadcn/ui** - Similar workflow, built for Excalibrr
 
 ## 🚀 Quick Start
 
@@ -10,11 +17,25 @@ This workspace enables user to generate production-quality Excalibrr demos using
 # One-time setup
 ./setup.sh
 
-# Start developing
-yarn dev                    # Start demo project
-claude --chat             # In Cursor terminal
-# Say: "Create a product grid with editing"
+# Start using the MCP server
+claude --chat
+
+# Try these commands in Claude Code:
+"List all available components"
+"Search for grid components"
+"Show me how to use GraviGrid"
+"Create a product inventory demo"
 ```
+
+## 💬 Natural Language Usage
+
+The MCP server understands natural language. Try:
+
+- **Browse Components:** "What components are available?" or "List all form components"
+- **Search:** "Find button components" or "Search for data grids"
+- **Get Details:** "Show me GraviGrid documentation" or "How do I use the Modal component?"
+- **Install/Use:** "Add a button to my project" or "Show me button examples"
+- **Generate Demos:** "Create a product grid" or "Make a customer form"
 
 ## 📂 Structure
 
@@ -39,19 +60,30 @@ excalibrr-workspace/
     └── development/       # Coding conventions
 ```
 
-## 🎯 For user
+## 🎯 How It Works (Like shadcn/ui)
 
-**Your workflow:**
-1. Open Cursor: `code .`
-2. Start demo: `yarn dev` 
-3. Terminal: `claude --chat`
-4. Create demos: *"Create inventory grid with inline editing"*
+The Excalibrr MCP Server works just like shadcn/ui's MCP server:
 
-**The MCP server will:**
-- Generate real Excalibrr components
-- Use production patterns and themes
-- Apply your coding rules automatically
-- Create working demos instantly
+1. **Registry Connection** - MCP connects to the Excalibrr component registry
+2. **Natural Language** - You describe what you need in plain English
+3. **AI Processing** - Claude translates your request into registry commands
+4. **Component Delivery** - Components, examples, and docs are provided instantly
+
+**Two Modes of Operation:**
+
+### 1. Component Registry (New! 🎉)
+Browse and install individual components:
+- `list_components` - Browse all Excalibrr components
+- `search_components` - Find specific components
+- `get_component` - Get full documentation and examples
+- `install_component` - Add components to your project
+
+### 2. Demo Generation (Original)
+Generate complete demo applications:
+- `create_demo` - Create grid/form/dashboard demos
+- `modify_grid` - Modify existing demos
+- `change_theme` - Switch themes (OSP, PE, BP)
+- `run_dev_server` - Start development server
 
 ## 🛠 Commands
 
@@ -68,6 +100,34 @@ yarn dev:check          # Check server status
 yarn stop               # Stop dev server
 ```
 
+## 📦 Available Components
+
+The registry includes 9 core Excalibrr components:
+
+### Data Components
+- **GraviGrid** - Powerful AG Grid-based data grid with editing, grouping, and filtering
+
+### Form Components
+- **GraviButton** - Themed button with variants and loading states
+- **Form** - Form container with validation support
+- **Select** - Dropdown with search and multi-select
+
+### Layout Components
+- **Horizontal** - Flexbox horizontal layout
+- **Vertical** - Flexbox vertical layout
+- **Texto** - Themed text with typography options
+
+### Overlay Components
+- **Modal** - Dialog/modal overlays
+- **Popover** - Floating content popovers
+
+Each component includes:
+- ✅ Full prop documentation
+- ✅ Multiple usage examples
+- ✅ TypeScript types
+- ✅ Dependency information
+- ✅ Theme support
+
 ## 📋 Rules Integration
 
 The MCP server automatically applies rules from `docs/rules/`:
@@ -75,6 +135,28 @@ The MCP server automatically applies rules from `docs/rules/`:
 - ✅ Apply theme variables (no hardcoded colors)
 - ✅ Follow production patterns
 - ✅ Generate realistic mock data
+
+## ⚙️ Configuration
+
+Projects can use `components.json` (like shadcn/ui) to configure the registry:
+
+```json
+{
+  "registries": {
+    "excalibrr": {
+      "name": "Excalibrr Component Registry",
+      "url": "mcp://excalibrr",
+      "description": "Official Excalibrr component library"
+    }
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils"
+  }
+}
+```
+
+The demo project includes this configuration by default.
 
 ## 🎨 Themes
 

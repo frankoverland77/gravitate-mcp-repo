@@ -11,7 +11,9 @@ export function AuthenticatedRoute() {
     Welcome: true,
     Grids: true,
     Forms: true,
+    Dashboards: true,
     ProductGrid: true,
+    TabbedView: true,
   };
   return (
     <NavigationContextProvider
