@@ -17,6 +17,8 @@ import OSPAuthBackground from "../../../assets/osp/logos/osp-auth-background.jpg
 import OSPAuthLogo from "../../../assets/osp/logos/osp-logo-dark.png";
 import P66AuthBackground from "../../../assets/p66/p66-auth-background.png";
 import P66AuthLogo from "../../../assets/p66/p66-logo-dark.png";
+import PEAuthBackground from "../../../assets/pe/logos/sunoco-auth-background.png";
+import PEAuthLogo from "../../../assets/pe/logos/sunoco-lp-logo-light.png";
 import PoweredByOSP from "../../../assets/SiteImages/PoweredByLogos/PoweredByOSP.png";
 import PoweredByPE from "../../../assets/SiteImages/PoweredByLogos/PoweredByPE.png";
 import christmasLoginImage from "../../../assets/SiteImages/Themes/Christmas/christmas-tree.jpg";
@@ -108,6 +110,15 @@ export const themeConfigs = {
     LoginLogo: P66AuthLogo,
     isDark: false,
     poweredByLogo: PoweredByOSP,
+  },
+  PE_LIGHT: {
+    display: "PE Light",
+    key: "PE_LIGHT",
+    ThemeImportComponent: React.lazy(() => import("./Themes/PE/Light")),
+    LoginBanner: PEAuthBackground,
+    LoginLogo: PEAuthLogo,
+    isDark: false,
+    poweredByLogo: PoweredByPE,
   },
   MOTIVA: {
     display: "Motiva",

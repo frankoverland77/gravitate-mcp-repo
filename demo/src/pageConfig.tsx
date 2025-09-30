@@ -5,10 +5,11 @@ import {
   DashboardOutlined,
 } from "@ant-design/icons";
 
-import { FormulaManager } from "@pages/demos/grids/FormulaManager";
 import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
-import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
 import { CustomerForm } from "./pages/demos/forms/CustomerForm/CustomerForm";
+import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
+import { FormulaManager } from "./pages/demos/grids/FormulaManager";
+import { DeliveryManager } from "./pages/demos/delivery/DeliveryManager";
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -24,11 +25,29 @@ interface DemoRoute {
 // Registry of all available demos - MCP server will populate this
 export const demoRegistry: DemoRoute[] = [
   {
-    key: "ProductGrid",
-    title: "Bakery Products",
+    key: "BakeryProducts",
+    title: "Bakery Products", 
     element: <ProductGrid />,
-    path: "/demos/grids/product-grid",
-    description: "Interactive product data grid with real-time updates",
+    path: "/demos/grids/bakery-products",
+    description: "Interactive bakery product data grid with real-time updates",
+    created: new Date().toISOString(),
+    category: "grids",
+  },
+  {
+    key: "FormulaManager",
+    title: "Formula Manager",
+    element: <FormulaManager />,
+    path: "/demos/grids/formula-manager", 
+    description: "Manage and apply pricing formulas dynamically",
+    created: new Date().toISOString(),
+    category: "grids",
+  },
+  {
+    key: "DeliveryManagement",
+    title: "Delivery Management",
+    element: <DeliveryManager />,
+    path: "/demos/grids/delivery-management",
+    description: "Complete delivery management with routes, drivers, and tracking",
     created: new Date().toISOString(),
     category: "grids",
   },
@@ -41,15 +60,6 @@ export const demoRegistry: DemoRoute[] = [
     created: new Date().toISOString(),
     category: "forms",
   },
-  {
-    key: "FormulaManager",
-    title: "Formula Manager",
-    element: <FormulaManager />,
-    path: "/demos/grids/formula-manager",
-    description: "Manage and apply formulas dynamically",
-    created: new Date().toISOString(),
-    category: "grids",
-  }
   // MCP server will add more demos here automatically
 ];
 

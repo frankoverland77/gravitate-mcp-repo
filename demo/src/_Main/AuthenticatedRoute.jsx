@@ -13,10 +13,9 @@ export function AuthenticatedRoute() {
     Grids: true,
     Forms: true,
     Dashboards: true,
-    ProductGrid: true,
-    BakeryDemo: true,
+    BakeryProducts: true,
     FormulaManager: true,
-    TabbedView: true,
+    DeliveryManagement: true,
   };
   return (
     <ProductFormulaProvider>

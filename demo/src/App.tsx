@@ -22,7 +22,7 @@ export function App() {
 function ThemeWrapper({ themeConfigs }) {
   useEffect(() => {
     if (!localStorage.getItem("TYPE_OF_THEME")) {
-      localStorage.setItem("TYPE_OF_THEME", "LIGHT_MODE");
+      localStorage.setItem("TYPE_OF_THEME", "PE_LIGHT");
     }
   }, []);
 

@@ -1,0 +1,291 @@
+/* Delivery Demo - Drag & Drop Animations */
+
+/* Draggable Elements */
+.drag-item {
+  cursor: grab;
+  transition: all 0.2s ease;
+  transform: scale(1);
+  opacity: 1;
+}
+
+.drag-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.drag-item:active {
+  cursor: grabbing;
+}
+
+/* While being dragged */
+.drag-item.dragging {
+  opacity: 0.8;
+  transform: scale(1.05) rotate(2deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Drop zones */
+.drop-zone {
+  transition: all 0.3s ease;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+}
+
+.drop-zone.drag-over {
+  border: 2px dashed #1890ff;
+  background-color: #f0f8ff;
+  box-shadow: inset 0 0 0 2px rgba(24, 144, 255, 0.2);
+  transform: scale(1.02);
+}
+
+.drop-zone.drop-active {
+  border: 3px dashed #52c41a;
+  background-color: #f6ffed;
+  animation: pulse-green 1.5s infinite;
+}
+
+/* Drop zone animations */
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(82, 196, 26, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0);
+  }
+}
+
+@keyframes pulse-blue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(24, 144, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0);
+  }
+}
+
+/* Order items in lists */
+.order-item {
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.order-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.order-item:hover::before {
+  left: 100%;
+}
+
+.order-item.being-dragged {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+/* Route cards */
+.route-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1);
+}
+
+.route-card.drop-target {
+  transform: scale(1.05);
+  border-color: #1890ff !important;
+  box-shadow: 0 8px 20px rgba(24, 144, 255, 0.3);
+  animation: pulse-blue 2s infinite;
+}
+
+.route-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Drag handle */
+.drag-handle {
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+  transform: scale(1.2);
+  color: #1890ff;
+}
+
+/* Drag ghost/preview */
+.drag-ghost {
+  opacity: 0.8;
+  transform: rotate(5deg);
+  border: 2px dashed #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+/* Route builder sections */
+.route-builder-section {
+  transition: all 0.3s ease;
+  min-height: 200px;
+}
+
+.route-builder-section.empty {
+  border: 2px dashed #d9d9d9;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.02) 10px,
+    rgba(0, 0, 0, 0.02) 20px
+  );
+}
+
+.route-builder-section.empty.drag-over {
+  border-color: #52c41a;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(82, 196, 26, 0.1) 10px,
+    rgba(82, 196, 26, 0.1) 20px
+  );
+  animation: bounce-subtle 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes bounce-subtle {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-4px);
+  }
+}
+
+/* Batch suggestions */
+.batch-suggestion {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.batch-suggestion:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.batch-suggestion.drop-target {
+  border-color: #52c41a;
+  background-color: #f6ffed;
+  transform: scale(1.03);
+  animation: pulse-green 1.5s infinite;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Success feedback */
+.drop-success {
+  animation: success-flash 0.6s ease-out;
+}
+
+@keyframes success-flash {
+  0% {
+    background-color: #52c41a;
+    transform: scale(1);
+  }
+  50% {
+    background-color: #73d13d;
+    transform: scale(1.05);
+  }
+  100% {
+    background-color: transparent;
+    transform: scale(1);
+  }
+}
+
+/* Error feedback */
+.drop-error {
+  animation: error-shake 0.5s ease-out;
+}
+
+@keyframes error-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-3px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(3px);
+  }
+}
+
+/* Mobile/Touch optimizations */
+@media (max-width: 768px) {
+  .drag-item {
+    touch-action: none;
+  }
+  
+  .drop-zone {
+    min-height: 60px;
+    padding: 16px;
+  }
+  
+  .route-card {
+    margin-bottom: 16px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .drop-zone.drag-over {
+    border: 3px solid #000;
+    background-color: #fff;
+  }
+  
+  .drag-item.dragging {
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .drag-item,
+  .drop-zone,
+  .route-card,
+  .order-item,
+  .batch-suggestion {
+    transition: none;
+    animation: none;
+  }
+  
+  .drag-item:hover,
+  .route-card:hover {
+    transform: none;
+  }
+}
