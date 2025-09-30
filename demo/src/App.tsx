@@ -22,15 +22,9 @@ export function App() {
 function ThemeWrapper({ themeConfigs }) {
   useEffect(() => {
     if (!localStorage.getItem("TYPE_OF_THEME")) {
-      const defaultThemeKey = Object.keys(themeConfigs).find(
-        (key) => themeConfigs[key].default
-      );
-      localStorage.setItem(
-        "TYPE_OF_THEME",
-        defaultThemeKey || themeConfigs[0]?.key
-      );
+      localStorage.setItem("TYPE_OF_THEME", "LIGHT_MODE");
     }
-  }, [themeConfigs]);
+  }, []);
 
   if (!themeConfigs || Object.entries(themeConfigs)?.length <= 0) return null;
 

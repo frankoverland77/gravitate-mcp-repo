@@ -30,6 +30,7 @@ export const themeConfigs = {
     key: "LIGHT_MODE",
     ThemeImportComponent: React.lazy(() => import("./Themes/Light/Light")),
     isDark: false,
+    default: true,
   },
   DARK_MODE: {
     display: "Dark",
