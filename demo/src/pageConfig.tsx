@@ -3,6 +3,7 @@ import {
   TableOutlined,
   EditOutlined,
   DashboardOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
 
 import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
@@ -64,6 +65,10 @@ export const demoRegistry: DemoRoute[] = [
 ];
 
 export const createPageConfig = () => {
+  // IMPORTANT: When adding new sections here (Grids, Forms, Dashboards, etc.),
+  // you MUST also add the corresponding scope to the scopes object in
+  // src/_Main/AuthenticatedRoute.jsx or the menu item will not appear!
+
   // Group demos by category
   const gridsRoutes = demoRegistry
     .filter((demo) => demo.category === "grids")
@@ -108,13 +113,13 @@ export const createPageConfig = () => {
     },
   };
 
-  // Add Grids section if there are grid demos
+  // Add Bakery section if there are grid demos
   if (gridsRoutes.length > 0) {
-    config.Grids = {
+    config.Bakery = {
       hasPermission: () => true,
-      key: "Grids",
-      icon: <TableOutlined />,
-      title: "Grids",
+      key: "Bakery",
+      icon: <ShopOutlined />,
+      title: "Bakery",
       routes: gridsRoutes,
     };
   }

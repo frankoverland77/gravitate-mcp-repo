@@ -162,6 +162,13 @@ The server provides comprehensive tools for Excalibrr demo generation:
 - Path aliases prevent relative import chains
 - Data files co-located with component files
 
+**Navigation and Routing** ⚠️ CRITICAL:
+- When adding navigation sections to `demo/src/pageConfig.tsx`, you MUST also update `demo/src/_Main/AuthenticatedRoute.jsx`
+- The `scopes` object in AuthenticatedRoute controls which menu items appear
+- Section keys in pageConfig MUST match scope keys exactly (case-sensitive)
+- Example: Adding `config.Bakery = {...}` in pageConfig requires `Bakery: true` in scopes
+- Failing to update both files will cause navigation items to not appear in the menu
+
 **Theme System**:
 - Multiple theme support via configuration objects
 - Theme switching without component re-architecture

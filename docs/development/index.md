@@ -39,9 +39,10 @@ Server management rules have been moved to `docs/rules/server-management.mdc` wh
 3. 🧪 Test example code works with demo generation
 
 ### Troubleshooting
-- **Server issues**: Check `docs/rules/server-management.mdc` 
+- **Server issues**: Check `docs/rules/server-management.mdc`
 - **Demo generation fails**: Verify examples follow the guide standards
 - **Theme problems**: Ensure Excalibrr components are used correctly
+- **Navigation items not appearing**: When adding sections to `pageConfig.tsx`, you must also update the `scopes` object in `AuthenticatedRoute.jsx`. See `docs/rules/page-config-scopes-sync.mdc` for details.
 
 ## 📁 Organization
 

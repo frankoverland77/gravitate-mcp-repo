@@ -1,0 +1,60 @@
+---
+description: Synchronize pageConfig sections with AuthenticatedRoute scopes
+globs:
+alwaysApply: true
+---
+
+# PageConfig and AuthenticatedRoute Scopes Synchronization
+
+When adding or modifying navigation sections in the demo application, you MUST update TWO files:
+
+## Required Files
+
+1. **`demo/src/pageConfig.tsx`** - Defines navigation structure and routes
+2. **`demo/src/_Main/AuthenticatedRoute.jsx`** - Defines which sections are visible via scopes
+
+## The Pattern
+
+When you add a new section to `pageConfig.tsx`:
+
+```typescript
+// In createPageConfig() function
+if (gridsRoutes.length > 0) {
+  config.Bakery = {  // <- Section key is "Bakery"
+    hasPermission: () => true,
+    key: "Bakery",
+    icon: <ShopOutlined />,
+    title: "Bakery",
+    routes: gridsRoutes,
+  };
+}
+```
+
+You MUST add the corresponding scope to `AuthenticatedRoute.jsx`:
+
+```javascript
+const scopes = {
+  Welcome: true,
+  Bakery: true,  // <- MUST match the section key from pageConfig
+  Forms: true,
+  // ... other scopes
+};
+```
+
+## Why This Matters
+
+The NavigationContextProvider uses the `scopes` object to determine which navigation items to show. If a section is defined in `pageConfig` but not in `scopes`, the menu item will not appear.
+
+## Examples
+
+- Section key "Grids" → scope "Grids: true"
+- Section key "Forms" → scope "Forms: true"
+- Section key "Dashboards" → scope "Dashboards: true"
+- Section key "Bakery" → scope "Bakery: true"
+
+## Checklist
+
+When adding a navigation section:
+- [ ] Add section to `config` object in `createPageConfig()` in pageConfig.tsx
+- [ ] Add matching scope to `scopes` object in AuthenticatedRoute.jsx
+- [ ] Verify the section key matches exactly (case-sensitive)

@@ -8,9 +8,13 @@ import { ProductFormulaProvider } from "../contexts/ProductFormulaContext";
 
 export function AuthenticatedRoute() {
   const pageConfig = useMemo(createPageConfig, []);
+
+  // IMPORTANT: This scopes object controls which navigation items appear in the menu.
+  // It MUST match the section keys defined in pageConfig.tsx (createPageConfig function).
+  // If you add a new section like "Bakery" or "Forms" in pageConfig, add it here too!
   const scopes = {
     Welcome: true,
-    Grids: true,
+    Bakery: true,
     Forms: true,
     Dashboards: true,
     BakeryProducts: true,
