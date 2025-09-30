@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Horizontal, Vertical, GraviButton, Texto, GraviGrid } from '@gravitate-js/excalibrr';
 import { Switch, Popover, Input, Select, Popconfirm, Drawer } from 'antd';
 import { FolderOutlined, FolderAddOutlined, FunctionOutlined, EditOutlined, DeleteOutlined, PlusOutlined, CheckOutlined, EllipsisOutlined, CloseOutlined, DownOutlined, RightOutlined, ExperimentOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useProductFormula } from '../contexts/ProductFormulaContext';
+import { useProductFormula } from '@contexts/ProductFormulaContext';
 
 export function FormulaManager() {
   /* MCP Theme Script */

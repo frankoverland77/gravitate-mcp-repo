@@ -15,6 +15,7 @@ import {
 } from "@ant-design/icons";
 
 export function GraviButtonExample() {
+    let x = true
   return (
     <Vertical style={{ maxWidth: "800px", margin: "0 auto" }}>
       <Texto className="mb-3" category="h3">
@@ -25,7 +26,7 @@ export function GraviButtonExample() {
       <Texto category="h5">Theme Variations</Texto>
       <Vertical className="mb-3">
         <Horizontal style={{ gap: "10px" }} verticalCenter>
-          <GraviButton buttonText="Theme1" theme1 />
+          <GraviButton buttonText="Theme1" theme1/>
           <GraviButton buttonText="Theme2" theme2 />
           <GraviButton buttonText="Theme3" theme3 />
           <GraviButton buttonText="Theme4" theme4 />

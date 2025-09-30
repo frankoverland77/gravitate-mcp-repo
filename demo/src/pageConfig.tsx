@@ -5,8 +5,7 @@ import {
   DashboardOutlined,
 } from "@ant-design/icons";
 
-import { FormulaManager } from "./pages/FormulaManager";
-// import { BakeryDemo } from "./pages/demos/BakeryDemo";
+import { FormulaManager } from "@pages/demos/grids/FormulaManager";
 import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
 import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
 import { CustomerForm } from "./pages/demos/forms/CustomerForm/CustomerForm";
@@ -26,7 +25,7 @@ interface DemoRoute {
 export const demoRegistry: DemoRoute[] = [
   {
     key: "ProductGrid",
-    title: "Product Grid",
+    title: "Bakery Products",
     element: <ProductGrid />,
     path: "/demos/grids/product-grid",
     description: "Interactive product data grid with real-time updates",
@@ -42,6 +41,15 @@ export const demoRegistry: DemoRoute[] = [
     created: new Date().toISOString(),
     category: "forms",
   },
+  {
+    key: "FormulaManager",
+    title: "Formula Manager",
+    element: <FormulaManager />,
+    path: "/demos/grids/formula-manager",
+    description: "Manage and apply formulas dynamically",
+    created: new Date().toISOString(),
+    category: "grids",
+  }
   // MCP server will add more demos here automatically
 ];
 
@@ -97,7 +105,6 @@ export const createPageConfig = () => {
       key: "Grids",
       icon: <TableOutlined />,
       title: "Grids",
-      element: gridsRoutes[0].element, // Default to first grid
       routes: gridsRoutes,
     };
   }
@@ -109,7 +116,6 @@ export const createPageConfig = () => {
       key: "Forms",
       icon: <EditOutlined />,
       title: "Forms",
-      element: formsRoutes[0].element, // Default to first form
       routes: formsRoutes,
     };
   }
@@ -121,7 +127,6 @@ export const createPageConfig = () => {
       key: "Dashboards",
       icon: <DashboardOutlined />,
       title: "Dashboards",
-      element: dashboardRoutes[0].element, // Default to first dashboard
       routes: dashboardRoutes,
     };
   }
