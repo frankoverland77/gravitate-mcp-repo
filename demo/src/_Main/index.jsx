@@ -16,7 +16,7 @@ import { WelcomePage } from "../pages/WelcomePages/WelcomePage";
 export function Main() {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<AuthenticatedRoute />}>
+      <Route path="/*" element={<AuthenticatedRoute />}>
         {/* Welcome/Home route */}
         <Route index element={<WelcomePage />} />
         <Route path="demos" element={<WelcomePage />} />

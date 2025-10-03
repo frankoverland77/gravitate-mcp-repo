@@ -1,0 +1,794 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f5f7;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* App Layout */
+.app-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 120px;
+    background: #e5e5e7;
+    border-right: 1px solid #d1d1d6;
+    flex-shrink: 0;
+}
+
+.sidebar-content {
+    padding: 20px 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-item {
+    padding: 12px 8px;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.nav-item:hover {
+    background: #d1d1d6;
+}
+
+.nav-item.active {
+    background: #007AFF;
+    color: white;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    height: 100px;
+    background: #d1d1d6;
+    border-bottom: 1px solid #c7c7cc;
+    flex-shrink: 0;
+}
+
+.header-content {
+    height: 100%;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.view-toggles {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #c7c7cc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.view-toggle:hover {
+    background: #f0f0f0;
+}
+
+.view-toggle.active {
+    background: #007AFF;
+    color: white;
+    border-color: #007AFF;
+}
+
+.settings-btn {
+    padding: 8px;
+    background: white;
+    border: 1px solid #c7c7cc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.settings-btn:hover {
+    background: #f0f0f0;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Search Section */
+.search-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-container {
+    position: relative;
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    border: 1px solid #d1d1d6;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007AFF;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: 0.5;
+}
+
+.template-count {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Context Banner */
+.context-banner {
+    background: #E8F4FD;
+    border: 1px solid #B3D9F2;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.context-content {
+    flex: 1;
+}
+
+.context-label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.context-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: white;
+    border: 1px solid #007AFF;
+    border-radius: 16px;
+    font-size: 14px;
+    color: #007AFF;
+}
+
+.context-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-text {
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    color: #007AFF;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+}
+
+.btn-text:hover {
+    opacity: 0.8;
+}
+
+/* Cards View - Horizontal Slider */
+.cards-view {
+    margin-bottom: 40px;
+}
+
+.slider-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.slider-wrapper {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.slider-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.3s ease;
+    padding: 4px 0;
+}
+
+.slider-nav {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #d1d1d6;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.slider-nav:hover {
+    background: #f0f0f0;
+    border-color: #007AFF;
+    color: #007AFF;
+}
+
+.slider-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.slider-nav:disabled:hover {
+    background: white;
+    border-color: #d1d1d6;
+    color: #666;
+}
+
+.slider-indicators {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #666;
+}
+
+.current-position {
+    font-weight: 600;
+    color: #007AFF;
+}
+
+.position-separator {
+    margin: 0 8px;
+}
+
+/* Family Card - FIXED HEIGHT */
+.family-card {
+    width: 420px;
+    height: 550px;
+    flex-shrink: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.family-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: #f8f9fa;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.card-title-section {
+    text-align: center;
+}
+
+.family-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+}
+
+.family-meta {
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.separator {
+    opacity: 0.5;
+}
+
+.card-content {
+    flex: 1;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.components-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.components-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.selected-count {
+    font-size: 12px;
+    color: #007AFF;
+    font-weight: 500;
+}
+
+.count-num {
+    font-weight: 700;
+}
+
+/* Scrollable Components Area */
+.components-scroll-container {
+    position: relative;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.components-list {
+    padding: 8px;
+}
+
+/* Custom Scrollbar */
+.components-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.components-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.components-scroll-container::-webkit-scrollbar-thumb {
+    background: #007AFF;
+    border-radius: 4px;
+}
+
+.components-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #0051D5;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(250, 250, 250, 0.95) 0%, transparent 100%);
+    padding: 8px 0 4px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.scroll-text {
+    font-size: 11px;
+    color: #007AFF;
+    font-weight: 500;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Component Checkbox */
+.component-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.component-checkbox:hover {
+    background: #f5f9ff;
+    border-color: #007AFF;
+}
+
+.component-checkbox:has(.component-check:checked) {
+    background: #e8f4fd;
+    border-color: #007AFF;
+}
+
+.component-check {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.component-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.component-main {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.component-percentage {
+    font-weight: 700;
+    color: #007AFF;
+    min-width: 45px;
+}
+
+.component-operator {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.component-operator.positive {
+    color: #28a745;
+}
+
+.component-operator.negative {
+    color: #dc3545;
+}
+
+.component-source {
+    font-weight: 600;
+    color: #333;
+}
+
+.component-instrument {
+    color: #666;
+}
+
+.component-meta {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: #999;
+}
+
+.component-date,
+.component-type {
+    white-space: nowrap;
+}
+
+/* Formula Preview */
+.formula-preview {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #007AFF;
+    flex-shrink: 0;
+}
+
+.formula-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.formula-display {
+    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #1a1a1a;
+    word-wrap: break-word;
+}
+
+.card-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.btn-select {
+    padding: 12px 32px;
+    background: #007AFF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+    min-width: 180px;
+}
+
+.btn-select:hover {
+    background: #0051D5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.btn-select:active {
+    transform: translateY(0);
+}
+
+/* List View */
+.list-view {
+    margin-bottom: 40px;
+}
+
+.list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.list-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.list-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.list-card-header {
+    background: #f8f9fa;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-title-section .family-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.list-title-section .family-meta {
+    justify-content: flex-start;
+}
+
+.list-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.list-card-content {
+    padding: 20px;
+}
+
+.list-components-section {
+    margin-bottom: 16px;
+}
+
+.components-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.list-formula-section .formula-preview {
+    margin-top: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .family-card {
+        width: 380px;
+        height: 520px;
+    }
+
+    .components-list-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-content {
+        flex-direction: row;
+        padding: 16px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        gap: 16px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px 24px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .family-card {
+        width: 320px;
+        height: 500px;
+    }
+
+    .components-list-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .list-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .list-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.family-card {
+    animation: slideIn 0.3s ease-out;
+}
+
+.list-card {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Scrollbar Styling for Content Wrapper */
+.content-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}

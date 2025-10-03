@@ -4,6 +4,7 @@ import {
   EditOutlined,
   DashboardOutlined,
   ShopOutlined,
+  CalculatorOutlined,
 } from "@ant-design/icons";
 
 import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
@@ -11,6 +12,8 @@ import { CustomerForm } from "./pages/demos/forms/CustomerForm/CustomerForm";
 import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
 import { FormulaManager } from "./pages/demos/grids/FormulaManager";
 import { DeliveryManager } from "./pages/demos/delivery/DeliveryManager";
+import { PromptsGrid } from "./pages/demos/grids/PromptsGrid";
+import { ContractDetails } from "./pages/demos/grids/ContractDetails";
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -20,7 +23,7 @@ interface DemoRoute {
   path: string;
   description: string;
   created: string;
-  category: "grids" | "forms" | "dashboards";
+  category: "grids" | "forms" | "dashboards" | "contract-management";
 }
 
 // Registry of all available demos - MCP server will populate this
@@ -60,6 +63,24 @@ export const demoRegistry: DemoRoute[] = [
     description: "Customer management form with validation",
     created: new Date().toISOString(),
     category: "forms",
+  },
+  {
+    key: "PromptsGrid",
+    title: "Prompts",
+    element: <PromptsGrid />,
+    path: "/demos/grids/prompts",
+    description: "Contract formula prompts management grid",
+    created: new Date().toISOString(),
+    category: "contract-management",
+  },
+  {
+    key: "ContractDetails",
+    title: "Contract Details",
+    element: <ContractDetails />,
+    path: "/demos/grids/contract-details/:id",
+    description: "Contract details view",
+    created: new Date().toISOString(),
+    category: "contract-management",
   },
   // MCP server will add more demos here automatically
 ];
@@ -145,6 +166,32 @@ export const createPageConfig = () => {
       routes: dashboardRoutes,
     };
   }
+
+  // Add Contract Management section with Prompts grid
+  config.ContractFormulas = {
+    hasPermission: () => true,
+    key: "ContractFormulas",
+    icon: <CalculatorOutlined />,
+    title: "Contract Management",
+    routes: [
+      {
+        hasPermission: () => true,
+        key: "PromptsGrid",
+        title: "Prompts",
+        element: <PromptsGrid />,
+        path: "/demos/grids/prompts",
+        description: "Contract formula prompts management grid",
+      },
+      {
+        hasPermission: () => true,
+        key: "ContractDetails",
+        title: "Contract Details",
+        element: <ContractDetails />,
+        path: "/demos/grids/contract-details/:id",
+        description: "Contract details view",
+      }
+    ],
+  };
 
   return config;
 };

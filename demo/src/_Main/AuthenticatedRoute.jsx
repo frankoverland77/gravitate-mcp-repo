@@ -17,6 +17,7 @@ export function AuthenticatedRoute() {
     Bakery: true,
     Forms: true,
     Dashboards: true,
+    ContractFormulas: true,
     BakeryProducts: true,
     FormulaManager: true,
     DeliveryManagement: true,

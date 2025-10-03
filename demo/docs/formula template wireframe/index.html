@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula Templates v4 - Component Selection</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Layout Structure -->
+    <div class="app-layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-logo">OSP</div>
+                <nav class="sidebar-nav">
+                    <div class="nav-item active">Templates</div>
+                    <div class="nav-item">Formulas</div>
+                    <div class="nav-item">History</div>
+                    <div class="nav-item">Settings</div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <h1>Formula Templates</h1>
+                    <div class="header-actions">
+                        <div class="view-toggles">
+                            <button class="view-toggle active" data-view="cards">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <rect x="1" y="1" width="6" height="6" rx="1"/>
+                                    <rect x="9" y="1" width="6" height="6" rx="1"/>
+                                    <rect x="1" y="9" width="6" height="6" rx="1"/>
+                                    <rect x="9" y="9" width="6" height="6" rx="1"/>
+                                </svg>
+                                Cards
+                            </button>
+                            <button class="view-toggle" data-view="list">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <rect x="1" y="3" width="14" height="2"/>
+                                    <rect x="1" y="7" width="14" height="2"/>
+                                    <rect x="1" y="11" width="14" height="2"/>
+                                </svg>
+                                List
+                            </button>
+                        </div>
+                        <button class="settings-btn">⚙️</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-wrapper">
+                <!-- Search and Filters -->
+                <div class="search-section">
+                    <div class="search-container">
+                        <input type="text" id="quickSearch" placeholder="Search template families..." class="search-input">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div class="template-count">
+                        <span id="familyCount">5</span> template families • <span id="totalComponents">0</span> total components
+                    </div>
+                </div>
+
+                <!-- Context Filter Banner -->
+                <div class="context-banner">
+                    <div class="context-content">
+                        <span class="context-label">Auto-filtered for your context:</span>
+                        <div class="context-tags">
+                            <span class="tag">Product: 87 GHL</span>
+                            <span class="tag">Location: Columbus Terminal</span>
+                            <span class="tag">Counterparty: Shell Oil</span>
+                        </div>
+                    </div>
+                    <div class="context-actions">
+                        <button class="btn-text" onclick="clearFilters()">Clear filters</button>
+                        <button class="btn-text" onclick="adjustFilters()">Adjust filters</button>
+                    </div>
+                </div>
+
+                <!-- Template Views -->
+                <!-- Cards View (Horizontal Slider) -->
+                <div id="cardsView" class="cards-view">
+                    <div class="slider-container">
+                        <button class="slider-nav slider-nav-prev" id="sliderPrev">‹</button>
+                        <div class="slider-wrapper">
+                            <div class="slider-track" id="sliderTrack">
+                                <!-- Template family cards will be inserted here -->
+                            </div>
+                        </div>
+                        <button class="slider-nav slider-nav-next" id="sliderNext">›</button>
+                    </div>
+                    <div class="slider-indicators">
+                        <span class="current-position" id="currentPosition">1</span>
+                        <span class="position-separator">of</span>
+                        <span class="total-position" id="totalPosition">5</span>
+                    </div>
+                </div>
+
+                <!-- List View -->
+                <div id="listView" class="list-view" style="display: none;">
+                    <div class="list-container" id="listContainer">
+                        <!-- List cards will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Template for Family Card -->
+    <template id="familyCardTemplate">
+        <div class="family-card" data-family-id="">
+            <div class="card-header">
+                <div class="card-title-section">
+                    <h3 class="family-name"></h3>
+                    <div class="family-meta">
+                        <span class="contract-type"></span>
+                        <span class="separator">•</span>
+                        <span class="product-location"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="components-header">
+                    <span class="components-label">Select Components:</span>
+                    <span class="selected-count"><span class="count-num">0</span> selected</span>
+                </div>
+
+                <!-- Scrollable Components Area -->
+                <div class="components-scroll-container">
+                    <div class="components-list">
+                        <!-- Components will be inserted here -->
+                    </div>
+                    <div class="scroll-indicator">
+                        <span class="scroll-text">Scroll for more ↓</span>
+                    </div>
+                </div>
+
+                <div class="formula-preview">
+                    <div class="formula-label">Formula Preview:</div>
+                    <div class="formula-display"></div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn-select">Select Template</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template for List Card -->
+    <template id="listCardTemplate">
+        <div class="list-card" data-family-id="">
+            <div class="list-card-header">
+                <div class="list-title-section">
+                    <h3 class="family-name"></h3>
+                    <div class="family-meta">
+                        <span class="contract-type"></span>
+                        <span class="separator">•</span>
+                        <span class="product"></span>
+                        <span class="separator">•</span>
+                        <span class="location"></span>
+                    </div>
+                </div>
+                <div class="list-actions">
+                    <span class="selected-count"><span class="count-num">0</span> components selected</span>
+                    <button class="btn-select">Select Template</button>
+                </div>
+            </div>
+            <div class="list-card-content">
+                <div class="list-components-section">
+                    <div class="components-list-grid">
+                        <!-- Components will be inserted here -->
+                    </div>
+                </div>
+                <div class="list-formula-section">
+                    <div class="formula-label">Formula Preview:</div>
+                    <div class="formula-display"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Component Checkbox Template -->
+    <template id="componentTemplate">
+        <label class="component-checkbox">
+            <input type="checkbox" class="component-check" data-component-id="">
+            <div class="component-details">
+                <div class="component-main">
+                    <span class="component-percentage"></span>
+                    <span class="component-operator"></span>
+                    <span class="component-source"></span>
+                    <span class="component-instrument"></span>
+                </div>
+                <div class="component-meta">
+                    <span class="component-date"></span>
+                    <span class="component-type"></span>
+                </div>
+            </div>
+        </label>
+    </template>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
