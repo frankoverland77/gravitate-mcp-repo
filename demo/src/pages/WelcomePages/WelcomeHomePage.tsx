@@ -40,7 +40,7 @@ export function WelcomeHomePage() {
       {/* Header */}
       <Vertical className="mb-2">
         <Texto category="heading" className="mb-2">
-          Excalibrr Demo Showcase Frank was here!!!
+          Excalibrr Demo Showcase Frank Does it Again!!!
         </Texto>
         <Texto category="p1" style={{ lineHeight: "1.6" }}>
           Interactive demonstrations of Excalibrr components using production
