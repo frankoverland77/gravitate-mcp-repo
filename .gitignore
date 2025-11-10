@@ -51,6 +51,10 @@ jspm_packages/
 .env.test.local
 .env.production.local
 
+# Vercel
+.vercel
+*.vercel.json.backup
+
 
 # Logs
 logs
