@@ -5,6 +5,7 @@ import {
   DashboardOutlined,
   ShopOutlined,
   CalculatorOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 
 import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
@@ -13,7 +14,15 @@ import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
 import { FormulaManager } from "./pages/demos/grids/FormulaManager";
 import { DeliveryManager } from "./pages/demos/delivery/DeliveryManager";
 import { PromptsGrid } from "./pages/demos/grids/PromptsGrid";
+import { FormulaTemplates } from "./pages/demos/grids/FormulaTemplates";
+import { FormulaTemplateDetails } from "./pages/demos/grids/FormulaTemplateDetails";
 import { ContractDetails } from "./pages/demos/grids/ContractDetails";
+import { OnlineSellingPlatformHome } from "./pages/OnlineSellingPlatform/OnlineSellingPlatformHome";
+import { IndexOfferManagement } from "./pages/OnlineSellingPlatform/IndexOfferManagement";
+import { CompetitorAnalysis } from "./pages/OnlineSellingPlatform/CompetitorAnalysis";
+import { CompetitorDetails } from "./pages/OnlineSellingPlatform/CompetitorDetails";
+import { GlobalTieredPricing } from "./pages/GlobalTieredPricing/GlobalTieredPricing";
+import { ThemeRouteWrapper } from "./components/shared/ThemeRouteWrapper";
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -67,20 +76,56 @@ export const demoRegistry: DemoRoute[] = [
   {
     key: "PromptsGrid",
     title: "Prompts",
-    element: <PromptsGrid />,
-    path: "/demos/grids/prompts",
+    element: <ThemeRouteWrapper theme="PE_LIGHT"><PromptsGrid /></ThemeRouteWrapper>,
+    path: "/ContractFormulas/PromptsGrid",
     description: "Contract formula prompts management grid",
+    created: new Date().toISOString(),
+    category: "contract-management",
+  },
+  {
+    key: "FormulaTemplates",
+    title: "Formula Template Manager",
+    element: <ThemeRouteWrapper theme="PE_LIGHT"><FormulaTemplates /></ThemeRouteWrapper>,
+    path: "/ContractFormulas/FormulaTemplates",
+    description: "Manage and organize pricing formula templates",
+    created: new Date().toISOString(),
+    category: "contract-management",
+  },
+  {
+    key: "FormulaTemplateDetails",
+    title: "Formula Template Details",
+    element: <ThemeRouteWrapper theme="PE_LIGHT"><FormulaTemplateDetails /></ThemeRouteWrapper>,
+    path: "/ContractFormulas/FormulaTemplateDetails/:id",
+    description: "View formula template details",
     created: new Date().toISOString(),
     category: "contract-management",
   },
   {
     key: "ContractDetails",
     title: "Contract Details",
-    element: <ContractDetails />,
-    path: "/demos/grids/contract-details/:id",
+    element: <ThemeRouteWrapper theme="PE_LIGHT"><ContractDetails /></ThemeRouteWrapper>,
+    path: "/ContractFormulas/ContractDetails/:id",
     description: "Contract details view",
     created: new Date().toISOString(),
     category: "contract-management",
+  },
+  {
+    key: "CompetitorAnalysis",
+    title: "Competitor Profile & Price Analysis",
+    element: <ThemeRouteWrapper theme="OSP"><CompetitorAnalysis /></ThemeRouteWrapper>,
+    path: "/CompetitorAnalysis/CompetitorAnalysis",
+    description: "Analyze competitor profiles and pricing strategies",
+    created: new Date().toISOString(),
+    category: "grids",
+  },
+  {
+    key: "CompetitorDetails",
+    title: "Competitor Details",
+    element: <ThemeRouteWrapper theme="OSP"><CompetitorDetails /></ThemeRouteWrapper>,
+    path: "/CompetitorAnalysis/CompetitorDetails",
+    description: "Detailed competitor analysis",
+    created: new Date().toISOString(),
+    category: "grids",
   },
   // MCP server will add more demos here automatically
 ];
@@ -167,7 +212,7 @@ export const createPageConfig = () => {
     };
   }
 
-  // Add Contract Management section with Prompts grid
+  // Add Contract Management section with Prompts grid (PE_LIGHT theme)
   config.ContractFormulas = {
     hasPermission: () => true,
     key: "ContractFormulas",
@@ -178,19 +223,123 @@ export const createPageConfig = () => {
         hasPermission: () => true,
         key: "PromptsGrid",
         title: "Prompts",
-        element: <PromptsGrid />,
-        path: "/demos/grids/prompts",
+        element: <ThemeRouteWrapper theme="PE_LIGHT"><PromptsGrid /></ThemeRouteWrapper>,
+        path: "/ContractFormulas/PromptsGrid",
         description: "Contract formula prompts management grid",
+      },
+      {
+        hasPermission: () => true,
+        key: "FormulaTemplates",
+        title: "Formula Templates",
+        element: <ThemeRouteWrapper theme="PE_LIGHT"><FormulaTemplates /></ThemeRouteWrapper>,
+        path: "/ContractFormulas/FormulaTemplates",
+        description: "Manage and organize pricing formula templates",
+      },
+      {
+        hasPermission: () => true,
+        key: "FormulaTemplateDetails",
+        title: "Formula Template Details",
+        element: <ThemeRouteWrapper theme="PE_LIGHT"><FormulaTemplateDetails /></ThemeRouteWrapper>,
+        path: "/ContractFormulas/FormulaTemplateDetails/:id",
+        description: "View formula template details",
+        hidden: true,
       },
       {
         hasPermission: () => true,
         key: "ContractDetails",
         title: "Contract Details",
-        element: <ContractDetails />,
-        path: "/demos/grids/contract-details/:id",
+        element: <ThemeRouteWrapper theme="PE_LIGHT"><ContractDetails /></ThemeRouteWrapper>,
+        path: "/ContractFormulas/ContractDetails/:id",
         description: "Contract details view",
+        hidden: true,
       }
     ],
+  };
+
+  // Add Online Selling Platform section (uses OSP theme)
+  // Menu shows "Online Selling Platform", page header shows "Buy Now"
+  config.OnlineSellingPlatform = {
+    hasPermission: () => true,
+    key: "OnlineSellingPlatform",
+    icon: <GlobalOutlined />,
+    title: "Buy Now",
+    element: (
+      <ThemeRouteWrapper theme="OSP">
+        <OnlineSellingPlatformHome />
+      </ThemeRouteWrapper>
+    ),
+    path: "/OnlineSellingPlatform",
+  };
+
+  // Add Market Platform section for sellers (uses OSP theme)
+  config.MarketPlatform = {
+    hasPermission: () => true,
+    key: "MarketPlatform",
+    icon: <ShopOutlined />,
+    title: "Market Platform",
+    routes: [
+      {
+        hasPermission: () => true,
+        key: "IndexOfferManagement",
+        title: "Index Offer Management",
+        element: (
+          <ThemeRouteWrapper theme="OSP">
+            <IndexOfferManagement />
+          </ThemeRouteWrapper>
+        ),
+        path: "/MarketPlatform/IndexOfferManagement",
+        description: "Manage index pricing offers for buyers",
+      },
+    ],
+  };
+
+  // Add Competitor Analysis section (uses OSP theme)
+  config.CompetitorAnalysis = {
+    hasPermission: () => true,
+    key: "CompetitorAnalysis",
+    icon: <DashboardOutlined />,
+    title: "Competitor Analysis",
+    routes: [
+      {
+        hasPermission: () => true,
+        key: "CompetitorProfileAnalysis",
+        title: "Competitor Profile & Price Analysis",
+        element: (
+          <ThemeRouteWrapper theme="OSP">
+            <CompetitorAnalysis />
+          </ThemeRouteWrapper>
+        ),
+        path: "/CompetitorAnalysis/CompetitorAnalysis",
+        description: "Analyze competitor profiles and pricing strategies",
+      },
+      {
+        hasPermission: () => true,
+        key: "CompetitorDetails",
+        title: "Competitor Details",
+        element: (
+          <ThemeRouteWrapper theme="OSP">
+            <CompetitorDetails />
+          </ThemeRouteWrapper>
+        ),
+        path: "/CompetitorAnalysis/CompetitorDetails",
+        description: "Detailed competitor analysis",
+        hidden: true,
+      },
+    ],
+  };
+
+  // Add Global Tiered Pricing (uses PE_LIGHT theme)
+  config.GlobalTieredPricing = {
+    hasPermission: () => true,
+    key: "GlobalTieredPricing",
+    icon: <TableOutlined />,
+    title: "Global Tiered Pricing",
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <GlobalTieredPricing />
+      </ThemeRouteWrapper>
+    ),
+    path: "/GlobalTieredPricing",
   };
 
   return config;

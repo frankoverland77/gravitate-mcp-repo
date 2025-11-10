@@ -174,3 +174,22 @@ The server provides comprehensive tools for Excalibrr demo generation:
 - Theme switching without component re-architecture
 - CSS custom properties for dynamic theming
 - Less preprocessing for advanced styling features
+
+**Typography System** ⚠️ CRITICAL:
+- ALWAYS use Excalibrr `Texto` component with `category` and `appearance` props for typography
+- Typography categories: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `p1`, `p2`, `heading`, `heading-small`
+- Weight options: `"400"`, `"500"`, `"600"`, `"700"`, `"bold"`
+- Appearance options:
+  - `"primary"` - Primary text (black/dark)
+  - `"secondary"` - **BLUE** theme color (NOT for gray text!)
+  - `"light"` - **Very light gray** (use sparingly, can be hard to read on white backgrounds)
+  - `"medium"` - **Medium gray** for labels, helper text, and secondary content ✅ PREFERRED
+  - `"error"`, `"success"`, `"warning"` - Status colors
+- **NEVER use `appearance="secondary"` for gray/muted text** - this applies BLUE color
+- **ALWAYS use `appearance="medium"` for gray labels and helper text** - better readability than "light"
+- Section headers (uppercase labels): `<Texto category="h6" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>`
+- Field labels (uppercase): `<Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>`
+- Field values (bold): `<Texto category="p1" weight="600">`
+- Helper text/subdued content: `<Texto category="p2" appearance="medium">`
+- Medium gray body text: `<Texto category="p1" appearance="medium">`
+- Avoid hardcoded hex colors - use appearance props instead

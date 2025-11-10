@@ -42,7 +42,7 @@ export function DriverManagement() {
   // Create driver popover content  
   const getDriverPopoverContent = (driver: any) => (
     <div style={{ width: '250px', padding: '8px' }}>
-      <div style={{ marginBottom: '12px' }}>
+      <div className="mb-2">
         <div style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '4px' }}>
           {driver.name}
         </div>

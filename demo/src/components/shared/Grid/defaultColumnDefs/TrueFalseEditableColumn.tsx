@@ -26,7 +26,7 @@ export const TrueFalseEditableColumn = (field: string, headerName: string, allow
     const value = getYesNoFromBoolean(params.data?.[field])
     if (!value) return ''
     return (
-      <BBDTag success={value === 'Yes'} error={value === 'No'} style={{ textAlign: 'center' }}>
+      <BBDTag success={value === 'Yes'} error={value === 'No'} className="text-center">
         {value}
       </BBDTag>
     )

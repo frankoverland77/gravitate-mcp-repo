@@ -5,6 +5,8 @@ import { Outlet } from "react-router-dom";
 
 import { createPageConfig } from "../pageConfig";
 import { ProductFormulaProvider } from "../contexts/ProductFormulaContext";
+import { FormulaTemplateProvider } from "../contexts/FormulaTemplateContext";
+import { FeatureModeProvider } from "../contexts/FeatureModeContext";
 
 export function AuthenticatedRoute() {
   const pageConfig = useMemo(createPageConfig, []);
@@ -18,21 +20,29 @@ export function AuthenticatedRoute() {
     Forms: true,
     Dashboards: true,
     ContractFormulas: true,
+    OnlineSellingPlatform: true,
+    MarketPlatform: true,
+    CompetitorAnalysis: true,
+    GlobalTieredPricing: true,
     BakeryProducts: true,
     FormulaManager: true,
     DeliveryManagement: true,
   };
   return (
-    <ProductFormulaProvider>
-      <NavigationContextProvider
-        getScopes={async () => scopes}
-        handleLogout={() => {}}
-        pageConfig={pageConfig}
-        userControlPane={<UserControlPanel />}
-        navStyle="vertical"
-      >
-        <Outlet />
-      </NavigationContextProvider>
-    </ProductFormulaProvider>
+    <FeatureModeProvider>
+      <ProductFormulaProvider>
+        <FormulaTemplateProvider>
+          <NavigationContextProvider
+            getScopes={async () => scopes}
+            handleLogout={() => {}}
+            pageConfig={pageConfig}
+            userControlPane={<UserControlPanel />}
+            navStyle="vertical"
+          >
+            <Outlet />
+          </NavigationContextProvider>
+        </FormulaTemplateProvider>
+      </ProductFormulaProvider>
+    </FeatureModeProvider>
   );
 }

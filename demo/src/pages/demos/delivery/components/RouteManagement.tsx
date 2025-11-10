@@ -610,7 +610,7 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#1890ff', marginBottom: '8px' }}>
                 {summaryMetrics.activeRoutes}
               </div>
@@ -631,7 +631,7 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#fa8c16', marginBottom: '8px' }}>
                 {summaryMetrics.scheduledRoutes}
               </div>
@@ -652,7 +652,7 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#52c41a', marginBottom: '8px' }}>
                 {summaryMetrics.completedToday}
               </div>
@@ -673,7 +673,7 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#722ed1', marginBottom: '8px' }}>
                 {summaryMetrics.onTimeRate}%
               </div>
@@ -694,7 +694,7 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#13c2c2', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <ThunderboltOutlined style={{ fontSize: '24px' }} />
                 {summaryMetrics.averageEfficiency}%
@@ -716,7 +716,7 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#f759ab', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <DollarOutlined style={{ fontSize: '24px' }} />
                 {formatCurrency(summaryMetrics.optimizationSavings)}

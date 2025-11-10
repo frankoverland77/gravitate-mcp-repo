@@ -143,7 +143,7 @@ function DeliveryTabs() {
         key="settings"
       >
         <Horizontal>
-          <div style={{ padding: '20px' }}>
+          <div className="p-3">
             <Vertical gap={20}>
               <Texto variant="h2">⚙️ Delivery System Settings</Texto>
               <Texto variant="body1">

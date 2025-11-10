@@ -90,7 +90,7 @@ export function SimulationControlDrawer({ className = '' }: SimulationControlDra
 
         {/* Expandable content */}
         {isOpen && (
-          <div style={{ padding: '16px' }}>
+          <div className="p-2">
             {/* Main Controls Row */}
             <div style={{ 
               display: 'flex', 

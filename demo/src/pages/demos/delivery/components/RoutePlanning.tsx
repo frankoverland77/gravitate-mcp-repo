@@ -604,7 +604,7 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                 <div>
                   {/* Current Metrics */}
                   {currentMetrics && (
-                    <div style={{ marginBottom: '16px' }}>
+                    <div className="mb-2">
                       <div style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
                         Current Route Metrics
                       </div>
@@ -660,21 +660,21 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                       </div>
                       
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-                        <div style={{ textAlign: 'center' }}>
+                        <div className="text-center">
                           <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#52c41a' }}>
                             -{formatDistance(optimizationResult.savings.distanceSaved)}
                           </div>
                           <div style={{ fontSize: '10px', color: '#666' }}>Distance Saved</div>
                         </div>
                         
-                        <div style={{ textAlign: 'center' }}>
+                        <div className="text-center">
                           <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#1890ff' }}>
                             -{formatDuration(optimizationResult.savings.timeSaved)}
                           </div>
                           <div style={{ fontSize: '10px', color: '#666' }}>Time Saved</div>
                         </div>
                         
-                        <div style={{ textAlign: 'center' }}>
+                        <div className="text-center">
                           <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#fa8c16' }}>
                             -{formatCurrency(optimizationResult.savings.costSaved)}
                           </div>
@@ -695,7 +695,7 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                       </div>
 
                       {optimizationResult.warnings.length > 0 && (
-                        <div style={{ marginTop: '8px' }}>
+                        <div className="mt-1">
                           <div style={{ fontSize: '12px', fontWeight: 600, color: '#fa8c16', marginBottom: '4px' }}>
                             ⚠️ Warnings:
                           </div>
@@ -710,7 +710,7 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                       {(() => {
                         const recommendations = generateOptimizationRecommendations(optimizationResult, routeBuilderState.orderIds);
                         return recommendations.length > 0 ? (
-                          <div style={{ marginTop: '8px' }}>
+                          <div className="mt-1">
                             <div style={{ fontSize: '12px', fontWeight: 600, color: '#1890ff', marginBottom: '4px' }}>
                               💡 Recommendations:
                             </div>

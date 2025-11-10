@@ -610,7 +610,7 @@ export function Analytics() {
                 </div>
               </div>
               
-              <div style={{ marginBottom: '8px' }}>
+              <div className="mb-1">
                 <div style={{ fontSize: '28px', fontWeight: 'bold', color: kpi.color }}>
                   {kpi.value}
                 </div>

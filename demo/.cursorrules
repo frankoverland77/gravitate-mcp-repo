@@ -1,0 +1,53 @@
+# Excalibrr Component Rules for Claude Code
+
+## CRITICAL: Always Follow These Rules
+
+### 1. NO INLINE STYLES
+- NEVER use `style={{...}}` on any Excalibrr component
+- Use component props instead (spacing, theme, variant, etc.)
+- If custom styling is absolutely needed, use className with CSS
+
+### 2. Component-Specific Rules
+
+#### Layout (Horizontal, Vertical)
+- spacing: "sm" | "md" | "lg" (not gap or margin styles)
+- align: for alignment (not justifyContent/alignItems styles)
+
+#### Typography (Texto)
+- variant: "h1" | "h2" | "h3" | "body1" | "body2" | "caption"
+- color: theme colors (not hex/rgb values)
+- weight: "normal" | "medium" | "bold"
+
+#### Buttons (GraviButton)
+- theme: "success" | "theme1" | "danger" | "default"
+- size: "small" | "medium" | "large"
+- Never use backgroundColor, padding, etc.
+
+#### Grids (GraviGrid)
+- Configure via columnDefs, not styles
+- Use cellClass not cellStyle for styling
+- Use custom cell editors: NumberCellEditor, SelectCellEditor
+
+#### Forms
+- Wrap in <Form> component
+- Use Vertical/Horizontal for layout
+- GraviButton for actions
+
+### 3. Before Any Code Generation
+1. Read DESIGN_SYSTEM_RULES.md if unsure
+2. Check component documentation via excalibrr:get_component
+3. Use excalibrr:search_components to find right component
+
+### 4. After Making Changes
+- Run excalibrr:cleanup_styles to fix violations automatically
+
+### 5. When Working with Figma
+- Use figma-excalibrr-mapper agent for design translation
+- Map Figma properties to Excalibrr props, not CSS
+
+## Quick Reference
+- Spacing: Use spacing prop or utility classes (mt-4, mb-2)
+- Colors: Use theme colors via props
+- Flex: Use Horizontal/Vertical components
+- Typography: Use Texto with variant prop
+- Forms: Use Form component with Vertical layout

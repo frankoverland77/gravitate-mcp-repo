@@ -109,7 +109,7 @@ export function TextoExample() {
       <Card title="Appearance Variations" className="mb-4">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Standard Appearances:</Texto>
+            <Texto category="h6" className="mb-2">Standard Appearances:</Texto>
             <Vertical style={{ gap: "8px" }}>
               <Texto appearance="primary">Primary text emphasis</Texto>
               <Texto appearance="secondary">Secondary text, less prominent</Texto>
@@ -119,7 +119,7 @@ export function TextoExample() {
           </div>
 
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Status Appearances:</Texto>
+            <Texto category="h6" className="mb-2">Status Appearances:</Texto>
             <Vertical style={{ gap: "8px" }}>
               <Texto appearance="error">
                 <ExclamationCircleOutlined className="mr-1" />
@@ -256,7 +256,7 @@ export function TextoExample() {
       <Card title="Color and Theming" className="mb-4">
         <Vertical style={{ gap: "20px" }}>
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Theme Colors:</Texto>
+            <Texto category="h6" className="mb-2">Theme Colors:</Texto>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '12px' }}>
               <Texto style={{ color: 'var(--theme-color-2)' }}>
                 Theme color 2 (var(--theme-color-2))
@@ -280,7 +280,7 @@ export function TextoExample() {
           </div>
 
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Custom Colors:</Texto>
+            <Texto category="h6" className="mb-2">Custom Colors:</Texto>
             <Horizontal style={{ gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
               <Texto style={{ color: '#1890ff' }}>Custom blue (#1890ff)</Texto>
               <Texto style={{ color: '#52c41a' }}>Custom green (#52c41a)</Texto>
@@ -296,7 +296,7 @@ export function TextoExample() {
       <Card title="Interactive Text Patterns" className="mb-4">
         <Vertical style={{ gap: "20px" }}>
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Clickable Text:</Texto>
+            <Texto category="h6" className="mb-2">Clickable Text:</Texto>
             <Horizontal style={{ gap: '16px', flexWrap: 'wrap' }}>
               <Texto
                 style={{
@@ -336,7 +336,7 @@ export function TextoExample() {
           </div>
 
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Text with States:</Texto>
+            <Texto category="h6" className="mb-2">Text with States:</Texto>
             <Vertical style={{ gap: '8px' }}>
               <Texto style={{ opacity: 0.5 }}>
                 Disabled text (reduced opacity)
@@ -357,7 +357,7 @@ export function TextoExample() {
         <Vertical style={{ gap: "24px" }}>
           {/* Card Header Pattern */}
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Card Headers:</Texto>
+            <Texto category="h6" className="mb-2">Card Headers:</Texto>
             <Card size="small">
               <Texto category="h5" className="mb-2" style={{ color: 'var(--theme-color-2)' }}>
                 Card Title
@@ -370,14 +370,14 @@ export function TextoExample() {
 
           {/* Form Labels Pattern */}
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Form Labels:</Texto>
+            <Texto category="h6" className="mb-2">Form Labels:</Texto>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
                 <Texto category="p1" style={{ fontWeight: '600', marginBottom: '4px' }}>
                   Required Field *
                 </Texto>
                 <Input placeholder="Enter value" />
-                <Texto category="p2" appearance="secondary" style={{ marginTop: '4px' }}>
+                <Texto category="p2" appearance="secondary" className="mt-1">
                   Additional field information or hints
                 </Texto>
               </div>
@@ -387,7 +387,7 @@ export function TextoExample() {
                   Field with Error
                 </Texto>
                 <Input placeholder="Enter value" status="error" />
-                <Texto category="p2" appearance="error" style={{ marginTop: '4px' }}>
+                <Texto category="p2" appearance="error" className="mt-1">
                   <ExclamationCircleOutlined className="mr-1" />
                   This field is required
                 </Texto>
@@ -397,7 +397,7 @@ export function TextoExample() {
 
           {/* Navigation Pattern */}
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Navigation Items:</Texto>
+            <Texto category="h6" className="mb-2">Navigation Items:</Texto>
             <Horizontal style={{ gap: '24px' }}>
               <Texto
                 category="p1"
@@ -432,7 +432,7 @@ export function TextoExample() {
 
           {/* Data Display Pattern */}
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>Data Display:</Texto>
+            <Texto category="h6" className="mb-2">Data Display:</Texto>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -471,7 +471,7 @@ export function TextoExample() {
 
           {/* User Profile Pattern */}
           <div>
-            <Texto category="h6" style={{ marginBottom: "12px" }}>User Profile Card:</Texto>
+            <Texto category="h6" className="mb-2">User Profile Card:</Texto>
             <Card size="small" style={{ maxWidth: '400px' }}>
               <Horizontal style={{ gap: '16px', alignItems: 'center' }}>
                 <div style={{
@@ -489,7 +489,7 @@ export function TextoExample() {
                   <UserOutlined />
                 </div>
                 <Vertical style={{ flex: 1 }}>
-                  <Texto category="h6" style={{ marginBottom: '4px' }}>
+                  <Texto category="h6" className="mb-1">
                     Sarah Wilson
                   </Texto>
                   <Texto category="p2" appearance="secondary">

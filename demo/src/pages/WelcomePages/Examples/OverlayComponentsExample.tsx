@@ -494,7 +494,7 @@ export function OverlayComponentsExample() {
           {/* Positioning Examples */}
           <div>
             <Texto category="p2" className="mb-3">Positioning Options:</Texto>
-            <div style={{ marginBottom: '12px' }}>
+            <div className="mb-2">
               <Radio.Group
                 value={tooltipPosition}
                 onChange={(e) => setTooltipPosition(e.target.value)}
@@ -563,7 +563,7 @@ export function OverlayComponentsExample() {
                     <Texto category="p2" style={{ color: 'white', fontWeight: 'bold' }}>
                       Interactive Help
                     </Texto>
-                    <div style={{ marginTop: '8px' }}>
+                    <div className="mt-1">
                       <Texto category="p2" style={{ color: 'white' }}>
                         • Click to open editor
                       </Texto>

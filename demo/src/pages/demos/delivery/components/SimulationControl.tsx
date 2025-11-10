@@ -115,7 +115,7 @@ export function SimulationControl({ compact = false, showProgressBars = false }:
         </div>
       }
       size="small"
-      style={{ marginBottom: '16px' }}
+      className="mb-2"
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         
@@ -174,21 +174,21 @@ export function SimulationControl({ compact = false, showProgressBars = false }:
 
         {/* Status Display */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-          <div style={{ textAlign: 'center' }}>
+          <div className="text-center">
             <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1890ff' }}>
               {activeRoutes.length}
             </div>
             <div style={{ fontSize: '12px', color: '#666' }}>Active Routes</div>
           </div>
           
-          <div style={{ textAlign: 'center' }}>
+          <div className="text-center">
             <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#fa8c16' }}>
               {simulationState.events.length}
             </div>
             <div style={{ fontSize: '12px', color: '#666' }}>Events Generated</div>
           </div>
           
-          <div style={{ textAlign: 'center' }}>
+          <div className="text-center">
             <div style={{ fontSize: '20px', fontWeight: 'bold', color: simulationState.alerts.length > 0 ? '#ff4d4f' : '#52c41a' }}>
               {simulationState.alerts.length}
             </div>

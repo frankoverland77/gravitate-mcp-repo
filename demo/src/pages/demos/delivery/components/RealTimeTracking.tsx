@@ -252,10 +252,10 @@ export function RealTimeTracking() {
 
                   {/* Customer Info */}
                   <div style={{ fontSize: '12px', color: '#666' }}>
-                    <div style={{ marginBottom: '4px' }}>
+                    <div className="mb-1">
                       📍 {selectedOrder.deliveryAddress}
                     </div>
-                    <div style={{ marginBottom: '4px' }}>
+                    <div className="mb-1">
                       📞 {selectedOrder.phone}
                     </div>
                     <div>

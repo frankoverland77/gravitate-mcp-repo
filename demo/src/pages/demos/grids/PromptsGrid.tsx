@@ -404,10 +404,13 @@ export function PromptsGrid() {
                 <Horizontal style={{ gap: '12px', alignItems: 'center', height: '100%' }}>
                     <RightOutlined
                         style={{
-                            color: '#1890ff',
+                            color: '#595959',
                             cursor: 'pointer',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#262626'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#595959'}
                         onClick={() => navigate('/ContractFormulas/ContractDetails', {
                             state: {
                                 id: params.data.id,
@@ -420,28 +423,37 @@ export function PromptsGrid() {
                     />
                     <BarChartOutlined
                         style={{
-                            color: '#1890ff',
+                            color: '#595959',
                             cursor: 'pointer',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#262626'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#595959'}
                         onClick={() => console.log('View charts:', params.data.id)}
                         title="View analytics"
                     />
                     <DollarOutlined
                         style={{
-                            color: '#1890ff',
+                            color: '#595959',
                             cursor: 'pointer',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#262626'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#595959'}
                         onClick={() => console.log('View pricing:', params.data.id)}
                         title="View pricing"
                     />
                     <EllipsisOutlined
                         style={{
-                            color: '#666',
+                            color: '#595959',
                             cursor: 'pointer',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            transition: 'color 0.2s'
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#262626'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#595959'}
                         onClick={() => console.log('More options:', params.data.id)}
                         title="More options"
                     />

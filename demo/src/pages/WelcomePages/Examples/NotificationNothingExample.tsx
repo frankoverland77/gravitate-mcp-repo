@@ -328,7 +328,7 @@ export function NotificationNothingExample() {
                   <CheckCircleOutlined className="mr-2" />
                   Data Loaded Successfully
                 </Texto>
-                <Texto category="p2" style={{ marginTop: "8px" }}>
+                <Texto category="p2" className="mt-1">
                   Your data would be displayed here in a real application.
                 </Texto>
               </div>
@@ -416,7 +416,7 @@ export function NotificationNothingExample() {
             <Texto category="p1" style={{ fontWeight: "bold", marginBottom: "8px" }}>
               NotificationMessage Best Practices:
             </Texto>
-            <ul style={{ marginLeft: "16px" }}>
+            <ul className="ml-2">
               <li><Texto category="p2">Use descriptive titles and helpful messages</Texto></li>
               <li><Texto category="p2">Set isError=false for success, isError=true for errors/warnings</Texto></li>
               <li><Texto category="p2">Provide specific error information when possible</Texto></li>
@@ -428,7 +428,7 @@ export function NotificationNothingExample() {
             <Texto category="p1" style={{ fontWeight: "bold", marginBottom: "8px" }}>
               NothingMessage Best Practices:
             </Texto>
-            <ul style={{ marginLeft: "16px" }}>
+            <ul className="ml-2">
               <li><Texto category="p2">Explain why the state is empty and what users can do</Texto></li>
               <li><Texto category="p2">Use appropriate icons to reinforce the message</Texto></li>
               <li><Texto category="p2">Provide actionable next steps when possible</Texto></li>

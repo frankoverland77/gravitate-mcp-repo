@@ -742,7 +742,7 @@ export function FormulaManager() {
           overflow: 'auto'
         }}>
           {/* Page Title */}
-          <Texto category="h4" style={{ marginBottom: '12px' }}>
+          <Texto category="h4" className="mb-2">
             Formulas
           </Texto>
           
@@ -816,7 +816,7 @@ export function FormulaManager() {
           {/* Formula List */}
           <Vertical style={{ gap: '0' }}>
             {getFoldersWithFormulas().map((folder, folderIndex) => (
-              <div key={folderIndex} className="folder-item" style={{ marginBottom: '8px' }}>
+              <div key={folderIndex} className="folder-item" className="mb-1">
                 <div 
                   className={`folder-header ${dragOverFolder === folder.name ? 'drag-over' : ''}`}
                   style={{ 
@@ -1033,7 +1033,7 @@ export function FormulaManager() {
             <Horizontal style={{ marginBottom: '16px', gap: '24px', alignItems: 'flex-start' }}>
               {/* Operators Section */}
               <Vertical style={{ flex: 1 }}>
-                <div className="eyebrow-label" style={{ marginBottom: '8px' }}>Quick Operators</div>
+                <div className="eyebrow-label" className="mb-1">Quick Operators</div>
                 <Horizontal style={{ gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                   {['+', '-', '*', '/', '(', ')', '%', '^', '.'].map((operator, index) => (
                     <GraviButton
@@ -1067,7 +1067,7 @@ export function FormulaManager() {
 
               {/* Template Dropdown Section */}
               <Vertical style={{ flex: 1 }}>
-                <div className="eyebrow-label" style={{ marginBottom: '8px' }}>Formula Templates</div>
+                <div className="eyebrow-label" className="mb-1">Formula Templates</div>
                 <Horizontal style={{ gap: '12px', alignItems: 'flex-end' }}>
                   <Vertical style={{ flex: 1 }}>
                     <Select
@@ -1213,8 +1213,8 @@ export function FormulaManager() {
             </Horizontal>
           ) : (
             /* Version A: Operators Only */
-            <Vertical style={{ marginBottom: '16px' }}>
-              <div className="eyebrow-label" style={{ marginBottom: '8px' }}>Quick Operators</div>
+            <Vertical className="mb-2">
+              <div className="eyebrow-label" className="mb-1">Quick Operators</div>
               <Horizontal style={{ gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                 {['+', '-', '*', '/', '(', ')', '%', '^', '.'].map((operator, index) => (
                   <GraviButton
@@ -1411,7 +1411,7 @@ export function FormulaManager() {
           {/* ========== VARIABLES SECTION ========== */}
           {/* Variables Header */}
           <Vertical style={{ marginBottom: '0', alignItems: 'flex-start' }}>
-            <Texto category="h4" style={{ marginBottom: '8px' }}>
+            <Texto category="h4" className="mb-1">
               Variables
             </Texto>
             <Texto category="p2" style={{ color: '#666', marginBottom: '16px' }}>
@@ -1587,7 +1587,7 @@ export function FormulaManager() {
           {/* Templates Header */}
           {versionMode === 'A' && (
           <Vertical style={{ marginTop: '32px', marginBottom: '0', alignItems: 'flex-start' }}>
-            <Texto category="h4" style={{ marginBottom: '8px' }}>
+            <Texto category="h4" className="mb-1">
               Formula Templates
             </Texto>
             <Texto category="p2" style={{ color: '#666', marginBottom: '16px' }}>
@@ -1842,7 +1842,7 @@ export function FormulaManager() {
           overflow: 'auto'
         }}>
           {/* Page Title */}
-          <Texto category="h4" style={{ marginBottom: '12px' }}>
+          <Texto category="h4" className="mb-2">
             Apply to Products
           </Texto>
           

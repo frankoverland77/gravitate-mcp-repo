@@ -677,7 +677,7 @@ export function MapView({
                 </div>
                 <div style={{ fontSize: '11px', maxHeight: '150px', overflowY: 'auto' }}>
                   {cluster.orders.map(order => (
-                    <div key={order.id} style={{ marginBottom: '4px' }}>
+                    <div key={order.id} className="mb-1">
                       <strong>{order.id}</strong> - {order.customerName}
                     </div>
                   ))}
