@@ -40,7 +40,7 @@ export function WelcomeHomePage() {
       {/* Header */}
       <Vertical className="mb-2">
         <Texto category="heading" className="mb-2">
-          Excalibrr Demo Showcase
+          Excalibrr Demo Showcase Frank was here!!!
         </Texto>
         <Texto category="p1" style={{ lineHeight: "1.6" }}>
           Interactive demonstrations of Excalibrr components using production
@@ -127,7 +127,7 @@ export function WelcomeHomePage() {
               className="text-center"
               style={{ color: "var(--theme-color-3)" }}
             >
-              No demos available yet. Create your first demo using Claude Code!
+              No demos available yet. Create your first demo using Claude Code! 
             </Texto>
           </Horizontal>
         )}
