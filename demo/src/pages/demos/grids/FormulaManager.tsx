@@ -816,7 +816,7 @@ export function FormulaManager() {
           {/* Formula List */}
           <Vertical style={{ gap: '0' }}>
             {getFoldersWithFormulas().map((folder, folderIndex) => (
-              <div key={folderIndex} className="folder-item" className="mb-1">
+              <div key={folderIndex} className="folder-item mb-1">
                 <div 
                   className={`folder-header ${dragOverFolder === folder.name ? 'drag-over' : ''}`}
                   style={{ 
@@ -1033,7 +1033,7 @@ export function FormulaManager() {
             <Horizontal style={{ marginBottom: '16px', gap: '24px', alignItems: 'flex-start' }}>
               {/* Operators Section */}
               <Vertical style={{ flex: 1 }}>
-                <div className="eyebrow-label" className="mb-1">Quick Operators</div>
+                <div className="eyebrow-label mb-1">Quick Operators</div>
                 <Horizontal style={{ gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                   {['+', '-', '*', '/', '(', ')', '%', '^', '.'].map((operator, index) => (
                     <GraviButton
@@ -1067,7 +1067,7 @@ export function FormulaManager() {
 
               {/* Template Dropdown Section */}
               <Vertical style={{ flex: 1 }}>
-                <div className="eyebrow-label" className="mb-1">Formula Templates</div>
+                <div className="eyebrow-label mb-1">Formula Templates</div>
                 <Horizontal style={{ gap: '12px', alignItems: 'flex-end' }}>
                   <Vertical style={{ flex: 1 }}>
                     <Select
@@ -1214,7 +1214,7 @@ export function FormulaManager() {
           ) : (
             /* Version A: Operators Only */
             <Vertical className="mb-2">
-              <div className="eyebrow-label" className="mb-1">Quick Operators</div>
+              <div className="eyebrow-label mb-1">Quick Operators</div>
               <Horizontal style={{ gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                 {['+', '-', '*', '/', '(', ')', '%', '^', '.'].map((operator, index) => (
                   <GraviButton
