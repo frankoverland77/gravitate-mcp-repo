@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Texto, GraviButton, GraviGrid, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import {
     PlusOutlined,
@@ -11,6 +11,7 @@ import { Drawer, Tag, Input, Segmented, Checkbox, Button, Switch } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { isPlaceholder } from '../FormulaTemplates.data';
 import { TemplateChooser } from '../../../../components/shared/TemplateChooser/TemplateChooser';
+import { SaveTemplateForm } from '../../../../components/shared/SaveTemplateModal';
 
 interface Formula {
     name: string;
@@ -35,6 +36,7 @@ interface FormulaEditorDrawerProps {
     templates: any[]; // All templates from context
     buildFormulaPreview: (template: any) => string;
     handleTemplateSelect: (template: any) => void;
+    onSaveTemplate: (templateData: any) => void; // Handler for saving new templates
 }
 
 export function FormulaEditorDrawer({
@@ -54,12 +56,15 @@ export function FormulaEditorDrawer({
     formulaGridAgProps,
     templates,
     buildFormulaPreview,
-    handleTemplateSelect
+    handleTemplateSelect,
+    onSaveTemplate
 }: FormulaEditorDrawerProps) {
     const navigateInternal = useNavigate();
+    const [showSaveTemplateForm, setShowSaveTemplateForm] = useState(false);
 
     return (
-        <Drawer
+        <>
+            <Drawer
             placement="bottom"
             height="70%"
             visible={drawerOpen}
@@ -130,7 +135,23 @@ export function FormulaEditorDrawer({
                 overflowY: 'auto',
                 position: 'relative'
             }}>
-                {!showTemplateManager ? (
+                {showSaveTemplateForm ? (
+                    /* Save Template Form View */
+                    <SaveTemplateForm
+                        key={Date.now()}
+                        initialData={{
+                            formulaName: formulas[activeFormulaIndex]?.name || '',
+                            components: formulas[activeFormulaIndex]?.rows || [],
+                            product: editingRow?.product || '',
+                            location: editingRow?.location || ''
+                        }}
+                        onSave={(templateData) => {
+                            onSaveTemplate(templateData);
+                            setShowSaveTemplateForm(false);
+                        }}
+                        onCancel={() => setShowSaveTemplateForm(false)}
+                    />
+                ) : !showTemplateManager ? (
                     <>
                         {/* Render each formula section */}
                         {formulas.map((formula, formulaIndex) => (
@@ -208,6 +229,15 @@ export function FormulaEditorDrawer({
                                                 setShowTemplateManager(true);
                                             }}
                                         />
+                                        <GraviButton
+                                            buttonText="Save as Template"
+                                            icon={<SettingOutlined />}
+                                            appearance="outlined"
+                                            onClick={() => {
+                                                setActiveFormulaIndex(formulaIndex);
+                                                setShowSaveTemplateForm(true);
+                                            }}
+                                        />
                                     </div>
                                 </div>
 
@@ -274,6 +304,7 @@ export function FormulaEditorDrawer({
                     />
                 )}
             </div>
-        </Drawer>
+            </Drawer>
+        </>
     );
 }

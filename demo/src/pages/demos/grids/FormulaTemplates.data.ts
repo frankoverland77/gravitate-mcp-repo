@@ -11,18 +11,21 @@ export const PLACEHOLDER_VALUES = {
 } as const;
 
 // Helper to check if a value is a placeholder
-export const isPlaceholder = (value: string): boolean => {
+export const isPlaceholder = (value: any): boolean => {
+    if (typeof value !== 'string') return false;
     return value?.startsWith('[*') && value?.includes('*]');
 };
 
 // Helper to extract placeholder abbreviation from full value
-export const getPlaceholderAbbrev = (value: string): string => {
+export const getPlaceholderAbbrev = (value: any): string => {
+    if (typeof value !== 'string') return '';
     const match = value?.match(/\[\*([A-Z]+)\*\]/);
     return match ? match[1] : '';
 };
 
 // Helper to get user-friendly placeholder display text
-export const getPlaceholderDisplayText = (value: string): string => {
+export const getPlaceholderDisplayText = (value: any): string => {
+    if (typeof value !== 'string') return String(value || '');
     if (!isPlaceholder(value)) return value;
 
     switch (value) {

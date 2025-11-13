@@ -133,12 +133,6 @@ export function ContractDetails() {
     const [selectedComponents, setSelectedComponents] = useState<{[templateId: string]: {[compId: number]: boolean}}>({});
     const [savedDetails, setSavedDetails] = useState<any[]>([]);
 
-    // Save as Template modal state
-    const [saveTemplateModalOpen, setSaveTemplateModalOpen] = useState(false);
-    const [newTemplateName, setNewTemplateName] = useState('');
-    const [newTemplateDescription, setNewTemplateDescription] = useState('');
-    const [newTemplateCategory, setNewTemplateCategory] = useState<'Popular' | 'Partner' | 'Advanced' | 'Specialty' | 'Regional' | 'Seasonal'>('Popular');
-
     // Get contract details from navigation state or use mock data
     // Use params.id from URL if available, otherwise fall back to location.state.id or default
     const contractData = location.state || {
@@ -338,6 +332,41 @@ export function ContractDetails() {
         setShowTemplateManager(false);
     };
 
+    // Handler for saving current formula as template
+    const handleSaveAsTemplate = (templateData: any) => {
+        try {
+            // Transform components from formula rows to template format
+            const transformedComponents = templateData.components.map((row: any) => ({
+                id: row.id,
+                percentage: row.percentage || '100',
+                operator: row.operator || '+',
+                source: row.publisher || row.source, // KEY: publisher → source
+                instrument: row.instrument,
+                dateRule: row.dateRule,
+                type: row.type,
+                display: row.display
+            }));
+
+            // Create template with required fields
+            const template = {
+                name: templateData.name,
+                contractType: templateData.category, // Category becomes contractType directly
+                usedInProducts: templateData.products || [], // Already arrays from modal
+                usedInLocations: templateData.locations || [], // Already arrays from modal
+                description: templateData.description,
+                createdBy: templateData.createdBy,
+                components: transformedComponents,
+                customFormulaPreview: templateData.customFormulaPreview
+            };
+
+            const newTemplate = addTemplate(template);
+            message.success(`Template "${newTemplate.name}" saved successfully`);
+        } catch (error) {
+            message.error('Failed to save template');
+            console.error('Save template error:', error);
+        }
+    };
+
 
     // Handle Save Formula
     const handleSaveFormula = () => {
@@ -532,80 +561,6 @@ export function ContractDetails() {
 
     const handleDeleteRow = (rowId: number) => {
         setGridRowData(gridRowData.filter(row => row.id !== rowId));
-    };
-
-    const handleSaveAsTemplate = () => {
-        // Check if there are any rows with formulas
-        const rowsWithFormulas = gridRowData.filter(row =>
-            row.formulas && row.formulas.length > 0 && row.formulas.some((f: any) => f.rows.length > 0)
-        );
-
-        if (rowsWithFormulas.length === 0) {
-            message.warning('No formulas configured. Please add and configure a formula first.');
-            return;
-        }
-
-        // Open the modal to collect template details
-        setSaveTemplateModalOpen(true);
-    };
-
-    const handleSaveTemplateConfirm = () => {
-        if (!newTemplateName.trim()) {
-            message.warning('Please enter a template name');
-            return;
-        }
-
-        // Get the first row with formulas (or could let user select which one)
-        const rowWithFormula = gridRowData.find(row =>
-            row.formulas && row.formulas.length > 0 && row.formulas.some((f: any) => f.rows.length > 0)
-        );
-
-        if (!rowWithFormula) {
-            message.error('No formula found to save');
-            return;
-        }
-
-        // Extract formula components from the first formula
-        const firstFormula = rowWithFormula.formulas[0];
-        const components: TemplateComponent[] = firstFormula.rows.map((row: any, index: number) => ({
-            id: index + 1,
-            percentage: row.percentage || '',
-            operator: row.display?.includes('-') ? '-' : '+',
-            source: row.publisher || '',
-            instrument: row.instrument || '',
-            dateRule: row.dateRule || '',
-            type: row.type || ''
-        }));
-
-        // Create the template
-        console.log('=== SAVING TEMPLATE ===');
-        console.log('contractData.product:', contractData.product);
-        console.log('contractData.originLocation:', contractData.originLocation);
-        console.log('usedInProducts will be:', contractData.product ? [contractData.product] : []);
-        console.log('usedInLocations will be:', contractData.originLocation ? [contractData.originLocation] : []);
-
-        const newTemplate = addTemplate({
-            name: newTemplateName,
-            contractType: contractData.contractType || 'Day - Fixed',
-            usedInProducts: contractData.product ? [contractData.product] : [],
-            usedInLocations: contractData.originLocation ? [contractData.originLocation] : [],
-            category: newTemplateCategory,
-            description: newTemplateDescription || `Template created from contract ${contractData.id}`,
-            createdBy: 'User',
-            components
-        });
-
-        console.log('Template created:', newTemplate);
-        console.log('Template usedInProducts:', newTemplate.usedInProducts);
-        console.log('Template usedInLocations:', newTemplate.usedInLocations);
-
-        message.success(`Template "${newTemplateName}" created successfully!`);
-
-        // Reset modal state
-        setSaveTemplateModalOpen(false);
-        setNewTemplateName('');
-        setNewTemplateDescription('');
-        setNewTemplateCategory('Popular');
     };
 
     const handleEditRow = (row: any) => {
@@ -818,12 +773,6 @@ export function ContractDetails() {
                     }}
                 />
                 <GraviButton
-                    buttonText="Save as Template"
-                    icon={<PlusOutlined />}
-                    appearance="outlined"
-                    onClick={handleSaveAsTemplate}
-                />
-                <GraviButton
                     buttonText="Add Price"
                     appearance="solid"
                     onClick={handleAddPrice}
@@ -835,7 +784,7 @@ export function ContractDetails() {
                 />
             </div>
         )
-    }), [gridRowData, handleSaveAsTemplate, handleAddPrice]);
+    }), [gridRowData, handleAddPrice]);
 
     const gridAgPropOverrides = useMemo(() => ({
         domLayout: 'normal',
@@ -1173,12 +1122,12 @@ export function ContractDetails() {
 
         const newRow = {
             id: currentFormula.rows.length + 1,
-            publisher: 0,
-            percentage: '',
-            instrument: '',
-            type: '',
+            publisher: PLACEHOLDER_VALUES.SOURCE,       // [*SRC*]
+            percentage: PLACEHOLDER_VALUES.PERCENTAGE,  // [*PCT*]
+            instrument: PLACEHOLDER_VALUES.INSTRUMENT,  // [*INSTR*]
+            type: PLACEHOLDER_VALUES.TYPE,              // [*TYPE*]
             diff: 0,
-            dateRule: '',
+            dateRule: PLACEHOLDER_VALUES.DATE_RULE,     // [*DATE*]
             required: '',
             display: '',
             uomCurrency: ''
@@ -1950,80 +1899,9 @@ export function ContractDetails() {
                 templates={templateFamilies}
                 buildFormulaPreview={buildFormulaPreview}
                 handleTemplateSelect={handleTemplateSelect}
+                onSaveTemplate={handleSaveAsTemplate}
             />
 
-            {/* Save as Template Modal */}
-            <Modal
-                title="Save Formula as Template"
-                visible={saveTemplateModalOpen}
-                onOk={handleSaveTemplateConfirm}
-                onCancel={() => {
-                    setSaveTemplateModalOpen(false);
-                    setNewTemplateName('');
-                    setNewTemplateDescription('');
-                    setNewTemplateCategory('Popular');
-                }}
-                okText="Save Template"
-                cancelText="Cancel"
-                width={600}
-                getContainer={() => document.body}
-                destroyOnClose={false}
-            >
-                <Vertical style={{ gap: '16px', marginTop: '16px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                            Template Name <span style={{ color: 'red' }}>*</span>
-                        </label>
-                        <Input
-                            placeholder="Enter template name"
-                            value={newTemplateName}
-                            onChange={(e) => setNewTemplateName(e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                            Category
-                        </label>
-                        <Select
-                            value={newTemplateCategory}
-                            onChange={(value) => setNewTemplateCategory(value)}
-                            style={{ width: '100%' }}
-                        >
-                            <Select.Option value="Popular">Popular</Select.Option>
-                            <Select.Option value="Partner">Partner</Select.Option>
-                            <Select.Option value="Advanced">Advanced</Select.Option>
-                            <Select.Option value="Specialty">Specialty</Select.Option>
-                            <Select.Option value="Regional">Regional</Select.Option>
-                            <Select.Option value="Seasonal">Seasonal</Select.Option>
-                        </Select>
-                    </div>
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                            Description
-                        </label>
-                        <Input.TextArea
-                            placeholder="Enter template description (optional)"
-                            value={newTemplateDescription}
-                            onChange={(e) => setNewTemplateDescription(e.target.value)}
-                            rows={3}
-                        />
-                    </div>
-
-                    <div style={{
-                        padding: '12px',
-                        backgroundColor: '#f0f9ff',
-                        borderRadius: '4px',
-                        border: '1px solid #91d5ff'
-                    }}>
-                        <Texto style={{ margin: 0, fontSize: '12px', color: '#1890ff' }}>
-                            💡 This will save the formula configuration from your price setup as a reusable template.
-                            The template will be available in the Formula Template Chooser for future contracts.
-                        </Texto>
-                    </div>
-                </Vertical>
-            </Modal>
         </>
     );
 }

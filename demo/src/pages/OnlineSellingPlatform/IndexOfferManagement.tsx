@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { GraviGrid, GraviButton, Vertical, Texto, Horizontal, BBDTag } from '@gravitate-js/excalibrr';
-import { Drawer, Button, Tag, Form, Input, Select, InputNumber, Checkbox, Switch, Radio } from 'antd';
+import { Drawer, Button, Tag, Form, Input, Select, InputNumber, Checkbox, Switch, Radio, message } from 'antd';
 import { PlusOutlined, CloseOutlined, SettingOutlined, EyeOutlined, EditOutlined, DeleteOutlined, UndoOutlined, ReloadOutlined, LeftOutlined } from '@ant-design/icons';
 import { Popconfirm } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { buildFormulaPreview, PLACEHOLDER_VALUES, isPlaceholder, getPlaceholderD
 import { SearchableSelect } from '@components/shared/Grid/cellEditors/SelectCellEditor';
 import { suppressKeyboardEvent } from '@components/shared/Grid/cellEditors';
 import { TemplateChooser } from '../../components/shared/TemplateChooser';
+import { SaveTemplateForm } from '../../components/shared/SaveTemplateModal';
 import { generateMarketContextData, getMarketContextForOffer, MarketContextData } from './IndexOfferManagement.data';
 import { MarketContextPanel } from './components/MarketContextPanel';
 import { RankBadge } from './components/RankBadge';
@@ -18,7 +19,7 @@ const { TextArea } = Input;
 
 export function IndexOfferManagement() {
     const navigate = useNavigate();
-    const { templates, getTemplateById } = useFormulaTemplateContext();
+    const { templates, getTemplateById, addTemplate } = useFormulaTemplateContext();
     const { featureMode, setFeatureMode, isFutureMode } = useFeatureMode();
 
     const [offerDrawerVisible, setOfferDrawerVisible] = useState(false);
@@ -47,6 +48,9 @@ export function IndexOfferManagement() {
 
     // Template chooser state
     const [showTemplateChooser, setShowTemplateChooser] = useState(false);
+
+    // Save template form state
+    const [showSaveTemplateForm, setShowSaveTemplateForm] = useState(false);
 
     // Formula components state
     const [components, setComponents] = useState<any[]>([]);
@@ -127,12 +131,12 @@ export function IndexOfferManagement() {
     const handleAddRow = useCallback(() => {
         const newRow = {
             id: Date.now(),
-            percentage: '100%',
+            percentage: PLACEHOLDER_VALUES.PERCENTAGE,  // [*PCT*]
             operator: '+',
-            source: '',
-            instrument: '',
-            type: 'Index',
-            dateRule: 'Prior Day',
+            source: PLACEHOLDER_VALUES.SOURCE,          // [*SRC*]
+            instrument: PLACEHOLDER_VALUES.INSTRUMENT,  // [*INSTR*]
+            type: PLACEHOLDER_VALUES.TYPE,              // [*TYPE*]
+            dateRule: PLACEHOLDER_VALUES.DATE_RULE,     // [*DATE*]
             diff: 0,
             required: true
         };
@@ -158,6 +162,39 @@ export function IndexOfferManagement() {
         // Close template chooser
         setShowTemplateChooser(false);
     }, [components]);
+
+    // Handler for saving current formula as template
+    const handleSaveAsTemplate = useCallback((templateData: any) => {
+        try {
+            // Components already match template format closely
+            const transformedComponents = templateData.components.map((comp: any) => ({
+                id: comp.id,
+                percentage: comp.percentage || '100',
+                operator: comp.operator || '+',
+                source: comp.source,
+                instrument: comp.instrument,
+                dateRule: comp.dateRule,
+                type: comp.type
+            }));
+
+            const template = {
+                name: templateData.name,
+                contractType: templateData.category, // Category becomes contractType
+                usedInProducts: templateData.products || [], // Already arrays from modal
+                usedInLocations: templateData.locations || [], // Already arrays from modal
+                description: templateData.description,
+                createdBy: templateData.createdBy,
+                components: transformedComponents,
+                customFormulaPreview: templateData.customFormulaPreview
+            };
+
+            const newTemplate = addTemplate(template);
+            message.success(`Template "${newTemplate.name}" saved successfully`);
+        } catch (error) {
+            message.error('Failed to save template');
+            console.error('Save template error:', error);
+        }
+    }, [addTemplate]);
 
     const handleSaveOffer = useCallback((saveAsActive: boolean) => {
         console.log('=== SAVE OFFER ===');
@@ -1254,8 +1291,24 @@ export function IndexOfferManagement() {
                     </Horizontal>
                 </div>
 
-                {/* Content - Either Template Chooser or Main Form */}
-                {showTemplateChooser ? (
+                {/* Content - Either Save Template Form, Template Chooser, or Main Form */}
+                {showSaveTemplateForm ? (
+                    /* Save Template Form View */
+                    <SaveTemplateForm
+                        key={Date.now()}
+                        initialData={{
+                            formulaName: '', // Index offers don't have a formula name
+                            components: components,
+                            product: product,
+                            location: location
+                        }}
+                        onSave={(templateData) => {
+                            handleSaveAsTemplate(templateData);
+                            setShowSaveTemplateForm(false);
+                        }}
+                        onCancel={() => setShowSaveTemplateForm(false)}
+                    />
+                ) : showTemplateChooser ? (
                     /* Template Chooser View */
                     <TemplateChooser
                         templates={templates}
@@ -1427,6 +1480,12 @@ export function IndexOfferManagement() {
                                     icon={<PlusOutlined />}
                                     appearance="outlined"
                                     onClick={handleOpenTemplateChooser}
+                                />
+                                <GraviButton
+                                    buttonText="Save as Template"
+                                    icon={<SettingOutlined />}
+                                    appearance="outlined"
+                                    onClick={() => setShowSaveTemplateForm(true)}
                                 />
                             </div>
                         </Horizontal>

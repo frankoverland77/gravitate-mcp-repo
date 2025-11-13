@@ -1027,22 +1027,6 @@ export function FormulaTemplates() {
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
-                                        Contract Type *
-                                    </label>
-                                    <Select
-                                        placeholder="Select contract type"
-                                        value={contractType}
-                                        onChange={setContractType}
-                                        style={{ width: '100%' }}
-                                        options={[
-                                            { value: 'Fixed', label: 'Fixed' },
-                                            { value: 'Index', label: 'Index' },
-                                            { value: 'Formula', label: 'Formula' }
-                                        ]}
-                                    />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                                         Location *
                                     </label>
                                     <Select
@@ -1055,6 +1039,22 @@ export function FormulaTemplates() {
                                             { value: 'Cushing', label: 'Cushing' },
                                             { value: 'PADD 1', label: 'PADD 1' },
                                             { value: 'PADD 5', label: 'PADD 5' }
+                                        ]}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+                                        Category *
+                                    </label>
+                                    <Select
+                                        placeholder="Select category"
+                                        value={contractType}
+                                        onChange={setContractType}
+                                        style={{ width: '100%' }}
+                                        options={[
+                                            { value: 'Fixed', label: 'Fixed' },
+                                            { value: 'Index', label: 'Index' },
+                                            { value: 'Formula', label: 'Formula' }
                                         ]}
                                     />
                                 </div>
@@ -1318,22 +1318,6 @@ export function FormulaTemplates() {
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
-                                        Contract Type *
-                                    </label>
-                                    <Select
-                                        placeholder="Select contract type"
-                                        value={contractType}
-                                        onChange={setContractType}
-                                        style={{ width: '100%' }}
-                                        options={[
-                                            { value: 'Fixed', label: 'Fixed' },
-                                            { value: 'Index', label: 'Index' },
-                                            { value: 'Formula', label: 'Formula' }
-                                        ]}
-                                    />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                                         Location *
                                     </label>
                                     <Select
@@ -1346,6 +1330,22 @@ export function FormulaTemplates() {
                                             { value: 'Cushing', label: 'Cushing' },
                                             { value: 'PADD 1', label: 'PADD 1' },
                                             { value: 'PADD 5', label: 'PADD 5' }
+                                        ]}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+                                        Category *
+                                    </label>
+                                    <Select
+                                        placeholder="Select category"
+                                        value={contractType}
+                                        onChange={setContractType}
+                                        style={{ width: '100%' }}
+                                        options={[
+                                            { value: 'Fixed', label: 'Fixed' },
+                                            { value: 'Index', label: 'Index' },
+                                            { value: 'Formula', label: 'Formula' }
                                         ]}
                                     />
                                 </div>
