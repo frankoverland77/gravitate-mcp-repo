@@ -934,37 +934,31 @@ export function FormulaTemplates() {
             >
                 {/* Drawer Header */}
                 <div style={{
-                    padding: '16px 24px',
-                    borderBottom: '1px solid #f0f0f0',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: '#fff'
+                    backgroundColor: '#0C5A58',
+                    padding: '20px 24px',
+                    flexShrink: 0
                 }}>
-                    <Horizontal style={{ gap: '16px', alignItems: 'center' }}>
-                        <CloseOutlined
-                            style={{ fontSize: '16px', cursor: 'pointer', color: '#595959' }}
+                    <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Vertical style={{ gap: '4px' }}>
+                            <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
+                                Create Formula Template
+                            </Texto>
+                            <Texto style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
+                                Define template components, formula display, and metadata
+                            </Texto>
+                        </Vertical>
+                        <Button
+                            type="text"
                             onClick={handleCloseDrawer}
-                        />
-                        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>
-                            Create Formula Template
-                        </h2>
+                            style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto' }}
+                        >
+                            ×
+                        </Button>
                     </Horizontal>
-                    <GraviButton
-                        buttonText="Save"
-                        icon={<SaveOutlined />}
-                        appearance="solid"
-                        onClick={handleSave}
-                        style={{
-                            fontWeight: 'bold',
-                            backgroundColor: '#51b073',
-                            color: 'white'
-                        }}
-                    />
                 </div>
 
                 {/* Drawer Content */}
-                <Vertical style={{ padding: '24px', gap: '24px', height: 'calc(100% - 72px)', overflow: 'auto' }}>
+                <Vertical style={{ padding: '24px', paddingBottom: '80px', gap: '24px', height: 'calc(100% - 72px)', overflow: 'auto' }}>
                     {/* Validation Errors */}
                     {validationErrors.length > 0 && (
                         <Alert
@@ -1151,13 +1145,8 @@ export function FormulaTemplates() {
                             <GraviButton
                                 buttonText="Add Component"
                                 icon={<PlusOutlined />}
-                                appearance="solid"
+                                appearance="outlined"
                                 onClick={handleAddComponent}
-                                style={{
-                                    fontWeight: 'bold',
-                                    backgroundColor: '#51b073',
-                                    color: 'white'
-                                }}
                             />
                         </Horizontal>
 
@@ -1213,6 +1202,36 @@ export function FormulaTemplates() {
                         </div>
                     </div>
                 </Vertical>
+
+                {/* Sticky Footer */}
+                <div style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: '16px 24px',
+                    borderTop: '1px solid #d9d9d9',
+                    backgroundColor: '#ffffff',
+                    zIndex: 10
+                }}>
+                    <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
+                        <Button
+                            size="large"
+                            onClick={handleCloseDrawer}
+                            style={{ minWidth: '100px' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            onClick={handleSave}
+                            style={{ minWidth: '100px' }}
+                        >
+                            Save Template
+                        </Button>
+                    </Horizontal>
+                </div>
             </Drawer>
 
             {/* Edit Template Drawer */}
@@ -1227,37 +1246,31 @@ export function FormulaTemplates() {
             >
                 {/* Drawer Header */}
                 <div style={{
-                    padding: '16px 24px',
-                    borderBottom: '1px solid #f0f0f0',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: '#fff'
+                    backgroundColor: '#0C5A58',
+                    padding: '20px 24px',
+                    flexShrink: 0
                 }}>
-                    <Horizontal style={{ gap: '16px', alignItems: 'center' }}>
-                        <CloseOutlined
-                            style={{ fontSize: '16px', cursor: 'pointer', color: '#595959' }}
+                    <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Vertical style={{ gap: '4px' }}>
+                            <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
+                                {isDuplicateMode ? 'Duplicate Formula Template' : 'Edit Formula Template'}
+                            </Texto>
+                            <Texto style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
+                                {isDuplicateMode ? 'Create a copy of this template with customizable components' : 'Modify template components, formula display, and metadata'}
+                            </Texto>
+                        </Vertical>
+                        <Button
+                            type="text"
                             onClick={handleCloseEditDrawer}
-                        />
-                        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>
-                            {isDuplicateMode ? 'Duplicate Formula Template' : 'Edit Formula Template'}
-                        </h2>
+                            style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto' }}
+                        >
+                            ×
+                        </Button>
                     </Horizontal>
-                    <GraviButton
-                        buttonText="Save"
-                        icon={<SaveOutlined />}
-                        appearance="solid"
-                        onClick={handleSaveEdit}
-                        style={{
-                            fontWeight: 'bold',
-                            backgroundColor: '#51b073',
-                            color: 'white'
-                        }}
-                    />
                 </div>
 
                 {/* Drawer Body */}
-                <Vertical style={{ padding: '24px', gap: '20px', height: 'calc(100% - 65px)', overflow: 'auto' }}>
+                <Vertical style={{ padding: '24px', paddingBottom: '80px', gap: '20px', height: 'calc(100% - 65px)', overflow: 'auto' }}>
                     {/* Validation Errors */}
                     {validationErrors.length > 0 && (
                         <Alert
@@ -1442,13 +1455,8 @@ export function FormulaTemplates() {
                             <GraviButton
                                 buttonText="Add Component"
                                 icon={<PlusOutlined />}
-                                appearance="solid"
+                                appearance="outlined"
                                 onClick={handleAddComponent}
-                                style={{
-                                    fontWeight: 'bold',
-                                    backgroundColor: '#51b073',
-                                    color: 'white'
-                                }}
                             />
                         </Horizontal>
 
@@ -1494,6 +1502,36 @@ export function FormulaTemplates() {
                         </div>
                     </div>
                 </Vertical>
+
+                {/* Sticky Footer */}
+                <div style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: '16px 24px',
+                    borderTop: '1px solid #d9d9d9',
+                    backgroundColor: '#ffffff',
+                    zIndex: 10
+                }}>
+                    <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
+                        <Button
+                            size="large"
+                            onClick={handleCloseEditDrawer}
+                            style={{ minWidth: '100px' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            onClick={handleSaveEdit}
+                            style={{ minWidth: '100px' }}
+                        >
+                            Save Template
+                        </Button>
+                    </Horizontal>
+                </div>
             </Drawer>
 
             {/* Floating Action Button for View Settings */}

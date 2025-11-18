@@ -127,7 +127,7 @@ export function FormulaEditorDrawer({
             {/* Formula Editor Content */}
             <div style={{
                 backgroundColor: 'white',
-                padding: '20px 16px 80px 16px',
+                padding: 0,
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
@@ -153,8 +153,12 @@ export function FormulaEditorDrawer({
                     />
                 ) : !showTemplateManager ? (
                     <>
-                        {/* Render each formula section */}
-                        {formulas.map((formula, formulaIndex) => (
+                        {/* Main editing UI with padding */}
+                        <div style={{
+                            padding: '20px 16px 80px 16px'
+                        }}>
+                            {/* Render each formula section */}
+                            {formulas.map((formula, formulaIndex) => (
                             <div key={formulaIndex} style={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -253,6 +257,7 @@ export function FormulaEditorDrawer({
                                 />
                             </div>
                         ))}
+                        </div>
 
                         {/* Sticky Footer for Main Editor */}
                         <div style={{

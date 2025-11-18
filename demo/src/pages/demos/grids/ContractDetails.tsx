@@ -6,7 +6,7 @@ import { Divider, Tag, DatePicker, Select, Drawer, Input, Segmented, Checkbox, m
 import { FormulaEditorDrawer } from './components/FormulaEditorDrawer';
 import { useFormulaTemplateContext } from '../../../contexts/FormulaTemplateContext';
 import type { TemplateComponent } from './FormulaTemplates.data';
-import { isPlaceholder, getPlaceholderDisplayText } from './FormulaTemplates.data';
+import { isPlaceholder, getPlaceholderDisplayText, PLACEHOLDER_VALUES } from './FormulaTemplates.data';
 import { PUBLISHERS, INSTRUMENTS, DATE_RULES, PRICE_TYPES } from './FormulaFieldOptions';
 
 // Detail cell renderer for formula components
@@ -1121,7 +1121,7 @@ export function ContractDetails() {
         const currentFormula = updated[formulaIndex];
 
         const newRow = {
-            id: currentFormula.rows.length + 1,
+            id: Date.now(),
             publisher: PLACEHOLDER_VALUES.SOURCE,       // [*SRC*]
             percentage: PLACEHOLDER_VALUES.PERCENTAGE,  // [*PCT*]
             instrument: PLACEHOLDER_VALUES.INSTRUMENT,  // [*INSTR*]

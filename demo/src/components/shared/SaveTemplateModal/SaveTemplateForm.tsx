@@ -119,32 +119,57 @@ export function SaveTemplateForm({
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: 'white'
+            backgroundColor: '#f5f5f5',
+            padding: '20px'
         }}>
-            {/* Header with Back Button */}
+            {/* Header */}
             <div style={{
-                padding: '12px 20px',
-                borderBottom: '1px solid #e8e8e8',
+                marginBottom: '12px',
                 flexShrink: 0
             }}>
-                <Horizontal style={{ alignItems: 'center', gap: '12px' }}>
-                    <Button
-                        type="text"
-                        icon={<LeftOutlined />}
-                        onClick={onCancel}
-                        style={{ padding: '4px 8px' }}
-                    >
-                        Back
-                    </Button>
-                    <Vertical style={{ gap: '2px' }}>
-                        <Texto style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                    }}>
+                        <Texto style={{
+                            margin: 0,
+                            color: '#262626',
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            lineHeight: '28px'
+                        }}>
                             Save Formula as Template
                         </Texto>
-                        <Texto style={{ fontSize: '12px', color: '#8c8c8c', margin: 0 }}>
+                        <Texto style={{
+                            margin: 0,
+                            color: '#8c8c8c',
+                            fontSize: '14px',
+                            lineHeight: '22px'
+                        }}>
                             Create a reusable template from this formula
                         </Texto>
-                    </Vertical>
-                </Horizontal>
+                    </div>
+                    <div
+                        style={{
+                            cursor: 'pointer',
+                            color: '#595959',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}
+                        onClick={onCancel}
+                    >
+                        <LeftOutlined style={{ fontSize: '12px' }} />
+                        <span>Back to Edit Formula</span>
+                    </div>
+                </div>
             </div>
 
             {/* Scrollable Content */}
