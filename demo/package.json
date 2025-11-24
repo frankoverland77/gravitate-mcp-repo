@@ -9,7 +9,13 @@
     "dev:check": "ps aux | grep vite | grep excalibrr-demo || echo 'No servers running'",
     "stop": "pkill -f 'vite.*excalibrr-demo' || true",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "quality:check": "yarn type-check && yarn lint && yarn format:check"
   },
   "dependencies": {
     "@gravitate-js/excalibrr": "4.0.34-osp",
