@@ -1,142 +1,88 @@
 import React, { useState } from 'react';
 import { Select, InputNumber } from 'antd';
-import { GraviButton, Texto } from '@gravitate-js/excalibrr';
+import { GraviButton, Horizontal } from '@gravitate-js/excalibrr';
 
-interface BulkChangeBarProps {
-    selectedRows: any[];
-    onApply: (property: string, value: number) => void;
+// =============================================================================
+// Types
+// =============================================================================
+
+export type BulkChangeAction = 'set' | 'add' | 'subtract';
+
+export interface BulkEditControlsProps {
+    onApply: (property: string, value: number, action: BulkChangeAction) => void;
 }
 
-export function BulkChangeBar({ selectedRows, onApply }: BulkChangeBarProps) {
-    const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
-    const [bulkChangeValue, setBulkChangeValue] = useState<number | null>(null);
+// =============================================================================
+// BulkEditControls Component
+// =============================================================================
 
-    // Debug: Log when component mounts and when selectedRows changes
-    React.useEffect(() => {
-        console.log('[BulkChangeBar] selectedRows changed:', selectedRows.length, selectedRows);
-    }, [selectedRows]);
+/**
+ * BulkEditControls - Inline control bar for bulk editing grid values
+ *
+ * Features:
+ * - Property selector (Proposed Diff or Proposed Price)
+ * - Action selector (Set, Add, Subtract)
+ * - Value input with 4 decimal precision
+ * - Apply button to execute changes on selected range
+ *
+ * Usage:
+ * Designed to be used in GraviGrid's controlBarProps.actionButtons
+ * Works with AG Grid's range selection to apply changes to selected cells
+ */
+export function BulkEditControls({ onApply }: BulkEditControlsProps) {
+    const [selectedProperty, setSelectedProperty] = useState<string>('proposedDiff');
+    const [value, setValue] = useState<number | null>(null);
+    const [action, setAction] = useState<BulkChangeAction>('set');
 
     const handleApply = () => {
-        if (selectedProperty && bulkChangeValue !== null) {
-            onApply(selectedProperty, bulkChangeValue);
-            // Reset form after apply
-            setSelectedProperty(null);
-            setBulkChangeValue(null);
+        if (value !== null) {
+            onApply(selectedProperty, value, action);
+            // Reset value after apply for next operation
+            setValue(null);
         }
     };
 
-    const handleCancel = () => {
-        setSelectedProperty(null);
-        setBulkChangeValue(null);
-    };
-
-    // State 1: No selection - null state
-    if (selectedRows.length === 0) {
-        return (
-            <div style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                backgroundColor: '#f5f5f5',
-                borderTop: '1px solid #d9d9d9',
-                padding: '16px 24px',
-                zIndex: 1000
-            }}>
-                <Texto style={{
-                    margin: 0,
-                    color: '#0C5A58',
-                    fontSize: '16px',
-                    fontWeight: 600
-                }}>
-                    Select offer(s) to override
-                </Texto>
-            </div>
-        );
-    }
-
-    // State 2: Rows selected - active bulk change interface
     return (
-        <div style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: '#0C5A58',
-            borderTop: '1px solid #d9d9d9',
-            padding: '16px 24px',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '24px'
-        }}>
-            {/* Left: Selection count */}
-            <Texto style={{
-                margin: 0,
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: 600,
-                whiteSpace: 'nowrap'
-            }}>
-                {selectedRows.length} offer{selectedRows.length > 1 ? 's' : ''} will be updated
-            </Texto>
-
-            {/* Center-Left: Property selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Texto style={{ margin: 0, color: 'white', fontSize: '14px', whiteSpace: 'nowrap' }}>
-                    Property:
-                </Texto>
-                <Select
-                    placeholder="Select property"
-                    value={selectedProperty}
-                    onChange={setSelectedProperty}
-                    style={{ width: 200 }}
-                    options={[
-                        { value: 'proposedDiff', label: 'Proposed Differential' },
-                        { value: 'proposedPrice', label: 'Proposed Price' }
-                    ]}
-                />
-            </div>
-
-            {/* Center-Right: Value input */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Texto style={{ margin: 0, color: 'white', fontSize: '14px', whiteSpace: 'nowrap' }}>
-                    Value:
-                </Texto>
-                <InputNumber
-                    placeholder="0.0000"
-                    value={bulkChangeValue}
-                    onChange={setBulkChangeValue}
-                    step={0.0001}
-                    precision={4}
-                    style={{ width: 140 }}
-                />
-            </div>
-
-            {/* Right: Action buttons */}
-            <div style={{ display: 'flex', gap: '12px', marginLeft: 'auto' }}>
-                <GraviButton
-                    buttonText="Cancel"
-                    appearance="outlined"
-                    onClick={handleCancel}
-                    style={{
-                        backgroundColor: 'transparent',
-                        borderColor: 'white',
-                        color: 'white'
-                    }}
-                />
-                <GraviButton
-                    buttonText="Apply"
-                    appearance="solid"
-                    onClick={handleApply}
-                    disabled={!selectedProperty || bulkChangeValue === null}
-                    style={{
-                        backgroundColor: 'white',
-                        color: '#0C5A58',
-                        fontWeight: 600
-                    }}
-                />
-            </div>
-        </div>
+        <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+            <Select
+                value={selectedProperty}
+                onChange={setSelectedProperty}
+                style={{ width: 150 }}
+                size="small"
+                options={[
+                    { value: 'proposedDiff', label: 'Proposed Diff' },
+                    { value: 'proposedPrice', label: 'Proposed Price' }
+                ]}
+            />
+            <Select
+                value={action}
+                onChange={setAction}
+                style={{ width: 100 }}
+                size="small"
+                options={[
+                    { value: 'set', label: 'Set to' },
+                    { value: 'add', label: 'Add' },
+                    { value: 'subtract', label: 'Subtract' }
+                ]}
+            />
+            <InputNumber
+                value={value}
+                onChange={setValue}
+                step={0.0001}
+                precision={4}
+                style={{ width: 120 }}
+                size="small"
+                placeholder="0.0000"
+            />
+            <GraviButton
+                buttonText="Apply to Selection"
+                appearance="solid"
+                size="small"
+                onClick={handleApply}
+                disabled={value === null}
+            />
+        </Horizontal>
     );
 }
+
+export default BulkEditControls;
