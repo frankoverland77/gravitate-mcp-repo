@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { GraviGrid, GraviButton, Vertical, Texto, Horizontal, BBDTag } from '@gravitate-js/excalibrr';
-import { Drawer, Button, Tag, Form, Input, Select, InputNumber, Checkbox, Switch, Radio, message } from 'antd';
+import { Drawer, Button, Tag, Form, Input, Select, InputNumber, Checkbox, Switch, Radio, message, Tabs } from 'antd';
 import { PlusOutlined, CloseOutlined, SettingOutlined, EyeOutlined, EditOutlined, DeleteOutlined, UndoOutlined, ReloadOutlined, LeftOutlined } from '@ant-design/icons';
 import { Popconfirm } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { SaveTemplateForm } from '../../components/shared/SaveTemplateModal';
 import { generateMarketContextData, getMarketContextForOffer, MarketContextData } from './IndexOfferManagement.data';
 import { MarketContextPanel } from './components/MarketContextPanel';
 import { RankBadge } from './components/RankBadge';
+import { BulkChangeBar } from './components/BulkChangeBar';
 import { useFeatureMode } from '../../contexts/FeatureModeContext';
 
 const { TextArea } = Input;
@@ -33,6 +34,36 @@ export function IndexOfferManagement() {
         return (saved as 'panel' | 'columns' | 'rank' | 'analytics') || 'panel';
     });
     const [selectedRowForContext, setSelectedRowForContext] = useState<any>(null);
+
+    // Tab state for Future State mode
+    const [activeTab, setActiveTab] = useState('offer-management');
+
+    // State for selected pricing row in Offer Pricing tab (triggers competitive analysis display)
+    const [selectedPricingRow, setSelectedPricingRow] = useState<any>(null);
+
+    // Bulk change state for Price Offers grid
+    const [bulkChangeModeActive, setBulkChangeModeActive] = useState(false);
+    const [selectedOffers, setSelectedOffers] = useState<any[]>([]);
+
+    // Selection mode is only active when bulk change mode is explicitly enabled
+    const isSelectionMode = bulkChangeModeActive;
+
+    // Grid API reference
+    const pricingGridApiRef = useRef<any>(null);
+
+    // Simplified selection changed handler - no conditional logic, no dependencies
+    const handlePricingSelectionChanged = useCallback((event: any) => {
+        console.log('[handlePricingSelectionChanged] ✅ FIRED!');
+        const selectedRows = event.api.getSelectedRows();
+        console.log('[handlePricingSelectionChanged] Selected rows:', selectedRows.length, selectedRows);
+        setSelectedOffers(selectedRows);
+    }, []);
+
+    // Handle grid ready - store API reference
+    const handlePricingGridReady = useCallback((params: any) => {
+        console.log('[handlePricingGridReady] ✅ Grid is ready!');
+        pricingGridApiRef.current = params.api;
+    }, []);
 
     // Save view mode to localStorage whenever it changes
     useEffect(() => {
@@ -221,6 +252,48 @@ export function IndexOfferManagement() {
         setOfferDrawerVisible(false);
     }, [isEditMode, product, location, components, useInternalOverride, internalOverride, useExternalOverride, externalOverride, differential, isInternalOnly, sendNotification, validFor, weekendRule, holidayRule, paymentTerms, freightTerms, terms]);
 
+    // Handle bulk apply for Price Offers
+    const handleBulkApply = useCallback((property: string, value: number) => {
+        console.log('=== BULK APPLY ===');
+        console.log('Property:', property);
+        console.log('Value:', value);
+        console.log('Selected Offers:', selectedOffers);
+
+        // Apply changes to selected offers
+        const updatedOffers = selectedOffers.map(offer => {
+            const updates: any = {};
+
+            if (property === 'proposedDiff') {
+                // Update proposed differential
+                updates.proposedDiff = value;
+                // Recalculate proposed price based on current price + new diff
+                updates.proposedPrice = Number(offer.currentPrice) + Number(value);
+            } else if (property === 'proposedPrice') {
+                // Update proposed price directly
+                updates.proposedPrice = value;
+            }
+
+            return { ...offer, ...updates };
+        });
+
+        // Update the grid data with changes
+        setSamplePricingRowData(prevData => {
+            return prevData.map(row => {
+                const updatedRow = updatedOffers.find(u => u.id === row.id);
+                return updatedRow || row;
+            });
+        });
+
+        console.log('Updated Offers:', updatedOffers);
+
+        // Show success message
+        const propertyLabel = property === 'proposedDiff' ? 'Proposed Differential' : 'Proposed Price';
+        message.success(`Updated ${propertyLabel} for ${selectedOffers.length} offer${selectedOffers.length > 1 ? 's' : ''}`);
+
+        // Clear selection (keep bulk change mode active for another operation)
+        setSelectedOffers([]);
+    }, [selectedOffers]);
+
     // Mock data for index offers
     const rowData = useMemo(() => [
         {
@@ -405,6 +478,158 @@ export function IndexOfferManagement() {
             isSelected: false
         }
     ], []);
+
+    // Sample Pricing Grid Data (for Tab 2: Offer Pricing)
+    const [samplePricingRowData, setSamplePricingRowData] = useState(() => [
+        { id: 1, product: '87 Gas', location: 'Houston', type: 'Argus', formula: '90% Prior Day Argus CBOB USGC, 10% Prior Day Argus CBOB USGC', currentDiff: 0.0200, currentPrice: 2.4500, proposedDiff: 0.0250, proposedPrice: 2.4550 },
+        { id: 2, product: 'ULSD 2', location: 'Houston', type: 'OPIS', formula: '100% Prior Day OPIS Houston ULSD', currentDiff: 0.0000, currentPrice: 2.7800, proposedDiff: 0.0050, proposedPrice: 2.7850 },
+        { id: 3, product: '87 Gas', location: 'Nashville Terminal', type: 'Argus', formula: '90% Prior Day Argus CBOB USGC, 10% Current OPIS RIN', currentDiff: 0.0300, currentPrice: 2.4700, proposedDiff: 0.0280, proposedPrice: 2.4680 },
+        { id: 4, product: 'ULSD 2', location: 'Nashville Terminal', type: 'OPIS', formula: '100% Prior Day OPIS Nashville ULSD Rack', currentDiff: 0.0100, currentPrice: 2.7900, proposedDiff: 0.0120, proposedPrice: 2.7920 },
+        { id: 5, product: '87 Gas', location: 'Detroit Terminal', type: 'Argus', formula: '95% Prior Day Argus CBOB Group 3, Less 5% OPIS RIN', currentDiff: 0.0200, currentPrice: 2.4600, proposedDiff: 0.0180, proposedPrice: 2.4580 },
+        { id: 6, product: 'ULSD 2', location: 'Detroit Terminal', type: 'OPIS', formula: '100% Prior Day OPIS Detroit ULSD', currentDiff: 0.0000, currentPrice: 2.7750, proposedDiff: 0.0075, proposedPrice: 2.7825 },
+        { id: 7, product: '93 Premium', location: 'Columbia Terminal', type: 'Argus', formula: '90% Prior Day Argus Premium USGC, 10% Prior Day Argus RFG USGC', currentDiff: 0.0500, currentPrice: 2.8200, proposedDiff: 0.0450, proposedPrice: 2.8150 },
+        { id: 8, product: '87 Gas', location: 'Columbia Terminal', type: 'OPIS', formula: '100% Current Day OPIS Columbia Rack', currentDiff: 0.0100, currentPrice: 2.4650, proposedDiff: 0.0150, proposedPrice: 2.4700 },
+        { id: 9, product: 'B7 GHL', location: 'Columbia Terminal', type: 'Argus', formula: '93% Prior Day Argus ULSD, 7% Prior Day Argus Biodiesel', currentDiff: 0.0000, currentPrice: 2.8100, proposedDiff: 0.0100, proposedPrice: 2.8200 },
+        { id: 10, product: 'Mid-Grade 88', location: 'Columbia Terminal', type: 'Platts', formula: '50% Prior Day OPIS 87 Gas, 50% Prior Day OPIS 93 Premium', currentDiff: 0.0200, currentPrice: 2.6400, proposedDiff: 0.0220, proposedPrice: 2.6420 }
+    ]);
+
+    // Sample Pricing Grid Column Definitions
+    const samplePricingColumnDefs = useMemo(() => [
+        {
+            field: 'location',
+            headerName: 'LOCATION',
+            width: 160,
+            sortable: true,
+            filter: true,
+            checkboxSelection: bulkChangeModeActive,  // Show checkboxes only in bulk change mode
+            headerCheckboxSelection: bulkChangeModeActive  // Show header checkbox only in bulk change mode
+        },
+        {
+            field: 'product',
+            headerName: 'PRODUCT',
+            width: 130,
+            sortable: true,
+            filter: true
+        },
+        {
+            field: 'type',
+            headerName: 'TYPE',
+            width: 100,
+            sortable: true,
+            filter: true
+        },
+        {
+            field: 'formula',
+            headerName: 'FORMULA',
+            width: 400,
+            sortable: true,
+            filter: true,
+            cellStyle: { fontFamily: 'monospace', fontSize: '11px' }
+        },
+        {
+            field: 'currentDiff',
+            headerName: 'CURRENT DIFF',
+            width: 130,
+            sortable: true,
+            filter: true,
+            type: 'numericColumn',
+            valueFormatter: (params: any) => params.value != null ? params.value.toFixed(4) : '',
+            cellStyle: { textAlign: 'right', fontFamily: 'monospace' }
+        },
+        {
+            field: 'currentPrice',
+            headerName: 'CURRENT PRICE',
+            width: 140,
+            sortable: true,
+            filter: true,
+            type: 'numericColumn',
+            valueFormatter: (params: any) => params.value != null ? `$${params.value.toFixed(4)}` : '',
+            cellStyle: { textAlign: 'right', fontFamily: 'monospace' }
+        },
+        {
+            field: 'proposedDiff',
+            headerName: 'PROPOSED DIFF',
+            width: 140,
+            sortable: true,
+            filter: true,
+            type: 'numericColumn',
+            valueFormatter: (params: any) => params.value != null ? params.value.toFixed(4) : '',
+            cellStyle: { textAlign: 'right', fontFamily: 'monospace' }
+        },
+        {
+            field: 'proposedPrice',
+            headerName: 'PROPOSED PRICE',
+            width: 150,
+            sortable: true,
+            filter: true,
+            type: 'numericColumn',
+            valueFormatter: (params: any) => params.value != null ? `$${params.value.toFixed(4)}` : '',
+            cellStyle: (params: any) => {
+                // Highlight proposed price if different from current
+                const priceDiff = params.data?.proposedPrice - params.data?.currentPrice;
+                if (priceDiff > 0) {
+                    return { textAlign: 'right', fontFamily: 'monospace', backgroundColor: '#fff7e6', color: '#d46b08' };
+                } else if (priceDiff < 0) {
+                    return { textAlign: 'right', fontFamily: 'monospace', backgroundColor: '#f6ffed', color: '#52c41a' };
+                }
+                return { textAlign: 'right', fontFamily: 'monospace' };
+            }
+        }
+    ], [bulkChangeModeActive]); // Depends on bulkChangeModeActive to show/hide checkboxes
+
+    // Update grid columns when bulk change mode changes
+    useEffect(() => {
+        if (pricingGridApiRef.current) {
+            console.log('[useEffect bulkChangeModeActive] Updating column definitions, mode:', bulkChangeModeActive);
+
+            // CRITICAL FIX: Clear all selections BEFORE updating column definitions when exiting bulk mode
+            // This prevents AG Grid from maintaining selection state that causes checkboxes to persist
+            if (!bulkChangeModeActive) {
+                console.log('[useEffect bulkChangeModeActive] Clearing selections before removing checkboxes');
+                pricingGridApiRef.current.deselectAll();
+            }
+
+            pricingGridApiRef.current.setColumnDefs(samplePricingColumnDefs);
+
+            // Use refreshCells with force instead of redrawRows for more thorough cell updates
+            pricingGridApiRef.current.refreshCells({
+                force: true,  // Force refresh even if data hasn't changed
+                suppressFlash: true  // Don't show flash animation
+            });
+        }
+    }, [bulkChangeModeActive, samplePricingColumnDefs]);
+
+    // Pricing Grid AG Prop Overrides - Stable configuration following GlobalTieredPricing pattern
+    const pricingGridAgPropOverrides = useMemo(() => ({
+        getRowId: (params: any) => params.data.id,
+        domLayout: 'normal',
+        headerHeight: 40,
+        rowHeight: 40,
+        rowSelection: 'multiple' as const,  // ✅ PERMANENT - always enabled
+        suppressRowClickSelection: true,  // ✅ PERMANENT - prevent row click from toggling selection
+        enableCellTextSelection: true,
+        onGridReady: handlePricingGridReady,
+        onRowClicked: (event: any) => {
+            console.log('[onRowClicked] Row clicked:', event.data);
+            // Note: Row clicks don't select rows due to suppressRowClickSelection
+            // Selection only happens via checkboxes
+
+            // Handle competitive analysis display - disabled during bulk mode
+            if (bulkChangeModeActive) {
+                // Don't show competitive analysis during bulk mode
+                // Message is displayed in the empty state banner
+                return;
+            }
+            setSelectedPricingRow(event.data);
+        },
+        onRowSelected: (event: any) => {
+            console.log('[onRowSelected] 🔵 Row selection toggled:', event.node.isSelected());
+            const selected = event.api.getSelectedRows();
+            console.log('[onRowSelected] Selected rows:', selected.length);
+            setSelectedOffers(selected);
+        },
+        onSelectionChanged: handlePricingSelectionChanged
+    }), [handlePricingGridReady, handlePricingSelectionChanged, bulkChangeModeActive]);  // Added bulkChangeModeActive for competitive analysis logic
 
     // Analytics Grid Column Definitions
     const analyticsColumnDefs = useMemo(() => [
@@ -1139,90 +1364,179 @@ export function IndexOfferManagement() {
 
     return (
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {/* Market Context Panel (Future State + Panel Mode Only) */}
-            {isFutureMode && viewMode === 'panel' && (
-                <div style={{ padding: '16px 16px 0 16px' }}>
-                    <MarketContextPanel
-                        marketData={selectedMarketContext}
-                        onClose={() => setSelectedRowForContext(null)}
+            {isFutureMode ? (
+                /* Future State Mode: Show Tabs */
+                <>
+                <style>{`
+                    .index-offer-tabs {
+                        flex: 1 !important;
+                        min-height: 0;
+                    }
+                    .index-offer-tabs .ant-tabs-content-holder {
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1;
+                    }
+                    .index-offer-tabs .ant-tabs-content {
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1;
+                        min-height: 0;
+                    }
+                    .index-offer-tabs .ant-tabs-tabpane {
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1;
+                        min-height: 0;
+                    }
+                `}</style>
+                <Tabs
+                    activeKey={activeTab}
+                    onChange={setActiveTab}
+                    style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                    className="index-offer-tabs"
+                >
+                    <Tabs.TabPane tab="Offer Management" key="offer-management" style={{ height: '100%' }}>
+                        {/* Main Offer Grid - Full Height */}
+                        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <GraviGrid
+                                key="offer-management-grid"
+                                storageKey="index-offer-management-grid"
+                                rowData={rowData}
+                                columnDefs={columnDefs}
+                                agPropOverrides={agPropOverrides}
+                                controlBarProps={controlBarProps}
+                                updateEP={updateEP}
+                            />
+                        </div>
+                    </Tabs.TabPane>
+
+                    <Tabs.TabPane tab="Offer Pricing" key="offer-pricing" style={{ height: '100%' }}>
+                        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px' }}>
+                            {/* Competitive Analysis Grid - Collapses when empty */}
+                            {selectedPricingRow ? (
+                                <div style={{ height: '400px' }}>
+                                    <GraviGrid
+                                        storageKey="offer-pricing-competitive-grid"
+                                        rowData={analyticsRowData}
+                                        columnDefs={analyticsColumnDefs}
+                                        agPropOverrides={{
+                                            getRowId: (params: any) => params.data.id,
+                                            domLayout: 'normal',
+                                            headerHeight: 40,
+                                            rowHeight: 48,
+                                            suppressRowClickSelection: true,
+                                            enableCellTextSelection: true,
+                                            rowGroupPanelShow: 'never',
+                                            suppressDragLeaveHidesColumns: true
+                                        }}
+                                        controlBarProps={{
+                                            title: (
+                                                <Horizontal style={{ gap: '16px', alignItems: 'baseline' }}>
+                                                    <Texto category="h6" weight="600">
+                                                        Competitive Analysis
+                                                    </Texto>
+                                                    <Texto category="p1" appearance="medium">
+                                                        Selected: {selectedPricingRow?.product} - {selectedPricingRow?.location}
+                                                    </Texto>
+                                                </Horizontal>
+                                            ),
+                                            hideActiveFilters: true,
+                                            hideFilterRow: true,
+                                            actionButtons: (
+                                                <Button size="small" onClick={() => setSelectedPricingRow(null)}>
+                                                    Close
+                                                </Button>
+                                            )
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div style={{
+                                    height: '80px',
+                                    backgroundColor: bulkChangeModeActive ? '#fff7e6' : '#fafafa',
+                                    border: bulkChangeModeActive ? '1px dashed #ffa940' : '1px dashed #d9d9d9',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '16px'
+                                }}>
+                                    <Horizontal style={{ gap: '12px', alignItems: 'center' }}>
+                                        <EyeOutlined style={{ fontSize: '24px', color: bulkChangeModeActive ? '#fa8c16' : '#bfbfbf' }} />
+                                        <Texto category="p2" appearance="medium" style={{ color: bulkChangeModeActive ? '#d46b08' : undefined }}>
+                                            {bulkChangeModeActive
+                                                ? 'Competitive analysis is disabled during bulk change mode. Exit bulk change mode to view analysis.'
+                                                : 'Click any row in the Price Offers table below to view competitive analysis'
+                                            }
+                                        </Texto>
+                                    </Horizontal>
+                                </div>
+                            )}
+
+                            {/* Price Offers Grid - Flex-based, takes available space with bottom padding for drawer */}
+                            <div style={{ flex: 1, minHeight: '300px', paddingBottom: bulkChangeModeActive ? '90px' : '0' }}>
+                                <GraviGrid
+                                    storageKey="offer-pricing-sample-grid"
+                                    rowData={samplePricingRowData}
+                                    columnDefs={samplePricingColumnDefs}
+                                    agPropOverrides={pricingGridAgPropOverrides}
+                                    controlBarProps={{
+                                        title: 'Price Offers',
+                                        hideActiveFilters: false,
+                                        actionButtons: (
+                                            <GraviButton
+                                                buttonText={bulkChangeModeActive ? 'Exit Bulk Change' : 'Bulk Change'}
+                                                appearance={bulkChangeModeActive ? 'outlined' : 'solid'}
+                                                onClick={() => {
+                                                    console.log('[Bulk Change Button] Current state:', bulkChangeModeActive);
+                                                    if (bulkChangeModeActive) {
+                                                        // Exit bulk change mode
+                                                        console.log('[Bulk Change Button] Exiting bulk change mode');
+                                                        setBulkChangeModeActive(false);
+                                                        setSelectedOffers([]);
+                                                        // Clear selection via AG Grid API
+                                                        if (pricingGridApiRef.current) {
+                                                            pricingGridApiRef.current.deselectAll();
+                                                            console.log('[Bulk Change Button] ✅ Cleared grid selection');
+                                                        }
+                                                    } else {
+                                                        // Enter bulk change mode
+                                                        console.log('[Bulk Change Button] Entering bulk change mode');
+                                                        setBulkChangeModeActive(true);
+                                                        setSelectedPricingRow(null); // Clear competitive analysis when entering bulk mode
+                                                    }
+                                                }}
+                                            />
+                                        )
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </Tabs.TabPane>
+                </Tabs>
+
+                {/* Bulk Change Bar - Only show when in bulk change mode */}
+                {bulkChangeModeActive && (
+                    <BulkChangeBar
+                        selectedRows={selectedOffers}
+                        onApply={handleBulkApply}
+                    />
+                )}
+                </>
+            ) : (
+                /* MVP Mode: Just show main grid without tabs */
+                <div style={{ flex: 1, minHeight: 0 }}>
+                    <GraviGrid
+                        storageKey="index-offer-management-grid"
+                        rowData={rowData}
+                        columnDefs={columnDefs}
+                        agPropOverrides={agPropOverrides}
+                        controlBarProps={controlBarProps}
+                        updateEP={updateEP}
                     />
                 </div>
             )}
-
-            {/* Analytics Grid (Future State + Analytics Mode Only) */}
-            {isFutureMode && viewMode === 'analytics' && (
-                <div>
-                    {selectedRowForContext ? (
-                        <div style={{ marginBottom: '16px', height: '400px' }}>
-                            <GraviGrid
-                                storageKey="analytics-competitive-grid"
-                                rowData={analyticsRowData}
-                                columnDefs={analyticsColumnDefs}
-                                agPropOverrides={{
-                                    getRowId: (params: any) => params.data.id,
-                                    domLayout: 'normal',
-                                    headerHeight: 40,
-                                    rowHeight: 48,
-                                    suppressRowClickSelection: true,
-                                    enableCellTextSelection: true,
-                                    rowGroupPanelShow: 'never',
-                                    suppressDragLeaveHidesColumns: true
-                                }}
-                                controlBarProps={{
-                                    title: (
-                                        <Horizontal style={{ gap: '16px', alignItems: 'baseline' }}>
-                                            <Texto category="h6" weight="600">
-                                                Competitive Analysis
-                                            </Texto>
-                                            <Texto category="p1" appearance="medium">
-                                                Offer: {selectedRowForContext?.product} at {selectedRowForContext?.terminal}
-                                            </Texto>
-                                        </Horizontal>
-                                    ),
-                                    hideActiveFilters: true,
-                                    hideFilterRow: true,
-                                    actionButtons: (
-                                        <Button size="small" onClick={() => setSelectedRowForContext(null)}>
-                                            Close
-                                        </Button>
-                                    )
-                                }}
-                            />
-                        </div>
-                    ) : (
-                        <div style={{
-                            backgroundColor: '#fafafa',
-                            border: '1px dashed #d9d9d9',
-                            borderRadius: '8px',
-                            padding: '48px 24px',
-                            marginBottom: '16px',
-                            textAlign: 'center'
-                        }}>
-                            <Vertical style={{ gap: '8px', alignItems: 'center' }}>
-                                <EyeOutlined style={{ fontSize: '48px', color: '#bfbfbf' }} />
-                                <Texto category="p1" weight="600" appearance="medium">
-                                    Select an offer to view competitive analysis
-                                </Texto>
-                                <Texto category="p2" appearance="medium">
-                                    Click any row in the grid below to see detailed pricing comparison
-                                </Texto>
-                            </Vertical>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* Main Grid */}
-            <div style={{ flex: 1, minHeight: 0 }}>
-                <GraviGrid
-                    storageKey="index-offer-management-grid"
-                    rowData={rowData}
-                    columnDefs={columnDefs}
-                    agPropOverrides={agPropOverrides}
-                    controlBarProps={controlBarProps}
-                    updateEP={updateEP}
-                />
-            </div>
 
             {/* Floating Action Button for View Settings */}
             <Button
@@ -1255,7 +1569,7 @@ export function IndexOfferManagement() {
                 placement="bottom"
                 height="80vh"
                 onClose={() => setOfferDrawerVisible(false)}
-                visible={offerDrawerVisible}
+                open={offerDrawerVisible}
                 mask={true}
                 closable={false}
                 destroyOnClose
@@ -1743,8 +2057,6 @@ export function IndexOfferManagement() {
                 visible={settingsDrawerVisible}
                 zIndex={2000}
                 maskClosable={true}
-                destroyOnClose={true}
-                getContainer={() => document.body}
             >
                 <Vertical style={{ gap: '24px' }}>
                     {/* Feature Prioritization Section */}
