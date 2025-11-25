@@ -22,17 +22,9 @@ export const horizontalComponent: ComponentMetadata = {
       description: "Child elements to arrange horizontally"
     },
     {
-      name: "gap",
-      type: "string",
-      required: false,
-      defaultValue: "'0px'",
-      description: "Space between children (CSS gap value)"
-    },
-    {
       name: "alignItems",
       type: "'flex-start' | 'center' | 'flex-end' | 'stretch'",
       required: false,
-      defaultValue: "'center'",
       description: "Vertical alignment of children"
     },
     {
@@ -43,28 +35,98 @@ export const horizontalComponent: ComponentMetadata = {
       description: "Horizontal alignment/distribution"
     },
     {
-      name: "wrap",
+      name: "verticalCenter",
       type: "boolean",
       required: false,
       defaultValue: "false",
-      description: "Allow children to wrap to new lines"
+      description: "Shorthand for alignItems='center'"
+    },
+    {
+      name: "horizontalCenter",
+      type: "boolean",
+      required: false,
+      defaultValue: "false",
+      description: "Shorthand for justifyContent='center'"
+    },
+    {
+      name: "flex",
+      type: "string",
+      required: false,
+      defaultValue: "'0 1 auto'",
+      description: "CSS flex property value"
+    },
+    {
+      name: "width",
+      type: "string",
+      required: false,
+      description: "CSS width value"
+    },
+    {
+      name: "height",
+      type: "string",
+      required: false,
+      description: "CSS height value"
+    },
+    {
+      name: "fullHeight",
+      type: "boolean",
+      required: false,
+      defaultValue: "false",
+      description: "Apply h-100 class for full height"
+    },
+    {
+      name: "background",
+      type: "string",
+      required: false,
+      description: "CSS variable name for background (e.g., 'bg-1')"
+    },
+    {
+      name: "border",
+      type: "string",
+      required: false,
+      description: "Border style key from borderEnum"
+    },
+    {
+      name: "borderRadius",
+      type: "string",
+      required: false,
+      description: "CSS border-radius value"
+    },
+    {
+      name: "scroll",
+      type: "boolean",
+      required: false,
+      defaultValue: "false",
+      description: "Enable overflow: auto for scrollable content"
     },
     {
       name: "className",
       type: "string",
       required: false,
-      description: "Additional CSS classes"
+      description: "Additional CSS classes (use gap-8, gap-10, gap-12, gap-16 for spacing)"
+    },
+    {
+      name: "style",
+      type: "React.CSSProperties",
+      required: false,
+      description: "Inline styles"
+    },
+    {
+      name: "onClick",
+      type: "() => void",
+      required: false,
+      description: "Click handler"
     }
   ],
   examples: [
     {
       name: "Button Group",
-      description: "Horizontal arrangement of buttons",
+      description: "Horizontal arrangement of buttons with gap",
       code: `import { Horizontal, GraviButton } from '@gravitate-js/excalibrr';
 
 function ButtonGroup() {
   return (
-    <Horizontal gap="8px">
+    <Horizontal verticalCenter className="gap-8">
       <GraviButton>Cancel</GraviButton>
       <GraviButton theme="theme1">Save Draft</GraviButton>
       <GraviButton theme="success">Publish</GraviButton>
@@ -80,12 +142,12 @@ function ButtonGroup() {
 
 function FormRow() {
   return (
-    <Horizontal gap="16px" alignItems="flex-start">
-      <Vertical gap="4px" style={{ flex: 1 }}>
+    <Horizontal className="gap-16" alignItems="flex-start">
+      <Vertical flex="1">
         <Texto weight="semibold">First Name</Texto>
         <input type="text" name="firstName" />
       </Vertical>
-      <Vertical gap="4px" style={{ flex: 1 }}>
+      <Vertical flex="1">
         <Texto weight="semibold">Last Name</Texto>
         <input type="text" name="lastName" />
       </Vertical>
@@ -101,9 +163,9 @@ function FormRow() {
 
 function PageHeader() {
   return (
-    <Horizontal justifyContent="space-between" alignItems="center">
+    <Horizontal justifyContent="space-between" verticalCenter>
       <Texto size="xl" weight="bold">Products</Texto>
-      <Horizontal gap="8px">
+      <Horizontal verticalCenter className="gap-8">
         <GraviButton>Export</GraviButton>
         <GraviButton theme="success">Add Product</GraviButton>
       </Horizontal>

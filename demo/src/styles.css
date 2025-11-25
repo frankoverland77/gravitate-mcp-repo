@@ -66,8 +66,14 @@
 .gap-16 {
   gap: 16px;
 }
+.gap-12 {
+  gap: 12px;
+}
 .gap-10 {
   gap: 10px;
+}
+.gap-8 {
+  gap: 8px;
 }
 @media only screen and (max-width: 1440px) {
   body {

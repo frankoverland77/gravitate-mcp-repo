@@ -3,9 +3,8 @@
  * Used in both card and list views
  */
 
-import React from 'react';
 import { Checkbox } from 'antd';
-import { Texto } from '@gravitate-js/excalibrr';
+import { Texto, Horizontal } from '@gravitate-js/excalibrr';
 import { TemplateComponent } from '../types';
 import { isPlaceholder } from '../../../../pages/demos/grids/FormulaTemplates.data';
 
@@ -24,110 +23,95 @@ export interface ComponentItemProps {
 }
 
 /**
+ * Helper to build class names conditionally
+ */
+const cx = (...classes: (string | false | undefined)[]): string =>
+  classes.filter(Boolean).join(' ');
+
+/**
+ * Get value text class based on placeholder status
+ */
+const getValueClass = (value: string, compact: boolean, normalClass: string): string =>
+  cx(
+    compact ? 'component-item-value-compact' : 'component-item-value',
+    isPlaceholder(value) ? 'component-item-placeholder' : normalClass
+  );
+
+/**
  * Renders a single formula component with selection checkbox
  */
 export function ComponentItem({
   component,
   isSelected,
   onToggle,
-  compact = false
+  compact = false,
 }: ComponentItemProps) {
-  const fontSize = compact ? '11px' : '12px';
-  const secondaryFontSize = compact ? '10px' : '11px';
+  const containerClass = cx(
+    'component-item',
+    compact && 'component-item-compact',
+    isSelected && 'component-item-selected'
+  );
+
+  const infoRowClass = cx('component-item-info-row', compact && 'component-item-info-row-compact');
+
+  const secondaryClass = cx(
+    'component-item-secondary',
+    compact && 'component-item-secondary-compact'
+  );
+
+  const operatorClass =
+    component.operator === '+' ? 'component-item-operator-plus' : 'component-item-operator-minus';
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: compact ? '6px' : '8px',
-        padding: compact ? '6px 8px' : '10px 12px',
-        marginBottom: compact ? '4px' : '0',
-        backgroundColor: isSelected ? '#e8f4fd' : '#f5f5f5',
-        border: `1px solid ${isSelected ? '#1890ff' : '#d9d9d9'}`,
-        borderRadius: compact ? '4px' : '6px',
-        opacity: isSelected ? 1 : 0.6,
-        transition: 'all 0.2s'
-      }}
-    >
-      <Checkbox
-        checked={isSelected}
-        onChange={onToggle}
-        style={{ marginTop: '2px' }}
-      />
+    <Horizontal alignItems="flex-start" className={containerClass}>
+      <Checkbox checked={isSelected} onChange={onToggle} className="component-item-checkbox" />
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Main component info */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: compact ? '4px' : '6px',
-          flexWrap: 'wrap',
-          marginBottom: '2px'
-        }}>
-          {/* Percentage */}
-          <Texto style={{
-            margin: 0,
-            fontSize,
-            fontWeight: '700',
-            color: isPlaceholder(component.percentage) ? '#722ed1' : '#1890ff',
-            fontFamily: isPlaceholder(component.percentage) ? 'monospace' : 'inherit'
-          }}>
+      <div className="component-item-content">
+        <div className={infoRowClass}>
+          <Texto
+            className={getValueClass(component.percentage, compact, 'component-item-percentage')}
+          >
             {component.percentage}
           </Texto>
 
-          {/* Operator */}
-          <Texto style={{
-            margin: 0,
-            fontSize,
-            fontWeight: '700',
-            color: component.operator === '+' ? '#28a745' : '#dc3545'
-          }}>
+          <Texto
+            className={cx(
+              compact ? 'component-item-value-compact' : 'component-item-value',
+              operatorClass
+            )}
+          >
             {component.operator}
           </Texto>
 
-          {/* Source */}
-          <Texto style={{
-            margin: 0,
-            fontSize,
-            fontWeight: compact ? '700' : '600',
-            color: isPlaceholder(component.source) ? '#722ed1' : '#333',
-            fontFamily: isPlaceholder(component.source) ? 'monospace' : 'inherit'
-          }}>
+          <Texto
+            className={getValueClass(component.source, compact, 'component-item-source')}
+            weight={!isPlaceholder(component.source) && !compact ? '600' : undefined}
+          >
             {component.source}
           </Texto>
 
-          {/* Instrument */}
-          <Texto style={{
-            margin: 0,
-            fontSize,
-            color: isPlaceholder(component.instrument) ? '#722ed1' : '#666',
-            fontFamily: isPlaceholder(component.instrument) ? 'monospace' : 'inherit',
-            fontWeight: compact ? '700' : isPlaceholder(component.instrument) ? '600' : 'normal'
-          }}>
+          <Texto
+            className={getValueClass(component.instrument, compact, 'component-item-instrument')}
+            weight={isPlaceholder(component.instrument) && !compact ? '600' : undefined}
+          >
             {component.instrument}
           </Texto>
         </div>
 
-        {/* Secondary info (date rule and type) */}
-        <Texto style={{ margin: 0, fontSize: secondaryFontSize, color: '#8c8c8c' }}>
-          <span style={{
-            color: isPlaceholder(component.dateRule) ? '#722ed1' : '#8c8c8c',
-            fontFamily: isPlaceholder(component.dateRule) ? 'monospace' : 'inherit',
-            fontWeight: isPlaceholder(component.dateRule) ? compact ? '700' : '600' : 'normal'
-          }}>
+        <Texto className={secondaryClass}>
+          <span
+            className={isPlaceholder(component.dateRule) ? 'component-item-placeholder' : undefined}
+          >
             {component.dateRule}
           </span>
           {' • '}
-          <span style={{
-            color: isPlaceholder(component.type) ? '#722ed1' : '#8c8c8c',
-            fontFamily: isPlaceholder(component.type) ? 'monospace' : 'inherit',
-            fontWeight: isPlaceholder(component.type) ? compact ? '700' : '600' : 'normal'
-          }}>
+          <span
+            className={isPlaceholder(component.type) ? 'component-item-placeholder' : undefined}
+          >
             {component.type}
           </span>
         </Texto>
       </div>
-    </div>
+    </Horizontal>
   );
 }

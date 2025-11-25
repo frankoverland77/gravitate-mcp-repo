@@ -2,9 +2,8 @@
  * List view display for a single template
  */
 
-import React from 'react';
 import { Tag } from 'antd';
-import { Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { Template } from '../types';
 import { ComponentItem } from './ComponentItem';
 import { FormulaPreview } from './FormulaPreview';
@@ -48,18 +47,18 @@ export function TemplateListItem({
     <div className={containerClass}>
       {/* List Card Header */}
       <div className="template-list-item-header">
-        <div className="template-list-item-header-left">
-          <div className="template-list-item-title-row">
+        <Vertical flex="1">
+          <Horizontal verticalCenter className="gap-12 mb-1">
             <Texto className="template-list-item-name">{template.name}</Texto>
             {hasPlaceholders && (
               <Tag className="template-list-item-placeholder-tag">PLACEHOLDERS</Tag>
             )}
-          </div>
+          </Horizontal>
           <Texto className="template-list-item-subtitle">
             {template.contractType} • {template.usedInLocations?.join(', ') || 'N/A'}
           </Texto>
-        </div>
-        <div className="template-list-item-header-right">
+        </Vertical>
+        <Horizontal verticalCenter className="gap-16">
           <Texto className="template-list-item-selected-count">
             {getSelectedCount()} components selected
           </Texto>
@@ -68,11 +67,11 @@ export function TemplateListItem({
             appearance="success"
             onClick={onTemplateSelect}
           />
-        </div>
+        </Horizontal>
       </div>
 
       {/* List Card Content */}
-      <div className="template-list-item-content">
+      <Vertical className="p-4">
         {/* Components Grid */}
         <div className="template-list-item-components-grid">
           {template.components.map((comp) => (
@@ -88,7 +87,7 @@ export function TemplateListItem({
 
         {/* Formula Preview */}
         <FormulaPreview previewText={previewText} title="Formula Preview" compact={true} />
-      </div>
+      </Vertical>
     </div>
   );
 }

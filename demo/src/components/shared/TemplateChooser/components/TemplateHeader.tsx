@@ -2,10 +2,9 @@
  * Header component for the TemplateChooser with search, filters, and view controls
  */
 
-import React from 'react';
 import { Segmented, Input } from 'antd';
 import { SearchOutlined, ExportOutlined, LeftOutlined } from '@ant-design/icons';
-import { Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { FilterTags } from './FilterTags';
 import { FilterField, FilterStateMap, TemplateViewMode } from '../types';
 
@@ -86,43 +85,27 @@ export function TemplateHeader({
   showManageButton,
   onManageTemplates,
   onClose,
-  manageButtonPath
+  manageButtonPath,
 }: TemplateHeaderProps) {
   return (
     <>
       {/* Title and Manage Button Row */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '12px'
-      }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px'
-        }}>
-          <Texto style={{
-            margin: 0,
-            color: '#262626',
-            fontSize: '20px',
-            fontWeight: 'bold',
-            lineHeight: '28px'
-          }}>
+      <Horizontal
+        justifyContent="space-between"
+        alignItems="flex-start"
+        className="template-header-title-row"
+      >
+        <Vertical className="template-header-title-column">
+          <Texto category="h3" weight="bold">
             {title}
           </Texto>
-          <Texto style={{
-            margin: 0,
-            color: '#8c8c8c',
-            fontSize: '14px',
-            lineHeight: '22px'
-          }}>
+          <Texto category="p1" appearance="hint">
             {subtitle}
           </Texto>
-        </div>
+        </Vertical>
 
         {showManageButton && (
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Horizontal verticalCenter className="template-header-actions">
             <GraviButton
               buttonText="Manage Formula Templates"
               icon={<ExportOutlined />}
@@ -134,61 +117,40 @@ export function TemplateHeader({
                   window.open(manageButtonPath, '_blank');
                 }
               }}
-              style={{
-                fontWeight: 'bold',
-                borderColor: '#1890ff',
-                color: '#1890ff'
-              }}
+              className="template-header-manage-button"
             />
             {onClose && (
-              <div
-                style={{
-                  cursor: 'pointer',
-                  color: '#595959',
-                  fontSize: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-                onClick={onClose}
-              >
-                <LeftOutlined style={{ fontSize: '12px' }} />
-                <span>Exit Templates</span>
-              </div>
+              <Horizontal verticalCenter className="template-header-exit-link" onClick={onClose}>
+                <LeftOutlined />
+                <Texto category="p1">Exit Templates</Texto>
+              </Horizontal>
             )}
-          </div>
+          </Horizontal>
         )}
-      </div>
+      </Horizontal>
 
       {/* Segmented Tabs, Search, and Filters Row */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
-        marginBottom: '16px',
-        flexWrap: 'wrap'
-      }}>
+      <Horizontal verticalCenter className="template-header-controls-row">
         {/* Segmented Tabs - Left Side */}
         <Segmented
           options={[
             { label: 'Cards', value: 'cards' },
-            { label: 'List', value: 'list' }
+            { label: 'List', value: 'list' },
           ]}
           value={templateViewMode}
           onChange={(value) => onViewModeChange(value as TemplateViewMode)}
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
         />
 
         {/* Search Input - Middle */}
         <Input
           placeholder="Search templates..."
-          prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
+          prefix={<SearchOutlined className="template-header-search-icon" />}
           allowClear
           value={searchText}
           onChange={(e) => onSearchChange(e.target.value)}
-          style={{
-            width: '300px',
-            borderRadius: '6px'
-          }}
+          className="template-header-search"
         />
 
         {/* Filter Tags - Right Side */}
@@ -202,7 +164,7 @@ export function TemplateHeader({
           onAddFilter={onAddFilter}
           filterDropdownRef={filterDropdownRef}
         />
-      </div>
+      </Horizontal>
     </>
   );
 }

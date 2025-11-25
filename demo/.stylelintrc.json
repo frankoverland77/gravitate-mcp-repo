@@ -1,0 +1,19 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.less"],
+      "customSyntax": "postcss-less"
+    }
+  ],
+  "ignoreFiles": [
+    "**/Theming/**"
+  ],
+  "rules": {
+    "selector-class-pattern": [
+      "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      {
+        "message": "Class names must be kebab-case (e.g., 'my-component-header')"
+      }
+    ]
+  }
+}

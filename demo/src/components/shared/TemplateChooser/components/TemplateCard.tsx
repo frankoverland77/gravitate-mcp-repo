@@ -2,13 +2,13 @@
  * Card view display for a single template
  */
 
-import React from 'react';
 import { Tag } from 'antd';
-import { Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { Template } from '../types';
 import { ComponentItem } from './ComponentItem';
 import { FormulaPreview } from './FormulaPreview';
 import { templateHasPlaceholders, buildFormulaPreviewFiltered } from '../utils/formulaPreview';
+import './TemplateCard.css';
 
 export interface TemplateCardProps {
   /** The template to display */
@@ -30,6 +30,103 @@ export interface TemplateCardProps {
   showExternalName: boolean;
 }
 
+interface CardHeaderProps {
+  template: Template;
+  hasPlaceholders: boolean;
+}
+
+function CardHeader({ template, hasPlaceholders }: CardHeaderProps) {
+  return (
+    <div className="template-card-header">
+      <Horizontal verticalCenter className="gap-8 mb-2">
+        <Texto className="template-card-title">{template.name}</Texto>
+        {hasPlaceholders && <Tag className="template-card-placeholder-tag">PLACEHOLDERS</Tag>}
+      </Horizontal>
+
+      <Vertical className="mb-1">
+        <Texto className="template-card-field-label">Type:</Texto>
+        <Texto className="template-card-field-value">{template.contractType}</Texto>
+      </Vertical>
+
+      <Vertical className="mb-1">
+        <Texto className="template-card-field-label">Location:</Texto>
+        <Texto className="template-card-field-value">
+          {template.usedInLocations?.join(', ') || 'N/A'}
+        </Texto>
+      </Vertical>
+
+      <Vertical>
+        <Texto className="template-card-field-label">Products:</Texto>
+        <Texto className="template-card-field-value">
+          {template.usedInProducts?.join(', ') || 'N/A'}
+        </Texto>
+      </Vertical>
+    </div>
+  );
+}
+
+interface CardContentProps {
+  template: Template;
+  selectedComponents: Record<number, boolean>;
+  onComponentToggle: (compId: number) => void;
+  getSelectedCount: () => number;
+  previewText: string;
+  showExternalName: boolean;
+}
+
+function CardContent({
+  template,
+  selectedComponents,
+  onComponentToggle,
+  getSelectedCount,
+  previewText,
+  showExternalName,
+}: CardContentProps) {
+  return (
+    <div className="template-card-content">
+      <div className="template-card-components-header">
+        <Texto className="template-card-components-label">Select Components:</Texto>
+        <Texto className="template-card-components-count">{getSelectedCount()} selected</Texto>
+      </div>
+
+      <div className="template-card-components-list">
+        {(template.components || []).map((comp) => (
+          <ComponentItem
+            key={comp.id}
+            component={comp}
+            isSelected={selectedComponents[comp.id] !== false}
+            onToggle={() => onComponentToggle(comp.id)}
+            compact={true}
+          />
+        ))}
+      </div>
+
+      <FormulaPreview
+        previewText={previewText}
+        showExternalName={showExternalName}
+        compact={false}
+      />
+    </div>
+  );
+}
+
+interface CardFooterProps {
+  onTemplateSelect: () => void;
+}
+
+function CardFooter({ onTemplateSelect }: CardFooterProps) {
+  return (
+    <Vertical className="p-3">
+      <GraviButton
+        buttonText="Select Template"
+        appearance="success"
+        onClick={onTemplateSelect}
+        className="template-card-select-button"
+      />
+    </Vertical>
+  );
+}
+
 /**
  * Renders a template as a card in the horizontal scrolling view
  */
@@ -39,188 +136,27 @@ export function TemplateCard({
   onComponentToggle,
   onTemplateSelect,
   getSelectedCount,
-  showExternalName
+  showExternalName,
 }: TemplateCardProps) {
   const hasPlaceholders = templateHasPlaceholders(template);
   const previewText = buildFormulaPreviewFiltered(template, selectedComponents);
 
+  const cardClassName = hasPlaceholders
+    ? 'template-card template-card-has-placeholders'
+    : 'template-card';
+
   return (
-    <div
-      style={{
-        width: '320px',
-        height: '480px',
-        minWidth: '320px',
-        backgroundColor: 'white',
-        border: '1px solid #d9d9d9',
-        borderLeft: hasPlaceholders ? '3px solid #722ed1' : '1px solid #d9d9d9',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        zIndex: 1
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.12)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)';
-      }}
-    >
-      {/* Card Header */}
-      <div style={{
-        backgroundColor: '#f8f9fa',
-        padding: '12px',
-        borderBottom: '1px solid #e9ecef',
-        flexShrink: 0
-      }}>
-        {/* Display Name with Placeholder Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <Texto style={{
-            margin: 0,
-            fontSize: '14px',
-            fontWeight: 'bold',
-            color: '#1a1a1a',
-            lineHeight: '18px',
-            flex: 1
-          }}>
-            {template.name}
-          </Texto>
-          {hasPlaceholders && (
-            <Tag style={{
-              margin: 0,
-              backgroundColor: '#f3e8ff',
-              color: '#722ed1',
-              border: '1px solid #d3adf7',
-              borderRadius: '4px',
-              fontSize: '9px',
-              fontWeight: 600,
-              padding: '2px 6px',
-              lineHeight: '12px'
-            }}>
-              PLACEHOLDERS
-            </Tag>
-          )}
-        </div>
-
-        {/* Type */}
-        <div style={{ marginBottom: '6px' }}>
-          <Texto style={{
-            margin: 0,
-            fontSize: '10px',
-            fontWeight: '600',
-            color: '#8c8c8c',
-            lineHeight: '14px'
-          }}>
-            Type:
-          </Texto>
-          <Texto style={{ margin: 0, fontSize: '11px', color: '#333', lineHeight: '16px' }}>
-            {template.contractType}
-          </Texto>
-        </div>
-
-        {/* Location */}
-        <div style={{ marginBottom: '6px' }}>
-          <Texto style={{
-            margin: 0,
-            fontSize: '10px',
-            fontWeight: '600',
-            color: '#8c8c8c',
-            lineHeight: '14px'
-          }}>
-            Location:
-          </Texto>
-          <Texto style={{ margin: 0, fontSize: '11px', color: '#333', lineHeight: '16px' }}>
-            {template.usedInLocations?.join(', ') || 'N/A'}
-          </Texto>
-        </div>
-
-        {/* Products */}
-        <div>
-          <Texto style={{
-            margin: 0,
-            fontSize: '10px',
-            fontWeight: '600',
-            color: '#8c8c8c',
-            lineHeight: '14px'
-          }}>
-            Products:
-          </Texto>
-          <Texto style={{ margin: 0, fontSize: '11px', color: '#333', lineHeight: '16px' }}>
-            {template.usedInProducts?.join(', ') || 'N/A'}
-          </Texto>
-        </div>
-      </div>
-
-      {/* Card Content */}
-      <div style={{
-        padding: '12px',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        minHeight: 0
-      }}>
-        {/* Components Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '8px',
-          flexShrink: 0
-        }}>
-          <Texto style={{ margin: 0, fontSize: '11px', fontWeight: '600', color: '#333' }}>
-            Select Components:
-          </Texto>
-          <Texto style={{ margin: 0, fontSize: '10px', fontWeight: '600', color: '#1890ff' }}>
-            {getSelectedCount()} selected
-          </Texto>
-        </div>
-
-        {/* Scrollable Components List */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          marginBottom: '8px',
-          border: '1px solid #e9ecef',
-          borderRadius: '6px',
-          backgroundColor: '#fafafa',
-          padding: '6px',
-          minHeight: 0
-        }}>
-          {(template.components || []).map((comp) => (
-            <ComponentItem
-              key={comp.id}
-              component={comp}
-              isSelected={selectedComponents[comp.id] !== false}
-              onToggle={() => onComponentToggle(comp.id)}
-              compact={true}
-            />
-          ))}
-        </div>
-
-        {/* Formula Preview */}
-        <FormulaPreview
-          previewText={previewText}
-          showExternalName={showExternalName}
-          compact={false}
-        />
-      </div>
-
-      {/* Card Footer */}
-      <div style={{ padding: '12px', flexShrink: 0 }}>
-        <GraviButton
-          buttonText="Select Template"
-          appearance="success"
-          onClick={onTemplateSelect}
-          style={{ width: '100%', fontSize: '12px' }}
-        />
-      </div>
+    <div className={cardClassName}>
+      <CardHeader template={template} hasPlaceholders={hasPlaceholders} />
+      <CardContent
+        template={template}
+        selectedComponents={selectedComponents}
+        onComponentToggle={onComponentToggle}
+        getSelectedCount={getSelectedCount}
+        previewText={previewText}
+        showExternalName={showExternalName}
+      />
+      <CardFooter onTemplateSelect={onTemplateSelect} />
     </div>
   );
 }
