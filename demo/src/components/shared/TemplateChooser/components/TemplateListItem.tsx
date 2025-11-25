@@ -35,86 +35,46 @@ export function TemplateListItem({
   selectedComponents,
   onComponentToggle,
   onTemplateSelect,
-  getSelectedCount
+  getSelectedCount,
 }: TemplateListItemProps) {
   const hasPlaceholders = templateHasPlaceholders(template);
   const previewText = buildFormulaPreviewFiltered(template, selectedComponents);
 
+  const containerClass = hasPlaceholders
+    ? 'template-list-item template-list-item-has-placeholders'
+    : 'template-list-item';
+
   return (
-    <div
-      style={{
-        width: '100%',
-        backgroundColor: 'white',
-        border: '1px solid #d9d9d9',
-        borderLeft: hasPlaceholders ? '3px solid #722ed1' : '1px solid #d9d9d9',
-        borderRadius: '8px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        transition: 'box-shadow 0.2s'
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'}
-      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'}
-    >
+    <div className={containerClass}>
       {/* List Card Header */}
-      <div style={{
-        backgroundColor: '#f8f9fa',
-        padding: '16px 20px',
-        borderBottom: '1px solid #e9ecef',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-            <Texto style={{
-              margin: 0,
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#1a1a1a',
-              lineHeight: '22px'
-            }}>
-              {template.name}
-            </Texto>
+      <div className="template-list-item-header">
+        <div className="template-list-item-header-left">
+          <div className="template-list-item-title-row">
+            <Texto className="template-list-item-name">{template.name}</Texto>
             {hasPlaceholders && (
-              <Tag style={{
-                margin: 0,
-                backgroundColor: '#f3e8ff',
-                color: '#722ed1',
-                border: '1px solid #d3adf7',
-                borderRadius: '4px',
-                fontSize: '10px',
-                fontWeight: 600,
-                padding: '2px 8px'
-              }}>
-                PLACEHOLDERS
-              </Tag>
+              <Tag className="template-list-item-placeholder-tag">PLACEHOLDERS</Tag>
             )}
           </div>
-          <Texto style={{ margin: 0, fontSize: '12px', color: '#666', lineHeight: '16px' }}>
+          <Texto className="template-list-item-subtitle">
             {template.contractType} • {template.usedInLocations?.join(', ') || 'N/A'}
           </Texto>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Texto style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: '#1890ff' }}>
+        <div className="template-list-item-header-right">
+          <Texto className="template-list-item-selected-count">
             {getSelectedCount()} components selected
           </Texto>
           <GraviButton
             buttonText="Select Template"
             appearance="success"
             onClick={onTemplateSelect}
-            style={{ fontSize: '12px' }}
           />
         </div>
       </div>
 
       {/* List Card Content */}
-      <div style={{ padding: '16px' }}>
+      <div className="template-list-item-content">
         {/* Components Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '12px',
-          marginBottom: '16px'
-        }}>
+        <div className="template-list-item-components-grid">
           {template.components.map((comp) => (
             <ComponentItem
               key={comp.id}
@@ -127,11 +87,7 @@ export function TemplateListItem({
         </div>
 
         {/* Formula Preview */}
-        <FormulaPreview
-          previewText={previewText}
-          title="Formula Preview"
-          compact={true}
-        />
+        <FormulaPreview previewText={previewText} title="Formula Preview" compact={true} />
       </div>
     </div>
   );

@@ -193,3 +193,15 @@ The server provides comprehensive tools for Excalibrr demo generation:
 - Helper text/subdued content: `<Texto category="p2" appearance="medium">`
 - Medium gray body text: `<Texto category="p1" appearance="medium">`
 - Avoid hardcoded hex colors - use appearance props instead
+
+**CSS Naming Convention** ⚠️ CRITICAL:
+- ALWAYS use **kebab-case** (single dashes) for CSS class names
+- NEVER use BEM-style double underscores (`__`) or double dashes (`--`)
+- Class names should be prefixed with the component name for global uniqueness
+- Examples:
+  - ✅ `template-list-item-header` (correct)
+  - ✅ `template-list-item-has-placeholders` (correct)
+  - ❌ `template-list-item__header` (wrong - no double underscores)
+  - ❌ `template-list-item--has-placeholders` (wrong - no double dashes)
+- Use directory-level `styles.css` files, imported once in the parent component
+- Child components use classes from the parent's `styles.css` without additional imports
