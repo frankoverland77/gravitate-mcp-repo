@@ -1718,7 +1718,7 @@ export function IndexOfferManagement() {
         placement="bottom"
         height="80vh"
         onClose={() => setOfferDrawerVisible(false)}
-        open={offerDrawerVisible}
+        visible={offerDrawerVisible}
         mask={true}
         closable={false}
         destroyOnClose
