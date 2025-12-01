@@ -20,17 +20,20 @@ import {
   Radio,
   message,
   Tabs,
+  DatePicker,
 } from 'antd';
 import {
   PlusOutlined,
   CloseOutlined,
   SettingOutlined,
   EyeOutlined,
+  EyeInvisibleOutlined,
   EditOutlined,
   DeleteOutlined,
   UndoOutlined,
   ReloadOutlined,
   LeftOutlined,
+  SendOutlined,
 } from '@ant-design/icons';
 import { Popconfirm } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -82,6 +85,12 @@ export function IndexOfferManagement() {
   // Bulk change visibility state (using GraviGrid's built-in bulk change mode)
   const [isBulkChangeVisible, setIsBulkChangeVisible] = useState<boolean>(false);
 
+  // Publish drawer state
+  const [publishDrawerVisible, setPublishDrawerVisible] = useState(false);
+  const [selectedRowsToPublish, setSelectedRowsToPublish] = useState<any[]>([]);
+  const [publishDateTime, setPublishDateTime] = useState<any>(null);
+  const [publishSearchText, setPublishSearchText] = useState('');
+
   // Grid API reference for pricing grid (using externalRef pattern)
   const pricingGridApiRef = useRef<any>(null);
 
@@ -96,6 +105,16 @@ export function IndexOfferManagement() {
     if (!selectedRowForContext) return null;
     return getMarketContextForOffer(selectedRowForContext.id);
   }, [selectedRowForContext]);
+
+  // Filter selected rows for publish drawer
+  const filteredPublishRows = useMemo(() => {
+    if (!publishSearchText) return selectedRowsToPublish;
+    const lower = publishSearchText.toLowerCase();
+    return selectedRowsToPublish.filter(row =>
+      row.location?.toLowerCase().includes(lower) ||
+      row.product?.toLowerCase().includes(lower)
+    );
+  }, [selectedRowsToPublish, publishSearchText]);
 
   // Template chooser state
   const [showTemplateChooser, setShowTemplateChooser] = useState(false);
@@ -284,6 +303,28 @@ export function IndexOfferManagement() {
       terms,
     ]
   );
+
+  // Handler for confirming publish
+  const handleConfirmPublish = useCallback(() => {
+    if (selectedRowsToPublish.length === 0) {
+      message.warning('No offers selected for publishing');
+      return;
+    }
+
+    const publishTime = publishDateTime
+      ? publishDateTime.format('MM/DD/YYYY hh:mm A')
+      : 'immediately';
+
+    message.success(
+      `Publishing ${selectedRowsToPublish.length} offer(s) ${publishTime === 'immediately' ? 'immediately' : `scheduled for ${publishTime}`}`
+    );
+
+    // Reset and close
+    setPublishDrawerVisible(false);
+    setSelectedRowsToPublish([]);
+    setPublishDateTime(null);
+    setPublishSearchText('');
+  }, [selectedRowsToPublish, publishDateTime]);
 
   // Mock data for index offers
   const rowData = useMemo(
@@ -621,7 +662,7 @@ export function IndexOfferManagement() {
         width: 400,
         sortable: true,
         filter: true,
-        cellStyle: { fontFamily: 'monospace', fontSize: '11px' },
+        cellStyle: { fontSize: '12px' },
       },
       {
         field: 'currentDiff',
@@ -631,7 +672,7 @@ export function IndexOfferManagement() {
         filter: true,
         type: 'numericColumn',
         valueFormatter: (params: any) => (params.value != null ? params.value.toFixed(4) : ''),
-        cellStyle: { textAlign: 'right', fontFamily: 'monospace' },
+        cellStyle: { textAlign: 'right' },
       },
       {
         field: 'currentPrice',
@@ -642,7 +683,7 @@ export function IndexOfferManagement() {
         type: 'numericColumn',
         valueFormatter: (params: any) =>
           params.value != null ? `$${params.value.toFixed(4)}` : '',
-        cellStyle: { textAlign: 'right', fontFamily: 'monospace' },
+        cellStyle: { textAlign: 'right' },
       },
       {
         field: 'proposedDiff',
@@ -653,7 +694,7 @@ export function IndexOfferManagement() {
         editable: true,
         type: 'numericColumn',
         valueFormatter: (params: any) => (params.value != null ? params.value.toFixed(4) : ''),
-        cellStyle: { textAlign: 'right', fontFamily: 'monospace' },
+        cellStyle: { textAlign: 'right' },
       },
       {
         field: 'proposedPrice',
@@ -665,26 +706,7 @@ export function IndexOfferManagement() {
         type: 'numericColumn',
         valueFormatter: (params: any) =>
           params.value != null ? `$${params.value.toFixed(4)}` : '',
-        cellStyle: (params: any) => {
-          // Highlight proposed price if different from current
-          const priceDiff = params.data?.proposedPrice - params.data?.currentPrice;
-          if (priceDiff > 0) {
-            return {
-              textAlign: 'right',
-              fontFamily: 'monospace',
-              backgroundColor: '#fff7e6',
-              color: '#d46b08',
-            };
-          } else if (priceDiff < 0) {
-            return {
-              textAlign: 'right',
-              fontFamily: 'monospace',
-              backgroundColor: '#f6ffed',
-              color: '#52c41a',
-            };
-          }
-          return { textAlign: 'right', fontFamily: 'monospace' };
-        },
+        cellStyle: { textAlign: 'right' },
       },
     ],
     []
@@ -868,6 +890,73 @@ export function IndexOfferManagement() {
           }
           return { color, textAlign: 'right', fontWeight: 600 };
         },
+      },
+    ],
+    []
+  );
+
+  // Publish drawer column definitions with grouped headers
+  const publishColumnDefs = useMemo(
+    () => [
+      {
+        field: 'location',
+        headerName: 'LOCATION',
+        width: 150,
+      },
+      {
+        field: 'product',
+        headerName: 'PRODUCT',
+        width: 140,
+      },
+      {
+        headerName: 'Prev. Posting',
+        children: [
+          {
+            field: 'currentDiff',
+            headerName: 'DIFF',
+            width: 100,
+            valueFormatter: (params: any) =>
+              params.value != null ? `$${params.value.toFixed(4)}` : '$0.0000',
+            cellStyle: { textAlign: 'right' },
+          },
+          {
+            field: 'currentPrice',
+            headerName: 'PRICE',
+            width: 110,
+            valueFormatter: (params: any) =>
+              params.value != null ? `$${params.value.toFixed(4)}` : '',
+            cellStyle: { textAlign: 'right' },
+          },
+        ],
+      },
+      {
+        headerName: 'Proposed Posting',
+        children: [
+          {
+            field: 'proposedDiff',
+            headerName: 'DIFF',
+            width: 100,
+            valueFormatter: (params: any) =>
+              params.value != null ? `$${params.value.toFixed(4)}` : '$0.0000',
+            cellStyle: { textAlign: 'right' },
+          },
+          {
+            field: 'proposedPrice',
+            headerName: 'PRICE',
+            width: 110,
+            valueFormatter: (params: any) =>
+              params.value != null ? `$${params.value.toFixed(4)}` : '',
+            cellStyle: (params: any) => {
+              const diff =
+                (params.data?.proposedPrice || 0) - (params.data?.currentPrice || 0);
+              if (diff > 0)
+                return { textAlign: 'right', backgroundColor: '#fff7e6', color: '#d46b08' };
+              if (diff < 0)
+                return { textAlign: 'right', backgroundColor: '#f6ffed', color: '#52c41a' };
+              return { textAlign: 'right' };
+            },
+          },
+        ],
       },
     ],
     []
@@ -1640,7 +1729,28 @@ export function IndexOfferManagement() {
                       </Texto>
                     </Horizontal>
                   </div>
-                ) : null}
+                ) : (
+                  <div
+                    style={{
+                      height: '80px',
+                      backgroundColor: '#f5f5f5',
+                      border: '1px dashed #d9d9d9',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '16px',
+                      opacity: 0.7,
+                    }}
+                  >
+                    <Horizontal style={{ gap: '12px', alignItems: 'center' }}>
+                      <EyeInvisibleOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
+                      <Texto category="p2" appearance="medium">
+                        Competitive analysis disabled while in Bulk Change mode
+                      </Texto>
+                    </Horizontal>
+                  </div>
+                )}
 
                 {/* Price Offers Grid with Built-in Bulk Change Mode */}
                 <div style={{ flex: 1, minHeight: '300px' }}>
@@ -1652,6 +1762,21 @@ export function IndexOfferManagement() {
                     controlBarProps={{
                       title: 'Price Offers',
                       hideActiveFilters: false,
+                      actionButtons: isBulkChangeVisible ? (
+                        <GraviButton
+                          buttonText="Publish"
+                          icon={<SendOutlined />}
+                          appearance="solid"
+                          onClick={() => {
+                            // Get selected rows from the grid API
+                            const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
+                            const selectedRows = gridApi?.getSelectedRows?.() || [];
+                            setSelectedRowsToPublish(selectedRows);
+                            setPublishDrawerVisible(true);
+                          }}
+                          style={{ backgroundColor: '#51b073', color: 'white', borderColor: '#51b073' }}
+                        />
+                      ) : undefined,
                     }}
                     isBulkChangeVisible={isBulkChangeVisible}
                     setIsBulkChangeVisible={setIsBulkChangeVisible}
@@ -2679,6 +2804,139 @@ export function IndexOfferManagement() {
             </Texto>
           </div>
         </Vertical>
+      </Drawer>
+
+      {/* Publish Drawer */}
+      <Drawer
+        title={null}
+        placement="bottom"
+        height="80vh"
+        onClose={() => {
+          setPublishDrawerVisible(false);
+          setPublishSearchText('');
+          setPublishDateTime(null);
+        }}
+        visible={publishDrawerVisible}
+        mask={true}
+        closable={false}
+        destroyOnClose
+        bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            backgroundColor: '#002140',
+            padding: '20px 24px',
+            flexShrink: 0,
+          }}
+        >
+          <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Vertical style={{ gap: '4px' }}>
+              <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
+                EOD Publish
+              </Texto>
+              <Texto style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
+                Publish selected price offers
+              </Texto>
+            </Vertical>
+            <Button
+              type="text"
+              onClick={() => {
+                setPublishDrawerVisible(false);
+                setPublishSearchText('');
+                setPublishDateTime(null);
+              }}
+              style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto' }}
+            >
+              ×
+            </Button>
+          </Horizontal>
+        </div>
+
+        {/* Results Count and Search Bar */}
+        <div
+          style={{
+            padding: '12px 24px',
+            borderBottom: '1px solid #e8e8e8',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}
+        >
+          <Texto style={{ color: '#51b073', fontWeight: 600 }}>
+            {filteredPublishRows.length} Results
+          </Texto>
+          <Input
+            placeholder="Search here"
+            value={publishSearchText}
+            onChange={(e) => setPublishSearchText(e.target.value)}
+            style={{ width: 300 }}
+            allowClear
+          />
+        </div>
+
+        {/* Main Grid Content */}
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          <GraviGrid
+            storageKey="publish-drawer-grid"
+            rowData={filteredPublishRows}
+            columnDefs={publishColumnDefs}
+            agPropOverrides={{
+              getRowId: (params: any) => String(params.data.id),
+              domLayout: 'normal',
+              headerHeight: 40,
+              rowHeight: 40,
+              suppressRowClickSelection: true,
+            }}
+            hideControlBar
+          />
+        </div>
+
+        {/* Footer */}
+        <div
+          style={{
+            padding: '16px 24px',
+            borderTop: '1px solid #d9d9d9',
+            backgroundColor: '#ffffff',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {/* Left side - Publisher label and date picker */}
+          <Horizontal style={{ alignItems: 'center', gap: '16px' }}>
+            <Texto style={{ color: '#51b073', fontWeight: 600 }}>EOD Publisher</Texto>
+            <DatePicker
+              showTime
+              format="MM/DD/YYYY hh:mm A"
+              placeholder="Schedule (optional)"
+              value={publishDateTime}
+              onChange={setPublishDateTime}
+              style={{ width: 220 }}
+            />
+          </Horizontal>
+
+          {/* Right side - Action buttons */}
+          <Horizontal style={{ gap: '12px' }}>
+            <Button
+              onClick={() => {
+                setPublishDrawerVisible(false);
+                setPublishSearchText('');
+                setPublishDateTime(null);
+              }}
+            >
+              Keep Editing
+            </Button>
+            <GraviButton
+              buttonText="Confirm Publish"
+              appearance="solid"
+              onClick={handleConfirmPublish}
+              disabled={filteredPublishRows.length === 0}
+              style={{ backgroundColor: '#51b073', borderColor: '#51b073' }}
+            />
+          </Horizontal>
+        </div>
       </Drawer>
     </div>
   );

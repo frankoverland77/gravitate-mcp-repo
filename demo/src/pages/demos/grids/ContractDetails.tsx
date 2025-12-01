@@ -864,7 +864,6 @@ export function ContractDetails() {
                         backgroundColor: '#d2f9f8',
                         color: '#0c5a58',
                         fontWeight: 'bold',
-                        fontFamily: 'monospace'
                     };
                 }
                 return null;
@@ -894,7 +893,6 @@ export function ContractDetails() {
                         backgroundColor: '#d2f9f8',
                         color: '#0c5a58',
                         fontWeight: 'bold',
-                        fontFamily: 'monospace'
                     };
                 }
                 return null;
@@ -924,7 +922,6 @@ export function ContractDetails() {
                         backgroundColor: '#d2f9f8',
                         color: '#0c5a58',
                         fontWeight: 'bold',
-                        fontFamily: 'monospace'
                     };
                 }
                 return null;
@@ -954,7 +951,6 @@ export function ContractDetails() {
                         backgroundColor: '#d2f9f8',
                         color: '#0c5a58',
                         fontWeight: 'bold',
-                        fontFamily: 'monospace'
                     };
                 }
                 return null;
@@ -990,7 +986,6 @@ export function ContractDetails() {
                         backgroundColor: '#d2f9f8',
                         color: '#0c5a58',
                         fontWeight: 'bold',
-                        fontFamily: 'monospace'
                     };
                 }
                 return null;
@@ -1040,7 +1035,6 @@ export function ContractDetails() {
                                         style={{
                                             color: isPH ? '#0c5a58' : '#262626',
                                             fontWeight: isPH ? 'bold' : 'normal',
-                                            fontFamily: isPH ? 'monospace' : 'inherit',
                                             fontSize: isPH ? '11px' : '13px'
                                         }}
                                     >

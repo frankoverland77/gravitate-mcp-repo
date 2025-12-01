@@ -50,14 +50,12 @@ export const SELECTED_ROW_STYLE: React.CSSProperties = {
   fontWeight: 600,
 };
 
-export const MONOSPACE_CELL_STYLE: React.CSSProperties = {
-  fontFamily: 'monospace',
+export const FORMULA_CELL_STYLE: React.CSSProperties = {
   fontSize: '11px',
 };
 
-export const RIGHT_ALIGNED_MONOSPACE_STYLE: React.CSSProperties = {
+export const RIGHT_ALIGNED_STYLE: React.CSSProperties = {
   textAlign: 'right',
-  fontFamily: 'monospace',
 };
 
 export const PLACEHOLDER_CELL_STYLE: React.CSSProperties = {
@@ -67,13 +65,13 @@ export const PLACEHOLDER_CELL_STYLE: React.CSSProperties = {
 };
 
 export const PRICE_INCREASE_STYLE: React.CSSProperties = {
-  ...RIGHT_ALIGNED_MONOSPACE_STYLE,
+  ...RIGHT_ALIGNED_STYLE,
   backgroundColor: COLORS.PRICE_INCREASE_BG,
   color: COLORS.PRICE_INCREASE_TEXT,
 };
 
 export const PRICE_DECREASE_STYLE: React.CSSProperties = {
-  ...RIGHT_ALIGNED_MONOSPACE_STYLE,
+  ...RIGHT_ALIGNED_STYLE,
   backgroundColor: COLORS.PRICE_DECREASE_BG,
   color: COLORS.PRICE_DECREASE_TEXT,
 };
@@ -110,7 +108,7 @@ export const getProposedPriceCellStyle = (
   currentPrice: number | undefined
 ): React.CSSProperties => {
   if (proposedPrice === undefined || currentPrice === undefined) {
-    return RIGHT_ALIGNED_MONOSPACE_STYLE;
+    return RIGHT_ALIGNED_STYLE;
   }
   const priceDiff = proposedPrice - currentPrice;
   if (priceDiff > 0) {
@@ -119,7 +117,7 @@ export const getProposedPriceCellStyle = (
   if (priceDiff < 0) {
     return PRICE_DECREASE_STYLE;
   }
-  return RIGHT_ALIGNED_MONOSPACE_STYLE;
+  return RIGHT_ALIGNED_STYLE;
 };
 
 // =============================================================================
