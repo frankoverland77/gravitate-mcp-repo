@@ -946,15 +946,7 @@ export function IndexOfferManagement() {
             width: 110,
             valueFormatter: (params: any) =>
               params.value != null ? `$${params.value.toFixed(4)}` : '',
-            cellStyle: (params: any) => {
-              const diff =
-                (params.data?.proposedPrice || 0) - (params.data?.currentPrice || 0);
-              if (diff > 0)
-                return { textAlign: 'right', backgroundColor: '#fff7e6', color: '#d46b08' };
-              if (diff < 0)
-                return { textAlign: 'right', backgroundColor: '#f6ffed', color: '#52c41a' };
-              return { textAlign: 'right' };
-            },
+            cellStyle: { textAlign: 'right' },
           },
         ],
       },
@@ -1762,21 +1754,26 @@ export function IndexOfferManagement() {
                     controlBarProps={{
                       title: 'Price Offers',
                       hideActiveFilters: false,
-                      actionButtons: isBulkChangeVisible ? (
+                      actionButtons: (
                         <GraviButton
                           buttonText="Publish"
                           icon={<SendOutlined />}
                           appearance="solid"
                           onClick={() => {
-                            // Get selected rows from the grid API
-                            const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
-                            const selectedRows = gridApi?.getSelectedRows?.() || [];
-                            setSelectedRowsToPublish(selectedRows);
+                            if (isBulkChangeVisible) {
+                              // In bulk change mode: publish only selected rows
+                              const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
+                              const selectedRows = gridApi?.getSelectedRows?.() || [];
+                              setSelectedRowsToPublish(selectedRows);
+                            } else {
+                              // Not in bulk change mode: publish all rows
+                              setSelectedRowsToPublish(samplePricingRowData);
+                            }
                             setPublishDrawerVisible(true);
                           }}
                           style={{ backgroundColor: '#51b073', color: 'white', borderColor: '#51b073' }}
                         />
-                      ) : undefined,
+                      ),
                     }}
                     isBulkChangeVisible={isBulkChangeVisible}
                     setIsBulkChangeVisible={setIsBulkChangeVisible}
