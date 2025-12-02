@@ -1,3 +1,3 @@
-// Exporting refactored version with directory-level styles.css
-export { TemplateChooser } from './TemplateChooser.refactored';
+// Exporting original working version
+export { TemplateChooser } from './TemplateChooser';
 export type { TemplateChooserProps } from './types';

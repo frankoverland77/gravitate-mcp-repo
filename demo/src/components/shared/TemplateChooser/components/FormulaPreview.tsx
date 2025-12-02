@@ -51,8 +51,9 @@ export function FormulaPreview({
   }
 
   // Full view with internal/external names (for card view)
+  // Wrapper div with flexShrink: 0 prevents this section from collapsing in flex containers
   return (
-    <>
+    <div style={{ flexShrink: 0 }}>
       {/* Internal Display Name */}
       <Vertical className={showExternalName ? 'formula-preview-section-spacing' : ''}>
         <Texto
@@ -88,6 +89,6 @@ export function FormulaPreview({
           </div>
         </Vertical>
       )}
-    </>
+    </div>
   );
 }

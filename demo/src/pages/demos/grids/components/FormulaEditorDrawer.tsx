@@ -10,7 +10,7 @@ import {
 import { Drawer, Tag, Input, Segmented, Checkbox, Button, Switch } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { isPlaceholder } from '../FormulaTemplates.data';
-import { TemplateChooser } from '../../../../components/shared/TemplateChooser/TemplateChooser';
+import { TemplateChooser } from '../../../../components/shared/TemplateChooser';
 import { SaveTemplateForm } from '../../../../components/shared/SaveTemplateModal';
 
 interface Formula {

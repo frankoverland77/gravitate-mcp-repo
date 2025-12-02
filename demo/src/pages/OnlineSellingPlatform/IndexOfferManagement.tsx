@@ -1895,22 +1895,24 @@ export function IndexOfferManagement() {
           />
         ) : showTemplateChooser ? (
           /* Template Chooser View */
-          <TemplateChooser
-            templates={templates}
-            onTemplateSelect={handleTemplateSelect}
-            buildFormulaPreview={buildFormulaPreview}
-            showManageButton={true}
-            title="Select a Formula Template"
-            subtitle="Choose a pre-configured pricing formula to add to your offer"
-            defaultFilters={{
-              'contractType-Index Deal': { value: 'Index Deal', enabled: true },
-            }}
-            onManageTemplates={() => {
-              window.open('/ContractFormulas/FormulaTemplates', '_blank');
-            }}
-            onClose={() => setShowTemplateChooser(false)}
-            showExternalName={true}
-          />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <TemplateChooser
+              templates={templates}
+              onTemplateSelect={handleTemplateSelect}
+              buildFormulaPreview={buildFormulaPreview}
+              showManageButton={true}
+              title="Select a Formula Template"
+              subtitle="Choose a pre-configured pricing formula to add to your offer"
+              defaultFilters={{
+                'contractType-Index Deal': { value: 'Index Deal', enabled: true },
+              }}
+              onManageTemplates={() => {
+                window.open('/ContractFormulas/FormulaTemplates', '_blank');
+              }}
+              onClose={() => setShowTemplateChooser(false)}
+              showExternalName={true}
+            />
+          </div>
         ) : (
           /* Main Form View */
           <Vertical
