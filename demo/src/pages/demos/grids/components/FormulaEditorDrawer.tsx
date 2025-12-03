@@ -103,7 +103,7 @@ export function FormulaEditorDrawer({
                         </Texto>
                     </Vertical>
                     <Button
-                        type="text"
+                        type="link"
                         onClick={() => setDrawerOpen(false)}
                         style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto' }}
                     >

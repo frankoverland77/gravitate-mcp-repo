@@ -59,7 +59,7 @@ export function PriceChangeCorrelationChart({ data, upCapture, downCapture }: Pr
                 borderRadius: '8px',
                 padding: '24px'
             }}>
-                <div style={{ height: '452px' }}>
+                <div style={{ height: '452px', width: '100%' }}>
                 <ResponsiveScatterPlot
                     data={chartData}
                     margin={{ top: 30, right: 80, bottom: 70, left: 80 }}

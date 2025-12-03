@@ -111,7 +111,7 @@ export const demoRegistry: DemoRoute[] = [
   },
   {
     key: "CompetitorAnalysis",
-    title: "Competitor Profile & Price Analysis",
+    title: "Competitor Price Analysis",
     element: <ThemeRouteWrapper theme="OSP"><CompetitorAnalysis /></ThemeRouteWrapper>,
     path: "/CompetitorAnalysis/CompetitorAnalysis",
     description: "Analyze competitor profiles and pricing strategies",
@@ -303,7 +303,7 @@ export const createPageConfig = () => {
       {
         hasPermission: () => true,
         key: "CompetitorProfileAnalysis",
-        title: "Competitor Profile & Price Analysis",
+        title: "Competitor Price Analysis",
         element: (
           <ThemeRouteWrapper theme="OSP">
             <CompetitorAnalysis />

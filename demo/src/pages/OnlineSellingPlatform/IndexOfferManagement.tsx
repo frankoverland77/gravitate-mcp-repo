@@ -1867,7 +1867,7 @@ export function IndexOfferManagement() {
               </Texto>
             </Vertical>
             <Button
-              type="text"
+              type="link"
               onClick={() => setOfferDrawerVisible(false)}
               style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto' }}
             >
@@ -2832,14 +2832,14 @@ export function IndexOfferManagement() {
           <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <Vertical style={{ gap: '4px' }}>
               <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
-                EOD Publish
+                Publish Index Offers
               </Texto>
               <Texto style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
                 Publish selected price offers
               </Texto>
             </Vertical>
             <Button
-              type="text"
+              type="link"
               onClick={() => {
                 setPublishDrawerVisible(false);
                 setPublishSearchText('');
@@ -2862,7 +2862,7 @@ export function IndexOfferManagement() {
             gap: '16px',
           }}
         >
-          <Texto style={{ color: '#51b073', fontWeight: 600 }}>
+          <Texto style={{ color: '#1890ff', fontWeight: 600 }}>
             {filteredPublishRows.length} Results
           </Texto>
           <Input
@@ -2905,7 +2905,7 @@ export function IndexOfferManagement() {
         >
           {/* Left side - Publisher label and date picker */}
           <Horizontal style={{ alignItems: 'center', gap: '16px' }}>
-            <Texto style={{ color: '#51b073', fontWeight: 600 }}>EOD Publisher</Texto>
+            <Texto style={{ color: '#1890ff', fontWeight: 600 }}>Publisher</Texto>
             <DatePicker
               showTime
               format="MM/DD/YYYY hh:mm A"
@@ -2932,7 +2932,7 @@ export function IndexOfferManagement() {
               appearance="solid"
               onClick={handleConfirmPublish}
               disabled={filteredPublishRows.length === 0}
-              style={{ backgroundColor: '#51b073', borderColor: '#51b073' }}
+              style={{ backgroundColor: '#51b073', borderColor: '#51b073', color: '#ffffff' }}
             />
           </Horizontal>
         </div>

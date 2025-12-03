@@ -26,7 +26,7 @@ export function ConsistencyTrendChart({ data }: ConsistencyTrendChartProps) {
                 borderRadius: '8px',
                 padding: '24px'
             }}>
-                <div style={{ height: '452px' }}>
+                <div style={{ height: '452px', width: '100%' }}>
                 <ResponsiveLine
                     data={data}
                     margin={{ top: 30, right: 160, bottom: 80, left: 80 }}

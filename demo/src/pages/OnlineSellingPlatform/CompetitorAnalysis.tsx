@@ -183,15 +183,9 @@ export function CompetitorAnalysis() {
             cellRenderer: (params: any) => {
                 const strategy = params.value;
                 if (strategy === 'Leader') {
-                    return <BBDTag success style={{ width: 'fit-content' }}>Leader</BBDTag>;
+                    return <span style={{ fontWeight: 600 }}>{strategy}</span>;
                 }
-                if (strategy === 'Follower') {
-                    return <BBDTag theme2 style={{ width: 'fit-content' }}>Follower</BBDTag>;
-                }
-                if (strategy === 'Position') {
-                    return <BBDTag theme4 style={{ width: 'fit-content' }}>Position</BBDTag>;
-                }
-                return <BBDTag style={{ width: 'fit-content' }}>{strategy}</BBDTag>;
+                return strategy;
             }
         },
         {
