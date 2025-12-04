@@ -13,9 +13,10 @@ const tooltipStyle = {
     backgroundColor: '#ffffff',
     border: '1px solid #e8e8e8',
     borderRadius: '4px',
-    padding: '8px 12px',
+    padding: '12px 16px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-    fontSize: '12px'
+    fontSize: '12px',
+    minWidth: '180px'
 };
 
 const PriceChangeTooltip = ({ node }: ScatterPlotTooltipProps<{ x: number; y: number }>) => (
@@ -92,7 +93,7 @@ export function CompetitorDetails() {
     };
 
     return (
-        <Vertical style={{ height: '100%', padding: '32px', gap: '24px', overflow: 'auto' }}>
+        <Vertical style={{ padding: '32px', gap: '24px', minHeight: '100%' }}>
 
             {/* Back Link */}
             <Horizontal
@@ -189,16 +190,16 @@ export function CompetitorDetails() {
             </Horizontal>
 
             {/* Two Charts Side by Side */}
-            <Horizontal style={{ gap: '24px' }}>
+            <Horizontal style={{ gap: '24px', flexShrink: 0 }}>
 
                 {/* Chart 1: Price Change vs Market - with red/green dots */}
-                <div style={{ flex: 1, ...cardStyle }}>
+                <div style={{ flex: 1, minHeight: '420px', ...cardStyle }}>
                     <Vertical style={{ gap: '16px' }}>
                         <Texto category="h6" weight="600">Price Change vs Market</Texto>
-                        <div style={{ height: '300px', width: '100%' }}>
+                        <div style={{ height: '350px', minHeight: '350px', width: '100%' }}>
                             <ResponsiveScatterPlot
                                 data={[chartData.priceChange.upSeries, chartData.priceChange.downSeries]}
-                                margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
+                                margin={{ top: 20, right: 20, bottom: 80, left: 60 }}
                                 xScale={{ type: 'linear', min: -0.25, max: 0.25 }}
                                 yScale={{ type: 'linear', min: -0.25, max: 0.25 }}
                                 colors={['#51B073', '#ff4d4f']}
@@ -220,27 +221,35 @@ export function CompetitorDetails() {
                                     legendOffset: -50,
                                     format: (v) => `$${v.toFixed(2)}`
                                 }}
+                                legends={[
+                                    {
+                                        anchor: 'bottom-right',
+                                        direction: 'row',
+                                        translateY: 70,
+                                        itemWidth: 80,
+                                        itemHeight: 20,
+                                        symbolSize: 12,
+                                        symbolShape: 'circle'
+                                    }
+                                ]}
                             />
                         </div>
-                        <Horizontal style={{ justifyContent: 'center', gap: '24px' }}>
-                            <Texto category="p2">Up: <span style={{ color: '#51B073', fontWeight: 600 }}>{metrics.upMarketCapture}%</span></Texto>
-                            <Texto category="p2">Down: <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{metrics.downMarketCapture}%</span></Texto>
-                        </Horizontal>
                     </Vertical>
                 </div>
 
                 {/* Chart 2: Capture Rate vs Size */}
-                <div style={{ flex: 1, ...cardStyle }}>
+                <div style={{ flex: 1, minHeight: '420px', ...cardStyle }}>
                     <Vertical style={{ gap: '16px' }}>
                         <Texto category="h6" weight="600">Capture Rate vs Size</Texto>
-                        <div style={{ height: '300px', width: '100%' }}>
+                        <div style={{ height: '350px', minHeight: '350px', width: '100%' }}>
                             <ResponsiveScatterPlot
                                 data={chartData.captureRate}
-                                margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
+                                margin={{ top: 20, right: 20, bottom: 80, left: 60 }}
                                 xScale={{ type: 'linear', min: 0, max: 5 }}
                                 yScale={{ type: 'linear', min: 0, max: 100 }}
                                 colors={['#51B073']}
                                 nodeSize={8}
+                                tooltip={CaptureRateTooltip}
                                 axisBottom={{
                                     tickSize: 5,
                                     tickPadding: 5,
@@ -263,21 +272,22 @@ export function CompetitorDetails() {
             </Horizontal>
 
             {/* Full Width Line Chart */}
-            <div style={cardStyle}>
+            <div style={{ minHeight: '420px', flexShrink: 0, ...cardStyle }}>
                 <Vertical style={{ gap: '16px' }}>
                     <Texto category="h6" weight="600">Consistency Over Time</Texto>
-                    <div style={{ height: '300px', width: '100%' }}>
+                    <div style={{ height: '350px', minHeight: '350px', width: '100%' }}>
                         <ResponsiveLine
                             data={chartData.consistency}
-                            margin={{ top: 20, right: 120, bottom: 60, left: 60 }}
+                            margin={{ top: 20, right: 20, bottom: 80, left: 60 }}
                             xScale={{ type: 'point' }}
                             yScale={{ type: 'linear', min: 0, max: 100 }}
-                            colors={['#fa8c16', '#bfbfbf']}
+                            colors={['#51B073', '#bfbfbf']}
                             pointSize={6}
                             pointColor={{ theme: 'background' }}
                             pointBorderWidth={2}
                             pointBorderColor={{ from: 'serieColor' }}
                             enableGridX={false}
+                            tooltip={ConsistencyTooltip}
                             axisBottom={{
                                 tickSize: 5,
                                 tickPadding: 5,
@@ -297,9 +307,9 @@ export function CompetitorDetails() {
                             legends={[
                                 {
                                     anchor: 'bottom-right',
-                                    direction: 'column',
-                                    translateX: 100,
-                                    itemWidth: 80,
+                                    direction: 'row',
+                                    translateY: 70,
+                                    itemWidth: 120,
                                     itemHeight: 20,
                                     symbolSize: 12,
                                     symbolShape: 'circle'

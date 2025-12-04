@@ -616,8 +616,8 @@ function generatePriceChangeByPeriod(
     }
 
     return {
-        upSeries: { id: 'up', data: upData },
-        downSeries: { id: 'down', data: downData }
+        upSeries: { id: 'Up Market', data: upData },
+        downSeries: { id: 'Down Market', data: downData }
     };
 }
 
