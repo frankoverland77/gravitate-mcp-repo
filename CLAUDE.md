@@ -12,196 +12,343 @@ This is a Yarn monorepo workspace containing two main projects:
 
 ### Workspace Commands (from root)
 ```bash
-# Initial setup - runs yarn install and builds MCP server
-./setup.sh
-
-# Quick workspace setup
-yarn setup
-
-# Build MCP server only
-yarn build:mcp
-
-# Start demo development server
-yarn dev
-
-# Start MCP server
-yarn mcp
+./setup.sh          # Initial setup - runs yarn install and builds MCP server
+yarn setup          # Quick workspace setup
+yarn build:mcp      # Build MCP server only
+yarn dev            # Start demo development server
+yarn mcp            # Start MCP server
 ```
 
 ### MCP Server Development (`/mcp-server/`)
 ```bash
 cd mcp-server
-
-# Build TypeScript to JavaScript
-npm run build
-
-# Development with watch mode
-npm run dev
-
-# Start production server (STDIO mode for Claude Desktop)
-npm start
-
-# Clean build artifacts
-npm run clean
+npm run build       # Build TypeScript to JavaScript
+npm run dev         # Development with watch mode
+npm start           # Start production server (STDIO mode)
+npm run clean       # Clean build artifacts
 ```
 
 ### Demo Project Development (`/demo/`)
 ```bash
 cd demo
-
-# Start Vite development server (port 3000 configured, but may use 5173)
-yarn dev
-
-# Alternative: Direct Vite execution if yarn dev issues
-npx vite
-
-# Build demo project
-yarn build
-
-# Preview production build
-yarn preview
+yarn dev            # Start Vite dev server (port 3000, may fallback to 5173)
+npx vite            # Alternative if yarn dev has issues
+yarn build          # Build demo project
+yarn preview        # Preview production build
 ```
 
-## Architecture Overview
+---
 
-### MCP Server Architecture
-The MCP server (`/mcp-server/`) implements the Model Context Protocol to provide AI assistants with structured tools for generating Excalibrr component demos:
+## ⚠️ MANDATORY RULES - ALWAYS FOLLOW
 
-- **Transport**: STDIO transport for Claude Desktop integration
-- **Core Tools**: 11 specialized tools for demo generation, modification, and management
-- **Tool Categories**:
+### Rule 1: Prefer Excalibrr Components Over Native HTML
+
+**ALWAYS use Excalibrr/AntD components. NEVER use raw HTML elements.**
+
+| Instead of | Use |
+|------------|-----|
+| `<div style={{display:'flex'}}>` | `<Horizontal>` or `<Vertical>` |
+| `<p>`, `<h1>`, `<span>` | `<Texto category="p1">` |
+| `<button>` | `<GraviButton>` |
+| `<input>` | `<Input>` from AntD |
+| `<select>` | `<Select>` from AntD |
+
+```tsx
+// ❌ WRONG
+<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+  <h1>Title</h1>
+  <button onClick={handleClick}>Click</button>
+</div>
+
+// ✅ CORRECT
+<Horizontal justifyContent='space-between'>
+  <Texto category='h1'>Title</Texto>
+  <GraviButton buttonText='Click' onClick={handleClick} />
+</Horizontal>
+```
+
+### Rule 2: Typography - Use Texto Component
+
+**NEVER use raw text elements. ALWAYS use `<Texto>` with proper props.**
+
+```tsx
+// Categories: h1, h2, h3, h4, h5, h6, p1, p2, heading, heading-small
+// Weight: "400", "500", "600", "700", "bold"
+// Appearance: "primary", "secondary" (BLUE!), "light", "medium" (gray), "error", "success", "warning"
+
+// ⚠️ CRITICAL: "secondary" = BLUE, NOT gray!
+// ⚠️ Use "medium" for gray labels and helper text
+
+// Section headers (uppercase labels)
+<Texto category='h6' appearance='medium' weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+
+// Field labels
+<Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+
+// Field values (bold)
+<Texto category='p1' weight='600'>
+
+// Helper text / subdued content
+<Texto category='p2' appearance='medium'>
+```
+
+### Rule 3: Utility Classes Over Inline Styles
+
+**Priority order: Component Props → Utility Classes → Inline Styles (last resort)**
+
+```tsx
+// ❌ WRONG - inline styles for common properties
+<Vertical style={{ padding: '24px', marginBottom: '16px', borderRadius: '8px' }}>
+
+// ✅ CORRECT - utility classes + props
+<Vertical className='p-3 mb-2 border-radius-5'>
+
+// ❌ WRONG - inline layout styles
+<Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+
+// ✅ CORRECT - component props
+<Horizontal justifyContent='space-between' alignItems='center'>
+```
+
+**Available utility classes:**
+- Spacing: `mb-1`, `mb-2`, `mb-4`, `mt-1`, `ml-2`, `p-2`, `p-3`
+- Layout: `border-radius-5`, `text-center`, `gap-16`, `gap-10`
+
+**Inline styles ONLY for:** theme variables, dynamic values, complex one-offs
+```tsx
+style={{ backgroundColor: 'var(--theme-bg-elevated)' }}  // ✅ OK
+style={{ width: `${progress}%` }}                         // ✅ OK
+```
+
+### Rule 4: CSS Naming Convention - Kebab-Case Only
+
+```tsx
+// ✅ CORRECT - kebab-case with component prefix
+.template-list-item-header
+.template-list-item-has-placeholders
+
+// ❌ WRONG - no BEM double underscores or dashes
+.template-list-item__header
+.template-list-item--has-placeholders
+```
+
+### Rule 5: Theme Colors - Use Variables
+
+**NEVER hardcode colors. ALWAYS use theme variables from `src/components/shared/Theming/`**
+
+```tsx
+// ❌ WRONG
+style={{ color: '#333', backgroundColor: '#f5f5f5' }}
+
+// ✅ CORRECT
+style={{ color: 'var(--theme-color-2)', backgroundColor: 'var(--theme-bg-elevated)' }}
+```
+
+### Rule 6: Code Formatting - Prettier Config
+
+All `.jsx`, `.tsx`, `.js`, `.ts` files must follow:
+```json
+{
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "semi": false,
+  "tabWidth": 2,
+  "bracketSpacing": true,
+  "jsxBracketSameLine": false,
+  "arrowParens": "always",
+  "printWidth": 120
+}
+```
+
+### Rule 7: Function Components - Named Exports
+
+```tsx
+// ✅ CORRECT - filename: ProductForm.tsx
+export function ProductForm() {
+  // ...
+}
+
+// ❌ WRONG - default exports, arrow functions as components
+export default function ProductForm() { }
+const ProductForm = () => { }
+```
+
+### Rule 8: No Lazy Imports
+
+```tsx
+// ❌ WRONG - causes duplicate mounting, white screens
+component: React.lazy(() => import('./pages/demos/ProductForm'))
+
+// ✅ CORRECT - direct imports
+import { ProductForm } from './pages/demos/ProductForm'
+// ...
+component: ProductForm
+```
+
+### Rule 9: No TypeScript Errors
+
+Resolve ALL TypeScript errors in `.tsx` and `.ts` files.
+
+**Exception:** Ignore `sideBar` property errors on GraviGrid - this is a valid prop despite TypeScript warnings.
+
+### Rule 10: No Console Errors
+
+Code must not generate console errors. Common fixes:
+- Check for duplicate route paths before adding
+- Use correct component props (check component docs)
+- Match import style to export style (named vs default)
+
+---
+
+## Navigation Configuration (CRITICAL)
+
+When adding navigation sections, you **MUST** update TWO files:
+
+### 1. `demo/src/pageConfig.tsx` - Define the route
+```typescript
+config.Bakery = {
+  hasPermission: () => true,
+  key: 'Bakery',
+  icon: <ShopOutlined />,
+  title: 'Bakery',
+  routes: gridsRoutes,
+}
+```
+
+### 2. `demo/src/_Main/AuthenticatedRoute.jsx` - Enable the scope
+```javascript
+const scopes = {
+  Welcome: true,
+  Bakery: true,  // ← MUST match section key exactly (case-sensitive)
+  Forms: true,
+}
+```
+
+**If you forget to update AuthenticatedRoute.jsx, the menu item will NOT appear!**
+
+---
+
+## Server Management
+
+### ONE server per project - always clean restart
+
+1. Check if server is already running
+2. Kill existing server first
+3. Start fresh server
+4. Use auto-detected ports (don't assume 3000/3001)
+5. Always show actual port in output
+
+---
+
+## Architecture
+
+### MCP Server (`/mcp-server/`)
+- **Transport**: STDIO for Claude Desktop
+- **Tools**: 11 specialized tools for demo generation
   - Demo Creation: `create_demo`, `create_form_demo`
-  - Demo Modification: `modify_grid`, `change_theme`
-  - Project Management: `run_dev_server`, `cleanup_demo`, `cleanup_styles`
-  - External Integration: `import_from_figma`, `list_figma_components`
-  - Support: `help`
+  - Modification: `modify_grid`, `change_theme`
+  - Management: `run_dev_server`, `cleanup_demo`, `cleanup_styles`
+  - Figma: `import_from_figma`, `list_figma_components`
 
-### Demo Project Architecture
-The demo project (`/demo/`) is a Vite-based React application configured for rapid Excalibrr component prototyping:
+### Demo Project (`/demo/`)
+- **Build**: Vite 5 + TypeScript + React + Less
+- **Components**: `@gravitate-js/excalibrr@4.0.34-osp`
+- **Grid**: AG Grid Community/Enterprise
+- **Themes**: OSP, PE, BP
 
-- **Build System**: Vite 5 with TypeScript, React, and Less preprocessing
-- **Dependencies**: Full Excalibrr component library (`@gravitate-js/excalibrr@4.0.34-osp`)
-- **Path Aliases**: Configured for `@components`, `@pages`, `@utils`, `@api`, `@styles`, `@assets`
-- **Theme System**: Supports multiple Gravitate themes (OSP, PE, BP)
-- **Grid System**: AG Grid Community/Enterprise integration for data tables
-
-### Key Integration Points
-
-**Excalibrr Component Library Integration**:
-- Uses production Excalibrr version with OSP theme variant
-- Real component implementations, not mocks or stubs
-- Theme switching via `ThemeContext` and configuration files
-
-**Development Workflow**:
-- MCP server generates component demo files in `/demo/src/pages/demos/`
-- Vite provides hot module replacement for rapid iteration
-- Component demos are self-contained with data files (`.data.ts`)
-
-**Generated Demo Structure**:
+### Generated Demo Structure
 ```
 demo/src/pages/demos/
-├── ProductGrid.tsx          # Grid component demos
-├── ProductGrid.data.ts      # Mock data for grid
-├── ProductForm/             # Form component demos
+├── ProductGrid.tsx
+├── ProductGrid.data.ts
+├── ProductForm/
 │   ├── ProductForm.tsx
 │   └── ProductForm.data.ts
-└── BakeryDemoTabs.tsx      # Tabbed demo containers
+└── BakeryDemoTabs.tsx
 ```
 
-## MCP Server Tool Capabilities
+---
 
-The server provides comprehensive tools for Excalibrr demo generation:
+## File Organization Patterns
 
-**Demo Creation Tools**:
-- `create_demo`: Creates grid, form, or dashboard demos with real Excalibrr components
-- `create_form_demo`: Specialized form generation with field validation and actions
+### Feature Structure (Gravitate Pattern)
+```
+src/modules/Admin/FeatureName/
+├── api/
+│   ├── types.schema.ts       # Request/response types
+│   └── useFeatureName.ts     # React Query hooks
+├── FeatureNamePage.tsx       # Main page component
+└── components/
+    └── FeatureNameColumnDefs.tsx
+```
 
-**Demo Modification Tools**:
-- `modify_grid`: Add/modify columns, renderers, and cell editors in existing grids
-- `change_theme`: Switch between Gravitate themes (OSP, PE, BP)
+### Naming Conventions
+- `{ComponentName}.tsx` - Component files match export name
+- `index.tsx` - Parent component in folder structure
+- `page.tsx` - Top-level page referenced in pageConfig
+- `columnDefs.tsx` - Grid column definitions
+- `*.types.ts` or `*.schema.ts` - Type definitions
 
-**Project Management Tools**:
-- `run_dev_server`: Start/stop/restart development servers with port management
-- `cleanup_demo`: Remove demos and clean up references in configuration files
-- `cleanup_styles`: Automated conversion of inline styles to utility classes
+### Import Priority
+1. First: `@gravitate-js/excalibrr`
+2. Second: `antd`
+3. Never: Raw HTML elements
 
-**External Integration Tools**:
-- `import_from_figma`: Convert Figma designs to React/Excalibrr components
-- `list_figma_components`: Browse available Figma components for import
+---
 
-## Configuration Files
+## Component Quick Reference
 
-**Vite Configuration** (`demo/vite.config.js`):
-- Optimized for Excalibrr library bundling
-- Path aliases for organized imports
-- Less preprocessing for Ant Design integration
-- SVG-as-React-component support
-- Port 3000 server configuration (may fallback to 5173)
+### GraviGrid Required Props
+```tsx
+<GraviGrid
+  agPropOverrides={{}}  // ← ALWAYS include this
+  columnDefs={columnDefs}
+  rowData={data}
+  storageKey='UniqueStorageKey'
+/>
+```
 
-**TypeScript Configuration**:
-- Strict mode enabled in both projects
-- Path mapping aligned with Vite aliases
-- ES module support throughout
+### Modal - Use `visible` not `open`
+```tsx
+<Modal visible={isOpen} />  // ✅
+<Modal open={isOpen} />     // ❌
+```
 
-**Package Management**:
-- Yarn workspaces for efficient dependency management
-- Shared node_modules between MCP server and demo project
-- Production-grade dependency versions matching Gravitate standards
+### Horizontal/Vertical - No `gap` prop, use style
+```tsx
+<Horizontal style={{ gap: '12px' }}>  // ✅
+<Horizontal gap={12}>                  // ❌
+```
 
-## Development Patterns
+### NotificationMessage for User Feedback
+```tsx
+// Success
+NotificationMessage('Success.', 'Record saved successfully', false)
 
-**Component Demo Generation**:
-- All demos use real Excalibrr components, never HTML elements
-- Mock data generation follows realistic business patterns
-- Theme variables used instead of hardcoded colors
-- Grid configurations support inline editing with appropriate cell editors
+// Error
+NotificationMessage('Error.', 'Failed to save record', true)
+```
 
-**File Organization**:
-- Demo components in `/demo/src/pages/demos/`
-- Shared theme configuration in `/demo/src/components/shared/Theming/`
-- Path aliases prevent relative import chains
-- Data files co-located with component files
+---
 
-**Navigation and Routing** ⚠️ CRITICAL:
-- When adding navigation sections to `demo/src/pageConfig.tsx`, you MUST also update `demo/src/_Main/AuthenticatedRoute.jsx`
-- The `scopes` object in AuthenticatedRoute controls which menu items appear
-- Section keys in pageConfig MUST match scope keys exactly (case-sensitive)
-- Example: Adding `config.Bakery = {...}` in pageConfig requires `Bakery: true` in scopes
-- Failing to update both files will cause navigation items to not appear in the menu
+## Path Aliases
 
-**Theme System**:
-- Multiple theme support via configuration objects
-- Theme switching without component re-architecture
-- CSS custom properties for dynamic theming
-- Less preprocessing for advanced styling features
+```typescript
+@components  → src/components
+@pages       → src/pages
+@utils       → src/utils
+@api         → src/api
+@styles      → src/styles
+@assets      → src/assets
+```
 
-**Typography System** ⚠️ CRITICAL:
-- ALWAYS use Excalibrr `Texto` component with `category` and `appearance` props for typography
-- Typography categories: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `p1`, `p2`, `heading`, `heading-small`
-- Weight options: `"400"`, `"500"`, `"600"`, `"700"`, `"bold"`
-- Appearance options:
-  - `"primary"` - Primary text (black/dark)
-  - `"secondary"` - **BLUE** theme color (NOT for gray text!)
-  - `"light"` - **Very light gray** (use sparingly, can be hard to read on white backgrounds)
-  - `"medium"` - **Medium gray** for labels, helper text, and secondary content ✅ PREFERRED
-  - `"error"`, `"success"`, `"warning"` - Status colors
-- **NEVER use `appearance="secondary"` for gray/muted text** - this applies BLUE color
-- **ALWAYS use `appearance="medium"` for gray labels and helper text** - better readability than "light"
-- Section headers (uppercase labels): `<Texto category="h6" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>`
-- Field labels (uppercase): `<Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>`
-- Field values (bold): `<Texto category="p1" weight="600">`
-- Helper text/subdued content: `<Texto category="p2" appearance="medium">`
-- Medium gray body text: `<Texto category="p1" appearance="medium">`
-- Avoid hardcoded hex colors - use appearance props instead
+---
 
-**CSS Naming Convention** ⚠️ CRITICAL:
-- ALWAYS use **kebab-case** (single dashes) for CSS class names
-- NEVER use BEM-style double underscores (`__`) or double dashes (`--`)
-- Class names should be prefixed with the component name for global uniqueness
-- Examples:
-  - ✅ `template-list-item-header` (correct)
-  - ✅ `template-list-item-has-placeholders` (correct)
-  - ❌ `template-list-item__header` (wrong - no double underscores)
-  - ❌ `template-list-item--has-placeholders` (wrong - no double dashes)
-- Use directory-level `styles.css` files, imported once in the parent component
-- Child components use classes from the parent's `styles.css` without additional imports
+## References
+
+For detailed documentation, see `/docs/`:
+- `COMPONENT_REGISTRY.md` - Component browsing and search
+- `The Anatomy Of A Feature.md` - Project structure patterns
+- `Feature Scaffolding Quick Start Guide.md` - Quick feature setup
+- `form-creation.md` - Form patterns
+- `figma-integration.md` - Figma import workflow
