@@ -1,8 +1,4 @@
-import fs from "fs";
-import path from "path";
 import axios from "axios";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
 
 // Get current directory in ES module
 const __filename = fileURLToPath(import.meta.url);
