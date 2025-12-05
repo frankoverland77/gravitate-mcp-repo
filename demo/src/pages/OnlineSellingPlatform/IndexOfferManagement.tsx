@@ -144,8 +144,6 @@ export function IndexOfferManagement() {
   const [weekendRule, setWeekendRule] = useState('use-friday');
   const [holidayRule, setHolidayRule] = useState('use-last-business-day');
   const [terms, setTerms] = useState('');
-  const [paymentTerms, setPaymentTerms] = useState('');
-  const [freightTerms, setFreightTerms] = useState('');
 
   // Additional state variables
   const [internalName, setInternalName] = useState('');
@@ -168,8 +166,6 @@ export function IndexOfferManagement() {
     setWeekendRule('use-friday');
     setHolidayRule('use-last-business-day');
     setTerms('');
-    setPaymentTerms('');
-    setFreightTerms('');
     setUseInternalOverride(false);
     setInternalOverride('');
     setUseExternalOverride(false);
@@ -277,8 +273,7 @@ export function IndexOfferManagement() {
       // TODO: Implement actual save logic here
       // Available data: isEditMode, product, location, components, useInternalOverride,
       // internalOverride, useExternalOverride, externalOverride, differential, saveAsActive,
-      // isInternalOnly, sendNotification, validFor, weekendRule, holidayRule, paymentTerms,
-      // freightTerms, terms
+      // isInternalOnly, sendNotification, validFor, weekendRule, holidayRule, terms
 
       // Close drawer
       setOfferDrawerVisible(false);
@@ -298,8 +293,6 @@ export function IndexOfferManagement() {
       validFor,
       weekendRule,
       holidayRule,
-      paymentTerms,
-      freightTerms,
       terms,
     ]
   );
@@ -2262,65 +2255,6 @@ export function IndexOfferManagement() {
                     />
                   </div>
 
-                  {/* Payment Terms */}
-                  <div>
-                    <Texto
-                      style={{
-                        fontSize: '11px',
-                        color: '#8c8c8c',
-                        marginBottom: '8px',
-                        display: 'block',
-                      }}
-                    >
-                      Payment Terms
-                    </Texto>
-                    <Select
-                      showSearch
-                      style={{ width: '100%' }}
-                      placeholder="Select payment terms"
-                      value={paymentTerms}
-                      onChange={setPaymentTerms}
-                      filterOption={(input, option) =>
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                      }
-                      options={[
-                        { value: 'net-30', label: 'Net 30' },
-                        { value: 'net-60', label: 'Net 60' },
-                        { value: 'due-on-receipt', label: 'Due on Receipt' },
-                        { value: 'prepaid', label: 'Prepaid' },
-                      ]}
-                    />
-                  </div>
-
-                  {/* Freight Terms */}
-                  <div>
-                    <Texto
-                      style={{
-                        fontSize: '11px',
-                        color: '#8c8c8c',
-                        marginBottom: '8px',
-                        display: 'block',
-                      }}
-                    >
-                      Freight Terms
-                    </Texto>
-                    <Select
-                      showSearch
-                      style={{ width: '100%' }}
-                      placeholder="Select freight terms"
-                      value={freightTerms}
-                      onChange={setFreightTerms}
-                      filterOption={(input, option) =>
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                      }
-                      options={[
-                        { value: 'fob', label: 'FOB' },
-                        { value: 'cif', label: 'CIF' },
-                        { value: 'delivered', label: 'Delivered' },
-                        { value: 'ex-works', label: 'Ex Works' },
-                      ]}
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -2348,7 +2282,7 @@ export function IndexOfferManagement() {
 
             {/* SECTION 5 & 6: Formula Differential and Calculated Price - Side by Side */}
             <div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isFutureMode ? '1fr 1fr' : '1fr', gap: '24px' }}>
                 {/* Formula Differential */}
                 <div>
                   <Texto
@@ -2389,63 +2323,65 @@ export function IndexOfferManagement() {
                   </Texto>
                 </div>
 
-                {/* Current Calculated Price */}
-                <div>
-                  <Texto
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      marginBottom: '12px',
-                      display: 'block',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                      color: '#595959',
-                    }}
-                  >
-                    Current Calculated Price
-                  </Texto>
-                  <div
-                    style={{
-                      backgroundColor: '#fafafa',
-                      padding: '16px',
-                      borderRadius: '4px',
-                      border: '1px solid #e8e8e8',
-                    }}
-                  >
-                    <Horizontal
-                      style={{
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '8px',
-                      }}
-                    >
-                      <Texto style={{ fontSize: '24px', fontWeight: 600, color: '#8c8c8c' }}>
-                        $0.0000
-                      </Texto>
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<ReloadOutlined />}
-                        style={{ padding: '4px 8px', color: '#595959' }}
-                      >
-                        Refresh
-                      </Button>
-                    </Horizontal>
+                {/* Current Calculated Price - Future State Only */}
+                {isFutureMode && (
+                  <div>
                     <Texto
                       style={{
-                        fontSize: '11px',
-                        color: '#8c8c8c',
-                        marginBottom: '8px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        marginBottom: '12px',
                         display: 'block',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        color: '#595959',
                       }}
                     >
-                      As of: --
+                      Current Calculated Price
                     </Texto>
-                    <Texto style={{ fontSize: '11px', color: '#8c8c8c', display: 'block' }}>
-                      Current price. Invoice generated with effective price at time of lifting.
-                    </Texto>
+                    <div
+                      style={{
+                        backgroundColor: '#fafafa',
+                        padding: '16px',
+                        borderRadius: '4px',
+                        border: '1px solid #e8e8e8',
+                      }}
+                    >
+                      <Horizontal
+                        style={{
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '8px',
+                        }}
+                      >
+                        <Texto style={{ fontSize: '24px', fontWeight: 600, color: '#8c8c8c' }}>
+                          $0.0000
+                        </Texto>
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<ReloadOutlined />}
+                          style={{ padding: '4px 8px', color: '#595959' }}
+                        >
+                          Refresh
+                        </Button>
+                      </Horizontal>
+                      <Texto
+                        style={{
+                          fontSize: '11px',
+                          color: '#8c8c8c',
+                          marginBottom: '8px',
+                          display: 'block',
+                        }}
+                      >
+                        As of: --
+                      </Texto>
+                      <Texto style={{ fontSize: '11px', color: '#8c8c8c', display: 'block' }}>
+                        Current price. Invoice generated with effective price at time of lifting.
+                      </Texto>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 

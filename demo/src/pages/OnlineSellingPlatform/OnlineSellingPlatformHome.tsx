@@ -3,11 +3,13 @@ import { GraviGrid, GraviButton, Vertical, Texto, Horizontal } from '@gravitate-
 import { Tabs, Drawer, Radio, Button, Form, InputNumber, DatePicker, Input, Select, Tag, Collapse, Checkbox, Segmented, Calendar } from 'antd';
 import { EyeOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
+import { useFeatureMode } from '../../contexts/FeatureModeContext';
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
 export function OnlineSellingPlatformHome() {
+    const { featureMode, setFeatureMode, isFutureMode } = useFeatureMode();
     const [activeTab, setActiveTab] = useState('buy-prompts');
     const [drawerVisible, setDrawerVisible] = useState(false);
 
@@ -368,6 +370,31 @@ export function OnlineSellingPlatformHome() {
                 onClose={() => setDrawerVisible(false)}
                 visible={drawerVisible}
             >
+                {/* Feature Prioritization Section */}
+                <div style={{ marginBottom: '24px' }}>
+                    <Texto style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', display: 'block' }}>
+                        Feature Prioritization
+                    </Texto>
+                    <Radio.Group
+                        onChange={(e) => setFeatureMode(e.target.value)}
+                        value={featureMode}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+                    >
+                        <Radio value="mvp">
+                            <div>
+                                <div style={{ fontWeight: 500 }}>MVP Mode</div>
+                                <div style={{ fontSize: '12px', color: '#8c8c8c' }}>Shows core features ready for production</div>
+                            </div>
+                        </Radio>
+                        <Radio value="future-state">
+                            <div>
+                                <div style={{ fontWeight: 500 }}>Future State</div>
+                                <div style={{ fontSize: '12px', color: '#8c8c8c' }}>Shows all features including upcoming functionality</div>
+                            </div>
+                        </Radio>
+                    </Radio.Group>
+                </div>
+
                 {/* Page Options Section - Only show on Index Offers tab */}
                 {activeTab === 'index-offers' && (
                     <div style={{ marginBottom: '24px' }}>
@@ -839,152 +866,154 @@ export function OnlineSellingPlatformHome() {
                                             </div>
                                         </div>
 
-                                        {/* Lifting Dates */}
-                                        <div style={{ marginTop: '24px' }}>
-                                            <Texto style={{ fontSize: '12px', fontWeight: 700, marginBottom: '12px', display: 'block', textTransform: 'uppercase', letterSpacing: '1px', color: '#595959' }}>
-                                                Lifting Dates
-                                            </Texto>
+                                        {/* Lifting Dates - Future State Only */}
+                                        {isFutureMode && (
+                                            <div style={{ marginTop: '24px' }}>
+                                                <Texto style={{ fontSize: '12px', fontWeight: 700, marginBottom: '12px', display: 'block', textTransform: 'uppercase', letterSpacing: '1px', color: '#595959' }}>
+                                                    Lifting Dates
+                                                </Texto>
 
-                                            {/* Date Range Inputs */}
-                                            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                                                <div style={{ flex: 1 }}>
-                                                    <Texto style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '8px', display: 'block' }}>Start</Texto>
-                                                    <Input
-                                                        value={liftingDateRange[0] ? liftingDateRange[0].format('MM/DD/YYYY') : ''}
-                                                        placeholder="mm/dd/yyyy"
-                                                        readOnly
-                                                        style={{
-                                                            cursor: 'default',
-                                                            backgroundColor: '#ffffff'
-                                                        }}
-                                                        suffix={<span style={{ color: '#8c8c8c' }}>📅</span>}
-                                                    />
+                                                {/* Date Range Inputs */}
+                                                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <Texto style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '8px', display: 'block' }}>Start</Texto>
+                                                        <Input
+                                                            value={liftingDateRange[0] ? liftingDateRange[0].format('MM/DD/YYYY') : ''}
+                                                            placeholder="mm/dd/yyyy"
+                                                            readOnly
+                                                            style={{
+                                                                cursor: 'default',
+                                                                backgroundColor: '#ffffff'
+                                                            }}
+                                                            suffix={<span style={{ color: '#8c8c8c' }}>📅</span>}
+                                                        />
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <Texto style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '8px', display: 'block' }}>End</Texto>
+                                                        <Input
+                                                            value={liftingDateRange[1] ? liftingDateRange[1].format('MM/DD/YYYY') : ''}
+                                                            placeholder="mm/dd/yyyy"
+                                                            readOnly
+                                                            style={{
+                                                                cursor: 'default',
+                                                                backgroundColor: '#ffffff'
+                                                            }}
+                                                            suffix={<span style={{ color: '#8c8c8c' }}>📅</span>}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div style={{ flex: 1 }}>
-                                                    <Texto style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '8px', display: 'block' }}>End</Texto>
-                                                    <Input
-                                                        value={liftingDateRange[1] ? liftingDateRange[1].format('MM/DD/YYYY') : ''}
-                                                        placeholder="mm/dd/yyyy"
-                                                        readOnly
-                                                        style={{
-                                                            cursor: 'default',
-                                                            backgroundColor: '#ffffff'
-                                                        }}
-                                                        suffix={<span style={{ color: '#8c8c8c' }}>📅</span>}
-                                                    />
-                                                </div>
-                                            </div>
 
-                                            {/* Always-visible Calendar */}
-                                            <style>
-                                                {`
-                                                    .lifting-dates-calendar .ant-picker-calendar-header {
-                                                        padding: 12px 16px;
-                                                        border-bottom: 1px solid #e8e8e8;
-                                                    }
-                                                    .lifting-dates-calendar .ant-picker-content {
-                                                        padding: 8px;
-                                                    }
-                                                    .lifting-dates-calendar .ant-picker-cell {
-                                                        color: #595959;
-                                                    }
-                                                    .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
-                                                        background: #e6f7ff !important;
-                                                        border: 2px solid #1890ff;
-                                                        color: #000000;
-                                                        font-weight: 600;
-                                                    }
-                                                    .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
-                                                    .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
-                                                        background: #52c41a !important;
-                                                        border: 2px solid #389e0d;
-                                                        color: #ffffff;
-                                                        font-weight: 600;
-                                                    }
-                                                    .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-in-range .ant-picker-cell-inner {
-                                                        background: #e6f7ff;
-                                                        border: 2px solid #91d5ff;
-                                                    }
-                                                    .lifting-dates-calendar .ant-picker-cell-today .ant-picker-cell-inner {
-                                                        border: 2px solid #000000;
-                                                    }
-                                                `}
-                                            </style>
-                                            <div className="lifting-dates-calendar">
-                                                <Calendar
-                                                    fullscreen={false}
-                                                    onSelect={(date) => {
-                                                        if (!liftingDateRange[0] || (liftingDateRange[0] && liftingDateRange[1])) {
-                                                            // Start new range
-                                                            setLiftingDateRange([date, null]);
-                                                        } else {
-                                                            // Complete the range
-                                                            const [start] = liftingDateRange;
-                                                            if (date.isBefore(start)) {
-                                                                setLiftingDateRange([date, start]);
-                                                            } else {
-                                                                setLiftingDateRange([start, date]);
-                                                            }
+                                                {/* Always-visible Calendar */}
+                                                <style>
+                                                    {`
+                                                        .lifting-dates-calendar .ant-picker-calendar-header {
+                                                            padding: 12px 16px;
+                                                            border-bottom: 1px solid #e8e8e8;
                                                         }
-                                                    }}
-                                                    headerRender={({ value, onChange }) => {
-                                                        const month = value.month();
-                                                        return (
-                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                <Button
-                                                                    type="text"
-                                                                    size="small"
-                                                                    onClick={() => {
-                                                                        const newValue = value.clone().month(month - 1);
-                                                                        onChange(newValue);
-                                                                    }}
-                                                                    style={{ fontSize: '18px', fontWeight: 'bold' }}
-                                                                >
-                                                                    ‹
-                                                                </Button>
-                                                                <Texto style={{ fontSize: '15px', fontWeight: 600, color: '#262626' }}>
-                                                                    {value.format('MMMM YYYY')}
-                                                                </Texto>
-                                                                <Button
-                                                                    type="text"
-                                                                    size="small"
-                                                                    onClick={() => {
-                                                                        const newValue = value.clone().month(month + 1);
-                                                                        onChange(newValue);
-                                                                    }}
-                                                                    style={{ fontSize: '18px', fontWeight: 'bold' }}
-                                                                >
-                                                                    ›
-                                                                </Button>
-                                                            </div>
-                                                        );
-                                                    }}
-                                                    dateFullCellRender={(date) => {
-                                                        const isStart = liftingDateRange[0] && date.isSame(liftingDateRange[0], 'day');
-                                                        const isEnd = liftingDateRange[1] && date.isSame(liftingDateRange[1], 'day');
-                                                        const isInRange = liftingDateRange[0] && liftingDateRange[1] &&
-                                                            date.isAfter(liftingDateRange[0], 'day') &&
-                                                            date.isBefore(liftingDateRange[1], 'day');
+                                                        .lifting-dates-calendar .ant-picker-content {
+                                                            padding: 8px;
+                                                        }
+                                                        .lifting-dates-calendar .ant-picker-cell {
+                                                            color: #595959;
+                                                        }
+                                                        .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+                                                            background: #e6f7ff !important;
+                                                            border: 2px solid #1890ff;
+                                                            color: #000000;
+                                                            font-weight: 600;
+                                                        }
+                                                        .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+                                                        .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+                                                            background: #52c41a !important;
+                                                            border: 2px solid #389e0d;
+                                                            color: #ffffff;
+                                                            font-weight: 600;
+                                                        }
+                                                        .lifting-dates-calendar .ant-picker-cell-in-view.ant-picker-cell-in-range .ant-picker-cell-inner {
+                                                            background: #e6f7ff;
+                                                            border: 2px solid #91d5ff;
+                                                        }
+                                                        .lifting-dates-calendar .ant-picker-cell-today .ant-picker-cell-inner {
+                                                            border: 2px solid #000000;
+                                                        }
+                                                    `}
+                                                </style>
+                                                <div className="lifting-dates-calendar">
+                                                    <Calendar
+                                                        fullscreen={false}
+                                                        onSelect={(date) => {
+                                                            if (!liftingDateRange[0] || (liftingDateRange[0] && liftingDateRange[1])) {
+                                                                // Start new range
+                                                                setLiftingDateRange([date, null]);
+                                                            } else {
+                                                                // Complete the range
+                                                                const [start] = liftingDateRange;
+                                                                if (date.isBefore(start)) {
+                                                                    setLiftingDateRange([date, start]);
+                                                                } else {
+                                                                    setLiftingDateRange([start, date]);
+                                                                }
+                                                            }
+                                                        }}
+                                                        headerRender={({ value, onChange }) => {
+                                                            const month = value.month();
+                                                            return (
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <Button
+                                                                        type="text"
+                                                                        size="small"
+                                                                        onClick={() => {
+                                                                            const newValue = value.clone().month(month - 1);
+                                                                            onChange(newValue);
+                                                                        }}
+                                                                        style={{ fontSize: '18px', fontWeight: 'bold' }}
+                                                                    >
+                                                                        ‹
+                                                                    </Button>
+                                                                    <Texto style={{ fontSize: '15px', fontWeight: 600, color: '#262626' }}>
+                                                                        {value.format('MMMM YYYY')}
+                                                                    </Texto>
+                                                                    <Button
+                                                                        type="text"
+                                                                        size="small"
+                                                                        onClick={() => {
+                                                                            const newValue = value.clone().month(month + 1);
+                                                                            onChange(newValue);
+                                                                        }}
+                                                                        style={{ fontSize: '18px', fontWeight: 'bold' }}
+                                                                    >
+                                                                        ›
+                                                                    </Button>
+                                                                </div>
+                                                            );
+                                                        }}
+                                                        dateFullCellRender={(date) => {
+                                                            const isStart = liftingDateRange[0] && date.isSame(liftingDateRange[0], 'day');
+                                                            const isEnd = liftingDateRange[1] && date.isSame(liftingDateRange[1], 'day');
+                                                            const isInRange = liftingDateRange[0] && liftingDateRange[1] &&
+                                                                date.isAfter(liftingDateRange[0], 'day') &&
+                                                                date.isBefore(liftingDateRange[1], 'day');
 
-                                                        return (
-                                                            <div
-                                                                className={`ant-picker-cell-inner ${isStart ? 'ant-picker-cell-range-start' : ''} ${isEnd ? 'ant-picker-cell-range-end' : ''} ${isInRange ? 'ant-picker-cell-in-range' : ''}`}
-                                                                style={{
-                                                                    height: '32px',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    borderRadius: '4px',
-                                                                    margin: '2px'
-                                                                }}
-                                                            >
-                                                                {date.date()}
-                                                            </div>
-                                                        );
-                                                    }}
-                                                />
+                                                            return (
+                                                                <div
+                                                                    className={`ant-picker-cell-inner ${isStart ? 'ant-picker-cell-range-start' : ''} ${isEnd ? 'ant-picker-cell-range-end' : ''} ${isInRange ? 'ant-picker-cell-in-range' : ''}`}
+                                                                    style={{
+                                                                        height: '32px',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        borderRadius: '4px',
+                                                                        margin: '2px'
+                                                                    }}
+                                                                >
+                                                                    {date.date()}
+                                                                </div>
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
 
                                         {/* Loading Numbers */}
                                         <div style={{ marginTop: '24px' }}>
@@ -1134,27 +1163,8 @@ export function OnlineSellingPlatformHome() {
                                             Additional Terms
                                         </Texto>
 
-                                        {/* Volume Basis */}
+                                        {/* Pricing Rules */}
                                         <div style={{ marginBottom: '24px' }}>
-                                            <Texto style={{ fontSize: '12px', fontWeight: 700, marginBottom: '12px', display: 'block', textTransform: 'uppercase', letterSpacing: '1px', color: '#595959' }}>
-                                                Volume Basis
-                                            </Texto>
-
-                                            {/* Net/Gross Tag - Full Row */}
-                                            <div className="mb-2">
-                                                <Tag style={{
-                                                    backgroundColor: '#1890ff',
-                                                    color: '#ffffff',
-                                                    border: 'none',
-                                                    fontSize: '12px',
-                                                    fontWeight: 600,
-                                                    padding: '4px 12px'
-                                                }}>
-                                                    NET
-                                                </Tag>
-                                            </div>
-
-                                            {/* Two Column Grid for Fields */}
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                                 {/* Price Validity */}
                                                 <div>
@@ -1183,26 +1193,6 @@ export function OnlineSellingPlatformHome() {
                                                     </Texto>
                                                     <Texto category="p1" weight="600">
                                                         Use prior business day
-                                                    </Texto>
-                                                </div>
-
-                                                {/* Payment Terms */}
-                                                <div>
-                                                    <Texto style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '8px', display: 'block' }}>
-                                                        Payment Terms
-                                                    </Texto>
-                                                    <Texto category="p1" weight="600">
-                                                        Net 15
-                                                    </Texto>
-                                                </div>
-
-                                                {/* Freight Terms */}
-                                                <div>
-                                                    <Texto style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '8px', display: 'block' }}>
-                                                        Freight Terms
-                                                    </Texto>
-                                                    <Texto category="p1" weight="600">
-                                                        FOB Destination
                                                     </Texto>
                                                 </div>
                                             </div>
