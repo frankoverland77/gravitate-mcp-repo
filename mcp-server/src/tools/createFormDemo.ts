@@ -1,6 +1,45 @@
 import fs from "fs";
 import path from "path";
+import { execSync } from "child_process";
 import { generateComponentProps } from "../utils/cssUtils.js";
+import { DEMO_DEMOS, PAGE_CONFIG_PATH, AUTH_ROUTE_PATH } from "../utils/paths.js";
+
+// Validate TypeScript/TSX syntax after file modification
+function validateSyntax(filePath: string): { valid: boolean; error?: string } {
+  try {
+    // Use TypeScript compiler to check syntax
+    // Run from demo directory where tsconfig exists
+    const demoRoot = path.resolve(path.dirname(filePath), '..');
+    const result = execSync(`npx tsc --noEmit --skipLibCheck "${filePath}" 2>&1 || true`, { 
+      stdio: 'pipe',
+      cwd: demoRoot,
+      encoding: 'utf8'
+    });
+    
+    // Filter out JSX config errors (TS6142, TS17004) - these are config issues, not syntax errors
+    const realErrors = result.split('\n')
+      .filter(line => line.includes('error TS'))
+      .filter(line => !line.includes('TS6142') && !line.includes('TS17004'))
+      .filter(line => !line.includes("'--jsx'"));
+    
+    if (realErrors.length > 0) {
+      return { valid: false, error: realErrors.join('\n') };
+    }
+    
+    return { valid: true };
+  } catch (error: any) {
+    const output = error.stdout?.toString() || error.stderr?.toString() || error.message;
+    // Check for real syntax errors, not JSX config issues
+    const hasRealError = output.includes('error TS') && 
+                         !output.includes('TS6142') && 
+                         !output.includes('TS17004') &&
+                         !output.includes("'--jsx'");
+    if (hasRealError) {
+      return { valid: false, error: output };
+    }
+    return { valid: true };
+  }
+}
 
 export interface FormField {
   name: string;
@@ -27,7 +66,7 @@ export interface CreateFormDemoParams {
   title?: string;
 }
 
-const DEMO_DIR = path.join(process.cwd(), "demo", "src", "pages", "demos");
+const DEMO_DIR = DEMO_DEMOS;
 
 // Generate form field based on type
 function generateFormField(field: FormField): string {
@@ -284,36 +323,72 @@ export async function createFormDemo(params: CreateFormDemoParams): Promise<stri
   fs.writeFileSync(path.join(demoPath, `${name}.data.ts`), mockDataFile);
   
   // Update pageConfig.tsx to include new demo
-  const pageConfigPath = path.join(process.cwd(), "demo", "src", "pageConfig.tsx");
+  const pageConfigPath = PAGE_CONFIG_PATH;
   if (fs.existsSync(pageConfigPath)) {
-    let pageConfig = fs.readFileSync(pageConfigPath, "utf8");
+    const originalPageConfig = fs.readFileSync(pageConfigPath, "utf8");
+    let pageConfig = originalPageConfig;
     
-    // Add import - import component directly from its file
+    // Add import at the top with other imports (after the last import statement)
     const importLine = `import { ${name} } from "./pages/demos/${name}/${name}";`;
     if (!pageConfig.includes(importLine)) {
-      const importInsertPoint = pageConfig.indexOf('export const createPageConfig');
-      pageConfig = pageConfig.slice(0, importInsertPoint) + importLine + '\n' + pageConfig.slice(importInsertPoint);
+      // Find the last import statement and insert after it
+      const importRegex = /^import .+ from ['"].+['"];?$/gm;
+      let lastImportMatch: RegExpExecArray | null = null;
+      let match: RegExpExecArray | null;
+      while ((match = importRegex.exec(pageConfig)) !== null) {
+        lastImportMatch = match;
+      }
+      
+      if (lastImportMatch) {
+        const insertPos = lastImportMatch.index + lastImportMatch[0].length;
+        pageConfig = pageConfig.slice(0, insertPos) + '\n' + importLine + pageConfig.slice(insertPos);
+      }
     }
     
-    // Add to config object - use component directly
-    const configEntry = `  ${name}: {
-    hasPermission: () => true,
+    // Add to demoRegistry array (NOT a config object)
+    // Find the marker comment and insert before it
+    const registryMarker = '// MCP server will add more demos here automatically';
+    const registryEntry = `  {
     key: "${name}",
-    icon: <FileOutlined />,
     title: "${params.title || name}",
     element: <${name} />,
+    path: "/demos/forms/${name.toLowerCase().replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '')}",
+    description: "${params.title || name} form",
+    created: new Date().toISOString(),
+    category: "forms" as const,
   },`;
     
-    if (!pageConfig.includes(`${name}:`)) {
-      const configInsertPoint = pageConfig.lastIndexOf('});');
-      pageConfig = pageConfig.slice(0, configInsertPoint) + configEntry + '\n' + pageConfig.slice(configInsertPoint);
+    if (!pageConfig.includes(`key: "${name}"`)) {
+      const markerIndex = pageConfig.indexOf(registryMarker);
+      if (markerIndex !== -1) {
+        pageConfig = pageConfig.slice(0, markerIndex) + registryEntry + '\n  ' + pageConfig.slice(markerIndex);
+      } else {
+        // Fallback: find the demoRegistry array closing bracket
+        const registryCloseRegex = /export const demoRegistry[^\]]+\]/s;
+        const registryMatch = pageConfig.match(registryCloseRegex);
+        if (registryMatch) {
+          const closeIndex = pageConfig.indexOf(registryMatch[0]) + registryMatch[0].length - 1;
+          pageConfig = pageConfig.slice(0, closeIndex) + '\n' + registryEntry + pageConfig.slice(closeIndex);
+        } else {
+          console.error('Could not find demoRegistry in pageConfig.tsx - manual update required');
+        }
+      }
     }
     
     fs.writeFileSync(pageConfigPath, pageConfig);
+    
+    // Validate the modified file - rollback if invalid
+    const validation = validateSyntax(pageConfigPath);
+    if (!validation.valid) {
+      console.error('Syntax validation failed, rolling back pageConfig.tsx');
+      console.error(validation.error);
+      fs.writeFileSync(pageConfigPath, originalPageConfig);
+      throw new Error(`Failed to update pageConfig.tsx: syntax error after modification. The file has been rolled back. Error: ${validation.error}`);
+    }
   }
   
   // Update AuthenticatedRoute.jsx to add the scope
-  const authRoutePath = path.join(process.cwd(), "demo", "src", "_Main", "AuthenticatedRoute.jsx");
+  const authRoutePath = AUTH_ROUTE_PATH;
   if (fs.existsSync(authRoutePath)) {
     let authRoute = fs.readFileSync(authRoutePath, "utf8");
     

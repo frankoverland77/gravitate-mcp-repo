@@ -1,0 +1,11 @@
+.product-card {
+  background-color: var(--theme-bg-elevated);
+  border: 1px solid var(--theme-border-color);
+  border-radius: 8px;
+  width: 320px;
+  transition: box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

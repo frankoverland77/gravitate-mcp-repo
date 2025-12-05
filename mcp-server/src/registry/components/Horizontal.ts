@@ -1,5 +1,7 @@
 /**
- * Horizontal Component Metadata
+ * Horizontal Component Metadata - CORRECTED
+ * 
+ * Based on actual Excalibrr implementation and production usage patterns.
  */
 
 import { ComponentMetadata } from "../types.js";
@@ -7,13 +9,20 @@ import { ComponentMetadata } from "../types.js";
 export const horizontalComponent: ComponentMetadata = {
   id: "horizontal",
   name: "Horizontal",
-  description: "Flexbox layout component for horizontal arrangement of children. Provides consistent spacing, alignment, and wrapping.",
+  description: "Flexbox row layout component. ALWAYS use instead of <div style={{display:'flex'}}>. Use component props for alignment, style/className for gap.",
   category: "layout",
   complexity: "simple",
   tags: ["layout", "flex", "horizontal", "row"],
   source: "@gravitate-js/excalibrr",
   version: "1.0.0",
   dependencies: ["@gravitate-js/excalibrr", "react"],
+  notes: `
+⚠️ CRITICAL RULES:
+- NEVER use <div style={{display:'flex'}}> - ALWAYS use Horizontal or Vertical
+- Use COMPONENT PROPS for justifyContent and alignItems (not inline styles)
+- NO gap prop - use style={{ gap: '12px' }} or className='gap-16'
+- Prefer utility classes (gap-8, gap-10, gap-12, gap-16) over inline gap styles
+`,
   props: [
     {
       name: "children",
@@ -22,17 +31,18 @@ export const horizontalComponent: ComponentMetadata = {
       description: "Child elements to arrange horizontally"
     },
     {
-      name: "alignItems",
-      type: "'flex-start' | 'center' | 'flex-end' | 'stretch'",
-      required: false,
-      description: "Vertical alignment of children"
-    },
-    {
       name: "justifyContent",
       type: "'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around'",
       required: false,
       defaultValue: "'flex-start'",
-      description: "Horizontal alignment/distribution"
+      description: "Horizontal distribution. USE THIS PROP instead of style."
+    },
+    {
+      name: "alignItems",
+      type: "'flex-start' | 'center' | 'flex-end' | 'stretch'",
+      required: false,
+      defaultValue: "'stretch'",
+      description: "Vertical alignment. USE THIS PROP instead of style."
     },
     {
       name: "verticalCenter",
@@ -52,20 +62,7 @@ export const horizontalComponent: ComponentMetadata = {
       name: "flex",
       type: "string",
       required: false,
-      defaultValue: "'0 1 auto'",
-      description: "CSS flex property value"
-    },
-    {
-      name: "width",
-      type: "string",
-      required: false,
-      description: "CSS width value"
-    },
-    {
-      name: "height",
-      type: "string",
-      required: false,
-      description: "CSS height value"
+      description: "CSS flex property value (e.g., '1', '0 1 auto')"
     },
     {
       name: "fullHeight",
@@ -75,104 +72,70 @@ export const horizontalComponent: ComponentMetadata = {
       description: "Apply h-100 class for full height"
     },
     {
-      name: "background",
-      type: "string",
-      required: false,
-      description: "CSS variable name for background (e.g., 'bg-1')"
-    },
-    {
-      name: "border",
-      type: "string",
-      required: false,
-      description: "Border style key from borderEnum"
-    },
-    {
-      name: "borderRadius",
-      type: "string",
-      required: false,
-      description: "CSS border-radius value"
-    },
-    {
-      name: "scroll",
-      type: "boolean",
-      required: false,
-      defaultValue: "false",
-      description: "Enable overflow: auto for scrollable content"
-    },
-    {
       name: "className",
       type: "string",
       required: false,
-      description: "Additional CSS classes (use gap-8, gap-10, gap-12, gap-16 for spacing)"
+      description: "CSS classes. Use gap-8, gap-10, gap-12, gap-16 for spacing."
     },
     {
       name: "style",
       type: "React.CSSProperties",
       required: false,
-      description: "Inline styles"
-    },
-    {
-      name: "onClick",
-      type: "() => void",
-      required: false,
-      description: "Click handler"
+      description: "Inline styles. Use for gap if no utility class fits, or theme variables."
     }
   ],
   examples: [
     {
-      name: "Button Group",
-      description: "Horizontal arrangement of buttons with gap",
-      code: `import { Horizontal, GraviButton } from '@gravitate-js/excalibrr';
+      name: "Space Between Header",
+      description: "Title on left, actions on right",
+      code: `import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 
-function ButtonGroup() {
-  return (
-    <Horizontal verticalCenter className="gap-8">
-      <GraviButton>Cancel</GraviButton>
-      <GraviButton theme="theme1">Save Draft</GraviButton>
-      <GraviButton theme="success">Publish</GraviButton>
-    </Horizontal>
-  );
-}`,
-      tags: ["buttons"]
+// ✅ CORRECT - use component props for alignment
+<Horizontal justifyContent='space-between' alignItems='center'>
+  <Texto category='h2'>Products</Texto>
+  <GraviButton buttonText='Add Product' theme1 />
+</Horizontal>`,
+      tags: ["header", "space-between", "alignment"]
     },
     {
-      name: "Form Row",
-      description: "Form fields arranged horizontally",
-      code: `import { Horizontal, Vertical, Texto } from '@gravitate-js/excalibrr';
+      name: "Button Group with Gap",
+      description: "Buttons with spacing using utility class",
+      code: `import { Horizontal, GraviButton } from '@gravitate-js/excalibrr'
 
-function FormRow() {
-  return (
-    <Horizontal className="gap-16" alignItems="flex-start">
-      <Vertical flex="1">
-        <Texto weight="semibold">First Name</Texto>
-        <input type="text" name="firstName" />
-      </Vertical>
-      <Vertical flex="1">
-        <Texto weight="semibold">Last Name</Texto>
-        <input type="text" name="lastName" />
-      </Vertical>
-    </Horizontal>
-  );
-}`,
-      tags: ["form", "layout"]
+// ✅ CORRECT - use className for gap
+<Horizontal alignItems='center' className='gap-12'>
+  <GraviButton buttonText='Cancel' />
+  <GraviButton buttonText='Save' success />
+</Horizontal>`,
+      tags: ["buttons", "gap", "utility-class"]
     },
     {
-      name: "Justified Header",
-      description: "Header with title on left and actions on right",
-      code: `import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
+      name: "Form Actions (Right-Aligned)",
+      description: "Standard form action buttons pattern",
+      code: `import { Horizontal, GraviButton } from '@gravitate-js/excalibrr'
 
-function PageHeader() {
-  return (
-    <Horizontal justifyContent="space-between" verticalCenter>
-      <Texto size="xl" weight="bold">Products</Texto>
-      <Horizontal verticalCenter className="gap-8">
-        <GraviButton>Export</GraviButton>
-        <GraviButton theme="success">Add Product</GraviButton>
-      </Horizontal>
-    </Horizontal>
-  );
-}`,
-      tags: ["header", "justified"]
+<Horizontal justifyContent='flex-end' style={{ gap: '12px' }}>
+  <GraviButton buttonText='Cancel' onClick={onCancel} />
+  <GraviButton buttonText='Save' success onClick={() => form.submit()} />
+</Horizontal>`,
+      tags: ["form", "actions", "right-aligned"]
+    },
+    {
+      name: "⚠️ WRONG: Inline Alignment Styles",
+      description: "Common mistake - use props not style for alignment",
+      code: `// ❌ WRONG - Don't use style for alignment
+<Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+
+// ✅ CORRECT - Use component props
+<Horizontal justifyContent='space-between' alignItems='center'>
+
+// ❌ WRONG - No gap prop exists
+<Horizontal gap={12}>
+
+// ✅ CORRECT - Use style or className for gap
+<Horizontal style={{ gap: '12px' }}>
+<Horizontal className='gap-12'>`,
+      tags: ["warning", "mistake", "props"]
     }
   ]
 };

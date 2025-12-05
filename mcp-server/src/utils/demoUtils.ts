@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { DEMO_DEMOS } from "./paths.js";
 
 /**
  * Shared utilities for MCP demo tools
@@ -9,14 +10,14 @@ import path from "path";
  * Get the path to a demo file
  */
 export function getDemoPath(demoName: string): string {
-  return path.join(process.cwd(), "demo", "src", "pages", "demos", `${demoName}.tsx`);
+  return path.join(DEMO_DEMOS, `${demoName}.tsx`);
 }
 
 /**
  * Get the path to a demo data file
  */
 export function getDemoDataPath(demoName: string): string {
-  return path.join(process.cwd(), "demo", "src", "pages", "demos", `${demoName}.data.ts`);
+  return path.join(DEMO_DEMOS, `${demoName}.data.ts`);
 }
 
 /**

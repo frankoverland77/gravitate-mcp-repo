@@ -1,12 +1,11 @@
 import fs from "fs";
 import path from "path";
+import { DEMO_DEMOS, PAGE_CONFIG_PATH, AUTH_ROUTE_PATH } from "../utils/paths.js";
 
 export interface CleanupDemoParams {
   name: string;
   force?: boolean; // Skip confirmation
 }
-
-const DEMO_DIR = path.join(process.cwd(), "demo", "src", "pages", "demos");
 
 export async function cleanupDemo(params: CleanupDemoParams): Promise<string> {
   const { name, force = false } = params;
@@ -15,7 +14,7 @@ export async function cleanupDemo(params: CleanupDemoParams): Promise<string> {
     throw new Error("Demo name is required");
   }
   
-  const demoPath = path.join(DEMO_DIR, name);
+  const demoPath = path.join(DEMO_DEMOS, name);
   const removedItems: string[] = [];
   
   // 1. Remove demo directory if it exists
@@ -25,9 +24,8 @@ export async function cleanupDemo(params: CleanupDemoParams): Promise<string> {
   }
   
   // 2. Clean up pageConfig.tsx
-  const pageConfigPath = path.join(process.cwd(), "demo", "src", "pageConfig.tsx");
-  if (fs.existsSync(pageConfigPath)) {
-    let pageConfig = fs.readFileSync(pageConfigPath, "utf8");
+  if (fs.existsSync(PAGE_CONFIG_PATH)) {
+    let pageConfig = fs.readFileSync(PAGE_CONFIG_PATH, "utf8");
     const originalLength = pageConfig.length;
     
     // Remove import statement - handle various import patterns
@@ -80,15 +78,14 @@ export async function cleanupDemo(params: CleanupDemoParams): Promise<string> {
     pageConfig = pageConfig.replace(/,?\s*\w+:\s*\n\s*\]\s*\}/g, '');
     
     if (pageConfig.length !== originalLength) {
-      fs.writeFileSync(pageConfigPath, pageConfig);
+      fs.writeFileSync(PAGE_CONFIG_PATH, pageConfig);
       removedItems.push(`📝 Cleaned pageConfig.tsx`);
     }
   }
   
   // 3. Clean up AuthenticatedRoute.jsx
-  const authRoutePath = path.join(process.cwd(), "demo", "src", "_Main", "AuthenticatedRoute.jsx");
-  if (fs.existsSync(authRoutePath)) {
-    let authRoute = fs.readFileSync(authRoutePath, "utf8");
+  if (fs.existsSync(AUTH_ROUTE_PATH)) {
+    let authRoute = fs.readFileSync(AUTH_ROUTE_PATH, "utf8");
     const originalLength = authRoute.length;
     
     // Remove scope entry - handle with or without trailing comma
@@ -120,15 +117,15 @@ export async function cleanupDemo(params: CleanupDemoParams): Promise<string> {
     }
     
     if (authRoute.length !== originalLength) {
-      fs.writeFileSync(authRoutePath, authRoute);
+      fs.writeFileSync(AUTH_ROUTE_PATH, authRoute);
       removedItems.push(`🔑 Removed scope from AuthenticatedRoute.jsx`);
     }
   }
   
   // 4. Clean up any orphaned files in demos directory
   const orphanedFiles = [
-    path.join(process.cwd(), "demo", "src", "pages", "demos", `${name}.tsx`),
-    path.join(process.cwd(), "demo", "src", "pages", "demos", `${name}.data.ts`),
+    path.join(DEMO_DEMOS, `${name}.tsx`),
+    path.join(DEMO_DEMOS, `${name}.data.ts`),
   ];
   
   for (const file of orphanedFiles) {

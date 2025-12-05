@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { DEMO_SRC } from "../utils/paths.js";
 
 interface CleanupStylesArgs {
   filePath?: string;
@@ -23,12 +24,12 @@ export async function cleanupStylesTool(args: CleanupStylesArgs) {
     let filesToProcess: string[] = [];
 
     if (filePath) {
-      // Process single file
-      const absolutePath = path.resolve(process.cwd(), filePath);
+      // Process single file - if absolute path, use as-is; otherwise resolve from DEMO_SRC
+      const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(DEMO_SRC, filePath);
       filesToProcess = [absolutePath];
     } else {
       // Process files matching pattern in demo/src directory
-      const demoSrcPath = path.resolve(process.cwd(), "demo/src");
+      const demoSrcPath = DEMO_SRC;
 
       // Use fs.readdir recursively to find files instead of glob
       const findFiles = async (dir: string, pattern: RegExp): Promise<string[]> => {
@@ -74,7 +75,7 @@ export async function cleanupStylesTool(args: CleanupStylesArgs) {
 
 ${results.length > 0 ? `
 📝 **Modified Files:**
-${results.map(r => `  • ${path.relative(process.cwd(), r.filePath)}: ${r.replacementCount} changes`).join('\n')}
+${results.map(r => `  • ${path.relative(DEMO_SRC, r.filePath)}: ${r.replacementCount} changes`).join('\n')}
 
 🔧 **Changes Made:**
 ${results.flatMap(r => r.changes.map(change => `  • ${change}`)).join('\n')}

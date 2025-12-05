@@ -158,6 +158,32 @@ export const KNOWN_TOOLS: KnownTool[] = [
       "what's in figma",
     ],
   },
+  {
+    name: "validate_code",
+    description: "Check code against Excalibrr conventions and return violations",
+    keywords: ["validate", "check", "lint", "review", "conventions", "rules", "violations", "errors"],
+    patterns: [
+      "validate code",
+      "check my code",
+      "review component",
+      "find violations",
+      "check conventions",
+      "lint this",
+    ],
+  },
+  {
+    name: "get_conventions",
+    description: "Get Excalibrr coding conventions and rules with examples",
+    keywords: ["conventions", "rules", "guidelines", "standards", "patterns", "best practices"],
+    patterns: [
+      "get conventions",
+      "show rules",
+      "what are the conventions",
+      "coding standards",
+      "best practices",
+      "how should I",
+    ],
+  },
 ];
 
 /**

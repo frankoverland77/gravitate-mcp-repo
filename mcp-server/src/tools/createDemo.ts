@@ -1,6 +1,45 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { execSync } from "child_process";
 import { generateComponentProps } from "../utils/cssUtils.js";
+import { DEMO_DEMOS, PAGE_CONFIG_PATH, AUTH_ROUTE_PATH } from "../utils/paths.js";
+
+// Validate TypeScript/TSX syntax after file modification
+function validateSyntax(filePath: string): { valid: boolean; error?: string } {
+  try {
+    // Use TypeScript compiler to check syntax
+    // Run from demo directory where tsconfig exists
+    const demoRoot = path.resolve(path.dirname(filePath), '..');
+    const result = execSync(`npx tsc --noEmit --skipLibCheck "${filePath}" 2>&1 || true`, { 
+      stdio: 'pipe',
+      cwd: demoRoot,
+      encoding: 'utf8'
+    });
+    
+    // Filter out JSX config errors (TS6142, TS17004) - these are config issues, not syntax errors
+    const realErrors = result.split('\n')
+      .filter(line => line.includes('error TS'))
+      .filter(line => !line.includes('TS6142') && !line.includes('TS17004'))
+      .filter(line => !line.includes("'--jsx'"));
+    
+    if (realErrors.length > 0) {
+      return { valid: false, error: realErrors.join('\n') };
+    }
+    
+    return { valid: true };
+  } catch (error: any) {
+    const output = error.stdout?.toString() || error.stderr?.toString() || error.message;
+    // Check for real syntax errors, not JSX config issues
+    const hasRealError = output.includes('error TS') && 
+                         !output.includes('TS6142') && 
+                         !output.includes('TS17004') &&
+                         !output.includes("'--jsx'");
+    if (hasRealError) {
+      return { valid: false, error: output };
+    }
+    return { valid: true };
+  }
+}
 
 interface CreateDemoArgs {
   instruction: string;
@@ -504,9 +543,8 @@ async function createDemoFile(
   const dataFileName = componentName + ".data.ts";
 
   // Create organized directory structure: demos/[category]/[ComponentName]/
-  const componentDir = path.resolve(
-    process.cwd(),
-    "demo/src/pages/demos",
+  const componentDir = path.join(
+    DEMO_DEMOS,
     parsed.category,
     componentName
   );
@@ -528,7 +566,7 @@ async function createDemoFile(
 }
 
 async function updateDemoConfig(parsed: ParsedInstruction): Promise<void> {
-  const configPath = path.resolve(process.cwd(), "demo/src/pageConfig.tsx");
+  const configPath = PAGE_CONFIG_PATH;
   const componentName = parsed.name.replace(/\s+/g, "");
   const routePath = `/demos/${parsed.category}/${parsed.name.toLowerCase().replace(/\s+/g, "-")}`;
 
@@ -582,18 +620,24 @@ async function updateDemoConfig(parsed: ParsedInstruction): Promise<void> {
     }
   }
 
-  // Write updated config
+  // Write updated config with validation
+  const originalContent = configContent;
   await fs.writeFile(configPath, updatedContent);
+  
+  // Validate syntax - rollback if invalid
+  const validation = validateSyntax(configPath);
+  if (!validation.valid) {
+    console.error('Syntax validation failed, rolling back pageConfig.tsx');
+    await fs.writeFile(configPath, originalContent);
+    throw new Error(`Failed to update pageConfig.tsx: syntax error. Rolled back. ${validation.error}`);
+  }
 }
 
 /**
  * Update AuthenticatedRoute.jsx to add the new demo scope
  */
 async function updateAuthenticatedRoute(parsed: ParsedInstruction): Promise<void> {
-  const authRoutePath = path.resolve(
-    process.cwd(),
-    "demo/src/_Main/AuthenticatedRoute.jsx"
-  );
+  const authRoutePath = AUTH_ROUTE_PATH;
 
   try {
     // Read current AuthenticatedRoute file

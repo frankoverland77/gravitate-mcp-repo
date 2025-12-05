@@ -2,6 +2,7 @@ import { spawn, exec } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 import { handleToolError } from "../utils/demoUtils.js";
+import { DEMO_ROOT } from "../utils/paths.js";
 
 interface RunDevServerArgs {
   demoName: string;
@@ -25,7 +26,9 @@ export async function runDevServerTool(args: RunDevServerArgs) {
   const { demoName, action = "start", port } = args;
 
   try {
-    const demoPath = path.join(process.cwd(), "demos", demoName);
+    // The demo app is a single Vite app at DEMO_ROOT
+    // Individual demos are pages within this app
+    const demoPath = DEMO_ROOT;
 
     // Check if demo exists
     await fs.access(demoPath);
@@ -64,7 +67,7 @@ async function startDevServer(
           text: `ℹ️ Server for ${demoName} is already running on port ${server.port}
 
 🌐 URL: http://localhost:${server.port}
-📁 Location: ./demos/${demoName}`,
+📁 Demo app: ${DEMO_ROOT}`,
         },
       ],
     };
@@ -129,10 +132,10 @@ async function startDevServer(
               text: `✅ Started development server for ${demoName}
 
 🌐 URL: http://localhost:${port}
-📁 Location: ./demos/${demoName}
+📁 Demo app: ${DEMO_ROOT}
 🔄 Hot-reload: Enabled
 
-The demo is now running and will automatically reload when you make changes.`,
+The demo app is now running and will automatically reload when you make changes.`,
             },
           ],
         });
