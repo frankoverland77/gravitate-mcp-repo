@@ -9,7 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from the mcp-server directory (silently for MCP compatibility)
-dotenv.config({ path: path.join(__dirname, '..', '..', '.env'), debug: false });
+// quiet: true suppresses the "[dotenv@x.x.x] injecting env" message that breaks MCP JSON protocol
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env'), debug: false, quiet: true });
 
 interface FigmaImportParams {
   fileUrl?: string;

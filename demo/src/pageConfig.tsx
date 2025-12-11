@@ -22,6 +22,8 @@ import { IndexOfferManagement } from "./pages/OnlineSellingPlatform/IndexOfferMa
 import { CompetitorAnalysis } from "./pages/OnlineSellingPlatform/CompetitorAnalysis";
 import { CompetitorDetails } from "./pages/OnlineSellingPlatform/CompetitorDetails";
 import { GlobalTieredPricing } from "./pages/GlobalTieredPricing/GlobalTieredPricing";
+import { ContractMeasurementGrid } from "./pages/ContractMeasurement/ContractMeasurementGrid";
+import { ContractMeasurementDetails } from "./pages/ContractMeasurement/ContractMeasurementDetails";
 import { ThemeRouteWrapper } from "./components/shared/ThemeRouteWrapper";
 
 // Demo registry - automatically populated by MCP server
@@ -124,6 +126,24 @@ export const demoRegistry: DemoRoute[] = [
     element: <ThemeRouteWrapper theme="OSP"><CompetitorDetails /></ThemeRouteWrapper>,
     path: "/CompetitorAnalysis/CompetitorDetails",
     description: "Detailed competitor analysis",
+    created: new Date().toISOString(),
+    category: "grids",
+  },
+  {
+    key: "ContractMeasurementGrid",
+    title: "Contract Measurement",
+    element: <ThemeRouteWrapper theme="PE_LIGHT"><ContractMeasurementGrid /></ThemeRouteWrapper>,
+    path: "/ContractMeasurement/ContractMeasurementGrid",
+    description: "Contract measurement tracking grid",
+    created: new Date().toISOString(),
+    category: "grids",
+  },
+  {
+    key: "ContractMeasurementDetails",
+    title: "Measurement Details",
+    element: <ThemeRouteWrapper theme="PE_LIGHT"><ContractMeasurementDetails /></ThemeRouteWrapper>,
+    path: "/ContractMeasurement/ContractMeasurementDetails",
+    description: "Contract measurement details view",
     created: new Date().toISOString(),
     category: "grids",
   },
@@ -340,6 +360,41 @@ export const createPageConfig = () => {
       </ThemeRouteWrapper>
     ),
     path: "/GlobalTieredPricing",
+  };
+
+  // Add Contract Measurement section (uses PE_LIGHT theme)
+  config.ContractMeasurement = {
+    hasPermission: () => true,
+    key: "ContractMeasurement",
+    icon: <DashboardOutlined />,
+    title: "Contract Measurement",
+    routes: [
+      {
+        hasPermission: () => true,
+        key: "ContractMeasurementGrid",
+        title: "Measurements",
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ContractMeasurementGrid />
+          </ThemeRouteWrapper>
+        ),
+        path: "/ContractMeasurement/ContractMeasurementGrid",
+        description: "Contract measurement tracking grid",
+      },
+      {
+        hasPermission: () => true,
+        key: "ContractMeasurementDetails",
+        title: "Measurement Details",
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ContractMeasurementDetails />
+          </ThemeRouteWrapper>
+        ),
+        path: "/ContractMeasurement/ContractMeasurementDetails",
+        description: "Contract measurement details view",
+        hidden: true,
+      },
+    ],
   };
 
   return config;
