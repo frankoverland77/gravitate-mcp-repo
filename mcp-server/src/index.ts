@@ -33,6 +33,8 @@ import { validateCodeTool } from "./tools/validateCode.js";
 import { getConventionsTool } from "./tools/getConventions.js";
 import { convertToExcalibrTool } from "./tools/convertToExcalibrr.js";
 import { reviewComponentTool } from "./tools/reviewComponent.js";
+import { preflightTool, preflightToolDefinition } from "./tools/preflight.js";
+import { registerDemoTool, registerDemoToolDefinition } from "./tools/registerDemo.js";
 
 // Import new Phase 2 tools
 import { scaffoldFeatureTool } from "./tools/scaffoldFeature.js";
@@ -82,6 +84,71 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       // ============ VALIDATION & CONVENTIONS TOOLS (NEW) ============
+      {
+        name: "preflight",
+        description:
+          "Get condensed API reference for components before code generation. Call ONCE at the start of any code generation task. Detects needed components from task description or accepts explicit list.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            task: {
+              type: "string",
+              description: "Task description (e.g., 'build a form modal', 'create a grid page'). Components will be auto-detected.",
+            },
+            components: {
+              type: "array",
+              items: { type: "string" },
+              description: "Explicit list of component IDs (e.g., ['vertical', 'gravi-grid', 'modal'])",
+            },
+            includeConventions: {
+              type: "boolean",
+              description: "Include critical conventions quick reference",
+              default: true,
+            },
+          },
+        },
+      },
+      {
+        name: "register_demo",
+        description:
+          "Register a new demo in the navigation system. Automatically adds import, registry entry, and scope. Call this AFTER creating a demo component file.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Component name (e.g., 'ScheduleDemo', 'ProductGrid')",
+            },
+            title: {
+              type: "string",
+              description: "Display title for navigation (e.g., 'Schedule Management')",
+            },
+            description: {
+              type: "string",
+              description: "Brief description of the demo",
+            },
+            category: {
+              type: "string",
+              enum: ["grids", "forms", "dashboards"],
+              description: "Demo category - determines which nav section it appears in",
+            },
+            componentPath: {
+              type: "string",
+              description: "Import path relative to src (e.g., './pages/demos/ScheduleDemo')",
+            },
+            routePath: {
+              type: "string",
+              description: "Custom route path (auto-generated from name if not provided)",
+            },
+            theme: {
+              type: "string",
+              enum: ["OSP", "PE_LIGHT", "BP"],
+              description: "Optional theme wrapper",
+            },
+          },
+          required: ["name", "title", "description", "category", "componentPath"],
+        },
+      },
       {
         name: "validate_code",
         description:
@@ -881,6 +948,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       // Validation & Conventions Tools
+      case "preflight":
+        return await preflightTool(args as any);
+      case "register_demo":
+        return await registerDemoTool(args as any);
       case "validate_code":
         return await validateCodeTool(args as any);
       case "get_conventions":

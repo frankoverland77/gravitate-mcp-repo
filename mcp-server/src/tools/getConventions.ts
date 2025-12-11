@@ -45,8 +45,9 @@ function getCondensedSummary(): string {
 - \`appearance="secondary"\` on Texto = **BLUE** (use \`"medium"\` for gray)
 - \`<GraviButton success>\` not \`<GraviButton theme="success">\`
 - No \`htmlType\` on GraviButton - use \`onClick={() => form.submit()}\`
-- \`<Modal visible={...}>\` not \`<Modal open={...}>\`
-- No \`gap\` prop on Horizontal/Vertical - use \`style={{ gap: '12px' }}\`
+- \`<Modal visible={...}>\` not \`<Modal open={...}>\` (same for Drawer)
+- No \`gap\` prop on Horizontal/Vertical - use \`className="gap-12"\` or \`style={{ gap: '12px' }}\`
+- Use \`<Vertical flex="1">\` not \`<Vertical style={{ flex: 1 }}>\`
 
 ## Styling Priority
 1. Component props: \`<Horizontal justifyContent="space-between">\`

@@ -2,6 +2,84 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+---
+
+## 🚨 MANDATORY WORKFLOW - READ FIRST
+
+**Before generating ANY Excalibrr component code, you MUST follow this workflow:**
+
+### Step 1: Call `preflight` tool
+```
+preflight({ task: "<describe what you're building>" })
+```
+
+This returns:
+- Critical conventions (mistakes to avoid)
+- Component APIs for detected components
+- Examples for each component
+
+### Step 2: Generate code following the conventions
+
+### Step 3: Call `validate_code` before presenting
+```
+validate_code({ code: "<your generated code>" })
+```
+
+### Step 4: Fix ALL errors before presenting to user
+
+### Step 5: Call `register_demo` to add navigation (for new demos)
+```
+register_demo({
+  name: "ComponentName",
+  title: "Display Title",
+  description: "Brief description",
+  category: "grids",  // or "forms" or "dashboards"
+  componentPath: "./pages/demos/ComponentName"
+})
+```
+
+**Example complete workflow:**
+```
+User: "Create a schedule management grid with edit drawer"
+
+Claude:
+1. preflight({ task: "grid page with edit drawer form" })
+2. [Read conventions and component APIs]
+3. [Generate ScheduleDemo.tsx code]
+4. validate_code({ filePath: "demo/src/pages/demos/ScheduleDemo.tsx" })
+5. [Fix any errors]
+6. register_demo({
+     name: "ScheduleDemo",
+     title: "Schedule Management", 
+     description: "Schedule management with edit/create drawer",
+     category: "grids",
+     componentPath: "./pages/demos/ScheduleDemo"
+   })
+7. [Present to user with navigation instructions]
+```
+
+**⚠️ NEVER skip the preflight step. It prevents 90% of common mistakes.**
+**⚠️ ALWAYS call register_demo for new demos. Otherwise they won't appear in navigation.**
+
+---
+
+## Common Mistakes to Avoid
+
+| Mistake | Fix |
+|---------|-----|
+| `<Vertical style={{ flex: 1 }}>` | `<Vertical flex="1">` |
+| `<Vertical style={{ height: '100%' }}>` | `<Vertical height="100%">` |
+| `<Horizontal gap={12}>` | `<Horizontal style={{ gap: '12px' }}>` or `className="gap-12"` |
+| `<Horizontal style={{ justifyContent: '...' }}>` | `<Horizontal justifyContent="...">` |
+| `<Modal open={isOpen}>` | `<Modal visible={isOpen}>` |
+| `<Drawer open={isOpen}>` | `<Drawer visible={isOpen}>` |
+| `<GraviButton theme="success">` | `<GraviButton success>` |
+| `<GraviButton htmlType="submit">` | `<GraviButton onClick={() => form.submit()}>` |
+| `<Texto appearance="secondary">` for gray | `<Texto appearance="medium">` (secondary is BLUE!) |
+| `<GraviGrid />` without agPropOverrides | `<GraviGrid agPropOverrides={{}} />` |
+
+---
+
 ## Repository Overview
 
 This is a Yarn monorepo workspace containing two main projects:
@@ -244,11 +322,14 @@ const scopes = {
 
 ### MCP Server (`/mcp-server/`)
 - **Transport**: STDIO for Claude Desktop
-- **Tools**: 11 specialized tools for demo generation
-  - Demo Creation: `create_demo`, `create_form_demo`
-  - Modification: `modify_grid`, `change_theme`
-  - Management: `run_dev_server`, `cleanup_demo`, `cleanup_styles`
-  - Figma: `import_from_figma`, `list_figma_components`
+- **Key Tools**:
+  - **Workflow**: `preflight` (CALL FIRST!), `validate_code`, `get_conventions`
+  - **Demo Creation**: `create_demo`, `create_form_demo`, `scaffold_feature`
+  - **Modification**: `modify_grid`, `change_theme`, `convert_to_excalibrr`
+  - **Review**: `review_component`, `design_review`
+  - **Registry**: `list_components`, `search_components`, `get_component`
+  - **Management**: `run_dev_server`, `cleanup_demo`, `cleanup_styles`
+  - **Figma**: `import_from_figma`, `figma_to_code`
 
 ### Demo Project (`/demo/`)
 - **Build**: Vite 5 + TypeScript + React + Less
@@ -352,3 +433,66 @@ For detailed documentation, see `/docs/`:
 - `Feature Scaffolding Quick Start Guide.md` - Quick feature setup
 - `form-creation.md` - Form patterns
 - `figma-integration.md` - Figma import workflow
+
+---
+
+## MCP Tools Quick Reference
+
+### 🚨 Workflow Tools (Use These!)
+
+| Tool | When to Use |
+|------|-------------|
+| `preflight` | **FIRST** - Before generating any code. Pass task description. |
+| `validate_code` | **BEFORE PRESENTING** - Check code for convention violations. |
+| `register_demo` | **AFTER CREATING** - Register new demo in navigation system. |
+| `get_conventions` | Get full conventions list (preflight includes condensed version). |
+
+### Code Generation Tools
+
+| Tool | Purpose |
+|------|----------|
+| `scaffold_feature` | Generate complete feature folder (API, types, page, grid, form) |
+| `create_demo` | Create grid demo shell |
+| `create_form_demo` | Create form demo shell |
+| `generate_column_defs` | Generate AG Grid column definitions from fields |
+
+### Code Quality Tools
+
+| Tool | Purpose |
+|------|----------|
+| `review_component` | Detailed code review with suggestions |
+| `design_review` | Multi-file design review workflow |
+| `convert_to_excalibrr` | Convert raw HTML/CSS to Excalibrr components |
+| `cleanup_styles` | Replace inline styles with utility classes |
+
+### Component Registry Tools
+
+| Tool | Purpose |
+|------|----------|
+| `get_component` | Get full details for a specific component |
+| `search_components` | Search components by name/description |
+| `list_components` | Browse all available components |
+
+### Example: Full Workflow
+
+```
+// 1. Get component APIs and conventions
+preflight({ task: "create a product management grid with edit modal" })
+
+// 2. Generate the component code (or use scaffold_feature for full feature)
+// [Write ProductManagement.tsx]
+
+// 3. Validate before presenting
+validate_code({ filePath: "demo/src/pages/demos/ProductManagement.tsx" })
+
+// 4. Register in navigation
+register_demo({
+  name: "ProductManagement",
+  title: "Product Management",
+  description: "Product grid with edit/create modal",
+  category: "grids",
+  componentPath: "./pages/demos/ProductManagement"
+})
+
+// 5. Present to user - demo will appear under Bakery in sidebar
+```

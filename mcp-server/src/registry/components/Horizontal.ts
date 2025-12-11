@@ -65,11 +65,10 @@ export const horizontalComponent: ComponentMetadata = {
       description: "CSS flex property value (e.g., '1', '0 1 auto')"
     },
     {
-      name: "fullHeight",
-      type: "boolean",
+      name: "height",
+      type: "CSSProperties['height']",
       required: false,
-      defaultValue: "false",
-      description: "Apply h-100 class for full height"
+      description: "Height value (e.g., '100%', '400px'). Use instead of style={{ height: '100%' }}"
     },
     {
       name: "className",

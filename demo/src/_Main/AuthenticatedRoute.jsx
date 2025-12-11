@@ -28,6 +28,9 @@ export function AuthenticatedRoute() {
     BakeryProducts: true,
     FormulaManager: true,
     DeliveryManagement: true,
+    ScheduleDemo: true,
+    CustomerList: true,
+    InventoryGrid: true,
   };
   return (
     <FeatureModeProvider>

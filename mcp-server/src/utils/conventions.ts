@@ -122,16 +122,16 @@ export const CONVENTIONS: ConventionRule[] = [
     }
   },
   {
-    id: 'modal-visible-not-open',
-    name: 'Modal Uses visible Prop',
+    id: 'modal-drawer-visible-not-open',
+    name: 'Modal/Drawer Use visible Prop',
     severity: 'error',
     category: 'component',
-    description: 'AntD Modal in this codebase uses "visible" prop, not "open".',
-    antiPattern: /<Modal[^>]*\sopen\s*=/gi,
+    description: 'AntD Modal and Drawer in this codebase use "visible" prop, not "open".',
+    antiPattern: /<(Modal|Drawer)[^>]*\sopen\s*=/gi,
     fix: 'Change open={...} to visible={...}',
     examples: {
-      bad: `<Modal open={isOpen}>`,
-      good: `<Modal visible={isOpen}>`
+      bad: `<Modal open={isOpen}>\n<Drawer open={isOpen}>`,
+      good: `<Modal visible={isOpen}>\n<Drawer visible={isOpen}>`
     }
   },
   {
@@ -150,6 +150,19 @@ export const CONVENTIONS: ConventionRule[] = [
   },
   
   // ============ STYLING RULES ============
+  {
+    id: 'use-flex-prop-not-style',
+    name: 'Use flex Prop Instead of Style',
+    severity: 'error',
+    category: 'styling',
+    description: 'Vertical/Horizontal have a flex prop. Use flex="1" instead of style={{ flex: 1 }}.',
+    antiPattern: /<(Vertical|Horizontal)[^>]*style\s*=\s*\{[^}]*flex\s*:/gi,
+    fix: 'Use <Vertical flex="1"> instead of <Vertical style={{ flex: 1 }}>',
+    examples: {
+      bad: `<Vertical style={{ flex: 1 }}>\n<Horizontal style={{ flex: '1 0 auto' }}>`,
+      good: `<Vertical flex="1">\n<Horizontal flex="1 0 auto">`
+    }
+  },
   {
     id: 'no-horizontal-gap-prop',
     name: 'No Gap Prop on Horizontal/Vertical',
@@ -174,6 +187,19 @@ export const CONVENTIONS: ConventionRule[] = [
     examples: {
       bad: `<Horizontal style={{ justifyContent: 'space-between' }}>`,
       good: `<Horizontal justifyContent='space-between'>`
+    }
+  },
+  {
+    id: 'use-gap-utility-class',
+    name: 'Use Gap Utility Class',
+    severity: 'warning',
+    category: 'styling',
+    description: 'Use gap utility classes (gap-4, gap-8, gap-12, gap-16) instead of style={{ gap }}.',
+    antiPattern: /style\s*=\s*\{\{[^}]*gap\s*:/gi,
+    fix: 'Use className="gap-8" or "gap-12" or "gap-16" instead of style={{ gap: "Xpx" }}',
+    examples: {
+      bad: `<Horizontal style={{ gap: '12px' }}>\n<Vertical style={{ gap: '8px' }}>`,
+      good: `<Horizontal className="gap-12">\n<Vertical className="gap-8">`
     }
   },
   {
@@ -320,6 +346,25 @@ export function formatConventionsForDisplay(): string {
 }
 
 /**
+ * Strip string literals from code to avoid false positives in pattern matching.
+ * Replaces content inside strings with placeholder text.
+ * Note: Placeholder must NOT contain patterns that trigger rules (e.g., no __ for BEM)
+ */
+function stripStringLiterals(code: string): string {
+  // Replace template literals (backticks) - handle nested ${} expressions
+  let result = code;
+  
+  // Simple approach: replace quoted strings with empty placeholders
+  // This prevents false positives from strings containing HTML-like content
+  // Using 'STRLIT' as placeholder - safe chars that won't trigger any rules
+  result = result.replace(/`[^`]*`/g, '"STRLIT"');  // Template literals
+  result = result.replace(/'[^'\n]*'/g, '"STRLIT"');  // Single quotes
+  result = result.replace(/"[^"\n]*"/g, '"STRLIT"');  // Double quotes (but not the placeholders)
+  
+  return result;
+}
+
+/**
  * Validate code against conventions
  */
 export function validateCode(code: string, filename?: string): ValidationResult {
@@ -329,16 +374,24 @@ export function validateCode(code: string, filename?: string): ValidationResult 
   
   const lines = code.split('\n');
   
+  // Strip string literals to avoid false positives
+  const codeForPatternMatching = stripStringLiterals(code);
+  
   for (const rule of CONVENTIONS) {
     // Check anti-patterns (things that should NOT be in the code)
     if (rule.antiPattern) {
-      const matches = code.match(rule.antiPattern);
+      // Use stripped code for pattern matching to avoid false positives in strings
+      const matches = codeForPatternMatching.match(rule.antiPattern);
       if (matches) {
         for (const match of matches) {
-          // Find line number
+          // Find line number - try original code first, fall back to stripped code
           let lineNum = 1;
           let charCount = 0;
-          const matchIndex = code.indexOf(match);
+          let matchIndex = code.indexOf(match);
+          const searchCode = matchIndex >= 0 ? code : codeForPatternMatching;
+          if (matchIndex < 0) {
+            matchIndex = codeForPatternMatching.indexOf(match);
+          }
           
           for (let i = 0; i < lines.length; i++) {
             charCount += lines[i].length + 1; // +1 for newline
@@ -371,7 +424,7 @@ export function validateCode(code: string, filename?: string): ValidationResult 
     // Check required patterns (things that SHOULD be in the code)
     if (rule.pattern && rule.id === 'named-exports' && filename?.endsWith('.tsx')) {
       // Only check for named exports in component files
-      if (!rule.pattern.test(code) && code.includes('function')) {
+      if (!rule.pattern.test(codeForPatternMatching) && codeForPatternMatching.includes('function')) {
         // No named exports found
         warnings.push({
           ruleId: rule.id,
