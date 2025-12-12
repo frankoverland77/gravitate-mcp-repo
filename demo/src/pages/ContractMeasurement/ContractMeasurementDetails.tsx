@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { Horizontal, Vertical, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { LeftOutlined } from '@ant-design/icons';
 import { Tabs } from 'antd';
 import { OverviewTab, ScenarioAnalysisTab, PerformanceDetailsTab, BenchmarksTab } from './tabs';

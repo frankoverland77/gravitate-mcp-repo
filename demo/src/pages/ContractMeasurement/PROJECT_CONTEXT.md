@@ -22,20 +22,27 @@ demo/src/pages/ContractMeasurement/
 ├── components/                      # Reusable components
 │   └── RatabilitySettingsDrawer.tsx # Global ratability settings drawer
 ├── types/                           # TypeScript type definitions
-│   └── ratability.types.ts          # Ratability settings types & defaults
+│   ├── ratability.types.ts          # Ratability settings types & defaults
+│   └── performanceDetails.types.ts  # Performance Details types
 ├── tabs/                            # Tab components (thin composition layers)
 │   ├── index.ts                     # Barrel export
 │   ├── OverviewTab.tsx              # Overview tab (placeholder)
 │   ├── ScenarioAnalysisTab.tsx      # Scenario Analysis tab (placeholder)
-│   ├── PerformanceDetailsTab.tsx    # Performance Details tab (placeholder)
+│   ├── PerformanceDetailsTab.tsx    # Performance Details tab (IMPLEMENTED)
 │   └── BenchmarksTab.tsx            # Benchmarks tab (composes sections)
 └── sections/                        # Section components (reusable across tabs)
     ├── index.ts                     # Main barrel export
-    └── benchmarks/                  # Sections for Benchmarks tab
-        ├── index.ts                 # Benchmarks barrel export
-        ├── PerformanceSummarySection.tsx
-        ├── DetailedComparisonSection.tsx
-        └── HistoricalComparisonSection.tsx
+    ├── benchmarks/                  # Sections for Benchmarks tab
+    │   ├── index.ts                 # Benchmarks barrel export
+    │   ├── PerformanceSummarySection.tsx
+    │   ├── DetailedComparisonSection.tsx
+    │   └── HistoricalComparisonSection.tsx
+    └── performance-details/         # Sections for Performance Details tab
+        ├── index.ts                 # Performance Details barrel export
+        ├── performanceDetails.data.ts  # Mock data and functions
+        ├── PerformanceSummaryTiles.tsx
+        ├── ProductPerformanceTable.tsx
+        └── DetailedAnalysisModal.tsx
 ```
 
 ## Critical Pattern: Detail Page Navigation
@@ -216,7 +223,7 @@ const scopes = {
 |-----|-----|----------------|---------|
 | Overview | overview | tabs/OverviewTab.tsx | Placeholder |
 | Scenario Analysis | scenario-analysis | tabs/ScenarioAnalysisTab.tsx | Placeholder |
-| Performance Details | performance-details | tabs/PerformanceDetailsTab.tsx | Placeholder |
+| Performance Details | performance-details | tabs/PerformanceDetailsTab.tsx | IMPLEMENTED (3 sections + modal) |
 | Benchmarks | benchmarks | tabs/BenchmarksTab.tsx | Implemented (3 sections) |
 
 ### Benchmarks Tab Structure
@@ -239,7 +246,7 @@ The Benchmarks tab contains 3 sections (each in its own component file under `se
 ### Placeholders (TBD)
 - [ ] Overview tab content
 - [ ] Scenario Analysis tab content
-- [ ] Performance Details tab content
+- [x] Performance Details tab content (COMPLETED - 3 sections + modal)
 - [x] Benchmarks tab content (basic structure implemented)
 - [ ] Real data integration
 - [ ] Make KPI tiles dynamic (currently static values)
@@ -527,3 +534,186 @@ localStorage.removeItem(STORAGE_KEY);
 - Ant Design `Drawer` component: use `visible` prop (not `open`), `zIndex={2000}` to appear above other overlays
 - Option card selection pattern: combine Radio.Group with clickable div containers for larger click targets
 - Conditional form fields work well for reducing UI complexity when options have sub-settings
+
+### Session 5 (2025-12-11)
+**Completed:**
+- Implemented Performance Details tab with full functionality
+- Created comprehensive section architecture following established patterns
+- Added detailed analysis modal with charts and metrics
+- All components follow Excalibrr conventions
+
+**Performance Details Tab Structure:**
+
+The Performance Details tab provides granular product-level performance tracking with:
+1. Summary tiles showing aggregate metrics
+2. Searchable/filterable product performance table
+3. Detailed analysis modal for individual products
+
+**File Structure Added:**
+```
+demo/src/pages/ContractMeasurement/
+├── types/
+│   └── performanceDetails.types.ts    # NEW: Type definitions
+└── sections/
+    ├── index.ts                        # Updated: exports performance-details
+    └── performance-details/            # NEW: Performance Details sections
+        ├── index.ts                    # Barrel export
+        ├── performanceDetails.data.ts  # Mock data and calculation functions
+        ├── PerformanceSummaryTiles.tsx # 7 summary metric tiles
+        ├── ProductPerformanceTable.tsx # Ant Design Table with search
+        └── DetailedAnalysisModal.tsx   # Modal with charts and metrics
+```
+
+**Type Definitions (performanceDetails.types.ts):**
+```typescript
+export interface ProductPerformanceRecord {
+  id: number
+  productName: string
+  location: string
+  targetVolume: number
+  actualVolume: number
+  fulfillmentPercentage: number
+  benchmarkPrice: number
+  varianceVsBenchmark: number      // cents difference
+  dailyAverageLifting: number
+  requiredDailyPace: number
+  paceVariance: number             // percentage above/below required
+  riskLevel: 'low' | 'medium' | 'high' | 'critical'
+  riskScore: number
+  trend: 'improving' | 'stable' | 'declining'
+  trendData: number[]              // Last 10 daily values for sparkline
+  performanceStatus: 'ahead' | 'on-track' | 'behind' | 'critical'
+}
+
+export interface PerformanceSummary {
+  totalDetails: number
+  aboveBenchmark: number
+  atBenchmark: number
+  belowBenchmark: number
+  averagePerformance: number
+  underPerforming: number
+  atRisk: number
+}
+
+export interface DetailedAnalysisData {
+  product: ProductPerformanceRecord
+  dailyLiftingData: Array<{ date: string; actual: number; target: number }>
+  dayOfWeekPattern: Array<{ day: string; avgVolume: number }>
+  projectedCompletion: string
+  projectedShortfall: number
+  daysToTarget: number
+  recommendations: string[]
+}
+```
+
+**Summary Tiles (PerformanceSummaryTiles.tsx):**
+7 metric tiles displayed in responsive grid:
+
+| Tile | Icon | Label | Color |
+|------|------|-------|-------|
+| Total Details | AppstoreOutlined | Total products | Default |
+| Above Benchmark | CheckCircleOutlined | Above benchmark | Green (#52c41a) |
+| At Benchmark | MinusCircleOutlined | At benchmark | Gray |
+| Below Benchmark | CloseCircleOutlined | Below benchmark | Red (#cf1322) |
+| Avg Performance | PercentageOutlined | Average % | Default |
+| Under-Performing | ExclamationCircleOutlined | Below 90% | Orange (#faad14) |
+| At Risk | WarningOutlined | High risk | Red (#cf1322) |
+
+**Product Performance Table (ProductPerformanceTable.tsx):**
+Ant Design Table with 8 columns and features:
+
+| Column | Features |
+|--------|----------|
+| PRODUCT & LOCATION | Two-line cell (product name + location with icons) |
+| PERFORMANCE | Percentage + status badge + progress bar + volume fraction |
+| DAILY AVERAGE | Current pace + target + variance percentage |
+| BENCHMARK $/GAL | Price display |
+| Δ VS BENCHMARK | Arrow icon + cents value + "Above/Below Benchmark" label |
+| RISK | Risk score in Tag + risk level label |
+| TREND | Trend icon + label + mini sparkline chart |
+| Actions | "View Details" button |
+
+**Table Features:**
+- Search input for filtering by product or location
+- Product count display
+- Export button (placeholder)
+- Row click opens detailed analysis modal
+- Sortable columns
+- Mini sparkline component for trend visualization
+
+**Detailed Analysis Modal (DetailedAnalysisModal.tsx):**
+Wide modal (1000px) with comprehensive product analysis:
+
+**Layout:**
+1. **4 Metric Cards** (grid layout):
+   - Performance: fulfillment % with progress bar
+   - Daily Pace: current rate vs required
+   - Risk Level: score with tag
+   - Timeline: days remaining + projected completion
+
+2. **2 Chart Cards** (side by side):
+   - Daily Lifting (30 Days): Bar chart with target line
+   - Day of Week Pattern: Bar chart showing weekday patterns
+
+3. **Pace Analysis Section**:
+   - Current Pace, Required Pace, Variance, Trend
+
+4. **Recommendations Section**:
+   - Green banner with actionable suggestions
+
+**Key Patterns Used:**
+- Conditional rendering inside Modal: `{product ? (...content...) : null}`
+- Custom bar chart visualizations using div elements
+- Mini sparkline using flex container with bars
+- Progress bar with conditional coloring
+
+**Data Functions (performanceDetails.data.ts):**
+```typescript
+// Calculate summary metrics from product data
+export function calculatePerformanceSummary(data: ProductPerformanceRecord[]): PerformanceSummary
+
+// Generate detailed analysis data for a product
+export function getDetailedAnalysisData(record: ProductPerformanceRecord): DetailedAnalysisData
+```
+
+**Key Learnings:**
+- Ant Design v4 Modal uses `visible` prop, NOT `open` (v5 uses `open`)
+- Modal needs to be in DOM even when not shown (don't early return null)
+- Use `destroyOnClose` to reset modal state between opens
+- Mini sparkline pattern: flex container with absolute-positioned bars
+- Progress bar conditional coloring based on status thresholds
+- Custom chart visualizations work well for simple displays (no need for chart library)
+
+**Component Composition Pattern:**
+```tsx
+// tabs/PerformanceDetailsTab.tsx - thin composition layer
+import {
+  PerformanceSummaryTiles,
+  ProductPerformanceTable,
+  DetailedAnalysisModal,
+  PRODUCT_PERFORMANCE_DATA,
+  calculatePerformanceSummary,
+  getDetailedAnalysisData,
+} from '../sections'
+
+export function PerformanceDetailsTab() {
+  const [modalVisible, setModalVisible] = useState(false)
+  const [analysisData, setAnalysisData] = useState<DetailedAnalysisData | null>(null)
+
+  const summary = useMemo(() => calculatePerformanceSummary(PRODUCT_PERFORMANCE_DATA), [])
+
+  const handleRowClick = (record: ProductPerformanceRecord) => {
+    const data = getDetailedAnalysisData(record)
+    setAnalysisData(data)
+    setModalVisible(true)
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <PerformanceSummaryTiles summary={summary} />
+      <ProductPerformanceTable data={PRODUCT_PERFORMANCE_DATA} onRowClick={handleRowClick} />
+      <DetailedAnalysisModal visible={modalVisible} onClose={() => setModalVisible(false)} data={analysisData} />
+    </div>
+  )
+}
+```

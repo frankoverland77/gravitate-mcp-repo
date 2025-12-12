@@ -7,22 +7,23 @@ This guide explains how to use the Excalibrr MCP Server with both **Claude Deskt
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Installation](#installation)
-3. [Claude Desktop Setup](#claude-desktop-setup)
-4. [Claude Code CLI Setup](#claude-code-cli-setup)
-5. [Available Tools](#available-tools)
-6. [Usage Examples](#usage-examples)
-7. [Design Patterns Reference](#design-patterns-reference)
+2. [Mandatory Workflow](#mandatory-workflow)
+3. [Installation](#installation)
+4. [Available Tools](#available-tools)
+5. [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+6. [Component Patterns](#component-patterns)
+7. [Usage Examples](#usage-examples)
 8. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
-The Excalibrr MCP Server provides 14 tools for generating, modifying, and managing Excalibrr component demos:
+The Excalibrr MCP Server provides 16 tools for generating, modifying, and managing Excalibrr component demos:
 
 | Category | Tools |
 |----------|-------|
+| **Workflow (NEW)** | `preflight`, `validate_code`, `register_demo` |
 | **Demo Creation** | `create_demo`, `create_form_demo` |
 | **Demo Modification** | `modify_grid`, `change_theme` |
 | **Project Management** | `run_dev_server`, `cleanup_demo`, `cleanup_styles` |
@@ -32,46 +33,63 @@ The Excalibrr MCP Server provides 14 tools for generating, modifying, and managi
 
 ---
 
+## Mandatory Workflow
+
+**ALWAYS follow this workflow when generating Excalibrr code:**
+
+### Step 1: Call `preflight`
+```javascript
+preflight({ task: "create a customer grid with edit modal" })
+```
+Returns conventions + component APIs needed for the task.
+
+### Step 2: Generate Code
+Write code following the conventions returned by preflight.
+
+### Step 3: Call `validate_code`
+```javascript
+validate_code({ code: "<your generated code>" })
+```
+Catches common mistakes before presenting to user.
+
+### Step 4: Fix Any Errors
+Address all errors and warnings from validation.
+
+### Step 5: Call `register_demo`
+```javascript
+register_demo({
+  name: "CustomerList",
+  title: "Customer List",
+  description: "Customer grid with edit modal",
+  category: "grids",
+  componentPath: "./pages/demos/CustomerList"
+})
+```
+Auto-configures navigation so demo appears in sidebar.
+
+---
+
 ## Installation
 
 ### Prerequisites
 
 ```bash
-# Ensure you have Node.js 18+ installed
+# Ensure Node.js 18+ installed
 node --version
 
-# Navigate to the MCP server directory
+# Navigate to MCP server directory
 cd /Users/frankoverland/Documents/repos/excalibrr-mcp-server
 
-# Run setup script (installs dependencies and builds)
+# Run setup
 ./setup.sh
 
 # Or manually:
-cd mcp-server
-npm install
-npm run build
+cd mcp-server && npm install && npm run build
 ```
 
-### Verify Build
+### Claude Desktop Setup
 
-```bash
-# Check the build output exists
-ls mcp-server/build/index.js
-```
-
----
-
-## Claude Desktop Setup
-
-### Step 1: Locate Config File
-
-Open Claude Desktop configuration:
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-### Step 2: Add MCP Server Configuration
-
-Add to your `claude_desktop_config.json`:
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -80,93 +98,102 @@ Add to your `claude_desktop_config.json`:
       "command": "node",
       "args": [
         "/Users/frankoverland/Documents/repos/excalibrr-mcp-server/mcp-server/build/index.js"
-      ],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "YOUR_FIGMA_TOKEN_HERE"
-      }
+      ]
     }
   }
 }
 ```
 
-> **Note**: Replace `YOUR_FIGMA_TOKEN_HERE` with your actual Figma access token if using Figma integration.
+### Cursor Setup
 
-### Step 3: Restart Claude Desktop
+Add to `~/.cursor/mcp.json`:
 
-Completely quit and restart Claude Desktop for the MCP server to load.
-
-### Step 4: Verify Connection
-
-In Claude Desktop, you should see the MCP tools available. Try:
-- "List all Excalibrr components"
-- "Create a product inventory grid"
-
----
-
-## Claude Code CLI Setup
-
-### Slash Commands (Already Installed)
-
-The following slash commands are available in this repository:
-
-| Command | Description |
-|---------|-------------|
-| `/excalibrr [request]` | Full Excalibrr development assistant |
-| `/excalibrr-create [description]` | Create a new demo component |
-| `/excalibrr-patterns [type]` | Look up design patterns from Gravitate repo |
-
-### Using Slash Commands
-
-```bash
-# Start Claude Code in the repo
-cd /Users/frankoverland/Documents/repos/excalibrr-mcp-server
-claude
-
-# Use commands
-/excalibrr Create a customer management grid with name, email, and status columns
-
-/excalibrr-create Product inventory form with SKU, name, price, and quantity fields
-
-/excalibrr-patterns grid cell editors
+```json
+{
+  "mcpServers": {
+    "excalibrr": {
+      "command": "node",
+      "args": ["/Users/frankoverland/Documents/repos/excalibrr-mcp-server/mcp-server/build/index.js"]
+    }
+  }
+}
 ```
 
-### Global Installation (Optional)
+### Claude Code CLI
 
-To use these commands in any project, copy the commands folder:
-
-```bash
-# Create global commands directory
-mkdir -p ~/.claude/commands
-
-# Copy the Excalibrr commands
-cp -r .claude/commands/* ~/.claude/commands/
-```
+Slash commands available in repo at `.claude/commands/`:
+- `/excalibrr` - Full development assistant
+- `/excalibrr-create` - Quick demo creation
+- `/excalibrr-patterns` - Look up design patterns
 
 ---
 
 ## Available Tools
+
+### Workflow Tools (NEW)
+
+#### `preflight`
+**Purpose:** Get everything needed before code generation in one call.
+
+```javascript
+preflight({ task: "build a form modal with customer fields" })
+// Returns: conventions + APIs for detected components
+```
+
+Auto-detects components needed based on task keywords.
+
+#### `validate_code`
+**Purpose:** Catch common mistakes before presenting code.
+
+```javascript
+validate_code({ code: "<Vertical style={{ flex: 1 }}>..." })
+// Returns: errors, warnings, and suggestions
+```
+
+#### `register_demo`
+**Purpose:** Auto-configure navigation for new demos.
+
+```javascript
+register_demo({
+  name: "CustomerList",
+  title: "Customer List",
+  description: "Grid with edit modal",
+  category: "grids",  // grids | forms | dashboards
+  componentPath: "./pages/demos/CustomerList"
+})
+```
+
+Updates both `pageConfig.tsx` and `AuthenticatedRoute.jsx` automatically.
+
+---
 
 ### Demo Creation Tools
 
 #### `create_demo`
 Creates grid, form, or dashboard demos from natural language.
 
-```
-Instruction: "Create a product inventory grid"
-Result: ProductInventory/ folder with component and mock data
+```javascript
+create_demo({ instruction: "Create a product inventory grid" })
 ```
 
 #### `create_form_demo`
-Creates forms with validation and multiple field types.
+Creates forms with validation and field types.
 
-**Parameters:**
-- `name`: Form component name
-- `type`: "simple" | "management" | "bulk-edit" | "inline-edit"
-- `fields`: Array of field definitions
-- `actions`: Array of button definitions
-- `layout`: "vertical" | "horizontal" | "grid"
-
-**Field Types:** text, email, number, select, date, dateRange, switch, checkbox
+```javascript
+create_form_demo({
+  name: "CustomerForm",
+  type: "simple",
+  fields: [
+    { name: "name", label: "Name", type: "text", required: true },
+    { name: "email", label: "Email", type: "email", required: true },
+    { name: "status", label: "Status", type: "select", options: ["Active", "Inactive"] }
+  ],
+  actions: [
+    { type: "cancel", label: "Cancel" },
+    { type: "submit", label: "Save", theme: "success" }
+  ]
+})
+```
 
 ---
 
@@ -175,249 +202,326 @@ Creates forms with validation and multiple field types.
 #### `modify_grid`
 Add/modify columns in existing grids.
 
-**Actions:**
-- `add_column`: Add new column
-- `modify_column`: Update column properties
-- `add_renderer`: Add custom cell renderer
-- `make_editable`: Enable cell editing
+```javascript
+modify_grid({
+  demoName: "ProductGrid",
+  action: "add_column",
+  config: { field: "price", headerName: "Price", type: "number", editable: true }
+})
+```
 
 #### `change_theme`
-Switch theme for a demo: "OSP", "PE", "BP", "default"
+Switch theme for a demo.
 
----
-
-### Project Management Tools
-
-#### `run_dev_server`
-Start/stop the Vite dev server.
-- `action`: "start" | "stop" | "restart"
-- `port`: Optional port number
-
-#### `cleanup_demo`
-Remove a demo and all references.
-
-#### `cleanup_styles`
-Convert inline styles to utility classes.
+```javascript
+change_theme({ demoName: "ProductGrid", theme: "PE" })
+// Themes: OSP, PE, PE_LIGHT, BP, default
+```
 
 ---
 
 ### Component Discovery Tools
 
-#### `list_components`
-Browse all Excalibrr components by category.
-
-#### `search_components`
-Search by name, description, or tags.
-
 #### `get_component`
-Get full details with examples for a specific component.
+Get full details with examples for a component.
 
-#### `install_component`
-Get installation instructions and usage examples.
+```javascript
+get_component({ componentId: "gravi-grid" })
+```
+
+#### `list_components` / `search_components`
+Browse or search the component registry.
+
+---
+
+## Common Mistakes to Avoid
+
+**CRITICAL: These patterns will fail validation!**
+
+| Mistake | Correct |
+|---------|---------|
+| `<Vertical style={{ flex: 1 }}>` | `<Vertical flex="1">` |
+| `<Horizontal gap={12}>` | `<Horizontal className="gap-12">` |
+| `<Modal open={isOpen}>` | `<Modal visible={isOpen}>` |
+| `<Drawer open={isOpen}>` | `<Drawer visible={isOpen}>` |
+| `<GraviButton theme="success">` | `<GraviButton success>` |
+| `<GraviButton htmlType="submit">` | `<GraviButton type="submit">` |
+| `<Texto appearance="secondary">` (for gray) | `<Texto appearance="medium">` |
+| `<div style={{ display: 'flex' }}>` | `<Vertical>` or `<Horizontal>` |
+| `style={{ gap: '12px' }}` | `className="gap-12"` |
+| `style={{ justifyContent: 'center' }}` | `justifyContent="center"` prop |
+
+---
+
+## Component Patterns
+
+### Layout Components
+
+```typescript
+import { Vertical, Horizontal } from '@gravitate-js/excalibrr';
+
+// Vertical stack - use flex prop, not style
+<Vertical flex="1" height="100%">
+  {children}
+</Vertical>
+
+// Horizontal row - use className for gap, props for alignment
+<Horizontal
+  justifyContent="space-between"
+  alignItems="center"
+  className="gap-12"
+>
+  {children}
+</Horizontal>
+```
+
+### Typography (CRITICAL)
+
+```typescript
+import { Texto } from '@gravitate-js/excalibrr';
+
+// Appearances:
+//   "primary"   - Black/dark text (default)
+//   "secondary" - BLUE color (NOT for gray!)
+//   "medium"    - Medium gray - USE FOR LABELS
+//   "light"     - Very light gray
+//   "error", "success", "warning" - Status colors
+
+// Section header
+<Texto category="h6" appearance="medium" weight="600"
+  style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+  Section Header
+</Texto>
+
+// Field label
+<Texto category="p2" appearance="medium">Label</Texto>
+
+// Field value
+<Texto category="p1" weight="600">Value</Texto>
+
+// Helper text
+<Texto category="p2" appearance="medium">Helper text</Texto>
+```
+
+### Modal & Drawer (CRITICAL)
+
+```typescript
+import { Modal, Drawer } from 'antd';
+
+// Use "visible" NOT "open"!
+<Modal
+  visible={isModalOpen}  // Correct
+  onCancel={() => setIsModalOpen(false)}
+  title="Edit Customer"
+>
+  {content}
+</Modal>
+
+<Drawer
+  visible={isDrawerOpen}  // Correct
+  onClose={() => setIsDrawerOpen(false)}
+>
+  {content}
+</Drawer>
+```
+
+### Button Component
+
+```typescript
+import { GraviButton } from '@gravitate-js/excalibrr';
+
+// Use boolean props for variants, NOT theme string
+<GraviButton success>Save</GraviButton>        // Green button
+<GraviButton ghost>Cancel</GraviButton>        // Ghost button
+<GraviButton danger>Delete</GraviButton>       // Red button
+<GraviButton type="submit">Submit</GraviButton> // Form submit
+
+// WRONG:
+// <GraviButton theme="success">Save</GraviButton>
+// <GraviButton htmlType="submit">Submit</GraviButton>
+```
+
+### Grid Component
+
+```typescript
+import { GraviGrid } from '@gravitate-js/excalibrr';
+
+<GraviGrid
+  storageKey="unique-grid-key"
+  rowData={data}
+  columnDefs={columnDefs}
+  agPropOverrides={{
+    getRowId: (params) => params.data.id,
+  }}
+  controlBarProps={{
+    title: 'Grid Title',
+    actionButtons: <Horizontal className="gap-12">{buttons}</Horizontal>,
+  }}
+  updateEP={async (params) => {
+    // Handle cell edits
+    return Promise.resolve();
+  }}
+/>
+```
+
+### Card Section Pattern
+
+```typescript
+<Vertical className="bg-1 bordered pb-4" style={{ borderRadius: 8 }}>
+  <Horizontal className="p-4 bg-2 border-bottom">
+    <Texto category="h6">Section Title</Texto>
+  </Horizontal>
+
+  <Horizontal className="px-4 py-2">
+    <Vertical flex="0.25" className="my-2 mx-4">
+      <Texto category="heading-small" appearance="medium">FIELD LABEL</Texto>
+      <Texto category="p1" weight="600">Field Value</Texto>
+    </Vertical>
+  </Horizontal>
+</Vertical>
+```
 
 ---
 
 ## Usage Examples
 
-### Example 1: Create a Product Grid
+### Complete Workflow Example
 
 ```
-Create a product catalog grid with columns for:
+User: Create a customer management grid with edit drawer
+
+Claude:
+1. preflight({ task: "customer grid with edit drawer" })
+   -> Gets conventions + GraviGrid, Drawer, Vertical, Horizontal, Texto, GraviButton APIs
+
+2. Generates code following conventions:
+   - Uses <Drawer visible={...}> not open
+   - Uses <Vertical flex="1"> not style={{ flex: 1 }}
+   - Uses <Horizontal className="gap-12"> not gap prop
+   - Uses <GraviButton success> not theme="success"
+
+3. validate_code({ code: "..." })
+   -> Catches any remaining issues
+
+4. Fixes any errors
+
+5. register_demo({
+     name: "CustomerGrid",
+     title: "Customer Management",
+     category: "grids",
+     componentPath: "./pages/demos/CustomerGrid"
+   })
+   -> Demo appears in Bakery -> Customer Management in sidebar
+```
+
+### Quick Grid Creation
+
+```
+/excalibrr Create a product catalog grid with:
 - Product ID (readonly)
 - Name (editable)
 - Category (dropdown: Electronics, Clothing, Food)
-- Price (editable number)
+- Price (editable number with currency format)
 - Stock (editable number)
 - Status (Active/Inactive badge)
 ```
 
-### Example 2: Create a Customer Form
+### Quick Form Creation
 
 ```
-Create a customer registration form with:
-- First Name (required text)
-- Last Name (required text)
-- Email (required email)
-- Phone (text)
+/excalibrr-create Customer registration form with:
+- First Name (required)
+- Last Name (required)
+- Email (required, email validation)
+- Phone
 - Account Type (select: Individual, Business, Enterprise)
-- Receive Newsletter (switch)
-- Terms Accepted (checkbox, required)
-
-With Save and Cancel buttons
-```
-
-### Example 3: Modify Existing Grid
-
-```
-Add a "Last Updated" date column to the ProductGrid demo
-Make the Price column editable with a number editor
-Add a status badge renderer to the Status column
-```
-
-### Example 4: Look Up Patterns
-
-```
-/excalibrr-patterns master-detail grid
-
-/excalibrr-patterns form with multiple sections
-
-/excalibrr-patterns searchable select cell editor
+- Newsletter (switch)
+- Terms (checkbox, required)
 ```
 
 ---
 
-## Design Patterns Reference
+## CSS Naming Convention
 
-### Typography Rules (CRITICAL)
-
-Always use `Texto` component with proper appearances:
-
-| Use Case | Code |
-|----------|------|
-| Section Header | `<Texto category="h6" appearance="medium" weight="600">` |
-| Field Label | `<Texto category="p2" appearance="medium">` |
-| Field Value | `<Texto category="p1" weight="600">` |
-| Helper Text | `<Texto category="p2" appearance="medium">` |
-| Error Text | `<Texto category="p2" appearance="error">` |
-
-**NEVER use `appearance="secondary"` for gray text** - it renders BLUE!
-
----
-
-### CSS Naming Convention
-
-**ALWAYS kebab-case, NEVER BEM:**
+**ALWAYS kebab-case, NEVER BEM double underscores or dashes:**
 
 ```css
-/* ✅ Correct */
+/* Correct */
 .template-list-item-header { }
 .product-grid-container { }
 
-/* ❌ Wrong */
+/* Wrong */
 .template-list-item__header { }
 .product-grid--expanded { }
 ```
 
 ---
 
-### Layout Patterns
+## Theme Configuration
 
-**Vertical/Horizontal Containers:**
-```tsx
-<Vertical className="p-3" style={{ height: '100%' }}>
-  <Horizontal justifyContent="space-between" alignItems="center">
-    <Texto category="h4">Title</Texto>
-    <GraviButton success>Action</GraviButton>
-  </Horizontal>
-  {/* Content */}
-</Vertical>
-```
-
-**Card Section:**
-```tsx
-<Vertical className="bg-1 bordered pb-4" style={{ borderRadius: 8 }}>
-  <Horizontal className="p-4 bg-2 border-bottom">
-    <Texto category="h6">Section Title</Texto>
-  </Horizontal>
-  <Horizontal className="px-4 py-2">
-    {/* Content */}
-  </Horizontal>
-</Vertical>
-```
-
----
-
-### Theme Configuration
-
-Set theme in component:
-```tsx
+```typescript
+// Set in component useEffect
 useEffect(() => {
   localStorage.setItem("TYPE_OF_THEME", "BP");
 }, []);
 ```
 
-Available themes: `OSP`, `PE`, `PE_LIGHT`, `BP`, `default`
-
----
-
-### Routing Requirements
-
-When adding navigation items, update BOTH files:
-
-1. **`pageConfig.tsx`** - Add route configuration
-2. **`AuthenticatedRoute.jsx`** - Add scope: `SectionName: true`
-
-Keys must match exactly (case-sensitive)!
+Available: `OSP`, `PE`, `PE_LIGHT`, `BP`, `default`
 
 ---
 
 ## Reference Repository
 
-For real-world examples, browse the Gravitate.Dotnet.Next repo:
+For real-world examples:
+```
+/Users/frankoverland/Documents/Gravitate Repo/Gravitate.Dotnet.Next/frontend/src/
+```
 
-**Path:** `/Users/frankoverland/Documents/Gravitate Repo/Gravitate.Dotnet.Next/frontend/src/`
-
-| Pattern Type | Location |
-|--------------|----------|
+| Pattern | Location |
+|---------|----------|
 | Grid Examples | `modules/ContractManagement/pages/ContractsReport/` |
 | Form Examples | `modules/ContractManagement/pages/CreateContract/` |
 | Column Defs | Search for `columnDefs.ts` |
 | API Hooks | `modules/**/api/` |
-| Shared Components | `components/shared/` |
 
 ---
 
 ## Troubleshooting
 
-### MCP Server Not Connecting (Claude Desktop)
+### MCP Server Not Connecting
 
-1. Verify the build exists: `ls mcp-server/build/index.js`
-2. Check config path is absolute
-3. Restart Claude Desktop completely (quit, not just close window)
-4. Check Claude Desktop logs for errors
+1. Verify build: `ls mcp-server/build/index.js`
+2. Check path is absolute in config
+3. Restart app completely (quit, not just close)
 
-### Slash Commands Not Found (Claude Code)
+### Demo Not in Navigation
 
-1. Ensure you're in the correct directory
-2. Check `.claude/commands/` folder exists
-3. Verify markdown files have correct format
+1. Check `register_demo` was called
+2. Verify both pageConfig.tsx AND AuthenticatedRoute.jsx updated
+3. Keys must match exactly (case-sensitive)
 
-### Demo Not Appearing in Navigation
+### Validation Errors
 
-1. Check both `pageConfig.tsx` AND `AuthenticatedRoute.jsx` were updated
-2. Verify scope key matches exactly (case-sensitive)
-3. Restart the dev server
-
-### Theme Not Applying
-
-1. Check localStorage is being set in useEffect
-2. Verify theme name is correct ("BP", "PE", "OSP", etc.)
-3. Try hard refresh (Cmd+Shift+R)
+Run `validate_code` to see specific issues. Common fixes:
+- `use-flex-prop-not-style` -> Use `flex="1"` prop
+- `modal-drawer-visible-not-open` -> Use `visible` not `open`
+- `no-horizontal-gap-prop` -> Use `className="gap-12"`
 
 ---
 
 ## Quick Reference
 
-### Start Development
-
-```bash
-# Terminal 1: Start demo dev server
-cd demo && yarn dev
-
-# Terminal 2: Build MCP server (if modified)
-cd mcp-server && npm run build
-```
-
-### Common Commands
-
-| Task | Command |
-|------|---------|
-| Create Grid | `/excalibrr Create a [entity] grid` |
-| Create Form | `/excalibrr-create [entity] form with [fields]` |
-| Find Pattern | `/excalibrr-patterns [pattern type]` |
-| Change Theme | Use `change_theme` tool with demo name and theme |
-| Cleanup | Use `cleanup_demo` tool with demo name |
+| Task | Tool/Command |
+|------|--------------|
+| Start workflow | `preflight({ task: "..." })` |
+| Validate code | `validate_code({ code: "..." })` |
+| Register demo | `register_demo({ name, title, category, ... })` |
+| Create grid | `create_demo({ instruction: "..." })` |
+| Create form | `create_form_demo({ name, fields, ... })` |
+| Modify grid | `modify_grid({ demoName, action, config })` |
+| Change theme | `change_theme({ demoName, theme })` |
+| Get component API | `get_component({ componentId: "..." })` |
 
 ---
 
-*Generated for Excalibrr MCP Server v2.0.0*
+*Excalibrr MCP Server v2.1.0 - With Preflight Workflow*
