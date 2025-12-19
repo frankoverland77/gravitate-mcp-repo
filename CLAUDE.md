@@ -428,9 +428,9 @@ NotificationMessage('Error.', 'Failed to save record', true)
 ## References
 
 For detailed documentation, see `/docs/`:
-- `COMPONENT_REGISTRY.md` - Component browsing and search
-- `The Anatomy Of A Feature.md` - Project structure patterns
-- `Feature Scaffolding Quick Start Guide.md` - Quick feature setup
+- `component-registry.md` - Component browsing and search
+- `the-anatomy-of-a-feature.md` - Project structure patterns
+- `feature-scaffolding-quick-start-guide.md` - Quick feature setup
 - `form-creation.md` - Form patterns
 - `figma-integration.md` - Figma import workflow
 
