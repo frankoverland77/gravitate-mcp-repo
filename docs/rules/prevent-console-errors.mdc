@@ -29,14 +29,14 @@ if (configContent.includes(`path: '${routePath}'`)) {
 #### 2. Invalid Component Props
 **Problem**: Using props that don't exist on components
 ```tsx
-// ❌ BAD - GraviButton doesn't have htmlType
-<GraviButton htmlType="submit" theme1 />
+// ❌ BAD - Using theme as a string prop
+<GraviButton theme="success" buttonText="Save" />
 ```
 
 **Solution**: Use correct props from component knowledge base
 ```tsx
-// ✅ GOOD - Use valid props
-<GraviButton success onClick={() => form.submit()} />
+// ✅ GOOD - Use boolean theme props
+<GraviButton success buttonText="Save" />
 ```
 
 #### 3. Missing Exports
@@ -50,6 +50,19 @@ import ProductForm from './ProductForm'; // Error if named export
 ```tsx
 // ✅ GOOD - Named import for named export
 import { ProductForm } from './ProductForm';
+```
+
+#### 4. Modal/Drawer Wrong Prop
+**Problem**: Using `open` instead of `visible`
+```tsx
+// ❌ BAD - Wrong prop name
+<Modal open={isOpen}>
+```
+
+**Solution**: Use `visible` prop
+```tsx
+// ✅ GOOD - Correct prop name
+<Modal visible={isOpen}>
 ```
 
 ### Prevention Checklist

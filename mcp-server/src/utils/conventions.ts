@@ -108,19 +108,7 @@ export const CONVENTIONS: ConventionRule[] = [
       good: `<GraviButton success buttonText='Save' />`
     }
   },
-  {
-    id: 'gravi-button-no-htmltype',
-    name: 'GraviButton No htmlType',
-    severity: 'error',
-    category: 'component',
-    description: 'GraviButton does not have htmlType prop. Use onClick={() => form.submit()}.',
-    antiPattern: /<GraviButton[^>]*htmlType/gi,
-    fix: 'Remove htmlType and use onClick={() => form.submit()}',
-    examples: {
-      bad: `<GraviButton htmlType='submit' buttonText='Submit' />`,
-      good: `<GraviButton success buttonText='Submit' onClick={() => form.submit()} />`
-    }
-  },
+
   {
     id: 'modal-drawer-visible-not-open',
     name: 'Modal/Drawer Use visible Prop',

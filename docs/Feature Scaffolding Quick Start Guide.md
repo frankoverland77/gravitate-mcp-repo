@@ -10,8 +10,8 @@
 
 ```
 1. Where should this feature be placed?
-   - Admin features → src/modules/Admin/FeatureName/
-   - Business features → src/modules/FeatureName/
+   - Admin features → modules/Admin/{FeatureName}/
+   - Business features → modules/{Category}/{FeatureName}/
 
 2. What should the navigation title be?
    - Get exact wording for pageConfig
@@ -20,34 +20,32 @@
    - Determines permission scope
 ```
 
-### **Step 2: Examine Reference Pattern (2 min)**
+### **Step 2: Reference the Folder Structure (2 min)**
 
-**Reference Implementation:** `src/modules/CommandCenter/`
+**See:** `The Anatomy Of A Feature.md` for full details.
 
 ```
-CommandCenter/
-├── api/                      # ✅ API inside feature folder
-│   ├── types.schema.ts      # ✅ .schema.ts suffix
-│   └── useCommandCenter.ts  # ✅ Matches folder name
-├── CommandCenterPage.tsx    # ✅ Matches export function
-└── components/              # ✅ All components here
+modules/{Category}/{FeatureName}/
+├── api/
+│   ├── use{FeatureName}.ts       # API hooks
+│   └── types.schema.ts           # Types & schemas
+├── components/
+│   └── Grid/
+│       ├── ActionButtons.tsx     # Control bar actions
+│       ├── Columns/
+│       │   └── columnDefs.tsx    # Column definitions
+│       ├── GridEvents.ts         # Event handlers
+│       └── {FeatureName}Grid.tsx # Grid component
+├── styles.css                    # Feature styles
+├── {FeatureName}Page.tsx         # Main page component
+└── utils/
+    ├── Constants.ts              # Constants & config
+    └── Utils.ts                  # Utility functions
 ```
 
 ---
 
 ## **⚡ Implementation Templates**
-
-### **File Structure Template**
-
-```
-src/modules/Admin/FeatureName/
-├── api/
-│   ├── types.schema.ts
-│   └── useFeatureName.ts
-├── FeatureNamePage.tsx
-└── components/
-    └── FeatureNameColumnDefs.tsx
-```
 
 ### **1. types.schema.ts**
 
@@ -77,12 +75,12 @@ export type FeatureAPIResponse = APIResponse<FeatureResponse>
 export type FeatureMetadataAPIResponse = APIResponse<FeatureMetadata>
 ```
 
-### **2. useFeatureName.ts**
+### **2. use{FeatureName}.ts**
 
 ```typescript
 import { useApi } from '@gravitate-js/excalibrr'
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
-import { NotificationMessage } from '@gravitate-js/excalibrr'
+import { notification } from 'antd'
 
 import { FeatureAPIResponse, FeatureMetadataAPIResponse, FeatureFilters } from './types.schema'
 
@@ -112,22 +110,22 @@ export function useFeatureName() {
   const useCreateMutation = () =>
     useMutation((request: any) => api.post(endpoints.create, request), {
       onSuccess: () => {
-        NotificationMessage('Success.', 'Created successfully', false)
+        notification.success({ message: 'Success', description: 'Created successfully' })
         queryClient.invalidateQueries([endpoints.read])
       },
       onError: () => {
-        NotificationMessage('Error.', 'Failed to create', true)
+        notification.error({ message: 'Error', description: 'Failed to create' })
       },
     })
 
   const useDeleteMutation = () =>
     useMutation((request: any) => api.post(endpoints.delete, request), {
       onSuccess: () => {
-        NotificationMessage('Success.', 'Deleted successfully', false)
+        notification.success({ message: 'Success', description: 'Deleted successfully' })
         queryClient.invalidateQueries([endpoints.read])
       },
       onError: () => {
-        NotificationMessage('Error.', 'Failed to delete', true)
+        notification.error({ message: 'Error', description: 'Failed to delete' })
       },
     })
 
@@ -140,19 +138,20 @@ export function useFeatureName() {
 }
 ```
 
-### **3. FeatureNameColumnDefs.tsx**
+### **3. components/Grid/Columns/columnDefs.tsx**
 
 ```typescript
 import { GraviButton } from '@gravitate-js/excalibrr'
 import { DeleteOutlined } from '@ant-design/icons'
 import { ColDef } from 'ag-grid-community'
-import { FeatureData } from '../api/types.schema'
+
+import { FeatureData } from '../../../api/types.schema'
 
 interface ColumnDefsProps {
   onDelete: (id: number) => void
 }
 
-export function FeatureNameColumnDefs({ onDelete }: ColumnDefsProps): ColDef[] {
+export function getColumnDefs({ onDelete }: ColumnDefsProps): ColDef[] {
   return [
     {
       headerName: 'Name',
@@ -167,11 +166,9 @@ export function FeatureNameColumnDefs({ onDelete }: ColumnDefsProps): ColDef[] {
       cellRenderer: (params: { data: FeatureData }) => {
         return (
           <GraviButton
-            type='text'
-            size='small'
             icon={<DeleteOutlined />}
             onClick={() => onDelete(params.data.Id)}
-            danger
+            error
           />
         )
       },
@@ -183,21 +180,87 @@ export function FeatureNameColumnDefs({ onDelete }: ColumnDefsProps): ColDef[] {
 }
 ```
 
-### **4. FeatureNamePage.tsx**
+### **4. components/Grid/ActionButtons.tsx**
 
 ```typescript
-import { useFeatureName } from './api/useFeatureName'
-import { FeatureData } from './api/types.schema'
-import { GraviButton, GraviGrid, Horizontal, Vertical } from '@gravitate-js/excalibrr'
+import { GraviButton, Horizontal } from '@gravitate-js/excalibrr'
 import { PlusOutlined } from '@ant-design/icons'
-import { Modal } from 'antd'
-import { GridApi } from 'ag-grid-community'
-import React, { useMemo, useRef, useState } from 'react'
 
-import { FeatureNameColumnDefs } from './components/FeatureNameColumnDefs'
+interface ActionButtonsProps {
+  onCreate: () => void
+}
+
+export function ActionButtons({ onCreate }: ActionButtonsProps) {
+  return (
+    <Horizontal>
+      <GraviButton
+        buttonText='Create New'
+        icon={<PlusOutlined />}
+        onClick={onCreate}
+        success
+      />
+    </Horizontal>
+  )
+}
+```
+
+### **5. components/Grid/{FeatureName}Grid.tsx**
+
+```typescript
+import { GraviGrid } from '@gravitate-js/excalibrr'
+import { GridApi } from 'ag-grid-community'
+import { useMemo, useRef } from 'react'
+
+import { FeatureData } from '../../api/types.schema'
+import { ActionButtons } from './ActionButtons'
+import { getColumnDefs } from './Columns/columnDefs'
+
+interface FeatureGridProps {
+  data: FeatureData[]
+  isLoading: boolean
+  onDelete: (id: number) => void
+  onCreate: () => void
+}
+
+export function FeatureNameGrid({ data, isLoading, onDelete, onCreate }: FeatureGridProps) {
+  const gridAPIRef = useRef() as React.MutableRefObject<GridApi>
+
+  const columnDefs = useMemo(() => getColumnDefs({ onDelete }), [onDelete])
+
+  const controlBarProps = useMemo(
+    () => ({
+      title: 'Feature Title',
+      actionButtons: <ActionButtons onCreate={onCreate} />,
+      hideActiveFilters: false,
+    }),
+    [onCreate]
+  )
+
+  return (
+    <GraviGrid
+      externalRef={gridAPIRef}
+      controlBarProps={controlBarProps}
+      columnDefs={columnDefs}
+      rowData={data}
+      storageKey='FeatureStorageKey'
+      loading={isLoading}
+      agPropOverrides={{}}
+    />
+  )
+}
+```
+
+### **6. {FeatureName}Page.tsx**
+
+```typescript
+import { Vertical } from '@gravitate-js/excalibrr'
+import { Modal } from 'antd'
+import { useState } from 'react'
+
+import { useFeatureName } from './api/useFeatureName'
+import { FeatureNameGrid } from './components/Grid/FeatureNameGrid'
 
 export function FeatureNamePage() {
-  const gridAPIRef = useRef() as React.MutableRefObject<GridApi>
   const [filters, setFilters] = useState({})
 
   const { getMetadata, getFeatureData, useDeleteMutation } = useFeatureName()
@@ -216,44 +279,48 @@ export function FeatureNamePage() {
     })
   }
 
-  const columnDefs = useMemo(() => FeatureNameColumnDefs({ onDelete: handleDelete }), [deleteMutation])
-
-  const controlBarProps = useMemo(
-    () => ({
-      title: 'Feature Title',
-      actionButtons: (
-        <Horizontal>
-          <GraviButton
-            buttonText='Create New'
-            type='primary'
-            icon={<PlusOutlined />}
-            onClick={() => {
-              /* handle create */
-            }}
-          />
-        </Horizontal>
-      ),
-      hideActiveFilters: false,
-    }),
-    []
-  )
+  const handleCreate = () => {
+    // Open create modal or navigate
+  }
 
   return (
     <Vertical>
       <Vertical flex='1'>
-        <GraviGrid
-          externalRef={gridAPIRef}
-          controlBarProps={controlBarProps}
-          columnDefs={columnDefs}
-          rowData={data}
-          storageKey='FeatureStorageKey'
-          loading={isLoading}
-          agPropOverrides={{}}
+        <FeatureNameGrid
+          data={data}
+          isLoading={isLoading}
+          onDelete={handleDelete}
+          onCreate={handleCreate}
         />
       </Vertical>
     </Vertical>
   )
 }
+```
+
+### **7. utils/Constants.ts**
+
+```typescript
+export const FEATURE_CONSTANTS = {
+  STORAGE_KEY: 'FeatureStorageKey',
+  DEFAULT_PAGE_SIZE: 50,
+} as const
+```
+
+### **8. utils/Utils.ts**
+
+```typescript
+import { FeatureData } from '../api/types.schema'
+
+export function formatFeatureData(data: FeatureData): string {
+  return data.Name
+}
+```
+
+### **9. styles.css**
+
+```css
+/* Feature-specific styles */
 ```
 
 ---
@@ -263,10 +330,10 @@ export function FeatureNamePage() {
 ### **Add Import**
 
 ```typescript
-import { FeatureNamePage } from './Admin/FeatureName/FeatureNamePage'
+import { FeatureNamePage } from './{Category}/{FeatureName}/{FeatureName}Page'
 ```
 
-### **Add Route (find appropriate Admin section)**
+### **Add Route (find appropriate section)**
 
 ```typescript
 {
@@ -296,9 +363,6 @@ npx eslint --fix src/modules/pageConfig.tsx
 
 // ✅ Use visible, not open
 <Modal visible={isOpen} />
-
-// ✅ Remove gap prop
-<Horizontal> {/* no gap prop */}
 ```
 
 ---
@@ -310,17 +374,21 @@ npx eslint --fix src/modules/pageConfig.tsx
 - API folder **inside** feature folder
 - Use `.schema.ts` suffix for types
 - Page component name matches exported function
-- Column defs in `components/` folder
-- Include success/error notifications
+- Column defs in `components/Grid/Columns/columnDefs.tsx`
+- Grid component in `components/Grid/{FeatureName}Grid.tsx`
+- Action buttons in `components/Grid/ActionButtons.tsx`
+- Use `notification.success()` / `notification.error()` from antd
+- Use GraviButton theme props: `success`, `error`, `theme2`
 - Add `agPropOverrides={{}}` to GraviGrid
+- Include `styles.css` and `utils/` folder
 
 ### **❌ DON'T:**
 
 - Put API in global `src/api/` folder
-- Create separate grid folders
-- Add styles.css initially
-- Use `gap` prop on Horizontal
-- Use `open` prop on Modal
+- Put column defs flat in `components/`
+- Use deprecated `NotificationMessage`
+- Use `type='primary'` or `danger` on GraviButton
+- Use `open` prop on Modal (use `visible`)
 - Forget linter fixes
 
 ---
@@ -328,9 +396,12 @@ npx eslint --fix src/modules/pageConfig.tsx
 ## **🎯 Verification Checklist**
 
 - [ ] Feature folder structure matches template
+- [ ] Grid structure: `components/Grid/Columns/columnDefs.tsx`
 - [ ] All imports use relative paths within feature
 - [ ] Page component export matches filename
 - [ ] pageConfig updated with import + route
+- [ ] Using `notification` from antd (not NotificationMessage)
+- [ ] Using GraviButton theme props (success/error/theme2)
 - [ ] No TypeScript errors
 - [ ] No ESLint errors
 - [ ] Navigation works in browser

@@ -1,11 +1,14 @@
 /**
  * NotificationMessage Component Examples Database
  *
- * This file contains production-tested examples of the NotificationMessage component
- * extracted from the Excalibrr component library. These examples range from
- * simple to complex implementations, covering various use cases and patterns.
- *
- * Used by the MCP server to generate high-quality NotificationMessage implementations.
+ * ⚠️ DEPRECATED: This component is marked as deprecated in the excalibrr source.
+ * Do not use NotificationMessage in new code. Use Ant Design's notification API directly:
+ * 
+ * import { notification } from 'antd';
+ * notification.success({ message: 'Title', description: 'Details' });
+ * notification.error({ message: 'Error', description: 'What went wrong' });
+ * 
+ * This file is kept for reference only.
  */
 
 export interface NotificationMessageExample {

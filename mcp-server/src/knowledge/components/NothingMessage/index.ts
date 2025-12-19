@@ -6,6 +6,11 @@
  * simple to complex implementations, covering various use cases and patterns.
  *
  * Used by the MCP server to generate high-quality NothingMessage implementations.
+ * 
+ * COMPONENT API:
+ * - title: string (required) - The main message title
+ * - message: string (required) - The description text
+ * - className?: string - Optional CSS class
  */
 
 export interface NothingMessageExample {
@@ -82,49 +87,26 @@ export const NothingMessageExamples: NothingMessageExample[] = [
   },
 
   {
-    id: 'nothing_medium_01',
-    name: 'Empty State with Icon',
-    description: 'Empty state with custom icon and styling',
-    complexity: 'medium',
-    category: 'enhanced-empty',
-    tags: ['icon', 'custom', 'styled'],
+    id: 'nothing_simple_04',
+    name: 'No Data Available',
+    description: 'Empty state when data has not loaded yet or is unavailable',
+    complexity: 'simple',
+    category: 'empty-state',
+    tags: ['no-data', 'unavailable', 'basic'],
     code: `<NothingMessage
   title="No Data Available"
   message="Data will appear here when it's available."
-  icon={<DatabaseOutlined style={{ fontSize: '48px', color: 'var(--theme-color-3)' }} />}
 />`,
     props: {
       title: '"No Data Available"',
-      message: '"Data will appear here when it\'s available."',
-      icon: 'Custom React icon component'
+      message: '"Data will appear here when it\'s available."'
     },
-    dependencies: ['@gravitate-js/excalibrr', '@ant-design/icons'],
-    notes: 'Enhanced empty state with visual icon'
+    dependencies: ['@gravitate-js/excalibrr'],
+    notes: 'Generic empty state for data display areas'
   },
 
   {
-    id: 'nothing_medium_02',
-    name: 'Loading State Variation',
-    description: 'Empty message for loading states',
-    complexity: 'medium',
-    category: 'loading',
-    tags: ['loading', 'pending', 'state'],
-    code: `<NothingMessage
-  title="Loading..."
-  message="Please wait while we fetch your data."
-  icon={<Spin size="large" />}
-/>`,
-    props: {
-      title: '"Loading..."',
-      message: '"Please wait while we fetch your data."',
-      icon: 'Loading spinner component'
-    },
-    dependencies: ['@gravitate-js/excalibrr', 'antd'],
-    notes: 'Loading state variant with spinner'
-  },
-
-  {
-    id: 'nothing_medium_03',
+    id: 'nothing_medium_01',
     name: 'Conditional Empty State',
     description: 'Conditionally rendered empty state based on data and loading',
     complexity: 'medium',
@@ -145,79 +127,116 @@ export const NothingMessageExamples: NothingMessageExample[] = [
   },
 
   {
+    id: 'nothing_medium_02',
+    name: 'Empty State with Custom Styling',
+    description: 'Empty state with additional className for custom positioning',
+    complexity: 'medium',
+    category: 'styled',
+    tags: ['className', 'custom', 'styled'],
+    code: `<NothingMessage
+  title="No Pending Orders"
+  message="All orders have been processed."
+  className="mt-4 p-3"
+/>`,
+    props: {
+      title: '"No Pending Orders"',
+      message: '"All orders have been processed."',
+      className: '"mt-4 p-3"'
+    },
+    dependencies: ['@gravitate-js/excalibrr'],
+    notes: 'Use className for spacing and positioning adjustments'
+  },
+
+  {
+    id: 'nothing_medium_03',
+    name: 'Empty State in Grid Context',
+    description: 'NothingMessage displayed when a grid has no data',
+    complexity: 'medium',
+    category: 'grid',
+    tags: ['grid', 'table', 'no-data'],
+    code: `{rowData.length === 0 ? (
+  <NothingMessage
+    title="No Data to Display"
+    message="Add items or adjust your filters to see data here."
+  />
+) : (
+  <GraviGrid
+    columnDefs={columnDefs}
+    rowData={rowData}
+    agPropOverrides={{}}
+  />
+)}`,
+    props: {
+      title: '"No Data to Display"',
+      message: '"Add items or adjust your filters to see data here."'
+    },
+    dependencies: ['@gravitate-js/excalibrr'],
+    notes: 'Common pattern for showing empty state instead of empty grid'
+  },
+
+  {
     id: 'nothing_complex_01',
-    name: 'Interactive Empty State with Actions',
-    description: 'Empty state with action buttons and multiple options',
+    name: 'Empty State with Adjacent Actions',
+    description: 'NothingMessage with action buttons rendered as siblings',
     complexity: 'complex',
     category: 'interactive',
-    tags: ['actions', 'buttons', 'interactive', 'complex'],
-    code: `<NothingMessage
-  title="No Projects Yet"
-  message="Create your first project to get started with managing your work."
-  actions={[
+    tags: ['actions', 'buttons', 'interactive'],
+    code: `<Vertical horizontalCenter className="p-4">
+  <NothingMessage
+    title="No Projects Yet"
+    message="Create your first project to get started with managing your work."
+  />
+  <Horizontal className="mt-3 gap-12">
     <GraviButton
-      key="create"
       theme1
       buttonText="Create Project"
       icon={<PlusOutlined />}
       onClick={() => setShowCreateModal(true)}
-    />,
+    />
     <GraviButton
-      key="import"
-      appearance="outline"
       buttonText="Import Project"
       icon={<UploadOutlined />}
       onClick={() => setShowImportModal(true)}
     />
-  ]}
-/>`,
+  </Horizontal>
+</Vertical>`,
     props: {
       title: '"No Projects Yet"',
-      message: '"Create your first project to get started with managing your work."',
-      actions: 'Array of action button components'
+      message: '"Create your first project to get started with managing your work."'
     },
     dependencies: ['@gravitate-js/excalibrr', '@ant-design/icons'],
-    notes: 'Full interactive empty state with multiple action options'
+    notes: 'Actions are rendered as siblings, not as props (NothingMessage only accepts title, message, className)'
   },
 
   {
     id: 'nothing_complex_02',
-    name: 'Contextual Empty State with Dynamic Content',
-    description: 'Dynamic empty state that changes based on context and user permissions',
+    name: 'Dynamic Empty State Based on Context',
+    description: 'Different messages based on user permissions or context',
     complexity: 'complex',
     category: 'dynamic',
     tags: ['dynamic', 'contextual', 'permissions', 'conditional'],
-    code: `<NothingMessage
-  title={userCanCreate ? "No Items Created" : "No Items Available"}
-  message={
-    userCanCreate
-      ? "You haven't created any items yet. Click the button below to create your first item."
-      : "There are no items available to view at this time."
-  }
-  icon={
-    <EmptyStateIcon
-      type={userCanCreate ? "create" : "empty"}
-      style={{ fontSize: '64px' }}
+    code: `<Vertical horizontalCenter>
+  <NothingMessage
+    title={userCanCreate ? "No Items Created" : "No Items Available"}
+    message={
+      userCanCreate
+        ? "You haven't created any items yet. Click the button below to create your first item."
+        : "There are no items available to view at this time."
+    }
+  />
+  {userCanCreate && (
+    <GraviButton
+      theme1
+      className="mt-3"
+      buttonText="Create First Item"
+      icon={<PlusOutlined />}
+      onClick={handleCreateItem}
     />
-  }
-  actions={
-    userCanCreate ? [
-      <GraviButton
-        key="create"
-        theme1
-        size="large"
-        buttonText="Create First Item"
-        icon={<PlusOutlined />}
-        onClick={handleCreateItem}
-      />
-    ] : undefined
-  }
-/>`,
+  )}
+</Vertical>`,
     props: {
       title: 'Dynamic based on user permissions',
-      message: 'Conditional message based on user context',
-      icon: 'Dynamic icon based on state',
-      actions: 'Conditional actions based on permissions'
+      message: 'Conditional message based on user context'
     },
     dependencies: ['@gravitate-js/excalibrr', '@ant-design/icons'],
     notes: 'Advanced empty state with full context awareness and permission-based content'

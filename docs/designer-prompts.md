@@ -1,6 +1,6 @@
 # Example Designer Prompts for Excalibrr MCP Server
 
-These are example prompts user can use with Claude Code to create demos and work with the Excalibrr component library effectively.
+These are example prompts you can use with Claude Code to create demos and work with the Excalibrr component library effectively.
 
 ## 🚀 Demo Creation
 
@@ -24,6 +24,42 @@ These are example prompts user can use with Claude Code to create demos and work
 - **"Switch the current demo to OSP theme"**
 - **"Show me all available themes"**
 
+---
+
+## 📚 Component Registry
+
+### Browsing Components
+
+- **"List all available components"**
+- **"Show me all form components"**
+- **"What layout components are available?"**
+- **"List simple components"**
+- **"Show me complex components"**
+
+### Searching Components
+
+- **"Search for grid components"**
+- **"Find button components"**
+- **"Search for editable components"**
+- **"Find components with modal"**
+
+### Getting Component Details
+
+- **"Show me GraviGrid documentation"**
+- **"How do I use the Modal component?"**
+- **"What props does GraviButton accept?"**
+- **"Get details for Horizontal component"**
+- **"Show me Texto examples"**
+
+### Installing/Using Components
+
+- **"How do I add GraviGrid to my project?"**
+- **"Install the Modal component"**
+- **"Show me how to use Select"**
+- **"What dependencies does GraviGrid need?"**
+
+---
+
 ## 📖 Component Information
 
 ### Learning About Components
@@ -39,6 +75,8 @@ These are example prompts user can use with Claude Code to create demos and work
 - **"What validation options work with form demos?"**
 - **"Show me proper form layout patterns"**
 - **"How do I handle form submissions in demos?"**
+
+---
 
 ## 🎨 Design-Focused Questions
 
@@ -63,6 +101,8 @@ These are example prompts user can use with Claude Code to create demos and work
 - **"Show me button variations"**
 - **"How do I handle form validation?"**
 
+---
+
 ## 🛠️ Demo Management
 
 ### Managing Existing Demos
@@ -86,6 +126,8 @@ These are example prompts user can use with Claude Code to create demos and work
 - **"The theme isn't applying correctly to my demo"**
 - **"Help me debug the column renderer issue"**
 
+---
+
 ## 🚀 Advanced Usage
 
 ### Component Relationships
@@ -100,11 +142,7 @@ These are example prompts user can use with Claude Code to create demos and work
 - **"What CSS properties can I override?"**
 - **"Show me advanced configuration options"**
 
-### Performance
-
-- **"What are the most lightweight components for simple UIs?"**
-- **"How do I optimize grid performance with large datasets?"**
-- **"Which components should I use for mobile interfaces?"**
+---
 
 ## 💡 Creative Combinations
 
@@ -117,12 +155,12 @@ These are example prompts user can use with Claude Code to create demos and work
 
 ### Specific Use Cases
 
-- **"I need to display financial data with charts - what components should I use?"**
 - **"Create a file upload interface with progress indicators"**
 - **"Design a settings panel with multiple sections"**
-- **"Build a notification system UI"**
 
-## 🎯 Pro Tips for user
+---
+
+## 🎯 Pro Tips
 
 1. **Be Specific**: Instead of "create a form", ask "create a product form with name, price, and category fields"
 
@@ -134,14 +172,23 @@ These are example prompts user can use with Claude Code to create demos and work
 
 5. **Test Incrementally**: Start with simple demos, then add complexity with modify tools
 
+6. **Use Component Registry**: Ask "show me GraviGrid documentation" before building to understand available props
+
 ---
 
 ## 🔧 Available MCP Tools
 
-The current MCP server provides these tools:
+### Component Registry Tools
+- **list_components** - Browse all components, filter by category/complexity/tags
+- **search_components** - Search by name, description, or tags
+- **get_component** - Get full documentation, props, and examples
+- **install_component** - Get usage instructions and check dependencies
 
-- **create_form_demo** - Creates form components with validation
+### Demo Creation Tools
 - **create_demo** - Creates grid/form demos from natural language
+- **create_form_demo** - Creates form components with validation
+
+### Demo Management Tools
 - **change_theme** - Switches themes (OSP, PE, BP)
 - **modify_grid** - Adds columns and makes grids editable
 - **cleanup_demo** - Removes demos and cleans up references

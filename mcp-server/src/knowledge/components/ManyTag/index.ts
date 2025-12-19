@@ -197,49 +197,6 @@ const filteredTags = useMemo(() => {
     },
     dependencies: ['@gravitate-js/excalibrr', 'antd', 'react'],
     notes: 'Advanced pattern combining search functionality with dynamic tag display and responsive maxCount'
-  },
-
-  {
-    id: 'many_tag_complex_04',
-    name: 'Categorized Tags with Themes',
-    description: 'ManyTag with different themes based on tag categories',
-    complexity: 'complex',
-    category: 'theming',
-    tags: ['themes', 'categories', 'styling', 'advanced'],
-    code: `const categorizedSkills = {
-  frontend: ['React', 'Vue', 'Angular'],
-  backend: ['Node.js', 'Python', 'Java'],
-  database: ['MongoDB', 'PostgreSQL', 'Redis']
-}
-
-const getTagTheme = (category) => {
-  const themes = {
-    frontend: 'success',
-    backend: 'warning',
-    database: 'error'
-  }
-  return themes[category] || 'default'
-}
-
-<div>
-  {Object.entries(categorizedSkills).map(([category, skills]) => (
-    <div key={category} className="mb-3">
-      <Texto category="h6" className="mb-2">{category.toUpperCase()}</Texto>
-      <ManyTag
-        tagItems={skills}
-        maxCount={3}
-        theme={getTagTheme(category)}
-      />
-    </div>
-  ))}
-</div>`,
-    props: {
-      tagItems: 'Category-specific skill arrays',
-      maxCount: 'Lower count for organized display',
-      theme: 'Dynamic theme based on category'
-    },
-    dependencies: ['@gravitate-js/excalibrr'],
-    notes: 'Professional pattern for organizing and theming tags by categories with visual hierarchy'
   }
 ]
 

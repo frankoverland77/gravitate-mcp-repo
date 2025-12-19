@@ -144,36 +144,29 @@ export const BBDTagExamples: BBDTagExample[] = [
 
   {
     id: 'bbd_tag_medium_02',
-    name: 'Right-Aligned Tag',
-    description: 'BBDTag with right alignment for numeric displays',
+    name: 'Right-Aligned Tag in Container',
+    description: 'BBDTag aligned right using wrapper container',
     complexity: 'medium',
     category: 'alignment',
-    tags: ['right-align', 'numeric', 'na-state'],
-    code: `// N/A state
-return <BBDTag align='right'>N/A</BBDTag>
-
-// With value
-return (
-  <div className='flex items-end justify-end'>
-    <BBDTag
-      success={!!data.is_best}
-      error={!data.is_best}
-      {...others}
-    >
-      <span className='text-xs font-normal'>
-        {formattedValue}
-      </span>
-    </BBDTag>
-  </div>
-)`,
+    tags: ['right-align', 'numeric', 'container'],
+    code: `// Use a flex container to right-align BBDTag
+<div className='flex items-end justify-end'>
+  <BBDTag
+    success={!!data.is_best}
+    error={!data.is_best}
+  >
+    <span className='text-xs font-normal'>
+      {formattedValue}
+    </span>
+  </BBDTag>
+</div>`,
     props: {
-      align: 'right',
       success: 'boolean condition',
       error: 'opposite boolean condition',
       children: 'Formatted numeric content'
     },
     sourceFile: 'src/components/GraviGrid/DefaultCellRenderers/DefaultCellRenderers.tsx',
-    notes: 'Shows alignment patterns and conditional success/error theming'
+    notes: 'BBDTag does not have an align prop - use a flex container to control alignment'
   },
 
   {
