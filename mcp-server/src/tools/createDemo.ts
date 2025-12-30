@@ -172,6 +172,9 @@ function parseInstruction(instruction: string): ParsedInstruction {
 
   // Extract features
   const features: string[] = [];
+  if (lowered.includes("bulk") || lowered.includes("bulk edit") || lowered.includes("bulk change") || lowered.includes("bulk editable")) {
+    features.push("Bulk editing");
+  }
   if (lowered.includes("edit") || lowered.includes("inline")) {
     features.push("Inline editing");
   }
@@ -223,12 +226,179 @@ function generateDemoComponent(parsed: ParsedInstruction): string {
   const componentName = parsed.name.replace(/\s+/g, "");
 
   if (parsed.type === "grid") {
+    // Check if bulk editing is requested
+    if (parsed.features.includes("Bulk editing")) {
+      return generateBulkGridComponent(componentName, parsed);
+    }
     return generateGridComponent(componentName, parsed);
   } else if (parsed.type === "form") {
     return generateFormComponent(componentName, parsed);
   } else {
     return generateGridComponent(componentName, parsed); // Default to grid
   }
+}
+
+/**
+ * Generate a grid component with bulk editing capabilities
+ */
+function generateBulkGridComponent(
+  componentName: string,
+  parsed: ParsedInstruction
+): string {
+  const idField = getBulkIdField(parsed.name);
+
+  return `import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { GraviGrid, BBDTag, NotificationMessage, Vertical } from '@gravitate-js/excalibrr';
+import { BulkSelectEditor, BulkNumberEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors';
+import { mockData } from './${componentName}.data';
+
+interface DataRow {
+  ${idField}: number;
+  Name: string;
+  IsActive: boolean;
+  Category: string;
+  Quantity: number;
+}
+
+// Category options for the select dropdown
+const CATEGORY_OPTIONS = [
+  { Value: 'Category A', Text: 'Category A' },
+  { Value: 'Category B', Text: 'Category B' },
+  { Value: 'Category C', Text: 'Category C' },
+  { Value: 'Category D', Text: 'Category D' },
+];
+
+export function ${componentName}() {
+  // REQUIRED: Bulk change visibility state
+  const [isBulkChangeVisible, setIsBulkChangeVisible] = useState<boolean>(false);
+
+  // Data state
+  const [data, setData] = useState<DataRow[]>(mockData);
+
+  // Column definitions with bulk editable columns
+  const columnDefs = useMemo(() => [
+    // ID column (not bulk editable)
+    {
+      field: '${idField}',
+      headerName: 'ID',
+      maxWidth: 80,
+    },
+    // Name column (not bulk editable)
+    {
+      field: 'Name',
+      headerName: 'Name',
+      minWidth: 200,
+      flex: 1,
+    },
+    // BULK EDITABLE: Boolean Column (Active/Inactive)
+    {
+      field: 'IsActive',
+      headerName: 'Status',
+      maxWidth: 120,
+      isBulkEditable: true,
+      bulkCellEditor: BulkSelectEditor,
+      bulkCellEditorParams: {
+        propKey: 'IsActive',
+        options: [
+          { Value: true, Text: 'Active' },
+          { Value: false, Text: 'Inactive' },
+        ],
+      },
+      cellRenderer: ({ value }: { value: boolean }) => (
+        <BBDTag success={value} error={!value}>
+          {value ? 'Active' : 'Inactive'}
+        </BBDTag>
+      ),
+    },
+    // BULK EDITABLE: Select Dropdown Column (Category)
+    {
+      field: 'Category',
+      headerName: 'Category',
+      minWidth: 160,
+      isBulkEditable: true,
+      bulkCellEditor: BulkSelectEditor,
+      bulkCellEditorParams: {
+        propKey: 'Category',
+        options: CATEGORY_OPTIONS,
+      },
+    },
+    // BULK EDITABLE: Number Column (Quantity)
+    {
+      field: 'Quantity',
+      headerName: 'Quantity',
+      maxWidth: 120,
+      isBulkEditable: true,
+      bulkCellEditor: BulkNumberEditor,
+      bulkCellEditorParams: {
+        propKey: 'Quantity',
+        min: 0,
+        max: 100,
+        precision: 0,
+        step: 1,
+        placeholder: 'Enter qty',
+      },
+    },
+  ], []);
+
+  // REQUIRED: updateEP handler for saving bulk changes
+  const updateEP = useCallback(async (rows: DataRow | DataRow[]) => {
+    try {
+      const rowsArray = Array.isArray(rows) ? rows : [rows];
+
+      // Update local data (simulating API call)
+      setData((prevData) => {
+        const updatedData = [...prevData];
+        rowsArray.forEach((updatedRow) => {
+          const index = updatedData.findIndex((r) => r.${idField} === updatedRow.${idField});
+          if (index !== -1) {
+            updatedData[index] = { ...updatedData[index], ...updatedRow };
+          }
+        });
+        return updatedData;
+      });
+
+      NotificationMessage('Success', \`Updated \${rowsArray.length} record(s)\`, false);
+    } catch (error) {
+      NotificationMessage('Error', 'Failed to update records', true);
+      throw error;
+    }
+  }, []);
+
+  /* MCP Theme Script */
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem("TYPE_OF_THEME", "BP");
+    }
+  }, []);
+  /* End MCP Theme Script */
+
+  return (
+    <Vertical flex='1' className='p-3'>
+      <GraviGrid
+        agPropOverrides={{
+          getRowId: (params: any) => params.data.${idField},
+        }}
+        columnDefs={columnDefs}
+        rowData={data}
+        storageKey='${componentName}Grid'
+        // BULK CHANGE PROPS (ALL REQUIRED)
+        isBulkChangeVisible={isBulkChangeVisible}
+        setIsBulkChangeVisible={setIsBulkChangeVisible}
+        updateEP={updateEP}
+        // OPTIONAL
+        isBulkChangeCompactMode
+        controlBarProps={{ title: '${parsed.name}' }}
+      />
+    </Vertical>
+  );
+}`;
+}
+
+function getBulkIdField(componentName: string): string {
+  if (componentName.includes("Product")) return "ProductId";
+  if (componentName.includes("Cookie")) return "CookieId";
+  if (componentName.includes("Inventory")) return "ItemId";
+  return "Id";
 }
 
 function generateGridComponent(
@@ -380,9 +550,27 @@ export function ${componentName}() {
 }`;
 }
 
-function generateMockData(componentName: string) {
+function generateMockData(componentName: string, isBulkGrid: boolean = false) {
   const baseData = [];
   const count = 25;
+
+  // Bulk grid uses a specific schema
+  if (isBulkGrid) {
+    const idField = getBulkIdField(componentName);
+    const categories = ["Category A", "Category B", "Category C", "Category D"];
+    const names = ["Item Alpha", "Item Beta", "Item Gamma", "Item Delta", "Item Epsilon"];
+
+    for (let i = 1; i <= count; i++) {
+      baseData.push({
+        [idField]: i,
+        Name: `${names[(i - 1) % names.length]} ${i}`,
+        IsActive: Math.random() > 0.3,
+        Category: categories[(i - 1) % categories.length],
+        Quantity: Math.floor(Math.random() * 100),
+      });
+    }
+    return baseData;
+  }
 
   for (let i = 1; i <= count; i++) {
     if (componentName.includes("Product")) {
@@ -528,7 +716,8 @@ function generateDataFile(
   componentName: string,
   parsed: ParsedInstruction
 ): string {
-  const mockData = generateMockData(parsed.name);
+  const isBulkGrid = parsed.features.includes("Bulk editing");
+  const mockData = generateMockData(parsed.name, isBulkGrid);
 
   return `// Mock data for ${componentName} demo
 export const mockData = ${JSON.stringify(mockData, null, 2)};`;

@@ -650,6 +650,244 @@ export const COLDEFS_EXAMPLES: ColumnDefsExample[] = [
     notes:
       "Advanced pattern for complex data editing. Uses conditional rendering based on data state and permissions. Custom modal editors for complex workflows.",
   },
+
+  // BULK CHANGE COLUMN DEFINITIONS
+  {
+    id: "column_defs_bulk_01",
+    name: "Simple Boolean Bulk Editable Column",
+    description:
+      "Basic boolean column with bulk editing enabled using BulkSelectEditor",
+    complexity: "simple",
+    category: "bulk-change",
+    tags: ["bulk-change", "bulk-edit", "boolean", "select", "simple"],
+    code: `{
+  field: 'IsActive',
+  headerName: 'Active',
+  maxWidth: 120,
+  // Enable bulk editing
+  isBulkEditable: true,
+  // Use select editor for bulk changes
+  bulkCellEditor: BulkSelectEditor,
+  // Configure the bulk editor options
+  bulkCellEditorParams: {
+    accessor: 'IsActive',
+    options: [
+      { value: true, label: 'Yes' },
+      { value: false, label: 'No' },
+    ],
+    placeholder: 'Select Option',
+  },
+  // Regular cell display
+  cellRenderer: ({ value }) => (
+    <BBDTag success={value} error={!value}>
+      {value ? 'Active' : 'Inactive'}
+    </BBDTag>
+  ),
+}`,
+    props: {
+      isBulkEditable: "true to enable bulk editing for this column",
+      bulkCellEditor: "BulkSelectEditor component for dropdown selection",
+      bulkCellEditorParams: "accessor (field name), options (value/label pairs), placeholder",
+    },
+    dependencies: ["ag-grid-community", "@gravitate-js/excalibrr"],
+    sourceFile:
+      "/src/components/shared/Grid/defaultColumnDefs/TrueFalseBulkEditableColumn.tsx",
+    notes:
+      "Foundation pattern for bulk-editable boolean columns. Use TrueFalseBulkEditableColumn helper for production code.",
+  },
+
+  {
+    id: "column_defs_bulk_02",
+    name: "Select Dropdown Bulk Editable Column",
+    description:
+      "Dropdown select column with bulk editing and metadata-driven options",
+    complexity: "medium",
+    category: "bulk-change",
+    tags: ["bulk-change", "bulk-edit", "select", "dropdown", "metadata"],
+    code: `{
+  field: 'CategoryCvId',
+  headerName: 'Category',
+  minWidth: 150,
+  // Conditionally enable based on permissions
+  isBulkEditable: canWrite,
+  bulkCellEditor: BulkSelectEditor,
+  bulkCellEditorParams: {
+    accessor: 'CategoryCvId',
+    placeholder: 'Select Category',
+    // Map metadata to options
+    options: metadata?.Categories?.map(item => ({
+      value: item.Value,
+      label: item.Text,
+    })) ?? [],
+  },
+  // Regular inline editing
+  editable: canWrite,
+  cellEditor: 'SearchableSelect',
+  cellEditorParams: {
+    showSearch: true,
+    options: metadata?.Categories?.map(item => ({
+      value: item.Value,
+      label: item.Text,
+    })) ?? [],
+  },
+  // Display resolved text value
+  valueGetter: ({ data }) => {
+    const category = metadata?.Categories?.find(
+      c => c.Value === data?.CategoryCvId
+    );
+    return category?.Text ?? '';
+  },
+}`,
+    props: {
+      isBulkEditable: "canWrite permission check - can be boolean or function",
+      bulkCellEditorParams: "accessor, placeholder, and dynamically generated options from metadata",
+      editable: "enables regular inline cell editing",
+      cellEditor: "SearchableSelect for single-row editing",
+      valueGetter: "resolves ID to display text from metadata",
+    },
+    dependencies: ["ag-grid-community", "@gravitate-js/excalibrr"],
+    sourceFile:
+      "/src/modules/PricingEngine/Calculations/ManageQuoteRows/Tabs/QuoteRows/components/Grid/columns/columnDefs.tsx",
+    notes:
+      "Common pattern for category/type fields. Options generated from metadata ensure consistency between bulk and inline editing.",
+  },
+
+  {
+    id: "column_defs_bulk_03",
+    name: "Multi-Field Bulk Update Column",
+    description:
+      "Advanced bulk editing that updates multiple related fields from a single selection",
+    complexity: "complex",
+    category: "bulk-change",
+    tags: ["bulk-change", "bulk-edit", "multi-field", "advanced", "transformation"],
+    code: `{
+  field: 'StrategyQuoteBenchmarkId',
+  headerName: 'Strategy',
+  isBulkEditable: true,
+  bulkCellEditor: BulkSelectEditor,
+  bulkCellEditorParams: {
+    accessor: 'StrategyQuoteBenchmarkId',
+    placeholder: 'Select Strategy',
+    options: getStrategyOptions(metadata),
+    // Custom transformation - updates multiple fields from single selection
+    getChanges: (value) => {
+      const newValues = JSON.parse(value);
+      return {
+        StrategyBaseTypeCvId: newValues.StrategyBaseTypeCvId,
+        StrategyQuoteBenchmarkId: newValues.StrategyQuoteBenchmarkId,
+      };
+    },
+  },
+  // Regular editing also uses JSON for multi-field updates
+  editable: (params) => !params?.data?.SpreadParentMappingId && canWrite,
+  valueSetter: (params) => {
+    const newValues = JSON.parse(params.newValue);
+    params.data.StrategyBaseTypeCvId = newValues.StrategyBaseTypeCvId;
+    params.data.StrategyQuoteBenchmarkId = newValues.StrategyQuoteBenchmarkId;
+    return true;
+  },
+  valueGetter: (params) => {
+    if (params.data?.SpreadParentMappingId) return 'Spread';
+    const typeDisplay = metadata?.StrategyBaseTypes?.find(
+      t => t.Value === params?.data?.StrategyBaseTypeCvId
+    )?.Text;
+    const benchmarkDisplay = metadata?.Benchmarks?.find(
+      b => b.Value === params?.data?.StrategyQuoteBenchmarkId
+    )?.Text;
+    return benchmarkDisplay || typeDisplay || 'Cost';
+  },
+}
+
+// Helper to build options with encoded multi-field values
+const getStrategyOptions = (metadata) => {
+  const options = [];
+  metadata?.StrategyBaseTypes?.forEach(type => {
+    options.push({
+      value: JSON.stringify({
+        StrategyBaseTypeCvId: type.Value,
+        StrategyQuoteBenchmarkId: null,
+      }),
+      label: type.Text,
+    });
+  });
+  metadata?.Benchmarks?.forEach(benchmark => {
+    options.push({
+      value: JSON.stringify({
+        StrategyBaseTypeCvId: null,
+        StrategyQuoteBenchmarkId: benchmark.Value,
+      }),
+      label: benchmark.Text,
+    });
+  });
+  return options;
+};`,
+    props: {
+      getChanges: "custom function in bulkCellEditorParams to transform selection into multiple field updates",
+      valueSetter: "parses JSON and updates multiple fields on the row data",
+      valueGetter: "resolves display value from multiple possible sources",
+      editable: "function for conditional editability based on row data",
+    },
+    dependencies: ["ag-grid-community", "@gravitate-js/excalibrr"],
+    sourceFile:
+      "/src/modules/PricingEngine/Calculations/ManageQuoteRows/Tabs/QuoteRows/components/Grid/columns/columnDefs.tsx",
+    notes:
+      "Advanced pattern for when selecting one option should update multiple data fields. Uses JSON.stringify/parse to encode multi-field values.",
+  },
+
+  {
+    id: "column_defs_bulk_04",
+    name: "Conditional Bulk Editable Column",
+    description:
+      "Column with conditional bulk editing based on row data and permissions",
+    complexity: "medium",
+    category: "bulk-change",
+    tags: ["bulk-change", "bulk-edit", "conditional", "permissions", "validation"],
+    code: `{
+  field: 'Price',
+  headerName: 'Price',
+  // Function-based bulk edit control
+  isBulkEditable: (params) => {
+    // Only enable for non-locked rows with write permission
+    return !params?.data?.IsLocked && canWrite;
+  },
+  bulkCellEditor: BulkNumberEditor,
+  bulkCellEditorParams: {
+    accessor: 'Price',
+    min: 0,
+    max: 999999,
+    precision: 2,
+    step: 0.01,
+  },
+  // Regular editing with same condition
+  editable: (params) => !params?.data?.IsLocked && canWrite,
+  cellEditor: 'NumericEditor',
+  cellEditorParams: {
+    min: 0,
+    precision: 2,
+  },
+  // Highlight edited cells
+  cellStyle: (params) => {
+    if (params?.data?.IsModified) {
+      return { backgroundColor: 'var(--theme-warning-dim)' };
+    }
+  },
+  valueFormatter: ({ value }) => value?.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }),
+}`,
+    props: {
+      isBulkEditable: "function receiving params, returns boolean based on row data",
+      editable: "same conditional logic for inline editing consistency",
+      cellStyle: "highlights modified cells for visual feedback",
+      BulkNumberEditor: "bulk editor for numeric fields with min/max/precision",
+    },
+    dependencies: ["ag-grid-community", "@gravitate-js/excalibrr"],
+    sourceFile:
+      "/src/modules/PricingEngine/QuoteBook/components/Grid/components/columns/",
+    notes:
+      "Use function-based isBulkEditable when bulk editing should be conditionally available per-row. Combine with same condition on editable for consistency.",
+  },
 ];
 
 export default COLDEFS_EXAMPLES;

@@ -20,7 +20,13 @@ const TASK_COMPONENT_MAP: Record<string, string[]> = {
   form: ["vertical", "horizontal", "texto", "gravi-button", "modal", "select"],
   modal: ["modal", "vertical", "horizontal", "texto", "gravi-button"],
   drawer: ["modal", "vertical", "horizontal", "texto", "gravi-button"], // Drawer uses similar patterns
-  
+
+  // Bulk editing
+  bulk: ["gravi-grid", "vertical", "horizontal", "texto", "gravi-button"],
+  "bulk edit": ["gravi-grid", "vertical", "horizontal", "texto", "gravi-button"],
+  "bulk change": ["gravi-grid", "vertical", "horizontal", "texto", "gravi-button"],
+  "bulk editable": ["gravi-grid", "vertical", "horizontal", "texto", "gravi-button"],
+
   // Data display
   grid: ["gravi-grid", "vertical", "horizontal", "texto", "gravi-button"],
   table: ["gravi-grid", "vertical", "horizontal", "texto"],
@@ -43,6 +49,134 @@ const TASK_COMPONENT_MAP: Record<string, string[]> = {
   management: ["gravi-grid", "modal", "vertical", "horizontal", "texto", "gravi-button", "select"],
   dashboard: ["gravi-grid", "vertical", "horizontal", "texto", "gravi-button", "tabs"],
 };
+
+// Bulk grid template for bulk editing tasks
+const BULK_GRID_TEMPLATE = `
+## 🔄 Bulk Editable Grid Template
+
+### Required Imports
+\`\`\`tsx
+import { GraviGrid, BBDTag, NotificationMessage, Vertical } from '@gravitate-js/excalibrr'
+import { useState, useMemo, useCallback } from 'react'
+import { BulkSelectEditor, BulkNumberEditor, BulkSwitchEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+\`\`\`
+
+### Required State
+\`\`\`tsx
+const [isBulkChangeVisible, setIsBulkChangeVisible] = useState<boolean>(false)
+\`\`\`
+
+### GraviGrid Props for Bulk Change
+\`\`\`tsx
+<GraviGrid
+  agPropOverrides={{
+    getRowId: (params) => params.data.Id,
+  }}
+  columnDefs={columnDefs}
+  rowData={data}
+  storageKey="UniqueGridKey"
+  // BULK CHANGE PROPS (ALL REQUIRED)
+  isBulkChangeVisible={isBulkChangeVisible}
+  setIsBulkChangeVisible={setIsBulkChangeVisible}
+  updateEP={updateEP}
+  // OPTIONAL
+  isBulkChangeCompactMode
+/>
+\`\`\`
+
+### updateEP Handler (REQUIRED)
+\`\`\`tsx
+const updateEP = useCallback(async (rows) => {
+  try {
+    const rowsArray = Array.isArray(rows) ? rows : [rows]
+    // Call your API here
+    NotificationMessage('Success', \`Updated \${rowsArray.length} record(s)\`, false)
+  } catch (error) {
+    NotificationMessage('Error', 'Failed to update', true)
+    throw error
+  }
+}, [])
+\`\`\`
+
+---
+
+## Column Definition Snippets
+
+### Boolean Column (Yes/No)
+\`\`\`tsx
+{
+  field: 'IsActive',
+  headerName: 'Active',
+  maxWidth: 120,
+  isBulkEditable: true,
+  bulkCellEditor: BulkSelectEditor,
+  bulkCellEditorParams: {
+    propKey: 'IsActive',
+    options: [
+      { Value: true, Text: 'Active' },
+      { Value: false, Text: 'Inactive' },
+    ],
+  },
+  cellRenderer: ({ value }) => (
+    <BBDTag success={value} error={!value}>
+      {value ? 'Active' : 'Inactive'}
+    </BBDTag>
+  ),
+}
+\`\`\`
+
+### Select Dropdown Column
+\`\`\`tsx
+{
+  field: 'CategoryId',
+  headerName: 'Category',
+  minWidth: 150,
+  isBulkEditable: true,
+  bulkCellEditor: BulkSelectEditor,
+  bulkCellEditorParams: {
+    propKey: 'CategoryId',
+    options: [
+      { Value: 1, Text: 'Option A' },
+      { Value: 2, Text: 'Option B' },
+    ],
+  },
+}
+\`\`\`
+
+### Number Column
+\`\`\`tsx
+{
+  field: 'Quantity',
+  headerName: 'Quantity',
+  minWidth: 120,
+  isBulkEditable: true,
+  bulkCellEditor: BulkNumberEditor,
+  bulkCellEditorParams: {
+    propKey: 'Quantity',
+    min: 0,
+    max: 100,
+    precision: 0,
+    step: 1,
+    placeholder: 'Enter qty',
+  },
+}
+\`\`\`
+
+---
+
+## ⚠️ Bulk Change Checklist
+
+| Required | Item |
+|----------|------|
+| ✓ | \`agPropOverrides={{}}\` on GraviGrid |
+| ✓ | \`isBulkChangeVisible\` state |
+| ✓ | \`setIsBulkChangeVisible\` setter |
+| ✓ | \`updateEP\` async handler |
+| ✓ | Each column: \`isBulkEditable: true\` |
+| ✓ | Each column: \`bulkCellEditor: BulkSelectEditor\` (or BulkNumberEditor) |
+| ✓ | Each column: \`bulkCellEditorParams.propKey\` matches field |
+| ✓ | Options use \`{ Value, Text }\` format (maps via toAntOption) |
+`;
 
 // Core conventions quick reference
 const CORE_CONVENTIONS = `
@@ -170,7 +304,14 @@ export async function preflightTool(args: PreflightArgs) {
       response += CORE_CONVENTIONS;
       response += `\n---\n\n`;
     }
-    
+
+    // Add bulk grid template if task involves bulk editing
+    const isBulkTask = args.task?.toLowerCase().includes('bulk');
+    if (isBulkTask) {
+      response += BULK_GRID_TEMPLATE;
+      response += `\n---\n\n`;
+    }
+
     // Add component APIs
     response += `## Component APIs\n\n`;
     

@@ -12,6 +12,7 @@ import { TextoExamples } from "./components/Texto/index.js";
 import { SelectExamples } from "./components/Select/index.js";
 import { FormExamples } from "./components/Form/index.js";
 import { DASHBOARD_PATTERNS } from "./patterns/dashboard/index.js";
+import { BULK_CHANGE_PATTERNS } from "./patterns/bulk-change/index.js";
 
 export interface ComponentExample {
   id?: string;
@@ -62,7 +63,7 @@ export function getExamplesForComponent(
 }
 
 export function getAllPatterns(): ComponentExample[] {
-  return [...DASHBOARD_PATTERNS];
+  return [...DASHBOARD_PATTERNS, ...BULK_CHANGE_PATTERNS];
 }
 
 export function getAllExamples(): ComponentExample[] {
@@ -130,4 +131,5 @@ export {
   SelectExamples,
   FormExamples,
   DASHBOARD_PATTERNS,
+  BULK_CHANGE_PATTERNS,
 };
