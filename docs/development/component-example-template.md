@@ -66,7 +66,7 @@ export default {ComponentName}Examples
   
   // Required - Complete working React component
   code: `import React, { useState } from 'react'
-import { Modal, Button } from 'antd'
+import { Modal } from 'antd'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 
 export function ExampleComponent({ visible, onCancel, onConfirm }) {
@@ -88,13 +88,13 @@ export function ExampleComponent({ visible, onCancel, onConfirm }) {
     <Modal
       visible={visible}
       onCancel={onCancel}
-      title="Example Modal"
+      title='Example Modal'
       footer={
-        <Horizontal justifyContent="flex-end" style={{ gap: 10 }}>
-          <GraviButton buttonText="Cancel" onClick={onCancel} />
-          <GraviButton 
-            buttonText="Confirm" 
-            theme1 
+        <Horizontal justifyContent='flex-end' style={{ gap: '10px' }}>
+          <GraviButton buttonText='Cancel' onClick={onCancel} />
+          <GraviButton
+            buttonText='Confirm'
+            primary
             onClick={handleConfirm}
             loading={loading}
           />
@@ -102,8 +102,8 @@ export function ExampleComponent({ visible, onCancel, onConfirm }) {
       }
     >
       <Vertical>
-        <Texto category="h6">Example Content</Texto>
-        <Texto category="p2">This is example modal content.</Texto>
+        <Texto category='h6'>Example Content</Texto>
+        <Texto category='p2'>This is example modal content.</Texto>
       </Vertical>
     </Modal>
   )
@@ -209,10 +209,10 @@ Include 3-6 tags that describe:
 Always include core dependencies:
 ```typescript
 import React from 'react'
-// Ant Design components as needed
-import { Modal, Form, Button } from 'antd'
-// Always use Excalibrr layout components
-import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
+// Ant Design components as needed (NOT Button - use GraviButton)
+import { Modal, Form } from 'antd'
+// Always use Excalibrr components for layout, typography, and buttons
+import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 ```
 
 ### Component Structure
@@ -229,8 +229,8 @@ export function ComponentName({ prop1, prop2, ...props }) {
   // Return JSX using Excalibrr components
   return (
     <ComponentWrapper>
-      <Vertical style={{ gap: '1rem' }}>
-        <Texto type="h3">Title</Texto>
+      <Vertical className='gap-16'>
+        <Texto category='h3'>Title</Texto>
         {/* Component content */}
       </Vertical>
     </ComponentWrapper>
@@ -245,9 +245,9 @@ const handleSubmit = async (values) => {
   setLoading(true)
   try {
     await apiCall(values)
-    NotificationMessage('Success', 'Operation completed!', false)
+    NotificationMessage('Success.', 'Operation completed!', false)
   } catch (error) {
-    NotificationMessage('Error', 'Operation failed', true)
+    NotificationMessage('Error.', 'Operation failed', true)
   } finally {
     setLoading(false)  
   }
@@ -264,7 +264,7 @@ dependencies: ["react", "antd", "@gravitate-js/excalibrr"]
 ### Add When Used
 - `"@ant-design/icons"` - When using Ant Design icons
 - `"@tanstack/react-query"` - For API integration examples
-- `"moment"` - For date formatting (if needed)
+- `"dayjs"` - For date formatting (if needed)
 - Custom hooks or utilities as referenced
 
 ## Props Documentation Format
@@ -307,6 +307,89 @@ mcp-server/src/knowledge/components/{ComponentName}/index.ts
 ```
 
 Replace `{ComponentName}` with the actual component name (e.g., `Modal`, `Form`, `Grid`).
+
+## Critical Conventions
+
+**These conventions are frequently violated. Examples MUST follow them:**
+
+### Texto Appearance Values
+```tsx
+// ⚠️ CRITICAL: "secondary" = BLUE, NOT gray!
+<Texto appearance='secondary'>This is BLUE text</Texto>  // Blue!
+<Texto appearance='medium'>This is gray text</Texto>     // Gray - use for labels
+```
+
+### Modal/Drawer Visibility
+```tsx
+// ✅ CORRECT
+<Modal visible={isOpen} />
+<Drawer visible={isOpen} />
+
+// ❌ WRONG - 'open' prop doesn't work
+<Modal open={isOpen} />
+```
+
+### GraviButton Props
+```tsx
+// ✅ CORRECT - Boolean props
+<GraviButton primary />
+<GraviButton success />
+<GraviButton danger />
+
+// ❌ WRONG - theme string
+<GraviButton theme='success' />
+```
+
+### GraviGrid Required Prop
+```tsx
+// ✅ CORRECT - Always include agPropOverrides
+<GraviGrid
+  agPropOverrides={{}}
+  columnDefs={columnDefs}
+  rowData={data}
+/>
+
+// ❌ WRONG - Missing required prop
+<GraviGrid columnDefs={columnDefs} rowData={data} />
+```
+
+### Layout Component Props
+```tsx
+// ✅ CORRECT - Use component props for layout
+<Horizontal justifyContent='space-between' alignItems='center'>
+
+// ❌ WRONG - Inline styles for layout props
+<Horizontal style={{ justifyContent: 'space-between' }}>
+```
+
+### Gap Handling
+```tsx
+// ✅ CORRECT - Utility class or style with string unit
+<Vertical className='gap-16'>
+<Horizontal style={{ gap: '12px' }}>
+
+// ❌ WRONG - gap prop or number without unit
+<Horizontal gap={12}>
+<Vertical style={{ gap: 16 }}>
+```
+
+### Utility Classes (prefer over inline styles)
+```
+Spacing: mb-1, mb-2, mb-4, mt-1, ml-2, p-2, p-3
+Layout: border-radius-5, text-center, gap-16, gap-10
+```
+
+### Named Exports Only
+```tsx
+// ✅ CORRECT
+export function MyComponent() { }
+
+// ❌ WRONG
+export default function MyComponent() { }
+const MyComponent = () => { }
+```
+
+---
 
 ## Validation Checklist
 
