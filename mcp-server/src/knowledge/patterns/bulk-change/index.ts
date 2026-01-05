@@ -94,7 +94,7 @@ export const BULK_CHANGE_PATTERNS: ComponentExample[] = [
     tags: ['grid', 'bulk-change', 'bulk-edit', 'multi-select', 'mass-update'],
     code: `import { GraviGrid } from '@gravitate-js/excalibrr'
 import { useState, useMemo, useCallback } from 'react'
-import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 
 function ProductGrid({ data, onUpdateProducts }) {
   // State for bulk change visibility
@@ -203,8 +203,8 @@ BULK CHANGE FLOW:
     category: 'patterns',
     complexity: 'simple',
     tags: ['grid', 'bulk-change', 'boolean', 'helper', 'column-definition'],
-    code: `import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
-import { TrueFalseEditableColumn } from '@/components/shared/Grid/defaultColumnDefs'
+    code: `import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
+import { TrueFalseEditableColumn } from '@components/shared/Grid/defaultColumnDefs'
 
 /**
  * Creates a column definition for boolean fields with bulk editing enabled.
@@ -256,7 +256,7 @@ The allowNullValue parameter lets users clear the field if needed.
     category: 'patterns',
     complexity: 'medium',
     tags: ['grid', 'bulk-change', 'select', 'dropdown', 'metadata'],
-    code: `import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+    code: `import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 
 // Column definition with select bulk editor and metadata lookup
 const getCategoryColumn = (metadata, canWrite) => ({
@@ -307,7 +307,7 @@ PATTERN HIGHLIGHTS:
     category: 'patterns',
     complexity: 'complex',
     tags: ['grid', 'bulk-change', 'multi-field', 'transformation', 'advanced'],
-    code: `import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+    code: `import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 
 // When selecting a strategy, we need to update multiple related fields
 const getStrategyColumn = (metadata) => ({

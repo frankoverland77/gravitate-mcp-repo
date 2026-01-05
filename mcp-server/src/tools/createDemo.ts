@@ -249,7 +249,7 @@ function generateBulkGridComponent(
 
   return `import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { GraviGrid, BBDTag, NotificationMessage, Vertical } from '@gravitate-js/excalibrr';
-import { BulkSelectEditor, BulkNumberEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors';
+import { BulkSelectEditor, BulkNumberEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors';
 import { mockData } from './${componentName}.data';
 
 interface DataRow {

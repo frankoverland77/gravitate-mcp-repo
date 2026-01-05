@@ -32,6 +32,7 @@ interface ProductFormulaContextType {
   getProductsWithFormula: (formulaId: string) => Product[];
   getAvailableProductsForFormula: (formulaId: string) => Product[];
   updateFormula: (formula: Formula) => void;
+  updateProducts: (updatedProducts: Product[]) => void;
 }
 
 const ProductFormulaContext = createContext<ProductFormulaContextType | undefined>(undefined);
@@ -49,8 +50,8 @@ interface ProductFormulaProviderProps {
 }
 
 export function ProductFormulaProvider({ children }: ProductFormulaProviderProps) {
-  const [products, setProducts] = useState<Product[]>(() => 
-    bakeryProducts.map(product => ({ ...product }))
+  const [products, setProducts] = useState<Product[]>(() =>
+    bakeryProducts.map((product) => ({ ...product }))
   );
   const [formulas, setFormulas] = useState<Formula[]>([]);
 
@@ -58,20 +59,20 @@ export function ProductFormulaProvider({ children }: ProductFormulaProviderProps
   const calculateProductPrice = (product: Product, formulaText: string): number => {
     try {
       // Replace variables with actual product values
-      let calculatedFormula = formulaText
+      const calculatedFormula = formulaText
         .replace(/base_cost/g, product.BaseCost.toString())
         .replace(/ingredients_cost/g, product.IngredientsCost.toString())
         .replace(/labor_rate/g, '15') // Default values for now
         .replace(/markup_percent/g, '1.4')
         .replace(/discount_rate/g, '0.1');
-      
+
       // Evaluate the formula
       const result = Function('"use strict"; return (' + calculatedFormula + ')')();
-      
+
       if (typeof result === 'number' && !isNaN(result)) {
         return Math.round(result * 100) / 100; // Round to 2 decimal places
       }
-      
+
       return product.FinalPrice; // Fallback to original price
     } catch (error) {
       console.error('Error calculating price for product:', product.ProductId, error);
@@ -81,11 +82,11 @@ export function ProductFormulaProvider({ children }: ProductFormulaProviderProps
 
   // Apply formula to multiple products
   const applyFormulaToProducts = (formulaId: string, productIds: string[]) => {
-    const formula = formulas.find(f => f.id === formulaId);
+    const formula = formulas.find((f) => f.id === formulaId);
     if (!formula) return;
 
-    setProducts(prevProducts => 
-      prevProducts.map(product => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => {
         if (productIds.includes(product.ProductId)) {
           const newPrice = calculateProductPrice(product, formula.formula);
           return {
@@ -93,7 +94,7 @@ export function ProductFormulaProvider({ children }: ProductFormulaProviderProps
             appliedFormulaId: formulaId,
             PricingFormula: formula.formula,
             FormulaNote: `Applied formula: ${formula.name}`,
-            FinalPrice: newPrice
+            FinalPrice: newPrice,
           };
         }
         return product;
@@ -103,18 +104,18 @@ export function ProductFormulaProvider({ children }: ProductFormulaProviderProps
 
   // Remove formula from a product
   const removeFormulaFromProduct = (productId: string) => {
-    setProducts(prevProducts => 
-      prevProducts.map(product => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => {
         if (product.ProductId === productId) {
           // Find original product data to restore
-          const originalProduct = bakeryProducts.find(p => p.ProductId === productId);
+          const originalProduct = bakeryProducts.find((p) => p.ProductId === productId);
           if (originalProduct) {
             return {
               ...product,
               appliedFormulaId: undefined,
               PricingFormula: originalProduct.PricingFormula,
               FormulaNote: originalProduct.FormulaNote,
-              FinalPrice: originalProduct.FinalPrice
+              FinalPrice: originalProduct.FinalPrice,
             };
           }
         }
@@ -125,33 +126,51 @@ export function ProductFormulaProvider({ children }: ProductFormulaProviderProps
 
   // Get products that have a specific formula applied
   const getProductsWithFormula = (formulaId: string): Product[] => {
-    return products.filter(product => product.appliedFormulaId === formulaId);
+    return products.filter((product) => product.appliedFormulaId === formulaId);
   };
 
   // Get products available for applying a formula (no formula currently applied)
   const getAvailableProductsForFormula = (formulaId: string): Product[] => {
-    return products.filter(product => 
-      !product.appliedFormulaId || product.appliedFormulaId === formulaId
+    return products.filter(
+      (product) => !product.appliedFormulaId || product.appliedFormulaId === formulaId
     );
   };
 
   // Update formula and recalculate all products using it
   const updateFormula = (updatedFormula: Formula) => {
-    setFormulas(prevFormulas => 
-      prevFormulas.map(f => f.id === updatedFormula.id ? updatedFormula : f)
+    setFormulas((prevFormulas) =>
+      prevFormulas.map((f) => (f.id === updatedFormula.id ? updatedFormula : f))
     );
 
     // Recalculate prices for all products using this formula
-    setProducts(prevProducts => 
-      prevProducts.map(product => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => {
         if (product.appliedFormulaId === updatedFormula.id) {
           const newPrice = calculateProductPrice(product, updatedFormula.formula);
           return {
             ...product,
             PricingFormula: updatedFormula.formula,
             FormulaNote: `Applied formula: ${updatedFormula.name}`,
-            FinalPrice: newPrice
+            FinalPrice: newPrice,
           };
+        }
+        return product;
+      })
+    );
+  };
+
+  // Bulk update products (for grid bulk change)
+  const updateProducts = (updatedProducts: Product[]) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => {
+        const updated = updatedProducts.find((p) => p.ProductId === product.ProductId);
+        if (updated) {
+          // Convert string booleans back to actual booleans
+          const processed: Partial<Product> & { IsAvailable?: boolean | string } = { ...updated };
+          if (typeof processed.IsAvailable === 'string') {
+            processed.IsAvailable = processed.IsAvailable === 'true';
+          }
+          return { ...product, ...processed };
         }
         return product;
       })
@@ -167,12 +186,11 @@ export function ProductFormulaProvider({ children }: ProductFormulaProviderProps
     calculateProductPrice,
     getProductsWithFormula,
     getAvailableProductsForFormula,
-    updateFormula
+    updateFormula,
+    updateProducts,
   };
 
   return (
-    <ProductFormulaContext.Provider value={contextValue}>
-      {children}
-    </ProductFormulaContext.Provider>
+    <ProductFormulaContext.Provider value={contextValue}>{children}</ProductFormulaContext.Provider>
   );
 }

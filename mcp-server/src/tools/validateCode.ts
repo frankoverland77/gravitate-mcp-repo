@@ -86,12 +86,13 @@ export async function validateCodeTool(args: ValidateCodeRequest): Promise<Valid
     // Validate code string
     if (code) {
       const result = validateCode(code);
-      const output = raw 
+      const output = raw
         ? JSON.stringify(result, null, 2)
         : formatValidationResult(result);
-      
+
       return {
-        content: [{ type: 'text', text: output }]
+        content: [{ type: 'text', text: output }],
+        isError: !result.valid
       };
     }
     
@@ -110,12 +111,13 @@ export async function validateCodeTool(args: ValidateCodeRequest): Promise<Valid
       
       const fileContent = fs.readFileSync(fullPath, 'utf-8');
       const result = validateCode(fileContent, fullPath);
-      const output = raw 
+      const output = raw
         ? JSON.stringify(result, null, 2)
         : `# Validation: ${path.basename(fullPath)}\n\n${formatValidationResult(result)}`;
-      
+
       return {
-        content: [{ type: 'text', text: output }]
+        content: [{ type: 'text', text: output }],
+        isError: !result.valid
       };
     }
     
@@ -164,7 +166,7 @@ export async function validateCodeTool(args: ValidateCodeRequest): Promise<Valid
         output += '✅ All files pass convention checks!\n';
       } else {
         output += '---\n\n';
-        
+
         // Show files with issues
         for (const { file, result } of results) {
           if (result.errors.length > 0 || result.warnings.length > 0) {
@@ -175,9 +177,10 @@ export async function validateCodeTool(args: ValidateCodeRequest): Promise<Valid
           }
         }
       }
-      
+
       return {
-        content: [{ type: 'text', text: output }]
+        content: [{ type: 'text', text: output }],
+        isError: totalErrors > 0
       };
     }
     
@@ -245,11 +248,12 @@ export async function validateCodeTool(args: ValidateCodeRequest): Promise<Valid
         }
       }
     }
-    
+
     return {
-      content: [{ type: 'text', text: output }]
+      content: [{ type: 'text', text: output }],
+      isError: totalErrors > 0
     };
-    
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {

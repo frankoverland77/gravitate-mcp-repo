@@ -196,7 +196,7 @@ export default DataListGrid;`,
     tags: ["grid", "bulk-change", "bulk-edit", "multi-select", "mass-update", "editable"],
     code: `import { GraviGrid, BBDTag, NotificationMessage } from '@gravitate-js/excalibrr';
 import { useState, useMemo, useCallback } from 'react';
-import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors';
+import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors';
 
 function ProductBulkEditGrid({ data, onUpdateProducts }) {
   // State for bulk change visibility
@@ -310,7 +310,7 @@ FLOW:
     tags: ["grid", "bulk-change", "status", "boolean", "editable"],
     code: `import { GraviGrid, BBDTag } from '@gravitate-js/excalibrr';
 import { useState, useMemo } from 'react';
-import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors';
+import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors';
 
 // Reusable helper for boolean bulk-editable columns
 const TrueFalseBulkEditableColumn = (field, headerName) => ({

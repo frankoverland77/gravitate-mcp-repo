@@ -150,8 +150,8 @@ Projects can use `components.json` (like shadcn/ui) to configure the registry:
     }
   },
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils"
+    "components": "@components",
+    "utils": "@lib/utils"
   }
 }
 ```

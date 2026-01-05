@@ -28,8 +28,10 @@ Bulk change allows users to modify multiple selected rows simultaneously. When e
   // OPTIONAL: Custom sorting for editable properties
   bulkChangePropertiesComparator={(a, b) => a.headerName.localeCompare(b.headerName)}
 
-  // REQUIRED: Must include (can be empty)
-  agPropOverrides={{}}
+  // REQUIRED: Enable multi-row selection for bulk operations
+  agPropOverrides={{
+    rowSelection: 'multiple' as const,
+  }}
 />
 ```
 
@@ -50,13 +52,11 @@ Bulk change allows users to modify multiple selected rows simultaneously. When e
 
   // Editor configuration
   bulkCellEditorParams: {
-    accessor: 'IsActive',           // Field to update
-    placeholder: 'Select Status',   // Placeholder text
-    options: [                      // For select editors
-      { value: true, label: 'Active' },
-      { value: false, label: 'Inactive' },
+    propKey: 'IsActive',            // Field to update
+    options: [                      // { Value, Text } format (converted via toAntOption)
+      { Value: 'true', Text: 'Active' },
+      { Value: 'false', Text: 'Inactive' },
     ],
-    allowNullValue: false,          // Allow clearing
     // For number editors:
     min: 0,
     max: 100,
@@ -65,6 +65,8 @@ Bulk change allows users to modify multiple selected rows simultaneously. When e
 }
 ```
 
+> **Important**: Use string `'true'`/`'false'` for boolean fields, not actual booleans. The confirm button uses `!!value` which fails for boolean `false`.
+
 ---
 
 ## Common Patterns
@@ -72,22 +74,24 @@ Bulk change allows users to modify multiple selected rows simultaneously. When e
 ### Boolean Column (TrueFalseBulkEditableColumn)
 
 ```typescript
-import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 
-const TrueFalseBulkEditableColumn = (field, headerName) => ({
+const TrueFalseBulkEditableColumn = (field: string, headerName: string) => ({
+  field,
+  headerName,
   isBulkEditable: true,
   bulkCellEditor: BulkSelectEditor,
   bulkCellEditorParams: {
-    accessor: field,
+    propKey: field,
     options: [
-      { value: true, label: 'Yes' },
-      { value: false, label: 'No' },
+      { Value: 'true', Text: 'Yes' },
+      { Value: 'false', Text: 'No' },
     ],
-    placeholder: 'Select Option',
   },
-  // ... other column props
 })
 ```
+
+> **Note**: Use string `'true'`/`'false'` values. Convert back to boolean in your `updateEP` handler.
 
 ### Select Dropdown Column
 
@@ -98,12 +102,8 @@ const TrueFalseBulkEditableColumn = (field, headerName) => ({
   isBulkEditable: canWrite,  // Permission check
   bulkCellEditor: BulkSelectEditor,
   bulkCellEditorParams: {
-    accessor: 'CategoryId',
-    placeholder: 'Select Category',
-    options: metadata?.Categories?.map(c => ({
-      value: c.Value,
-      label: c.Text,
-    })) ?? [],
+    propKey: 'CategoryId',
+    options: metadata?.Categories ?? [],  // Already in { Value, Text } format
   },
 }
 ```
@@ -116,19 +116,13 @@ const TrueFalseBulkEditableColumn = (field, headerName) => ({
   isBulkEditable: true,
   bulkCellEditor: BulkSelectEditor,
   bulkCellEditorParams: {
-    accessor: 'StrategyId',
-    options: strategyOptions,
-    // Custom transformation for multi-field updates
-    getChanges: (value) => {
-      const parsed = JSON.parse(value)
-      return {
-        StrategyTypeId: parsed.typeId,
-        StrategyBenchmarkId: parsed.benchmarkId,
-      }
-    },
+    propKey: 'StrategyId',
+    options: strategyOptions,  // { Value, Text } format
   },
 }
 ```
+
+> For complex multi-field updates, handle the transformation in your `updateEP` handler.
 
 ---
 
@@ -137,7 +131,7 @@ const TrueFalseBulkEditableColumn = (field, headerName) => ({
 ```typescript
 import { GraviGrid } from '@gravitate-js/excalibrr'
 import { useState } from 'react'
-import { BulkSelectEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 
 function ProductGrid({ data, onUpdate }) {
   const [isBulkChangeVisible, setIsBulkChangeVisible] = useState(false)
@@ -151,26 +145,37 @@ function ProductGrid({ data, onUpdate }) {
       isBulkEditable: true,
       bulkCellEditor: BulkSelectEditor,
       bulkCellEditorParams: {
-        accessor: 'IsActive',
+        propKey: 'IsActive',
         options: [
-          { value: true, label: 'Active' },
-          { value: false, label: 'Inactive' },
+          { Value: 'true', Text: 'Active' },
+          { Value: 'false', Text: 'Inactive' },
         ],
       },
     },
   ]
 
+  // Convert string booleans back to actual booleans
+  const handleUpdate = async (rows: any) => {
+    const updated = Array.isArray(rows) ? rows : [rows]
+    const processed = updated.map(row => ({
+      ...row,
+      IsActive: typeof row.IsActive === 'string' ? row.IsActive === 'true' : row.IsActive,
+    }))
+    return onUpdate(processed)
+  }
+
   return (
     <GraviGrid
       agPropOverrides={{
         getRowId: (p) => p.data.ProductId,
+        rowSelection: 'multiple' as const,
       }}
       columnDefs={columnDefs}
       rowData={data}
       storageKey="ProductGrid"
       isBulkChangeVisible={isBulkChangeVisible}
       setIsBulkChangeVisible={setIsBulkChangeVisible}
-      updateEP={onUpdate}
+      updateEP={handleUpdate}
     />
   )
 }
@@ -186,6 +191,10 @@ function ProductGrid({ data, onUpdate }) {
 | No `updateEP` callback | Required to save bulk changes |
 | `isBulkEditable` without `bulkCellEditor` | Both props required |
 | Missing `setIsBulkChangeVisible` | Need state handler for toggle |
+| Can only select one row | Add `rowSelection: 'multiple' as const` to agPropOverrides |
+| Boolean confirm button won't enable | Use string `'true'`/`'false'` not boolean (`!!false` is falsy) |
+| Options format `{ value, label }` | Use `{ Value, Text }` format (converted via `toAntOption`) |
+| Using `accessor` in params | Use `propKey` instead |
 
 ---
 

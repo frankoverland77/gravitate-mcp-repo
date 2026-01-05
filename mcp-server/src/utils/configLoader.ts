@@ -74,9 +74,9 @@ export function getDefaultConfig(): ComponentsConfig {
       cssVariables: true,
     },
     aliases: {
-      components: "@/components",
-      utils: "@/lib/utils",
-      ui: "@/components/ui",
+      components: "@components",
+      utils: "@lib/utils",
+      ui: "@components/ui",
     },
     registries: {
       excalibrr: {

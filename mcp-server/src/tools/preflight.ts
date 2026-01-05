@@ -58,7 +58,7 @@ const BULK_GRID_TEMPLATE = `
 \`\`\`tsx
 import { GraviGrid, BBDTag, NotificationMessage, Vertical } from '@gravitate-js/excalibrr'
 import { useState, useMemo, useCallback } from 'react'
-import { BulkSelectEditor, BulkNumberEditor, BulkSwitchEditor } from '@/components/shared/Grid/bulkChange/bulkCellEditors'
+import { BulkSelectEditor, BulkNumberEditor, BulkSwitchEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 \`\`\`
 
 ### Required State

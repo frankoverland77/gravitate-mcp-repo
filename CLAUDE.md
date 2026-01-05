@@ -20,10 +20,21 @@ This returns:
 
 ### Step 2: Generate code following the conventions
 
-### Step 3: Call `validate_code` before presenting
+### Step 3: Validate code before presenting
 ```
 validate_code({ code: "<your generated code>" })
 ```
+Then run the pre-commit hook:
+```bash
+git add <your-files>
+git hook run pre-commit
+```
+
+This validates:
+- Convention violations (via validate_code)
+- No ESLint errors (no `any` types, proper imports)
+- Prettier formatting
+- React best practices
 
 ### Step 4: Fix ALL errors before presenting to user
 
@@ -47,19 +58,21 @@ Claude:
 2. [Read conventions and component APIs]
 3. [Generate ScheduleDemo.tsx code]
 4. validate_code({ filePath: "demo/src/pages/demos/ScheduleDemo.tsx" })
-5. [Fix any errors]
-6. register_demo({
+5. git add && git hook run pre-commit
+6. [Fix any errors from validation or pre-commit]
+7. register_demo({
      name: "ScheduleDemo",
-     title: "Schedule Management", 
+     title: "Schedule Management",
      description: "Schedule management with edit/create drawer",
      category: "grids",
      componentPath: "./pages/demos/ScheduleDemo"
    })
-7. [Present to user with navigation instructions]
+8. [Present to user with navigation instructions]
 ```
 
 **⚠️ NEVER skip the preflight step. It prevents 90% of common mistakes.**
 **⚠️ ALWAYS call register_demo for new demos. Otherwise they won't appear in navigation.**
+**⚠️ ALWAYS validate code with both validate_code AND pre-commit hook before presenting.**
 
 ---
 

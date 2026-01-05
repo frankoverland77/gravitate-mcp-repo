@@ -258,7 +258,20 @@ export const CONVENTIONS: ConventionRule[] = [
       good: `import { ProductForm } from './ProductForm'\n// ...\ncomponent: ProductForm`
     }
   },
-  
+  {
+    id: 'correct-path-aliases',
+    name: 'Correct Path Aliases',
+    severity: 'error',
+    category: 'structure',
+    description: 'Path aliases must not have a slash after @. Use @components/, @pages/, etc. (NOT @/components/).',
+    antiPattern: /from\s+['"]@\/(components|pages|utils|api|styles|assets)\//gi,
+    fix: 'Remove the slash after @. Use @components/ instead of @/components/',
+    examples: {
+      bad: `import { Component } from '@/components/shared/Grid'`,
+      good: `import { Component } from '@components/shared/Grid'`
+    }
+  },
+
   // ============ TYPESCRIPT RULES ============
   {
     id: 'resolve-ts-errors',
