@@ -1,0 +1,300 @@
+/* Subscription Management Styles */
+/* Based on Gravitate theme variables and Reece's mockup designs */
+
+/* ========================================
+   EMAIL INPUT COMPONENT
+   ======================================== */
+
+.email-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--gray-300, #c4c4c4);
+  border-radius: 6px;
+  background: var(--bg-1, #ffffff);
+  min-height: 32px;
+  width: 100%;
+  cursor: text;
+}
+
+.email-input-container:focus-within {
+  border-color: var(--theme-color-2, #51b073);
+  box-shadow: 0 0 0 2px rgba(81, 176, 115, 0.15);
+}
+
+.email-input-readonly {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.email-input-field {
+  border: none !important;
+  box-shadow: none !important;
+  min-width: 90px;
+  max-width: 100%;
+  width: auto;
+  flex: 1;
+  padding: 2px 0;
+  background: transparent;
+}
+
+.email-input-field:focus {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Active email tags - Green */
+.email-tag {
+  background-color: #dbf4e4 !important;
+  color: #0c5a58 !important;
+  border: none !important;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+  margin: 0;
+}
+
+/* Opted-out email tags - Red with strikethrough */
+.email-tag-opted-out {
+  background-color: #fcd1d5 !important;
+  color: #f22939 !important;
+  text-decoration: line-through;
+  border: none !important;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+  margin: 0;
+}
+
+/* ========================================
+   SITE ID INPUT COMPONENT
+   ======================================== */
+
+.site-id-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--gray-300, #c4c4c4);
+  border-radius: 6px;
+  background: var(--bg-1, #ffffff);
+  min-height: 32px;
+  width: 100%;
+  cursor: text;
+}
+
+.site-id-input-container:focus-within {
+  border-color: var(--theme-color-2, #51b073);
+  box-shadow: 0 0 0 2px rgba(81, 176, 115, 0.15);
+}
+
+.site-id-input-readonly {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.site-id-input-field {
+  border: none !important;
+  box-shadow: none !important;
+  min-width: 90px;
+  max-width: 100%;
+  width: auto;
+  flex: 1;
+  padding: 2px 0;
+  background: transparent;
+}
+
+.site-id-input-field:focus {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Site ID tags - Blue */
+.site-id-tag {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border: none !important;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+  margin: 0;
+}
+
+/* ========================================
+   CONTENT CONFIGURATION COLUMNS
+   ======================================== */
+
+/* Green tint for content config column cells */
+.content-config-cell {
+  background-color: rgba(100, 210, 141, 0.03);
+}
+
+/* Hovered row content config cells */
+.ag-row-hover .content-config-cell {
+  background-color: rgba(100, 210, 141, 0.08);
+}
+
+/* Content config column header group */
+.content-config-header-group {
+  background-color: rgba(100, 210, 141, 0.1) !important;
+}
+
+/* Left border on first content config column */
+.content-config-first-col {
+  border-left: 2px solid var(--theme-color-2, #51b073);
+}
+
+/* ========================================
+   BULK EDIT MODE STYLES
+   ======================================== */
+
+/* Non-selected rows in bulk edit mode */
+.bulk-edit-disabled-row {
+  opacity: 0.6;
+}
+
+/* Disabled button styling */
+.disabled-gravi-button-row {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ========================================
+   SUBSCRIPTION MANAGEMENT TAB STYLES
+   ======================================== */
+
+.subscription-management-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-management-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Product/Location selection pill buttons */
+.selection-pill {
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: center;
+}
+
+.selection-pill-active {
+  background: var(--theme-color-2, #51b073);
+  color: white;
+}
+
+.selection-pill-inactive {
+  background: var(--gray-200, #d4d4d4);
+  color: var(--gray-600, #5e5e5e);
+}
+
+/* ========================================
+   CHECKBOX COLUMN STYLES
+   ======================================== */
+
+.content-checkbox-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.content-checkbox-cell .ant-checkbox-wrapper {
+  margin: 0;
+}
+
+/* ========================================
+   TAB STYLES
+   ======================================== */
+
+.subscription-tabs-container {
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-tabs-container .ant-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-tabs-container .ant-tabs-content {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.subscription-tabs-container .ant-tabs-content-holder {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-tabs-container .ant-tabs-tabpane {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-tabs-container .ant-tabs-tabpane-active {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ========================================
+   NOTIFICATION DESTINATIONS STYLES
+   ======================================== */
+
+.notification-destinations-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-destinations-description {
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+.notification-destinations-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ========================================
+   PREVIEW PLACEHOLDER STYLES
+   ======================================== */
+
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: var(--gray-500, #7a7a7a);
+}
+
+.preview-placeholder-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
