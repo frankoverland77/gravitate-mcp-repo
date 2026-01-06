@@ -1,3 +1,3 @@
-export { PerformanceSummarySection } from './PerformanceSummarySection';
-export { DetailedComparisonSection } from './DetailedComparisonSection';
-export { HistoricalComparisonSection } from './HistoricalComparisonSection';
+export { BenchmarksSidebar } from './BenchmarksSidebar'
+export { ScenarioComparisonSection } from './ScenarioComparisonSection'
+export { HistoricalComparisonSection } from './HistoricalComparisonSection'

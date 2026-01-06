@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr';
+import { useState, useMemo } from 'react'
+import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr'
 import {
   ComposedChart,
   Area,
@@ -12,8 +12,8 @@ import {
   ReferenceLine,
   ResponsiveContainer,
   Label,
-} from 'recharts';
-import { Select, Button } from 'antd';
+} from 'recharts'
+import { Select, Button } from 'antd'
 import {
   LineChartOutlined,
   BarChartOutlined,
@@ -21,8 +21,9 @@ import {
   EyeInvisibleOutlined,
   CopyOutlined,
   DownloadOutlined,
-} from '@ant-design/icons';
-import moment from 'moment';
+} from '@ant-design/icons'
+import moment from 'moment'
+import type { Scenario } from '../../types/scenario.types'
 
 // ============================================================================
 // STATIC DATA - ~26 days from Nov 9 to Dec 4, 2024
@@ -199,7 +200,11 @@ const CustomTooltip = ({ active, payload, label, viewMode }: CustomTooltipProps)
 // COMPONENT
 // ============================================================================
 
-export function HistoricalComparisonSection() {
+interface HistoricalComparisonSectionProps {
+  scenarios?: Scenario[]
+}
+
+export function HistoricalComparisonSection({ scenarios = [] }: HistoricalComparisonSectionProps) {
   const [activeView, setActiveView] = useState<ViewMode>('prices');
   const [visibleSeries, setVisibleSeries] = useState<VisibleSeries>({
     contractPrice: true,
