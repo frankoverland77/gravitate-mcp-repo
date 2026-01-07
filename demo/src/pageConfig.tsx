@@ -6,25 +6,27 @@ import {
   ShopOutlined,
   CalculatorOutlined,
   GlobalOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
 
-import { WelcomePage } from "./pages/WelcomePages/WelcomePage";
-import { CustomerForm } from "./pages/demos/forms/CustomerForm/CustomerForm";
-import { ProductGrid } from "./pages/demos/grids/ProductGrid/ProductGrid";
-import { FormulaManager } from "./pages/demos/grids/FormulaManager";
-import { DeliveryManager } from "./pages/demos/delivery/DeliveryManager";
-import { PromptsGrid } from "./pages/demos/grids/PromptsGrid";
-import { FormulaTemplates } from "./pages/demos/grids/FormulaTemplates";
-import { FormulaTemplateDetails } from "./pages/demos/grids/FormulaTemplateDetails";
-import { ContractDetails } from "./pages/demos/grids/ContractDetails";
-import { OnlineSellingPlatformHome } from "./pages/OnlineSellingPlatform/OnlineSellingPlatformHome";
-import { IndexOfferManagement } from "./pages/OnlineSellingPlatform/IndexOfferManagement";
-import { CompetitorAnalysis } from "./pages/OnlineSellingPlatform/CompetitorAnalysis";
-import { CompetitorDetails } from "./pages/OnlineSellingPlatform/CompetitorDetails";
-import { GlobalTieredPricing } from "./pages/GlobalTieredPricing/GlobalTieredPricing";
-import { ContractMeasurementGrid } from "./pages/ContractMeasurement/ContractMeasurementGrid";
-import { ContractMeasurementDetails } from "./pages/ContractMeasurement/ContractMeasurementDetails";
-import { ThemeRouteWrapper } from "./components/shared/ThemeRouteWrapper";
+import { WelcomePage } from './pages/WelcomePages/WelcomePage';
+import { CustomerForm } from './pages/demos/forms/CustomerForm/CustomerForm';
+import { ProductGrid } from './pages/demos/grids/ProductGrid/ProductGrid';
+import { FormulaManager } from './pages/demos/grids/FormulaManager';
+import { DeliveryManager } from './pages/demos/delivery/DeliveryManager';
+import { PromptsGrid } from './pages/demos/grids/PromptsGrid';
+import { FormulaTemplates } from './pages/demos/grids/FormulaTemplates';
+import { FormulaTemplateDetails } from './pages/demos/grids/FormulaTemplateDetails';
+import { ContractDetails } from './pages/demos/grids/ContractDetails';
+import { OnlineSellingPlatformHome } from './pages/OnlineSellingPlatform/OnlineSellingPlatformHome';
+import { IndexOfferManagement } from './pages/OnlineSellingPlatform/IndexOfferManagement';
+import { CompetitorAnalysis } from './pages/OnlineSellingPlatform/CompetitorAnalysis';
+import { CompetitorDetails } from './pages/OnlineSellingPlatform/CompetitorDetails';
+import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
+import { ContractMeasurementGrid } from './pages/ContractMeasurement/ContractMeasurementGrid';
+import { ContractMeasurementDetails } from './pages/ContractMeasurement/ContractMeasurementDetails';
+import { SubscriptionManagement } from './pages/SubscriptionManagement/SubscriptionManagement';
+import { ThemeRouteWrapper } from './components/shared/ThemeRouteWrapper';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -190,22 +192,30 @@ export const demoRegistry: DemoRoute[] = [
     category: 'grids',
   },
   {
-    key: "ContractMeasurementGrid",
-    title: "Contract Measurement",
-    element: <ThemeRouteWrapper theme="PE_LIGHT"><ContractMeasurementGrid /></ThemeRouteWrapper>,
-    path: "/ContractMeasurement/ContractMeasurementGrid",
-    description: "Contract measurement tracking grid",
+    key: 'ContractMeasurementGrid',
+    title: 'Contract Measurement',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <ContractMeasurementGrid />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractMeasurement/ContractMeasurementGrid',
+    description: 'Contract measurement tracking grid',
     created: new Date().toISOString(),
-    category: "grids",
+    category: 'grids',
   },
   {
-    key: "ContractMeasurementDetails",
-    title: "Measurement Details",
-    element: <ThemeRouteWrapper theme="PE_LIGHT"><ContractMeasurementDetails /></ThemeRouteWrapper>,
-    path: "/ContractMeasurement/ContractMeasurementDetails",
-    description: "Contract measurement details view",
+    key: 'ContractMeasurementDetails',
+    title: 'Measurement Details',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <ContractMeasurementDetails />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractMeasurement/ContractMeasurementDetails',
+    description: 'Contract measurement details view',
     created: new Date().toISOString(),
-    category: "grids",
+    category: 'grids',
   },
   // MCP server will add more demos here automatically
 ];
@@ -405,36 +415,46 @@ export const createPageConfig = (): PageConfig => {
     path: '/GlobalTieredPricing',
   };
 
+  // Add Subscription Management section
+  config.SubscriptionManagement = {
+    hasPermission: () => true,
+    key: 'SubscriptionManagement',
+    icon: <BellOutlined />,
+    title: 'Subscriptions',
+    element: <SubscriptionManagement />,
+    path: '/SubscriptionManagement',
+  };
+
   // Add Contract Measurement section (uses PE_LIGHT theme)
   config.ContractMeasurement = {
     hasPermission: () => true,
-    key: "ContractMeasurement",
+    key: 'ContractMeasurement',
     icon: <DashboardOutlined />,
-    title: "Contract Measurement",
+    title: 'Contract Measurement',
     routes: [
       {
         hasPermission: () => true,
-        key: "ContractMeasurementGrid",
-        title: "Measurements",
+        key: 'ContractMeasurementGrid',
+        title: 'Measurements',
         element: (
           <ThemeRouteWrapper theme="PE_LIGHT">
             <ContractMeasurementGrid />
           </ThemeRouteWrapper>
         ),
-        path: "/ContractMeasurement/ContractMeasurementGrid",
-        description: "Contract measurement tracking grid",
+        path: '/ContractMeasurement/ContractMeasurementGrid',
+        description: 'Contract measurement tracking grid',
       },
       {
         hasPermission: () => true,
-        key: "ContractMeasurementDetails",
-        title: "Measurement Details",
+        key: 'ContractMeasurementDetails',
+        title: 'Measurement Details',
         element: (
           <ThemeRouteWrapper theme="PE_LIGHT">
             <ContractMeasurementDetails />
           </ThemeRouteWrapper>
         ),
-        path: "/ContractMeasurement/ContractMeasurementDetails",
-        description: "Contract measurement details view",
+        path: '/ContractMeasurement/ContractMeasurementDetails',
+        description: 'Contract measurement details view',
         hidden: true,
       },
     ],

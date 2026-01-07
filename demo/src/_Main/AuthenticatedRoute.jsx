@@ -25,6 +25,7 @@ export function AuthenticatedRoute() {
     CompetitorAnalysis: true,
     GlobalTieredPricing: true,
     ContractMeasurement: true,
+    SubscriptionManagement: true,
     BakeryProducts: true,
     FormulaManager: true,
     DeliveryManagement: true,
