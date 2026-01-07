@@ -7,11 +7,16 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { 
-  validateCode, 
+import {
+  validateCode,
   formatValidationResult,
-  ValidationResult 
+  ValidationResult
 } from '../utils/conventions.js';
+import {
+  checkPageRegistration,
+  extractPageNameFromPath,
+  formatRegistrationWarning,
+} from '../utils/pageRegistration.js';
 
 export interface ValidateCodeRequest {
   /** Code string to validate */
@@ -111,16 +116,27 @@ export async function validateCodeTool(args: ValidateCodeRequest): Promise<Valid
       
       const fileContent = fs.readFileSync(fullPath, 'utf-8');
       const result = validateCode(fileContent, fullPath);
+
+      // Check page registration if this is a page file
+      let registrationWarning = '';
+      const pageName = extractPageNameFromPath(fullPath);
+      if (pageName) {
+        const regStatus = checkPageRegistration(pageName);
+        if (!regStatus.isFullyRegistered) {
+          registrationWarning = `\n## Page Registration Warning\n\n${formatRegistrationWarning(regStatus)}\n`;
+        }
+      }
+
       const output = raw
         ? JSON.stringify(result, null, 2)
-        : `# Validation: ${path.basename(fullPath)}\n\n${formatValidationResult(result)}`;
+        : `# Validation: ${path.basename(fullPath)}\n\n${formatValidationResult(result)}${registrationWarning}`;
 
       return {
         content: [{ type: 'text', text: output }],
         isError: !result.valid
       };
     }
-    
+
     // Validate directory
     if (directory) {
       const fullDir = path.isAbsolute(directory) 

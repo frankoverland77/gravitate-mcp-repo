@@ -1,1 +1,7 @@
-cd demo && npx lint-staged
+cd demo
+
+# Check page registration first (blocks commit if pages are unregistered)
+node scripts/check-page-registration.cjs
+
+# Then run lint-staged for code quality
+npx lint-staged

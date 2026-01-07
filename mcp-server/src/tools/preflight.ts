@@ -330,7 +330,16 @@ export async function preflightTool(args: PreflightArgs) {
     response += `1. Generate code following the conventions above\n`;
     response += `2. Run \`validate_code\` before presenting to user\n`;
     response += `3. Fix any errors before presenting\n`;
-    
+
+    // Registration reminder for new pages
+    response += `\n## Page Registration Reminder\n\n`;
+    response += `If creating a **new page** in \`src/pages/\`, you MUST register it:\n\n`;
+    response += `1. Import in \`pageConfig.tsx\`\n`;
+    response += `2. Add config section in \`createPageConfig()\`\n`;
+    response += `3. Add scope in \`AuthenticatedRoute.jsx\`\n\n`;
+    response += `Use the \`register_demo\` tool to do this automatically.\n`;
+    response += `The pre-commit hook will block commits with unregistered pages.\n`;
+
     return {
       content: [{ type: "text" as const, text: response }],
     };

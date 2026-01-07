@@ -17,7 +17,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
-    "quality:check": "yarn type-check && yarn lint && yarn format:check"
+    "quality:check": "yarn type-check && yarn lint && yarn format:check",
+    "check:pages": "node scripts/check-page-registration.cjs"
   },
   "dependencies": {
     "@gravitate-js/excalibrr": "4.0.34-osp",
