@@ -32,6 +32,8 @@ export function AuthenticatedRoute() {
     ScheduleDemo: true,
     CustomerList: true,
     InventoryGrid: true,
+    BulkChangeTest: true,
+    SubscriptionManagement: true,
   };
   return (
     <FeatureModeProvider>

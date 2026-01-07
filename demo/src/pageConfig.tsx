@@ -6,7 +6,7 @@ import {
   ShopOutlined,
   CalculatorOutlined,
   GlobalOutlined,
-  BellOutlined,
+  CreditCardOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
@@ -25,8 +25,9 @@ import { CompetitorDetails } from './pages/OnlineSellingPlatform/CompetitorDetai
 import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
 import { ContractMeasurementGrid } from './pages/ContractMeasurement/ContractMeasurementGrid';
 import { ContractMeasurementDetails } from './pages/ContractMeasurement/ContractMeasurementDetails';
-import { SubscriptionManagement } from './pages/SubscriptionManagement/SubscriptionManagement';
 import { ThemeRouteWrapper } from './components/shared/ThemeRouteWrapper';
+import { BulkChangeTest } from './pages/demos/BulkChangeTest/BulkChangeTest';
+import { SubscriptionManagement } from './pages/SubscriptionManagement/SubscriptionManagement';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -458,6 +459,24 @@ export const createPageConfig = (): PageConfig => {
         hidden: true,
       },
     ],
+  };
+
+  config.BulkChangeTest = {
+    hasPermission: () => true,
+    key: 'BulkChangeTest',
+    icon: <TableOutlined />,
+    title: 'Bulk Change Test',
+    element: <BulkChangeTest />,
+    path: '/BulkChangeTest',
+  };
+
+  config.SubscriptionManagement = {
+    hasPermission: () => true,
+    key: 'SubscriptionManagement',
+    icon: <CreditCardOutlined />,
+    title: 'Subscription Management',
+    element: <SubscriptionManagement />,
+    path: '/SubscriptionManagement',
   };
 
   return config;
