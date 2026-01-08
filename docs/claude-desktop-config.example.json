@@ -2,11 +2,11 @@
   "mcpServers": {
     "excalibrr": {
       "command": "node",
-      "args": ["/absolute/path/to/excalibrr-mcp-server/build/index.js"],
+      "args": [
+        "/replace-with-absolute-path-to/excalibrr-mcp-server/mcp-server/build/index.js"
+      ],
       "env": {
-        "EXCALIBRR_PATH": "/absolute/path/to/excalibrr",
-        "USAGE_EXAMPLES_PATH": "/absolute/path/to/your-main-project",
-        "FIGMA_API_TOKEN": "your_figma_token_here"
+        "FIGMA_ACCESS_TOKEN": "figma-access-token-here-if-needed"
       }
     }
   }
