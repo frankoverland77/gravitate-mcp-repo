@@ -1,80 +1,128 @@
-import { useState, useEffect } from 'react'
-import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr'
-import { PlusOutlined, CloseOutlined, BarChartOutlined, FormOutlined, DatabaseOutlined, PercentageOutlined, DollarOutlined, CheckCircleOutlined, ExclamationCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'
-import { Drawer, Input, Select, Button } from 'antd'
-import type { Scenario, ScenarioFormData, ProductSelection, EntryMethod } from '../types/scenario.types'
-import { PRODUCT_OPTIONS, COUNTERPARTY_OPTIONS } from '../types/scenario.types'
+import { useState, useEffect } from 'react';
+import { Texto, Horizontal, Vertical } from '@gravitate-js/excalibrr';
+import { CloseOutlined, DollarCircleOutlined, AreaChartOutlined } from '@ant-design/icons';
+import { Drawer, Input, Select, Button, Tabs } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
+const { TabPane } = Tabs;
+import type {
+  Scenario,
+  ScenarioFormData,
+  ProductSelection,
+  EntryMethod,
+  ScenarioFormulaComponent,
+  SelectedBenchmark,
+} from '../types/scenario.types';
+import { PRODUCT_OPTIONS, COUNTERPARTY_OPTIONS } from '../types/scenario.types';
+import { BenchmarkSelector } from './benchmark';
+import { FormulaComponentsGrid } from '../../OnlineSellingPlatform/components/FormulaComponentsGrid';
+import type { FormulaComponent } from '../../OnlineSellingPlatform/IndexOfferManagement.types';
+import {
+  PLACEHOLDER_VALUES,
+  buildAutoFormulaPreview,
+  buildFormulaPreview,
+  FormulaTemplate,
+  TemplateComponent,
+} from '../../demos/grids/FormulaTemplates.data';
+import { TemplateChooser } from '../../../components/shared/TemplateChooser';
+import { useFormulaTemplateContext } from '../../../contexts/FormulaTemplateContext';
+import { VolumeTabContent } from './VolumeTabContent';
+import { ConfigurationStatus } from './ConfigurationStatus';
+import { EntryMethodSelector } from './EntryMethodSelector';
+import styles from './ScenarioDrawer.module.css';
 
 interface ScenarioDrawerProps {
-  visible: boolean
-  onClose: () => void
-  scenario?: Scenario // If provided, we're in edit mode
-  onSave: (data: ScenarioFormData) => void
+  visible: boolean;
+  onClose: () => void;
+  scenario?: Scenario;
+  onSave: (data: ScenarioFormData) => void;
 }
 
 export function ScenarioDrawer({ visible, onClose, scenario, onSave }: ScenarioDrawerProps) {
-  const isEditMode = !!scenario
+  const isEditMode = !!scenario;
+  const navigate = useNavigate();
+  const { templates } = useFormulaTemplateContext();
 
-  // Form state
-  const [name, setName] = useState('')
-  const [counterparty, setCounterparty] = useState<string | undefined>(undefined)
-  const [products, setProducts] = useState<ProductSelection>('all')
-  const [entryMethod, setEntryMethod] = useState<EntryMethod>('benchmark')
+  const [name, setName] = useState('');
+  const [counterparty, setCounterparty] = useState<string | undefined>(undefined);
+  const [products, setProducts] = useState<ProductSelection>('all');
+  const [entryMethod, setEntryMethod] = useState<EntryMethod>('benchmark');
+  const [activeTab, setActiveTab] = useState<'price' | 'volume'>('price');
+  const [formulaComponents, setFormulaComponents] = useState<ScenarioFormulaComponent[]>([]);
+  const [selectedBenchmark, setSelectedBenchmark] = useState<SelectedBenchmark | undefined>(
+    undefined
+  );
+  const [showTemplateChooser, setShowTemplateChooser] = useState(false);
 
-  // Reset form when drawer opens/closes or scenario changes
   useEffect(() => {
     if (visible) {
+      setActiveTab('price');
+      setFormulaComponents([]);
+      setShowTemplateChooser(false);
+      setSelectedBenchmark(undefined);
       if (scenario) {
-        setName(scenario.name)
-        setCounterparty(scenario.counterparty)
-        setProducts(scenario.products)
-        setEntryMethod(scenario.entryMethod)
+        setName(scenario.name);
+        setCounterparty(scenario.counterparty);
+        setProducts(scenario.products);
+        setEntryMethod(scenario.entryMethod);
       } else {
-        setName('')
-        setCounterparty(undefined)
-        setProducts('all')
-        setEntryMethod('benchmark')
+        setName('');
+        setCounterparty(undefined);
+        setProducts('all');
+        setEntryMethod('benchmark');
       }
     }
-  }, [visible, scenario])
+  }, [visible, scenario]);
+
+  const handleAddFormulaRow = () => {
+    const maxId = Math.max(0, ...formulaComponents.map((c) => c.id));
+    const newComponent: ScenarioFormulaComponent = {
+      id: maxId + 1,
+      percentage: PLACEHOLDER_VALUES.PERCENTAGE,
+      source: PLACEHOLDER_VALUES.SOURCE,
+      instrument: PLACEHOLDER_VALUES.INSTRUMENT,
+      type: PLACEHOLDER_VALUES.TYPE,
+      dateRule: PLACEHOLDER_VALUES.DATE_RULE,
+      required: false,
+    };
+    setFormulaComponents([...formulaComponents, newComponent]);
+  };
+
+  const handleTemplateSelect = (template: FormulaTemplate) => {
+    const maxId = Math.max(0, ...formulaComponents.map((c) => c.id));
+    const newComponents: ScenarioFormulaComponent[] = template.components.map(
+      (comp: TemplateComponent, index: number) => ({
+        id: maxId + index + 1,
+        percentage: comp.percentage,
+        source: comp.source,
+        instrument: comp.instrument,
+        type: comp.type,
+        dateRule: comp.dateRule,
+        required: false,
+      })
+    );
+    setFormulaComponents([...formulaComponents, ...newComponents]);
+    setShowTemplateChooser(false);
+  };
 
   const handleSave = () => {
-    if (!name.trim()) return
-
+    if (!name.trim()) return;
     onSave({
       name: name.trim(),
       counterparty,
       products,
       entryMethod,
-    })
-  }
-
-  const getEntryMethodTileStyle = (method: EntryMethod) => ({
-    flex: 1,
-    padding: '16px',
-    border: entryMethod === method ? '2px solid #51b073' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    backgroundColor: entryMethod === method ? 'rgba(81, 176, 115, 0.05)' : '#fafafa',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    textAlign: 'center' as const,
-  })
-
-  const getConfigCardStyle = () => ({
-    flex: 1,
-    padding: '16px',
-    border: '1px solid #d9d9d9',
-    borderRadius: '8px',
-    backgroundColor: '#fafafa',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    minHeight: '100px',
-  })
+      benchmark: selectedBenchmark,
+    });
+  };
+  const noop = () => {
+    /* TBD */
+  };
 
   return (
     <Drawer
-      placement='bottom'
-      height='70%'
+      placement="bottom"
+      height="70%"
       visible={visible}
       onClose={onClose}
       closable={false}
@@ -90,281 +138,210 @@ export function ScenarioDrawer({ visible, onClose, scenario, onSave }: ScenarioD
       zIndex={2000}
       destroyOnClose
     >
-      {/* Custom Header - Green Background */}
-      <div
-        style={{
-          backgroundColor: '#0C5A58',
-          padding: '20px 24px',
-          flexShrink: 0,
-        }}
-      >
-        <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Vertical style={{ gap: '4px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '12px' }}>
-              <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
-                {isEditMode ? `Edit: ${scenario?.name}` : 'Add Scenario'}
-              </Texto>
-            </Horizontal>
-            <Texto style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
-              Configure pricing formula and volume settings for this scenario
+      <div className={styles.header}>
+        <Horizontal justifyContent="space-between" alignItems="center">
+          <Vertical gap="4px">
+            <Texto className={styles.headerTitle}>
+              {isEditMode ? 'Edit Scenario' : 'Add Scenario'}
+            </Texto>
+            <Texto className={styles.headerSubtitle}>
+              Configure pricing and volume settings for this scenario
             </Texto>
           </Vertical>
-          <Button
-            type='link'
-            onClick={onClose}
-            style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto' }}
-          >
+          <Button type="text" onClick={onClose} className={styles.closeButton}>
             <CloseOutlined />
           </Button>
         </Horizontal>
       </div>
 
-      {/* Scrollable Content */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '24px',
-          paddingBottom: '100px', // Space for sticky footer
+      <Tabs
+        activeKey={activeTab}
+        onChange={(key) => setActiveTab(key as 'price' | 'volume')}
+        className="scenario-drawer-tabs"
+        tabBarStyle={{
+          margin: 0,
+          padding: '0 24px',
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid #e8e8e8',
+          flexShrink: 0,
         }}
       >
-        <Vertical style={{ gap: '32px', maxWidth: '900px', margin: '0 auto' }}>
-          {/* Scenario Settings Section */}
-          <Vertical style={{ gap: '16px' }}>
-            <Texto category='h6' weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#595959' }}>
-              Scenario Settings
-            </Texto>
-            <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: '16px' }}>
-              <Vertical style={{ gap: '16px' }}>
-                {/* Scenario Name */}
-                <Vertical style={{ gap: '8px' }}>
-                  <Texto category='p2' weight='600'>
-                    Scenario Name
+        <TabPane
+          tab={
+            <Horizontal className={styles.tabIcon}>
+              <DollarCircleOutlined />
+              <span>Price</span>
+            </Horizontal>
+          }
+          key="price"
+        >
+          {showTemplateChooser ? (
+            <TemplateChooser
+              templates={templates}
+              onTemplateSelect={handleTemplateSelect}
+              buildFormulaPreview={buildFormulaPreview}
+              showManageButton
+              title="Formula Template Chooser"
+              subtitle="Select a pre-built formula template to quickly apply common pricing calculations to your scenario."
+              onManageTemplates={() => navigate('/ContractFormulas/FormulaTemplates')}
+              onClose={() => setShowTemplateChooser(false)}
+              showExternalName={false}
+            />
+          ) : (
+            <div className={styles.tabContent}>
+              <Vertical gap="24px">
+                <Vertical gap="16px">
+                  <Texto
+                    category="p2"
+                    weight="600"
+                    appearance="medium"
+                    className={styles.sectionLabel}
+                  >
+                    Scenario Settings
                   </Texto>
-                  <Input
-                    placeholder='Enter scenario name'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    maxLength={100}
-                    style={{ maxWidth: '400px' }}
-                  />
+                  <Vertical gap="8px">
+                    <Texto category="p2" appearance="medium">
+                      Scenario Name
+                    </Texto>
+                    <Input
+                      placeholder="Enter scenario name..."
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      maxLength={100}
+                    />
+                  </Vertical>
+                  <Horizontal gap="24px">
+                    <Vertical gap="8px" flex={1}>
+                      <Texto category="p2" appearance="medium">
+                        Counterparty
+                      </Texto>
+                      <Select
+                        placeholder="Select counterparty..."
+                        value={counterparty}
+                        onChange={setCounterparty}
+                        options={COUNTERPARTY_OPTIONS}
+                        style={{ width: '100%' }}
+                        allowClear
+                      />
+                    </Vertical>
+                    <Vertical gap="8px" flex={1}>
+                      <Texto category="p2" appearance="medium">
+                        Products
+                      </Texto>
+                      <Select
+                        placeholder="Select products..."
+                        value={products}
+                        onChange={(val) => setProducts(val as ProductSelection)}
+                        options={PRODUCT_OPTIONS}
+                        style={{ width: '100%' }}
+                      />
+                    </Vertical>
+                  </Horizontal>
                 </Vertical>
-
-                {/* Counterparty & Products Row */}
-                <Horizontal style={{ gap: '24px', flexWrap: 'wrap' }}>
-                  <Vertical style={{ gap: '8px', flex: 1, minWidth: '200px' }}>
-                    <Texto category='p2' weight='600'>
-                      Counterparty
-                    </Texto>
-                    <Select
-                      placeholder='Select counterparty'
-                      value={counterparty}
-                      onChange={setCounterparty}
-                      options={COUNTERPARTY_OPTIONS}
-                      style={{ width: '100%' }}
-                      allowClear
-                    />
-                  </Vertical>
-                  <Vertical style={{ gap: '8px', flex: 1, minWidth: '200px' }}>
-                    <Texto category='p2' weight='600'>
-                      Products / Locations
-                    </Texto>
-                    <Select
-                      placeholder='Select products'
-                      value={products}
-                      onChange={(val) => setProducts(val as ProductSelection)}
-                      options={PRODUCT_OPTIONS}
-                      style={{ width: '100%' }}
-                    />
-                  </Vertical>
-                </Horizontal>
-              </Vertical>
-            </div>
-          </Vertical>
-
-          {/* Price Configuration Section */}
-          <Vertical style={{ gap: '16px' }}>
-            <Texto category='h6' weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#595959' }}>
-              Price Configuration
-            </Texto>
-            <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: '16px' }}>
-              <Vertical style={{ gap: '16px' }}>
-                {/* Entry Method Tiles */}
-                <Vertical style={{ gap: '8px' }}>
-                  <Texto category='p2' weight='600'>
+                <div className={styles.divider} />
+                <Vertical gap="12px">
+                  <Texto
+                    category="p2"
+                    weight="600"
+                    appearance="medium"
+                    className={styles.sectionLabel}
+                  >
                     Entry Method
                   </Texto>
-                  <Horizontal style={{ gap: '16px' }}>
-                    <div style={getEntryMethodTileStyle('benchmark')} onClick={() => setEntryMethod('benchmark')}>
-                      <Vertical style={{ alignItems: 'center', gap: '8px' }}>
-                        <BarChartOutlined style={{ fontSize: '24px', color: entryMethod === 'benchmark' ? '#51b073' : '#8c8c8c' }} />
-                        <Texto weight='600'>Benchmark</Texto>
-                        <Texto category='p2' appearance='medium'>
-                          Use standard industry benchmarks
-                        </Texto>
-                      </Vertical>
-                    </div>
-                    <div style={getEntryMethodTileStyle('formula')} onClick={() => setEntryMethod('formula')}>
-                      <Vertical style={{ alignItems: 'center', gap: '8px' }}>
-                        <FormOutlined style={{ fontSize: '24px', color: entryMethod === 'formula' ? '#51b073' : '#8c8c8c' }} />
-                        <Texto weight='600'>Formula</Texto>
-                        <Texto category='p2' appearance='medium'>
-                          Build custom pricing formula
-                        </Texto>
-                      </Vertical>
-                    </div>
-                  </Horizontal>
+                  <EntryMethodSelector
+                    entryMethod={entryMethod}
+                    onEntryMethodChange={setEntryMethod}
+                  />
                 </Vertical>
-
-                {/* TBD Button based on entry method */}
-                <div style={{ backgroundColor: '#fafafa', border: '1px dashed #d9d9d9', borderRadius: '8px', padding: '16px' }}>
-                  <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Vertical style={{ gap: '4px' }}>
-                      <Texto weight='600'>
-                        {entryMethod === 'benchmark' ? 'Choose Benchmark' : 'Configure Formula'}
-                      </Texto>
-                      <Texto category='p2' appearance='medium'>
-                        {entryMethod === 'benchmark'
-                          ? 'Select from available industry benchmarks'
-                          : 'Build custom pricing formula with components'}
-                      </Texto>
-                    </Vertical>
-                    <GraviButton
-                      buttonText={entryMethod === 'benchmark' ? 'Choose Benchmark (TBD)' : 'Build Formula (TBD)'}
-                      appearance='outlined'
-                      onClick={() => {
-                        // TBD - will open benchmark selector or formula builder
-                        console.log(`${entryMethod} configuration TBD`)
-                      }}
+                <Vertical gap="12px">
+                  <Texto
+                    category="p2"
+                    weight="600"
+                    appearance="medium"
+                    className={styles.sectionLabel}
+                  >
+                    {entryMethod === 'benchmark' ? 'Benchmark Selection' : 'Formula Components'}
+                  </Texto>
+                  {entryMethod === 'benchmark' ? (
+                    <BenchmarkSelector
+                      selectedBenchmark={selectedBenchmark}
+                      onBenchmarkChange={setSelectedBenchmark}
                     />
-                  </Horizontal>
-                </div>
-
-                {/* Formula Summary */}
-                <Horizontal style={{ gap: '16px' }}>
-                  <div style={{ flex: 1, padding: '12px 16px', backgroundColor: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: '8px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-                      <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                      <Texto category='p2'>
-                        <strong>5</strong> Complete
-                      </Texto>
-                    </Horizontal>
-                  </div>
-                  <div style={{ flex: 1, padding: '12px 16px', backgroundColor: '#fffbe6', border: '1px solid #ffe58f', borderRadius: '8px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-                      <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-                      <Texto category='p2'>
-                        <strong>1</strong> Incomplete
-                      </Texto>
-                    </Horizontal>
-                  </div>
-                  <div style={{ flex: 1, padding: '12px 16px', backgroundColor: '#fafafa', border: '1px solid #d9d9d9', borderRadius: '8px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-                      <ClockCircleOutlined style={{ color: '#8c8c8c' }} />
-                      <Texto category='p2'>
-                        <strong>41</strong> Remaining
-                      </Texto>
-                    </Horizontal>
-                  </div>
-                </Horizontal>
+                  ) : (
+                    <>
+                      {formulaComponents.length > 0 && (
+                        <div className={styles.formulaPreview}>
+                          <Texto
+                            category="p2"
+                            appearance="medium"
+                            className={styles.formulaPreviewLabel}
+                          >
+                            Formula Preview:
+                          </Texto>
+                          <Texto weight="600">{buildAutoFormulaPreview(formulaComponents)}</Texto>
+                        </div>
+                      )}
+                      <FormulaComponentsGrid
+                        components={formulaComponents as unknown as FormulaComponent[]}
+                        setComponents={
+                          setFormulaComponents as unknown as React.Dispatch<
+                            React.SetStateAction<FormulaComponent[]>
+                          >
+                        }
+                        onAddRow={handleAddFormulaRow}
+                        onOpenTemplateChooser={() => setShowTemplateChooser(true)}
+                      />
+                    </>
+                  )}
+                </Vertical>
+                <Vertical gap="12px">
+                  <Texto
+                    category="p2"
+                    weight="600"
+                    appearance="medium"
+                    className={styles.sectionLabel}
+                  >
+                    Configuration Status
+                  </Texto>
+                  <ConfigurationStatus completeCount={5} incompleteCount={1} remainingCount={41} />
+                </Vertical>
               </Vertical>
             </div>
-          </Vertical>
+          )}
+        </TabPane>
+        <TabPane
+          tab={
+            <Horizontal className={styles.tabIcon}>
+              <AreaChartOutlined />
+              <span>Volume</span>
+            </Horizontal>
+          }
+          key="volume"
+        >
+          <VolumeTabContent
+            onAllocationConfig={noop}
+            onRateabilityConfig={noop}
+            onPenaltiesConfig={noop}
+          />
+        </TabPane>
+      </Tabs>
 
-          {/* Volume Configuration Section */}
-          <Vertical style={{ gap: '16px' }}>
-            <Texto category='h6' weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#595959' }}>
-              Volume Configuration
-            </Texto>
-            <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: '16px' }}>
-              <Horizontal style={{ gap: '16px', flexWrap: 'wrap' }}>
-                {/* Allocation Data Card */}
-                <div style={getConfigCardStyle()}>
-                  <Vertical style={{ gap: '12px', height: '100%' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-                      <DatabaseOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
-                      <Texto weight='600'>Allocation Data</Texto>
-                    </Horizontal>
-                    <Texto category='p2' appearance='medium'>
-                      Configure volume allocations for each product/location
-                    </Texto>
-                    <div style={{ marginTop: 'auto' }}>
-                      <GraviButton
-                        buttonText='Configure Allocation (TBD)'
-                        appearance='outlined'
-                        onClick={() => console.log('Allocation config TBD')}
-                      />
-                    </div>
-                  </Vertical>
-                </div>
-
-                {/* Rateability Requirements Card */}
-                <div style={getConfigCardStyle()}>
-                  <Vertical style={{ gap: '12px', height: '100%' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-                      <PercentageOutlined style={{ fontSize: '18px', color: '#52c41a' }} />
-                      <Texto weight='600'>Rateability Requirements</Texto>
-                    </Horizontal>
-                    <Texto category='p2' appearance='medium'>
-                      Set minimum and maximum volume thresholds
-                    </Texto>
-                    <div style={{ marginTop: 'auto' }}>
-                      <GraviButton
-                        buttonText='Configure Rateability (TBD)'
-                        appearance='outlined'
-                        onClick={() => console.log('Rateability config TBD')}
-                      />
-                    </div>
-                  </Vertical>
-                </div>
-
-                {/* Penalties Card */}
-                <div style={getConfigCardStyle()}>
-                  <Vertical style={{ gap: '12px', height: '100%' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-                      <DollarOutlined style={{ fontSize: '18px', color: '#ff4d4f' }} />
-                      <Texto weight='600'>Penalties</Texto>
-                    </Horizontal>
-                    <Texto category='p2' appearance='medium'>
-                      Define penalty structures for volume shortfalls
-                    </Texto>
-                    <div style={{ marginTop: 'auto' }}>
-                      <GraviButton
-                        buttonText='Configure Penalties (TBD)'
-                        appearance='outlined'
-                        onClick={() => console.log('Penalties config TBD')}
-                      />
-                    </div>
-                  </Vertical>
-                </div>
-              </Horizontal>
-            </div>
-          </Vertical>
-        </Vertical>
-      </div>
-
-      {/* Sticky Footer */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '16px 24px',
-          borderTop: '1px solid #d9d9d9',
-          backgroundColor: '#ffffff',
-          zIndex: 10,
-        }}
-      >
-        <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
-          <Button size='large' onClick={onClose} style={{ minWidth: '100px' }}>
+      <div className={styles.footer}>
+        <Horizontal justifyContent="flex-end" className={styles.footerButtons}>
+          <Button size="large" onClick={onClose} className={styles.cancelButton}>
             Cancel
           </Button>
-          <Button type='primary' size='large' onClick={handleSave} disabled={!name.trim()} style={{ minWidth: '140px' }}>
+          <Button
+            type="primary"
+            size="large"
+            onClick={handleSave}
+            disabled={!name.trim()}
+            className={styles.saveButton}
+          >
             {isEditMode ? 'Save Changes' : 'Add Scenario'}
           </Button>
         </Horizontal>
       </div>
     </Drawer>
-  )
+  );
 }

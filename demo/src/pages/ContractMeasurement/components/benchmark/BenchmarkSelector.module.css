@@ -1,0 +1,94 @@
+/* BenchmarkSelector styles */
+
+.container {
+  gap: 24px;
+}
+
+.leftPanel {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.rightPanel {
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.optionCard {
+  padding: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #fafafa;
+  border: 1px solid #d9d9d9;
+}
+
+.optionCardSelected {
+  border: 2px solid #51b073;
+  background-color: rgba(81, 176, 115, 0.05);
+}
+
+.optionIcon {
+  font-size: 24px;
+  color: #8c8c8c;
+}
+
+.optionIconSelected {
+  color: #51b073;
+}
+
+.optionDescription {
+  font-size: 12px;
+}
+
+.customSection {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.customHeader {
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.customHeaderIcon {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.customActiveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #51b073;
+}
+
+.customToggle {
+  font-size: 12px;
+  color: #8c8c8c;
+  transition: transform 0.2s;
+}
+
+.customToggleOpen {
+  transform: rotate(180deg);
+}
+
+.customContent {
+  padding: 0 16px 16px 16px;
+}
+
+.fieldLabel {
+  margin-bottom: 8px;
+  display: block;
+}
+
+.fullWidth {
+  width: 100%;
+}

@@ -7,6 +7,7 @@ import {
   CalculatorOutlined,
   GlobalOutlined,
   CreditCardOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';

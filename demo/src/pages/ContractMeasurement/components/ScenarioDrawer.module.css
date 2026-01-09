@@ -1,0 +1,196 @@
+/* ScenarioDrawer styles */
+
+/* Header */
+.drawerHeader {
+  background-color: #0c5a58;
+  padding: 16px 24px;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.headerSubtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.closeButton {
+  color: #ffffff;
+  font-size: 20px;
+  padding: 0;
+  height: auto;
+}
+
+/* Tabs */
+.tabContent {
+  padding: 24px 24px 100px 24px;
+  background-color: #f5f5f5;
+}
+
+.tabIcon {
+  gap: 8px;
+  align-items: center;
+}
+
+/* Entry Method Tiles */
+.entryMethodTile {
+  flex: 1;
+  padding: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  background-color: #fafafa;
+  border: 1px solid #d9d9d9;
+}
+
+.entryMethodTileSelected {
+  border: 2px solid #51b073;
+  background-color: rgba(81, 176, 115, 0.05);
+}
+
+.entryMethodIcon {
+  font-size: 24px;
+  color: #8c8c8c;
+}
+
+.entryMethodIconSelected {
+  color: #51b073;
+}
+
+/* Config Cards */
+.configCard {
+  padding: 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 100px;
+}
+
+.configCardIcon {
+  font-size: 18px;
+}
+
+.configCardIconBlue {
+  color: #1890ff;
+}
+
+.configCardIconGreen {
+  color: #52c41a;
+}
+
+.configCardIconRed {
+  color: #ff4d4f;
+}
+
+.configCardButton {
+  margin-top: 8px;
+}
+
+/* Status Cards */
+.statusCard {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.statusCardComplete {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.statusCardIncomplete {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+}
+
+.statusCardRemaining {
+  background-color: #fafafa;
+  border: 1px solid #d9d9d9;
+}
+
+.statusIconComplete {
+  color: #52c41a;
+}
+
+.statusIconIncomplete {
+  color: #faad14;
+}
+
+.statusIconRemaining {
+  color: #8c8c8c;
+}
+
+/* Formula Preview */
+.formulaPreview {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+
+.formulaPreviewLabel {
+  margin-bottom: 4px;
+}
+
+/* Footer */
+.drawerFooter {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px;
+  border-top: 1px solid #d9d9d9;
+  background-color: #ffffff;
+  z-index: 10;
+}
+
+.footerButtons {
+  gap: 16px;
+}
+
+.cancelButton {
+  min-width: 100px;
+}
+
+.saveButton {
+  min-width: 140px;
+}
+
+/* Sections */
+.sectionGap {
+  gap: 24px;
+}
+
+.sectionLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fieldGap {
+  gap: 8px;
+}
+
+.fieldRow {
+  gap: 24px;
+}
+
+.divider {
+  border-top: 1px solid #e8e8e8;
+}
+
+.tileGap {
+  gap: 16px;
+}
+
+.tileContent {
+  align-items: center;
+  gap: 8px;
+}

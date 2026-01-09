@@ -1,0 +1,73 @@
+import { Texto, Horizontal, Vertical } from '@gravitate-js/excalibrr';
+import { Checkbox, Tooltip } from 'antd';
+import { StarFilled } from '@ant-design/icons';
+import type { ScenarioCellData } from '../../types/scenario.types';
+import styles from './ScenarioComparisonSection.module.css';
+
+interface ScenarioCellRendererProps {
+  cellData: ScenarioCellData;
+  isPrimaryForRow: boolean;
+  showRowStar: boolean;
+  isPrimaryMode: boolean;
+  onSetPrimary: () => void;
+}
+
+function getDeltaColorClass(delta: number | undefined): string {
+  if (delta === undefined) return styles.deltaNeutral;
+  if (delta < 0) return styles.deltaPositive;
+  if (delta > 0) return styles.deltaNegative;
+  return styles.deltaNeutral;
+}
+
+export function ScenarioCellRenderer({
+  cellData,
+  isPrimaryForRow,
+  showRowStar,
+  isPrimaryMode,
+  onSetPrimary,
+}: ScenarioCellRendererProps) {
+  const cellClassName = `${styles.scenarioCell} ${isPrimaryForRow ? styles.scenarioCellPrimary : ''}`;
+
+  return (
+    <div className={cellClassName}>
+      {isPrimaryMode && (
+        <div className={styles.cellCheckbox}>
+          <Checkbox checked={isPrimaryForRow} onChange={onSetPrimary} />
+        </div>
+      )}
+
+      <Vertical gap="4px" alignItems="flex-start">
+        <Horizontal alignItems="center" gap="8px" justifyContent="flex-start">
+          <Texto weight="600">${cellData.price.toFixed(2)}/gal</Texto>
+          {showRowStar && (
+            <Tooltip title="Primary">
+              <StarFilled className={styles.starIcon} />
+            </Tooltip>
+          )}
+        </Horizontal>
+
+        {cellData.delta !== undefined && (
+          <Texto category="p2" className={getDeltaColorClass(cellData.delta)}>
+            {`${cellData.delta >= 0 ? '+' : ''}${cellData.delta.toFixed(2)} (${cellData.deltaPercent?.toFixed(1)}%)`}
+          </Texto>
+        )}
+
+        <Texto category="p2" appearance="medium" className={styles.formulaRef}>
+          {cellData.formulaRef}
+        </Texto>
+
+        <Texto category="p2" appearance="medium" className={styles.volumeText}>
+          {(cellData.allocation / 1000).toFixed(0)}K gal
+        </Texto>
+
+        {cellData.impact !== undefined && (
+          <Texto category="p2" weight="600" className={getDeltaColorClass(cellData.impact)}>
+            {`Impact: ${cellData.impact >= 0 ? '+' : ''}$${(cellData.impact / 1000).toFixed(1)}K`}
+          </Texto>
+        )}
+      </Vertical>
+    </div>
+  );
+}
+
+export { getDeltaColorClass };

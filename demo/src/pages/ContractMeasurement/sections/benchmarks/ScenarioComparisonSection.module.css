@@ -1,0 +1,83 @@
+/* ScenarioComparisonSection styles */
+
+.emptyState {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  color: #d9d9d9;
+}
+
+.infoBar {
+  padding: 12px 16px;
+  background-color: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: 8px;
+}
+
+.tableContainer {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.scenarioCell {
+  padding: 8px;
+  margin: -8px;
+  position: relative;
+  height: 100%;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.scenarioCellPrimary {
+  background-color: rgba(81, 176, 115, 0.08);
+}
+
+.cellCheckbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.starIcon {
+  font-size: 12px;
+  color: #51b073;
+}
+
+.starIconHeader {
+  font-size: 14px;
+  color: #51b073;
+}
+
+.formulaRef {
+  font-size: 11px;
+}
+
+.volumeText {
+  font-size: 11px;
+}
+
+.deltaPositive {
+  color: #51b073;
+}
+
+.deltaNegative {
+  color: #ff4d4f;
+}
+
+.deltaNeutral {
+  color: #8c8c8c;
+}
+
+.summaryRow {
+  background-color: #fafafa;
+}

@@ -21,10 +21,19 @@ demo/src/pages/ContractMeasurement/
 ├── ContractMeasurementDetails.tsx   # Detail page (with tabs)
 ├── project-context.md               # This file
 ├── components/                      # Reusable components
-│   └── RatabilitySettingsDrawer.tsx # Global ratability settings drawer
+│   ├── RatabilitySettingsDrawer.tsx # Global ratability settings drawer
+│   ├── ScenarioDrawer.tsx           # Add/Edit scenario drawer (with template chooser)
+│   └── benchmark/                   # Benchmark selection components
+│       ├── index.ts                 # Barrel export
+│       ├── benchmark.utils.ts       # Mock data and calculation functions
+│       ├── BenchmarkSelector.tsx    # Two-column benchmark selector
+│       └── BenchmarkPreview.tsx     # Real-time preview panel
+├── docs/                            # Feature documentation
+│   └── benchmark-selection-ux.md    # Benchmark selection UX reference (from prototype)
 ├── types/                           # TypeScript type definitions
 │   ├── ratability.types.ts          # Ratability settings types & defaults
-│   └── performanceDetails.types.ts  # Performance Details types
+│   ├── performanceDetails.types.ts  # Performance Details types
+│   └── scenario.types.ts            # Scenario types for What-If Analysis
 ├── tabs/                            # Tab components (thin composition layers)
 │   ├── index.ts                     # Barrel export
 │   ├── OverviewTab.tsx              # Overview tab (placeholder)
@@ -37,7 +46,8 @@ demo/src/pages/ContractMeasurement/
     │   ├── index.ts                 # Benchmarks barrel export
     │   ├── PerformanceSummarySection.tsx
     │   ├── DetailedComparisonSection.tsx
-    │   └── HistoricalComparisonSection.tsx
+    │   ├── HistoricalComparisonSection.tsx
+    │   └── ScenarioComparisonSection.tsx  # Scenario comparison table
     └── performance-details/         # Sections for Performance Details tab
         ├── index.ts                 # Performance Details barrel export
         ├── performanceDetails.data.ts  # Mock data and functions
@@ -45,6 +55,12 @@ demo/src/pages/ContractMeasurement/
         ├── ProductPerformanceTable.tsx
         └── DetailedAnalysisModal.tsx
 ```
+
+## Reference Documentation
+
+| Document                                                      | Description                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [benchmark-selection-ux.md](./docs/benchmark-selection-ux.md) | Detailed UX documentation for benchmark selection feature, extracted from Lovable prototype. Includes ASCII wireframes, data structures, state management patterns, and Excalibrr component mapping. |
 
 ## Critical Pattern: Detail Page Navigation
 
@@ -787,3 +803,632 @@ export function PerformanceDetailsTab() {
   );
 }
 ```
+
+### Session 6 (2026-01-06) - Wireframe Review & Design Updates
+
+**Reviewed:**
+
+- Static wireframe prototype at `/Users/frankoverland/Documents/contract-measurement-wireframe/`
+- PROJECT_CONTEXT.md (v2.0, January 2025) from wireframe project
+
+**Major Design Changes Identified:**
+
+The wireframe has been significantly updated with a new UX approach. Key changes documented below:
+
+#### 1. Scenario Analysis Tab - Complete Redesign Required
+
+**Current State:** Placeholder tab with "To be determined" text
+
+**Wireframe Design:** Single-page layout with:
+
+- **Left sidebar (300px, sticky)** - Configuration panel
+  - Parameters section (collapsible): Price/Volume history settings
+  - Scenarios section (collapsible): List of scenarios with expand/collapse details
+  - "+ Add Scenario" button navigates to dedicated page
+- **Right results area (flex: 1)** - Always visible with sidebar
+  - Scenario Comparison Results table (Combined View)
+  - Historical Comparison chart
+
+**Layout Pattern:**
+
+```css
+.results-layout {
+  display: flex;
+  flex-direction: row-reverse; /* Puts sidebar on LEFT */
+  gap: 24px;
+}
+```
+
+#### 2. DEPRECATED Concepts (DO NOT Implement)
+
+The following concepts were explored but removed from the design:
+
+| Deprecated Concept                              | Replacement                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| Configure/Results tab toggle                    | Sidebar + Results always visible together                    |
+| Separate Price Scenarios and Volume Scenarios   | Unified Scenarios (price + volume together)                  |
+| Price View / Volume View / Combined View toggle | Single Combined View only                                    |
+| "Select Baseline" configuration section         | Baseline defaults to incumbent; use "Set Primary" in results |
+| Separate "Add Volume Scenario" drawer           | Single scenario page with both Price and Volume config       |
+
+#### 3. Unified Scenario Model
+
+Each scenario now contains BOTH price AND volume configuration:
+
+```typescript
+interface UnifiedScenario {
+  id: string;
+  name: string;
+  counterparty: string;
+  status: 'complete' | 'incomplete';
+
+  // Price Configuration
+  entryMethod: 'benchmark' | 'formula' | 'template';
+  formulas: Array<{
+    detailId: string;
+    formula: {
+      publisher: string;
+      instrument: string;
+      priceType: string;
+      dateRule: string;
+      differential: number;
+    };
+  }>;
+
+  // Volume Configuration
+  allocation: {
+    method: string;
+    data: Record<string, number>;
+  };
+  rateability: {
+    minimum: number; // percentage (e.g., 90)
+    maximum: number; // percentage (e.g., 110)
+  };
+  penalties: {
+    enabled: boolean;
+    structure: object;
+  };
+}
+```
+
+#### 4. Combined View Table Structure
+
+The results table shows all data in one view:
+
+| Column          | Content                                                                                |
+| --------------- | -------------------------------------------------------------------------------------- |
+| Detail (sticky) | Product name + location + monthly volume                                               |
+| Baseline        | Price, Formula, Allocated volume, Rateability status                                   |
+| Scenario A      | Price, Delta (vs baseline), Formula, Allocated volume, Rateability %, Financial Impact |
+| Scenario B      | Same as Scenario A                                                                     |
+| ...             | Additional scenarios                                                                   |
+
+**Cell Content Pattern:**
+
+```html
+<div class="combined-cell">
+  <div class="combined-price">$2.45/gal</div>
+  <div class="combined-delta positive">-$0.07 (-2.9%)</div>
+  <div class="combined-formula">OPIS Contract Low Houston</div>
+  <div class="combined-volume">
+    <span class="vol-label">Allocated:</span> 120,000 gal
+    <span class="rateable-tag on-track">98%</span>
+  </div>
+  <div class="impact">Impact: -$8,400</div>
+</div>
+```
+
+**Rateability Status Tags:**
+
+- `on-track` - Green, within acceptable range
+- `at-risk` - Orange/yellow, approaching limits
+- `below-min` - Red, below minimum threshold
+
+#### 5. Scenario Creation - Dedicated Page
+
+Adding/editing scenarios uses `scenario-detail.html` (full page), NOT a drawer:
+
+**Page Sections:**
+
+1. **Scenario Settings**: Name, Counterparty, Products/Locations, Entry Method
+2. **Price Configuration**: Formula Builder (TBD placeholder)
+   - Entry methods: Benchmark-based, Custom Formula, From Template
+   - Summary stats: Complete, Incomplete, Remaining counts
+3. **Volume Configuration**: 3 config cards
+   - Allocation Data (TBD)
+   - Rateability Requirements (TBD)
+   - Penalties (TBD)
+
+**Navigation:**
+
+- "← Back to Analysis" returns to contract-detail.html
+- "Add Scenario" / "Cancel" buttons in header and footer
+
+#### 6. Sidebar Configuration Panel
+
+**Parameters Section (expandable):**
+
+- Summary view: "Price: 12mo, Monthly, Weighted" / "Volume: 12mo, Monthly, Sum"
+- Edit mode: Lookback (6/12/18/24mo), Aggregation (Daily/Weekly/Monthly/Quarterly), Method (Weighted/Simple/Median)
+
+**Scenarios Section (expandable):**
+
+- List of scenario cards with:
+  - Scenario name
+  - Status dot (green=complete, gray=incomplete)
+  - Expandable details: Products, Formula, Allocation, Rateability, Penalties
+  - Action buttons: Edit, Duplicate, Delete
+
+#### 7. Historical Comparison Chart
+
+Same as current implementation but integrated into the single-page layout:
+
+- Toggle: "Prices & Volume" / "Difference"
+- Product filter dropdown
+- Legend with Contract Price, Rack Average (PRIMARY), Spot Price
+- SVG-based chart visualization
+
+#### 8. Grid Page (index.html) - Minor Updates
+
+Columns match current prototype with some formatting differences:
+
+- Checkbox column added for bulk selection
+- Volume Progress shows "95,250 / 100,000" format (actual/total)
+- Days Left has visual urgency states (urgent=red, warning=orange, completed=gray)
+- Actions menu uses vertical ellipsis (⋮) button pattern
+
+---
+
+## Implementation Gap Analysis
+
+### Must Implement (High Priority)
+
+| Feature                  | Current State                        | Required State                                 |
+| ------------------------ | ------------------------------------ | ---------------------------------------------- |
+| Scenario Analysis Tab    | Placeholder                          | Full single-page layout with sidebar + results |
+| Unified Scenario Model   | Separate price/volume                | Combined price + volume in one scenario        |
+| Combined View Table      | Partial (existing in Benchmarks tab) | Full implementation with all cell data         |
+| Scenario List in Sidebar | Not implemented                      | Collapsible list with expand/collapse          |
+| Scenario Detail Page     | ScenarioDrawer (drawer)              | Full page component                            |
+
+### Refactor Required
+
+| Component            | Change Needed                                         |
+| -------------------- | ----------------------------------------------------- |
+| `BenchmarksTab.tsx`  | Move scenario comparison logic to ScenarioAnalysisTab |
+| `ScenarioDrawer.tsx` | Convert to full page component or deprecate           |
+| Sidebar layout       | Create new `ConfigurationSidebar` component           |
+
+### Can Reuse
+
+| Component                   | Notes                                   |
+| --------------------------- | --------------------------------------- |
+| Historical Comparison chart | Already implemented in BenchmarksTab    |
+| Scenario state management   | Existing scenario types and state logic |
+| Cell renderers              | Adapt from existing comparison table    |
+
+### TBD (Lower Priority - Marked in Wireframe)
+
+- Formula Builder UI
+- Benchmark selector
+- Allocation configuration
+- Rateability configuration
+- Penalties configuration
+- Template integration
+- Bulk operations
+
+---
+
+## Wireframe Reference Files
+
+Located at: `/Users/frankoverland/Documents/contract-measurement-wireframe/`
+
+| File                   | Purpose                                                   |
+| ---------------------- | --------------------------------------------------------- |
+| `index.html`           | Contracts grid (entry point)                              |
+| `contract-detail.html` | Analysis page - single-page layout with sidebar + results |
+| `scenario-detail.html` | Add/Edit scenario page (full page, not drawer)            |
+| `styles.css`           | All styling                                               |
+| `script.js`            | Interactions                                              |
+| `PROJECT_CONTEXT.md`   | Comprehensive design documentation (v2.0)                 |
+| `README.md`            | User documentation                                        |
+
+---
+
+### Session 7 (2026-01-08) - ScenarioDrawer Layout Fix & Comparison Table Improvements
+
+**Problem Statement:**
+User reported multiple layout issues with the ScenarioDrawer component:
+
+1. Formula builder table was cut off (not fully visible)
+2. Header scrolled with content (should be fixed)
+3. Tab bar scrolled with content (should be fixed)
+4. Content below tabs needed to scroll properly
+
+**Completed:**
+
+1. **ScenarioDrawer Layout Refactored** - Fixed all scrolling and layout issues:
+   - Header now stays FIXED at top (never scrolls)
+   - Tab bar stays FIXED below header (never scrolls)
+   - Content below tabs scrolls properly
+   - Formula builder grid (300px) fully visible when scrolled
+   - Footer stays FIXED at bottom using `position: fixed`
+
+2. **ScenarioComparisonSection Improvements:**
+   - Fixed price alignment (changed from centered to left-aligned)
+   - Fixed gaps caused by empty elements (conditional rendering for delta/impact)
+
+**Files Modified:**
+
+| File                                                                                   | Changes                                               |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `demo/src/pages/ContractMeasurement/components/ScenarioDrawer.tsx`                     | Complete layout refactor                              |
+| `demo/src/styles.css`                                                                  | Added CSS for `.scenario-drawer-tabs` scroll behavior |
+| `demo/src/pages/ContractMeasurement/sections/benchmarks/ScenarioComparisonSection.tsx` | Left alignment + conditional rendering                |
+
+**Key Layout Pattern (ScenarioDrawer):**
+
+The correct pattern for a drawer with fixed header/tabs and scrolling content:
+
+```tsx
+<Drawer
+  placement="bottom"
+  height="70%"
+  visible={visible}
+  onClose={onClose}
+  closable={false}
+  title={null}
+  headerStyle={{ display: 'none' }}
+  bodyStyle={{
+    backgroundColor: '#f5f5f5',
+    padding: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  }}
+  zIndex={2000}
+  destroyOnClose
+>
+  {/* HEADER - Fixed at top */}
+  <div
+    style={{
+      backgroundColor: '#0C5A58',
+      padding: '16px 24px',
+      flexShrink: 0, // Critical: prevents shrinking
+    }}
+  >
+    ...header content...
+  </div>
+
+  {/* TABS - Tab bar fixed, content scrolls */}
+  <Tabs
+    className="scenario-drawer-tabs"
+    tabBarStyle={{
+      margin: 0,
+      padding: '0 24px',
+      backgroundColor: '#ffffff',
+      borderBottom: '1px solid #e8e8e8',
+      flexShrink: 0, // Tab bar doesn't shrink
+    }}
+  >
+    <TabPane key="price">
+      {/* Content - NO height: 100%, NO overflowY on this div */}
+      <div
+        style={{
+          padding: '24px 24px 100px 24px', // Extra bottom padding for fixed footer
+          backgroundColor: '#f5f5f5',
+        }}
+      >
+        ...content...
+      </div>
+    </TabPane>
+  </Tabs>
+
+  {/* FOOTER - Fixed at bottom */}
+  <div
+    style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      padding: '16px 24px',
+      borderTop: '1px solid #d9d9d9',
+      backgroundColor: '#ffffff',
+      zIndex: 10,
+    }}
+  >
+    ...footer buttons...
+  </div>
+</Drawer>
+```
+
+**Critical CSS (styles.css):**
+
+```css
+/* ScenarioDrawer - Tab content fills available space and scrolls */
+.scenario-drawer-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* CRITICAL: allows flex children to shrink below content size */
+}
+
+.scenario-drawer-tabs .ant-tabs-content-holder {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden; /* Prevent double scrollbars */
+}
+
+.scenario-drawer-tabs .ant-tabs-content {
+  height: 100%;
+}
+
+.scenario-drawer-tabs .ant-tabs-tabpane {
+  height: 100%;
+  overflow-y: auto; /* TABPANE itself scrolls, not the content div inside */
+}
+```
+
+**Key Learnings:**
+
+1. **`min-height: 0` is CRITICAL** for flex containers that need to allow children to shrink and scroll
+2. **Don't put `height: 100%` and `overflowY: auto` on content divs inside flex layouts** - let the CSS handle scroll at the tabpane level
+3. **Reference pattern:** `FormulaEditorDrawer.tsx` in demos/grids/components
+4. **Footer pattern:** Use `position: fixed` inside the drawer (like FormulaEditorDrawer), NOT the Drawer's `footer` prop
+
+**Comparison Table Fixes:**
+
+```tsx
+// LEFT ALIGNMENT - Add textAlign and justifyContent
+<div style={{
+  textAlign: 'left',  // Text alignment
+  ...
+}}>
+  <Horizontal style={{ justifyContent: 'flex-start' }}>  // Flex alignment
+    ...
+  </Horizontal>
+</div>
+
+// CONDITIONAL RENDERING - Remove gaps from empty elements
+// WRONG: Always render with transparent color when undefined
+{cellData.delta !== undefined ? <Texto>...</Texto> : <Texto style={{ color: 'transparent' }}>-</Texto>}
+
+// RIGHT: Only render when value exists
+{cellData.delta !== undefined && (
+  <Texto>...</Texto>
+)}
+```
+
+**Verification Checklist (all passed):**
+
+- [x] Header stays fixed when scrolling content
+- [x] Tab bar stays fixed when scrolling content
+- [x] Content below tabs scrolls smoothly
+- [x] Formula builder grid is NOT cut off (full 300px visible)
+- [x] Footer stays fixed at bottom
+- [x] Both Price and Volume tabs work correctly
+- [x] Switch to Formula entry method and verify grid displays fully
+- [x] Prices in comparison table left-aligned
+- [x] No gaps from undefined delta/impact values
+
+---
+
+### Session 8 (2026-01-08) - Add Template Button Functionality
+
+**Problem Statement:**
+The "Add Template" button in the ScenarioDrawer's formula components table was not functional - it only logged to console.
+
+**Completed:**
+
+1. **Implemented Template Chooser Integration** - Replicated the exact pattern from Create Index Offer drawer in Index Offer Management
+   - When user clicks "Add Template", the entire Price tab content is replaced with the TemplateChooser component
+   - User can browse templates in card or list view
+   - User can search, filter, and select which components to include
+   - Clicking "Select Template" converts and appends components to the formula
+   - "Exit Templates" link returns to the form
+
+**Files Modified:**
+
+| File                                                               | Changes                            |
+| ------------------------------------------------------------------ | ---------------------------------- |
+| `demo/src/pages/ContractMeasurement/components/ScenarioDrawer.tsx` | Added template chooser integration |
+
+**Key Implementation Details:**
+
+1. **New Imports:**
+
+   ```tsx
+   import { useNavigate } from 'react-router-dom';
+   import { TemplateChooser } from '../../../components/shared/TemplateChooser';
+   import { useFormulaTemplateContext } from '../../../contexts/FormulaTemplateContext';
+   import {
+     FormulaTemplate,
+     TemplateComponent,
+     buildFormulaPreview,
+   } from '../../demos/grids/FormulaTemplates.data';
+   import type { FormulaComponent } from '../../OnlineSellingPlatform/IndexOfferManagement.types';
+   ```
+
+2. **New State:**
+
+   ```tsx
+   const [showTemplateChooser, setShowTemplateChooser] = useState(false);
+   const { templates } = useFormulaTemplateContext();
+   ```
+
+3. **Handler Pattern:**
+
+   ```tsx
+   const handleTemplateSelect = (template: FormulaTemplate) => {
+     const maxId = Math.max(0, ...formulaComponents.map((c) => c.id));
+     const newComponents = template.components.map((comp, index) => ({
+       id: maxId + index + 1,
+       percentage: comp.percentage,
+       source: comp.source,
+       instrument: comp.instrument,
+       type: comp.type,
+       dateRule: comp.dateRule,
+       required: false,
+     }));
+     setFormulaComponents([...formulaComponents, ...newComponents]);
+     setShowTemplateChooser(false);
+   };
+   ```
+
+4. **Conditional Rendering Pattern:**
+   ```tsx
+   {showTemplateChooser ? (
+     <TemplateChooser
+       templates={templates}
+       onTemplateSelect={handleTemplateSelect}
+       buildFormulaPreview={buildFormulaPreview}
+       showManageButton={true}
+       onManageTemplates={() => navigate('/ContractFormulas/FormulaTemplates')}
+       onClose={() => setShowTemplateChooser(false)}
+       showExternalName={false}
+     />
+   ) : (
+     /* Main Price Tab Content */
+   )}
+   ```
+
+**Key Learnings:**
+
+1. **Reuse existing shared components** - The `TemplateChooser` component is already built and handles all the complexity (search, filters, component selection, card/list views)
+2. **Use FormulaTemplateContext** - Templates are managed globally via context, no need to fetch or manage locally
+3. **Type casting for mismatched types** - `FormulaComponentsGridProps` type is outdated; use `as unknown as` pattern with eslint-disable comment
+4. **Pattern source:** `FormulaEditorDrawer.tsx` in `demo/src/pages/demos/grids/components/`
+
+**Verification:**
+
+- [x] Add Template button opens TemplateChooser
+- [x] Templates display in card and list views
+- [x] Search and filter work correctly
+- [x] Component checkboxes allow partial selection
+- [x] Select Template adds components to formula grid
+- [x] Exit Templates returns to form
+- [x] Manage Formula Templates navigates to templates page
+- [x] No TypeScript errors in ScenarioDrawer
+
+---
+
+### Session 9 (2026-01-08) - Implement Benchmark Selection in ScenarioDrawer
+
+**Problem Statement:**
+The ScenarioDrawer's "Benchmark" entry method had a TBD placeholder instead of functional benchmark selection. Users needed to select benchmarks (quick select or custom) with real-time preview of matching and impact.
+
+**Completed:**
+
+1. **Added Benchmark Types** - Extended `scenario.types.ts` with comprehensive type definitions
+   - `QuickBenchmarkType`, `BenchmarkPublisher`, `BenchmarkTypeOption`, `ProductHierarchy`, `LocationHierarchy`
+   - `SelectedBenchmark`, `BenchmarkMatchingInfo`, `BenchmarkImpactEstimate`, `ProductMatchDetail` interfaces
+   - Dropdown option constants: `PUBLISHER_OPTIONS`, `BENCHMARK_TYPE_OPTIONS`, `PRODUCT_HIERARCHY_OPTIONS`, `LOCATION_HIERARCHY_OPTIONS`
+
+2. **Created Benchmark Component Suite** - New folder `components/benchmark/`
+   - `benchmark.utils.ts` - Mock data and calculation functions for matching/impact
+   - `BenchmarkPreview.tsx` - Right panel showing preview, matching summary, estimated impact
+   - `BenchmarkSelector.tsx` - Two-column layout with quick select cards and custom benchmark configuration
+   - `index.ts` - Barrel export
+
+3. **Integrated into ScenarioDrawer** - Replaced TBD placeholder with functional BenchmarkSelector
+
+**Files Created:**
+
+| File                                         | Description                        |
+| -------------------------------------------- | ---------------------------------- |
+| `components/benchmark/index.ts`              | Barrel export                      |
+| `components/benchmark/benchmark.utils.ts`    | Utility functions and mock data    |
+| `components/benchmark/BenchmarkSelector.tsx` | Main two-column selector component |
+| `components/benchmark/BenchmarkPreview.tsx`  | Real-time preview panel            |
+
+**Files Modified:**
+
+| File                            | Changes                                               |
+| ------------------------------- | ----------------------------------------------------- |
+| `types/scenario.types.ts`       | Added benchmark selection types and dropdown options  |
+| `components/ScenarioDrawer.tsx` | Added state, import, and integrated BenchmarkSelector |
+
+**Key Implementation Details:**
+
+1. **Two-Column Layout Pattern (from Index Offer Management):**
+
+   ```tsx
+   <Horizontal alignItems="flex-start" style={{ gap: '24px' }}>
+     <div style={{ width: '300px', flexShrink: 0 }}>{/* Left Panel */}</div>
+     <div style={{ flex: 1, minWidth: 0 }}>{/* Right Panel - Preview */}</div>
+   </Horizontal>
+   ```
+
+2. **Option Card Styling (from RatabilitySettingsDrawer):**
+
+   ```tsx
+   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({
+     padding: '16px',
+     border: isSelected ? '2px solid #51b073' : '1px solid #d9d9d9',
+     borderRadius: '8px',
+     backgroundColor: isSelected ? 'rgba(81, 176, 115, 0.05)' : '#fafafa',
+     cursor: 'pointer',
+     transition: 'all 0.2s',
+   });
+   ```
+
+3. **Collapsible Section Pattern (custom div-based, not AntD Collapse):**
+
+   ```tsx
+   const [showCustom, setShowCustom] = useState(false)
+   // Header with click handler and rotating chevron
+   <DownOutlined style={{ transform: showCustom ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+   {showCustom && <div>/* Content */</div>}
+   ```
+
+4. **Reactive Calculations with useMemo:**
+   ```tsx
+   const matchingInfo = useMemo(
+     () => calculateMatchingInfo(selectedBenchmark),
+     [selectedBenchmark]
+   );
+   const impactEstimate = useMemo(
+     () => calculateImpactEstimate(selectedBenchmark),
+     [selectedBenchmark]
+   );
+   ```
+
+**Key Design Decisions:**
+
+1. **Quick Select First (80% Use Case)** - 3 quick options at top: Rack Average, Rack Low, Spot Price
+2. **Custom as Collapsible** - Advanced options hidden by default to reduce cognitive load
+3. **Real-time Preview** - Right panel updates immediately on any selection change
+4. **Impact Color Coding** - Revenue negative = green (lower cost is good), Margin positive = green (higher margin is good)
+5. **Product Breakdown Collapsible** - Per-product details available but hidden by default
+
+**Key Learnings:**
+
+1. **Avoid AntD Collapse `items` prop** - The newer API pattern caused TypeScript errors; use simple div-based collapsibles instead
+2. **Two-column patterns are powerful** - Configuration on left, preview on right provides immediate feedback
+3. **Mock data enables prototyping** - `benchmark.utils.ts` simulates API responses for rapid iteration
+
+**Verification:**
+
+- [x] Quick select cards respond to clicks with green border
+- [x] Only one quick option selected at a time
+- [x] Right panel updates immediately on selection
+- [x] Custom section expands/collapses
+- [x] Custom dropdowns work correctly
+- [x] Apply Custom button disabled until Publisher + Type selected
+- [x] Clear Selection resets both panels
+- [x] Benchmark name displayed in preview
+- [x] Matching summary shows progress bar and counts
+- [x] Estimated impact shows revenue/margin with correct colors
+
+**Note:** ESLint errors exist for inline styles on divs and function length - these are consistent with other prototype files in this feature area and don't affect functionality.
+
+---
+
+## Next Steps
+
+1. **Create ScenarioAnalysisTab layout** - Sidebar + Results container
+2. **Build ConfigurationSidebar component** - Parameters + Scenarios sections
+3. **Implement Combined View table** - Reuse patterns from BenchmarksTab
+4. **Create ScenarioDetailPage component** - Replace ScenarioDrawer
+5. **Update type definitions** - Add UnifiedScenario interface
+6. **Migrate historical chart** - Move from BenchmarksTab if needed

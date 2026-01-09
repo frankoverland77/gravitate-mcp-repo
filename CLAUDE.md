@@ -509,3 +509,68 @@ register_demo({
 
 // 5. Present to user - demo will appear under Bakery in sidebar
 ```
+
+---
+
+## 🔄 Project Context Updates (MANDATORY)
+
+**After completing major work on any feature with a `project-context.md` or `PROJECT_CONTEXT.md` file, you MUST update that file.**
+
+### When to Update Project Context
+
+Update the project context file when you complete work involving:
+- **UX decisions** - Layout changes, navigation patterns, user flow changes
+- **New components or sections** - Adding tabs, drawers, modals, pages
+- **Design pattern changes** - Switching from drawer to page, sidebar layouts, etc.
+- **Data model changes** - New interfaces, type definitions, state structures
+- **Key learnings** - Gotchas, workarounds, things that didn't work
+- **Implementation milestones** - Completing a feature or major section
+
+### What NOT to Update For
+
+Skip updates for:
+- Minor bug fixes or typo corrections
+- Code formatting changes
+- Small refactors that don't change behavior
+- Import reorganization
+
+### How to Update
+
+1. **Add a new session entry** with the date:
+   ```markdown
+   ### Session N (YYYY-MM-DD) - Brief Description
+
+   **Completed:**
+   - What was built/changed
+
+   **Key Decisions:**
+   - UX/design decisions made and why
+
+   **Key Learnings:**
+   - Patterns that worked
+   - Gotchas discovered
+   ```
+
+2. **Update status tables** if they exist (mark items complete, add new items)
+
+3. **Update file structure** if new files were added
+
+4. **Update "Next Steps"** section if priorities changed
+
+### Project Context File Locations
+
+| Feature | Context File |
+|---------|--------------|
+| Contract Measurement | `demo/src/pages/ContractMeasurement/project-context.md` |
+| Subscription Management | `demo/src/pages/SubscriptionManagement/PROJECT_CONTEXT.md` |
+
+### Automation
+
+When ending a session with significant work on a feature that has a project context file:
+
+1. **Review what was accomplished** - Check git diff or recent changes
+2. **Summarize key outcomes** - What decisions were made, what was learned
+3. **Update the context file** - Add session entry with relevant details
+4. **Keep it concise** - Focus on what helps future development, not verbose logs
+
+**This ensures continuity across sessions and helps both human developers and AI assistants understand the current state of each feature.**
