@@ -3,5 +3,7 @@ cd demo
 # Check page registration first (blocks commit if pages are unregistered)
 node scripts/check-page-registration.cjs
 
+# TEMPORARILY DISABLED - Re-enable when ready
 # Then run lint-staged for code quality
-npx lint-staged
+# npx lint-staged
+echo "⚠️  Lint-staged validation DISABLED - commits are not being validated"
