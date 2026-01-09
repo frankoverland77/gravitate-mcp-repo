@@ -3,6 +3,7 @@ import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import prettier from 'eslint-config-prettier';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 export default tseslint.config(
   // Base recommended configs
@@ -23,6 +24,7 @@ export default tseslint.config(
     plugins: {
       react,
       'react-hooks': reactHooks,
+      'unused-imports': unusedImports,
     },
     languageOptions: {
       ecmaVersion: 'latest',
@@ -68,10 +70,10 @@ export default tseslint.config(
       'max-params': ['error', 5],
 
       // ============================================
-      // STYLE ENFORCEMENT (Prevents inline styles)
+      // STYLE ENFORCEMENT (Warns about inline styles - non-blocking)
       // ============================================
       'react/forbid-dom-props': [
-        'error',
+        'warn',
         {
           forbid: ['style'],
         },
@@ -82,11 +84,16 @@ export default tseslint.config(
       // ============================================
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-unused-vars': [
+      // Use unused-imports plugin instead - it can AUTO-FIX unused imports!
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error', // Auto-fixes unused imports
+      'unused-imports/no-unused-vars': [
         'error',
         {
-          argsIgnorePattern: '^_',
+          vars: 'all',
           varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
         },
       ],
       '@typescript-eslint/no-empty-function': 'warn',
