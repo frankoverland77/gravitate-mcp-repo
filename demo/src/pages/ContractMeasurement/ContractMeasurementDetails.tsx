@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { Horizontal, Vertical, Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { LeftOutlined } from '@ant-design/icons';
 import { Tabs } from 'antd';
 import { OverviewTab, ScenarioAnalysisTab, PerformanceDetailsTab, BenchmarksTab } from './tabs';
+import styles from './ContractMeasurementDetails.module.css';
 
 const { TabPane } = Tabs;
 
@@ -26,9 +27,9 @@ export function ContractMeasurementDetails() {
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '24px' }}>
-      {/* Page Header with Back Button */}
-      <Horizontal alignItems="center" style={{ gap: '12px', marginBottom: '16px' }}>
+    <div className={styles.detailsPage}>
+      {/* Page Header with Back Button - flexShrink: 0 prevents compression */}
+      <Horizontal alignItems="center" className={styles.pageHeader} style={{ gap: '12px' }}>
         <GraviButton
           type="text"
           icon={<LeftOutlined />}
@@ -40,27 +41,19 @@ export function ContractMeasurementDetails() {
         </Texto>
       </Horizontal>
 
-      {/* Tabs */}
-      <Tabs defaultActiveKey="overview" style={{ flex: 1 }}>
+      {/* Tabs - CSS handles flex + scroll behavior */}
+      <Tabs defaultActiveKey="overview" className={styles.detailsTabs}>
         <TabPane tab="Overview" key="overview">
-          <div style={{ paddingTop: '24px' }}>
-            <OverviewTab />
-          </div>
+          <OverviewTab />
         </TabPane>
         <TabPane tab="Scenario Analysis" key="scenario-analysis">
-          <div style={{ paddingTop: '40px' }}>
-            <ScenarioAnalysisTab />
-          </div>
+          <ScenarioAnalysisTab />
         </TabPane>
         <TabPane tab="Performance Details" key="performance-details">
-          <div style={{ paddingTop: '40px' }}>
-            <PerformanceDetailsTab />
-          </div>
+          <PerformanceDetailsTab />
         </TabPane>
         <TabPane tab="Benchmarks" key="benchmarks">
-          <div style={{ paddingTop: '40px' }}>
-            <BenchmarksTab />
-          </div>
+          <BenchmarksTab />
         </TabPane>
       </Tabs>
     </div>
