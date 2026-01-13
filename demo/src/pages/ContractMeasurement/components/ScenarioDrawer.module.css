@@ -1,9 +1,10 @@
 /* ScenarioDrawer styles */
 
 /* Header */
+.header,
 .drawerHeader {
   background-color: #0c5a58;
-  padding: 16px 24px;
+  padding: 20px 24px;
   flex-shrink: 0;
 }
 
@@ -141,15 +142,12 @@
 }
 
 /* Footer */
+.footer,
 .drawerFooter {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   padding: 16px 24px;
   border-top: 1px solid #d9d9d9;
   background-color: #ffffff;
-  z-index: 10;
+  flex-shrink: 0;
 }
 
 .footerButtons {

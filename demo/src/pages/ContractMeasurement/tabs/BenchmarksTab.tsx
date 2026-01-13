@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react'
-import { Horizontal } from '@gravitate-js/excalibrr'
-import { BenchmarksSidebar } from '../sections/benchmarks/BenchmarksSidebar'
+import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
+import { Segmented } from 'antd'
+import { SettingOutlined } from '@ant-design/icons'
 import { ScenarioComparisonSection } from '../sections/benchmarks/ScenarioComparisonSection'
 import { HistoricalComparisonSection } from '../sections/benchmarks'
 import { ScenarioDrawer } from '../components/ScenarioDrawer'
+import { ParametersModal } from '../components/ParametersModal'
 import type { Scenario, AnalysisParameters, ScenarioFormData } from '../types/scenario.types'
-import { DEFAULT_PARAMETERS, createNewScenario, generateScenarioId } from '../types/scenario.types'
+import { DEFAULT_PARAMETERS, generateScenarioId } from '../types/scenario.types'
 
 // Initial sample scenarios
 const INITIAL_SCENARIOS: Scenario[] = [
@@ -32,7 +34,12 @@ const INITIAL_SCENARIOS: Scenario[] = [
   },
 ]
 
+type ViewTab = 'scenarios' | 'historical'
+
 export function BenchmarksTab() {
+  // View tab state
+  const [activeView, setActiveView] = useState<ViewTab>('scenarios')
+
   // Scenarios state
   const [scenarios, setScenarios] = useState<Scenario[]>(INITIAL_SCENARIOS)
 
@@ -46,44 +53,19 @@ export function BenchmarksTab() {
   const [drawerVisible, setDrawerVisible] = useState(false)
   const [editingScenario, setEditingScenario] = useState<Scenario | undefined>(undefined)
 
-  // Handle adding a new scenario
-  const handleAddScenario = useCallback(() => {
-    setEditingScenario(undefined)
-    setDrawerVisible(true)
+  // Parameters modal state
+  const [parametersModalVisible, setParametersModalVisible] = useState(false)
+
+  // Handle adding a new scenario (directly receives the scenario object)
+  const handleAddScenario = useCallback((scenario: Scenario) => {
+    setScenarios((prev) => [...prev, scenario])
   }, [])
 
-  // Handle editing an existing scenario
-  const handleEditScenario = useCallback((scenario: Scenario) => {
-    setEditingScenario(scenario)
-    setDrawerVisible(true)
-  }, [])
-
-  // Handle duplicating a scenario
-  const handleDuplicateScenario = useCallback((scenario: Scenario) => {
-    const duplicate: Scenario = {
-      ...scenario,
-      id: generateScenarioId(),
-      name: `${scenario.name} (Copy)`,
-      isPrimary: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-    setScenarios((prev) => [...prev, duplicate])
-  }, [])
-
-  // Handle deleting a scenario
-  const handleDeleteScenario = useCallback((scenarioId: string) => {
-    setScenarios((prev) => prev.filter((s) => s.id !== scenarioId))
-    // Clean up primary selections
-    setPrimarySelections((prev) => {
-      const next = { ...prev }
-      Object.keys(next).forEach((key) => {
-        if (next[key] === scenarioId) {
-          delete next[key]
-        }
-      })
-      return next
-    })
+  // Handle updating an existing scenario
+  const handleUpdateScenario = useCallback((updatedScenario: Scenario) => {
+    setScenarios((prev) =>
+      prev.map((s) => (s.id === updatedScenario.id ? updatedScenario : s))
+    )
   }, [])
 
   // Handle saving a scenario (create or update)
@@ -138,58 +120,83 @@ export function BenchmarksTab() {
   }, [])
 
   // Handle setting primary for entire column
-  const handleSetColumnPrimary = useCallback(
-    (scenarioId: string) => {
-      // Get all detail IDs from sample data (would come from actual data in real implementation)
-      const detailIds = ['DTL-001', 'DTL-002', 'DTL-003', 'DTL-004']
-      const newSelections: Record<string, string> = {}
-      detailIds.forEach((id) => {
-        newSelections[id] = scenarioId
-      })
-      setPrimarySelections(newSelections)
+  const handleSetColumnPrimary = useCallback((scenarioId: string) => {
+    // Get all detail IDs from sample data (would come from actual data in real implementation)
+    const detailIds = ['DTL-001', 'DTL-002', 'DTL-003', 'DTL-004']
+    const newSelections: Record<string, string> = {}
+    detailIds.forEach((id) => {
+      newSelections[id] = scenarioId
+    })
+    setPrimarySelections(newSelections)
 
-      // Also update the isPrimary flag on scenarios
-      setScenarios((prev) =>
-        prev.map((s) => ({
-          ...s,
-          isPrimary: s.id === scenarioId,
-        }))
-      )
-    },
-    []
-  )
+    // Also update the isPrimary flag on scenarios
+    setScenarios((prev) =>
+      prev.map((s) => ({
+        ...s,
+        isPrimary: s.id === scenarioId,
+      }))
+    )
+  }, [])
 
   return (
     <>
-      <Horizontal style={{ gap: '24px', alignItems: 'flex-start' }}>
-        {/* Left Sidebar */}
-        <BenchmarksSidebar
-          scenarios={scenarios}
-          parameters={parameters}
-          onAddScenario={handleAddScenario}
-          onEditScenario={handleEditScenario}
-          onDuplicateScenario={handleDuplicateScenario}
-          onDeleteScenario={handleDeleteScenario}
-          onUpdateParameters={setParameters}
-        />
+      <Vertical style={{ gap: '24px' }}>
+        {/* View Toggle with Parameters link */}
+        <Horizontal justifyContent="space-between" alignItems="center">
+          <Segmented
+            size="large"
+            options={[
+              { label: 'Scenario Comparison', value: 'scenarios' },
+              { label: 'Historical Comparison', value: 'historical' },
+            ]}
+            value={activeView}
+            onChange={(value) => setActiveView(value as ViewTab)}
+          />
+          <Horizontal
+            alignItems="center"
+            style={{ gap: '6px', cursor: 'pointer' }}
+            onClick={() => setParametersModalVisible(true)}
+          >
+            <SettingOutlined style={{ fontSize: '14px', color: '#666' }} />
+            <Texto category="p2" appearance="medium" style={{ textDecoration: 'underline' }}>
+              Parameters
+            </Texto>
+          </Horizontal>
+        </Horizontal>
 
-        {/* Right Results Area */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
-          {/* Scenario Comparison Table */}
+        {/* Conditional Content */}
+        {activeView === 'scenarios' ? (
           <ScenarioComparisonSection
             scenarios={scenarios}
             primarySelections={primarySelections}
             onSetPrimary={handleSetPrimary}
             onSetColumnPrimary={handleSetColumnPrimary}
+            onAddScenario={handleAddScenario}
+            onUpdateScenario={handleUpdateScenario}
           />
-
-          {/* Historical Comparison Chart */}
+        ) : (
           <HistoricalComparisonSection scenarios={scenarios} />
-        </div>
-      </Horizontal>
+        )}
+      </Vertical>
 
       {/* Scenario Drawer */}
-      <ScenarioDrawer visible={drawerVisible} onClose={handleCloseDrawer} scenario={editingScenario} onSave={handleSaveScenario} />
+      <ScenarioDrawer
+        visible={drawerVisible}
+        onClose={handleCloseDrawer}
+        scenario={editingScenario}
+        onSave={handleSaveScenario}
+      />
+
+      {/* Parameters Modal */}
+      <ParametersModal
+        visible={parametersModalVisible}
+        parameters={parameters}
+        onClose={() => setParametersModalVisible(false)}
+        onApply={(newParams) => {
+          setParameters(newParams)
+          setParametersModalVisible(false)
+        }}
+      />
     </>
   )
 }

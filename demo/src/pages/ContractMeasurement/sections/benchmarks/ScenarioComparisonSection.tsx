@@ -1,10 +1,13 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr';
-import { CheckSquareOutlined, BorderOutlined, StarOutlined, StarFilled } from '@ant-design/icons';
+import { Texto, GraviButton, Horizontal, Vertical, NotificationMessage } from '@gravitate-js/excalibrr';
+import { CheckSquareOutlined, BorderOutlined, StarOutlined, StarFilled, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Table, Checkbox, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { Scenario, ComparisonRowData, ScenarioCellData } from '../../types/scenario.types';
 import { ScenarioCellRenderer, getDeltaColorClass } from './ScenarioCellRenderer';
+import { BenchmarkScenarioDrawer } from '../../components/BenchmarkScenarioDrawer';
+import { FormulaScenarioDrawer } from '../../components/FormulaScenarioDrawer';
+import { SAMPLE_DETAILS } from '../../ContractMeasurement.data';
 import styles from './ScenarioComparisonSection.module.css';
 
 interface ScenarioComparisonSectionProps {
@@ -12,38 +15,9 @@ interface ScenarioComparisonSectionProps {
   primarySelections: Record<string, string>;
   onSetPrimary: (detailId: string, scenarioId: string) => void;
   onSetColumnPrimary: (scenarioId: string) => void;
+  onAddScenario?: (scenario: Scenario) => void;
+  onUpdateScenario?: (scenario: Scenario) => void;
 }
-
-const SAMPLE_DETAILS = [
-  {
-    detailId: 'DTL-001',
-    product: '87 Gas',
-    location: 'Houston Terminal',
-    volume: 120000,
-    percentTotal: 25.8,
-  },
-  {
-    detailId: 'DTL-002',
-    product: '89 Gas',
-    location: 'Houston Terminal',
-    volume: 160000,
-    percentTotal: 34.4,
-  },
-  {
-    detailId: 'DTL-003',
-    product: 'Diesel #2',
-    location: 'Tulsa Terminal',
-    volume: 85000,
-    percentTotal: 18.3,
-  },
-  {
-    detailId: 'DTL-004',
-    product: 'Jet Fuel',
-    location: 'Dallas Terminal',
-    volume: 100000,
-    percentTotal: 21.5,
-  },
-];
 
 function generateScenarioCellData(
   scenarioId: string,
@@ -77,8 +51,92 @@ export function ScenarioComparisonSection({
   primarySelections,
   onSetPrimary,
   onSetColumnPrimary,
+  onAddScenario,
+  onUpdateScenario,
 }: ScenarioComparisonSectionProps) {
   const [isPrimaryMode, setIsPrimaryMode] = useState(false);
+  const [showDraftColumn, setShowDraftColumn] = useState(false);
+  const [benchmarkDrawerVisible, setBenchmarkDrawerVisible] = useState(false);
+  const [formulaDrawerVisible, setFormulaDrawerVisible] = useState(false);
+
+  // Edit mode state
+  const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
+  const [editingDetailId, setEditingDetailId] = useState<string | null>(null); // For single-detail edit
+
+  // Handle editing a scenario (header click - edit all details)
+  const handleEditScenario = useCallback((scenario: Scenario) => {
+    setEditingScenario(scenario);
+    setEditingDetailId(null); // Edit all details
+    if (scenario.entryMethod === 'formula') {
+      setFormulaDrawerVisible(true);
+    } else {
+      setBenchmarkDrawerVisible(true);
+    }
+  }, []);
+
+  // Handle editing a single detail (cell click - formula scenarios only)
+  const handleEditDetail = useCallback((scenario: Scenario, detailId: string) => {
+    setEditingScenario(scenario);
+    setEditingDetailId(detailId);
+    setFormulaDrawerVisible(true);
+  }, []);
+
+  // Handle Add Scenario - show draft column instead of opening drawer
+  const handleAddScenarioClick = useCallback(() => {
+    setShowDraftColumn(true);
+  }, []);
+
+  // Handle selecting a scenario type (Benchmark or Formula)
+  const handleSelectScenarioType = useCallback((type: 'benchmark' | 'formula') => {
+    setShowDraftColumn(false);
+    if (type === 'benchmark') {
+      setBenchmarkDrawerVisible(true);
+    } else {
+      setFormulaDrawerVisible(true);
+    }
+  }, []);
+
+  // Handle closing drawers
+  const handleCloseBenchmarkDrawer = useCallback(() => {
+    setBenchmarkDrawerVisible(false);
+    setEditingScenario(null);
+  }, []);
+
+  const handleCloseFormulaDrawer = useCallback(() => {
+    setFormulaDrawerVisible(false);
+    setEditingScenario(null);
+    setEditingDetailId(null);
+  }, []);
+
+  // Handle saving a benchmark scenario (new or update)
+  const handleSaveBenchmarkScenario = useCallback(
+    (scenario: Scenario) => {
+      if (editingScenario) {
+        onUpdateScenario?.(scenario);
+        NotificationMessage('Success', `Scenario "${scenario.name}" updated successfully`, false);
+      } else {
+        onAddScenario?.(scenario);
+        NotificationMessage('Success', `Scenario "${scenario.name}" added successfully`, false);
+      }
+      handleCloseBenchmarkDrawer();
+    },
+    [editingScenario, onAddScenario, onUpdateScenario, handleCloseBenchmarkDrawer]
+  );
+
+  // Handle saving a formula scenario (new or update)
+  const handleSaveFormulaScenario = useCallback(
+    (scenario: Scenario) => {
+      if (editingScenario) {
+        onUpdateScenario?.(scenario);
+        NotificationMessage('Success', `Scenario "${scenario.name}" updated successfully`, false);
+      } else {
+        onAddScenario?.(scenario);
+        NotificationMessage('Success', `Scenario "${scenario.name}" added successfully`, false);
+      }
+      handleCloseFormulaDrawer();
+    },
+    [editingScenario, onAddScenario, onUpdateScenario, handleCloseFormulaDrawer]
+  );
 
   const allRowsHaveSamePrimary = useMemo(() => {
     const selections = Object.values(primarySelections);
@@ -111,7 +169,7 @@ export function ScenarioComparisonSection({
       scenarios.forEach((scenario) => {
         const isPrimaryForRow =
           primarySelections[detail.detailId] === scenario.id ||
-          (!primarySelections[detail.detailId] && scenario.isPrimary);
+          (!primarySelections[detail.detailId] && (scenario.isPrimary ?? false));
         scenarioData[scenario.id] = generateScenarioCellData(scenario.id, isPrimaryForRow, index);
       });
       return { ...detail, scenarios: scenarioData } as ComparisonRowData;
@@ -137,12 +195,71 @@ export function ScenarioComparisonSection({
 
   const renderScenarioCell = useCallback(
     (record: ComparisonRowData, scenario: Scenario) => {
+      // For formula scenarios, check if this specific detail has been configured
+      if (scenario.entryMethod === 'formula' && scenario.detailFormulas) {
+        const detailFormula = scenario.detailFormulas.find((d) => d.detailId === record.detailId);
+        if (!detailFormula || detailFormula.status !== 'confirmed') {
+          return (
+            <div className={`${styles.emptyCell} ${styles.cellWithEdit}`}>
+              <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>
+                Empty
+              </Texto>
+              <Tooltip title="Edit detail">
+                <EditOutlined
+                  className={styles.cellEditIcon}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditDetail(scenario, record.detailId);
+                  }}
+                />
+              </Tooltip>
+            </div>
+          );
+        }
+      }
+
+      // Show "Unconfirmed" placeholder for incomplete benchmark scenarios
+      if (scenario.entryMethod === 'benchmark' && scenario.status !== 'complete') {
+        return (
+          <div className={styles.unconfirmedCell}>
+            <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>
+              Unconfirmed
+            </Texto>
+          </div>
+        );
+      }
+
       const cellData = record.scenarios[scenario.id];
       if (!cellData) return null;
       const isPrimaryForRow =
         primarySelections[record.detailId] === scenario.id ||
-        (!primarySelections[record.detailId] && scenario.isPrimary);
+        (!primarySelections[record.detailId] && (scenario.isPrimary ?? false));
       const showRowStar = hasRowPrimary(record.detailId, scenario.id);
+
+      // For formula scenarios, wrap with edit icon
+      if (scenario.entryMethod === 'formula') {
+        return (
+          <div className={styles.cellWithEdit}>
+            <ScenarioCellRenderer
+              cellData={cellData}
+              isPrimaryForRow={isPrimaryForRow}
+              showRowStar={showRowStar}
+              isPrimaryMode={isPrimaryMode}
+              onSetPrimary={() => onSetPrimary(record.detailId, scenario.id)}
+            />
+            <Tooltip title="Edit detail">
+              <EditOutlined
+                className={styles.cellEditIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditDetail(scenario, record.detailId);
+                }}
+              />
+            </Tooltip>
+          </div>
+        );
+      }
+
       return (
         <ScenarioCellRenderer
           cellData={cellData}
@@ -153,7 +270,7 @@ export function ScenarioComparisonSection({
         />
       );
     },
-    [primarySelections, hasRowPrimary, isPrimaryMode, onSetPrimary]
+    [primarySelections, hasRowPrimary, isPrimaryMode, onSetPrimary, handleEditDetail]
   );
 
   const columns: ColumnsType<ComparisonRowData> = useMemo(() => {
@@ -163,9 +280,10 @@ export function ScenarioComparisonSection({
         dataIndex: 'product',
         key: 'detail',
         width: 180,
+        maxWidth: 250,
         fixed: 'left',
         render: (_: unknown, record: ComparisonRowData) => (
-          <Vertical gap="2px">
+          <Vertical style={{ gap: '2px' }}>
             <Texto weight="600">{record.product}</Texto>
             <Texto category="p2" appearance="medium">
               {record.location}
@@ -178,8 +296,9 @@ export function ScenarioComparisonSection({
         dataIndex: 'volume',
         key: 'volume',
         width: 100,
+        maxWidth: 250,
         render: (_: unknown, record: ComparisonRowData) => (
-          <Vertical gap="2px">
+          <Vertical style={{ gap: '2px' }}>
             <Texto>{(record.volume / 1000).toFixed(0)}K gal</Texto>
             <Texto category="p2" appearance="medium">
               {record.percentTotal.toFixed(1)}%
@@ -191,35 +310,94 @@ export function ScenarioComparisonSection({
 
     const scenarioColumns: ColumnsType<ComparisonRowData> = scenarios.map((scenario) => ({
       title: (
-        <Horizontal alignItems="center" gap="8px">
-          {isPrimaryMode && (
-            <Checkbox
-              checked={
-                Object.values(primarySelections).every((id) => id === scenario.id) &&
-                Object.keys(primarySelections).length === SAMPLE_DETAILS.length
-              }
-              indeterminate={
-                Object.values(primarySelections).some((id) => id === scenario.id) &&
-                !Object.values(primarySelections).every((id) => id === scenario.id)
-              }
-              onChange={() => onSetColumnPrimary(scenario.id)}
+        <div className={styles.columnHeader}>
+          <Horizontal alignItems="center" style={{ gap: '8px' }}>
+            {isPrimaryMode && (
+              <Checkbox
+                checked={
+                  Object.values(primarySelections).every((id) => id === scenario.id) &&
+                  Object.keys(primarySelections).length === SAMPLE_DETAILS.length
+                }
+                indeterminate={
+                  Object.values(primarySelections).some((id) => id === scenario.id) &&
+                  !Object.values(primarySelections).every((id) => id === scenario.id)
+                }
+                onChange={() => onSetColumnPrimary(scenario.id)}
+              />
+            )}
+            <span>{scenario.name}</span>
+            {isColumnPrimary(scenario.id) && (
+              <Tooltip title="Primary">
+                <StarFilled className={styles.starIconHeader} />
+              </Tooltip>
+            )}
+          </Horizontal>
+          <Tooltip title="Edit scenario">
+            <EditOutlined
+              className={styles.headerEditIcon}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditScenario(scenario);
+              }}
             />
-          )}
-          <span>{scenario.name}</span>
-          {isColumnPrimary(scenario.id) && (
-            <Tooltip title="Primary">
-              <StarFilled className={styles.starIconHeader} />
-            </Tooltip>
-          )}
-        </Horizontal>
+          </Tooltip>
+        </div>
       ),
       dataIndex: scenario.id,
       key: scenario.id,
-      width: 200,
+      minWidth: 250,
       render: (_: unknown, record: ComparisonRowData) => renderScenarioCell(record, scenario),
     }));
 
-    return [...baseColumns, ...scenarioColumns];
+    // Add draft column if showDraftColumn is true
+    const draftColumn: ColumnsType<ComparisonRowData> = showDraftColumn
+      ? [
+          {
+            title: 'NEW SCENARIO',
+            dataIndex: 'draft',
+            key: 'draft',
+            minWidth: 250,
+            onCell: (_, index) => ({
+              rowSpan: index === 0 ? SAMPLE_DETAILS.length : 0,
+            }),
+            render: (_: unknown, __: ComparisonRowData, index: number) => {
+              if (index !== 0) return null;
+              return (
+                <Vertical
+                  alignItems="center"
+                  justifyContent="center"
+                  style={{
+                    height: '100%',
+                    minHeight: '200px',
+                    gap: '16px',
+                    padding: '24px',
+                  }}
+                >
+                  <Texto category="p2" appearance="medium">
+                    What type of scenario do you need?
+                  </Texto>
+                  <Vertical style={{ gap: '12px', width: '100%' }}>
+                    <GraviButton
+                      buttonText="Benchmark"
+                      appearance="outlined"
+                      onClick={() => handleSelectScenarioType('benchmark')}
+                      style={{ width: '100%' }}
+                    />
+                    <GraviButton
+                      buttonText="Formula"
+                      appearance="outlined"
+                      onClick={() => handleSelectScenarioType('formula')}
+                      style={{ width: '100%' }}
+                    />
+                  </Vertical>
+                </Vertical>
+              );
+            },
+          },
+        ]
+      : [];
+
+    return [...baseColumns, ...scenarioColumns, ...draftColumn];
   }, [
     scenarios,
     primarySelections,
@@ -227,6 +405,9 @@ export function ScenarioComparisonSection({
     isColumnPrimary,
     onSetColumnPrimary,
     renderScenarioCell,
+    showDraftColumn,
+    handleSelectScenarioType,
+    handleEditScenario,
   ]);
 
   const summaryRow = () => (
@@ -242,7 +423,7 @@ export function ScenarioComparisonSection({
         </Table.Summary.Cell>
         {scenarios.map((scenario, index) => (
           <Table.Summary.Cell key={scenario.id} index={index + 2}>
-            <Vertical gap="4px">
+            <Vertical style={{ gap: '4px' }}>
               <Texto weight="600">{(totals[scenario.id]?.volume / 1000).toFixed(0)}K gal</Texto>
               {totals[scenario.id]?.impact !== 0 && (
                 <Texto weight="600" className={getDeltaColorClass(totals[scenario.id]?.impact)}>
@@ -260,19 +441,23 @@ export function ScenarioComparisonSection({
   if (scenarios.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <Vertical alignItems="center" gap="16px">
+        <Vertical alignItems="center" style={{ gap: '16px' }}>
           <StarOutlined className={styles.emptyIcon} />
           <Texto category="h4">No Scenarios</Texto>
-          <Texto appearance="medium">
-            Add a scenario from the sidebar to start comparing pricing options.
-          </Texto>
+          <Texto appearance="medium">Add a scenario to start comparing pricing options.</Texto>
+          <GraviButton
+            buttonText="Add Scenario"
+            icon={<PlusOutlined />}
+            success
+            onClick={handleAddScenarioClick}
+          />
         </Vertical>
       </div>
     );
   }
 
   return (
-    <Vertical gap="16px">
+    <Vertical style={{ gap: '16px' }}>
       <Horizontal justifyContent="space-between" alignItems="center">
         <div>
           <Texto category="h4" weight="600">
@@ -282,7 +467,15 @@ export function ScenarioComparisonSection({
             Compare pricing scenarios across all product details
           </Texto>
         </div>
-        <Horizontal gap="12px">
+        <Horizontal style={{ gap: '12px' }}>
+          {!showDraftColumn && (
+            <GraviButton
+              buttonText="Add Scenario"
+              icon={<PlusOutlined />}
+              success
+              onClick={handleAddScenarioClick}
+            />
+          )}
           <GraviButton
             buttonText={isPrimaryMode ? 'Done' : 'Set Primary'}
             icon={isPrimaryMode ? <CheckSquareOutlined /> : <BorderOutlined />}
@@ -313,6 +506,21 @@ export function ScenarioComparisonSection({
           size="small"
         />
       </div>
+
+      {/* Scenario Drawers */}
+      <BenchmarkScenarioDrawer
+        visible={benchmarkDrawerVisible}
+        onClose={handleCloseBenchmarkDrawer}
+        onSave={handleSaveBenchmarkScenario}
+        editingScenario={editingScenario?.entryMethod === 'benchmark' ? editingScenario : undefined}
+      />
+      <FormulaScenarioDrawer
+        visible={formulaDrawerVisible}
+        onClose={handleCloseFormulaDrawer}
+        onSave={handleSaveFormulaScenario}
+        editingScenario={editingScenario?.entryMethod === 'formula' ? editingScenario : undefined}
+        editingDetailId={editingDetailId}
+      />
     </Vertical>
   );
 }

@@ -1,0 +1,121 @@
+/* FormulaDetailPanel styles */
+
+.detailPanel {
+  padding: 16px 24px;
+  background-color: #fafafa;
+  border-top: 1px solid #e8e8e8;
+}
+
+.panelHeader {
+  margin-bottom: 16px;
+}
+
+.templateChooser {
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.componentsTable {
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 80px 150px 180px 100px 120px 50px;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #d9d9d9;
+  font-size: 11px;
+  font-weight: 600;
+  color: #595959;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 80px 150px 180px 100px 120px 50px;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e8e8e8;
+  align-items: center;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.colPercentage,
+.colSource,
+.colInstrument,
+.colType,
+.colDateRule,
+.colActions {
+  display: flex;
+  align-items: center;
+}
+
+.colActions {
+  justify-content: center;
+}
+
+.deleteIcon {
+  color: #8c8c8c;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.deleteIcon:hover {
+  color: #ff4d4f;
+}
+
+.emptyState {
+  padding: 24px;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+}
+
+/* Section styling */
+.section {
+  margin-bottom: 16px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8c8c8c;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* Actions row */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.leftActions {
+  display: flex;
+  gap: 8px;
+}
+
+.rightActions {
+  display: flex;
+  gap: 8px;
+}

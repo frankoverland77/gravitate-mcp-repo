@@ -42,6 +42,26 @@
   background-color: rgba(81, 176, 115, 0.08);
 }
 
+.unconfirmedCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 8px;
+  margin: -8px;
+  background-color: #fafafa;
+}
+
+.emptyCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 8px;
+  margin: -8px;
+  background-color: #fafafa;
+}
+
 .cellCheckbox {
   position: absolute;
   top: 8px;
@@ -80,4 +100,55 @@
 
 .summaryRow {
   background-color: #fafafa;
+}
+
+/* Column header with edit icon */
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.headerEditIcon {
+  font-size: 14px;
+  color: #8c8c8c;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.columnHeader:hover .headerEditIcon {
+  opacity: 1;
+}
+
+.headerEditIcon:hover {
+  color: #1890ff;
+}
+
+/* Cell with edit icon */
+.cellWithEdit {
+  position: relative;
+}
+
+.cellEditIcon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 14px;
+  color: #8c8c8c;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.cellWithEdit:hover .cellEditIcon {
+  opacity: 1;
+}
+
+.cellEditIcon:hover {
+  color: #1890ff;
 }

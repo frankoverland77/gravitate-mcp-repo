@@ -1,0 +1,378 @@
+/* FormulaScenarioDrawer Styles */
+
+/* Header */
+.header {
+  background-color: #0c5a58;
+  padding: 20px 24px;
+  flex-shrink: 0;
+}
+
+/* Footer */
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid #d9d9d9;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Grid Container */
+.gridContainer {
+  flex: 1;
+  min-height: 0;
+  padding: 0 24px 24px 24px;
+}
+
+/* Status Legend */
+.statusLegend {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status Dots (legacy - for context menu) */
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusEmpty .statusDot {
+  background: transparent;
+  border: 2px solid #999;
+}
+
+.statusInProgress .statusDot {
+  background: #faad14;
+  border: 2px solid #faad14;
+}
+
+.statusConfirmed .statusDot {
+  background: #52c41a;
+  border: 2px solid #52c41a;
+}
+
+/* Status Pills (with text labels) */
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.statusPill.statusEmpty {
+  color: #666666;
+  background: #f5f5f5;
+}
+
+.statusPill.statusInProgress {
+  color: #d97706;
+  background: #fff8e6;
+}
+
+.statusPill.statusConfirmed {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+/* Clipboard Indicator Bar */
+.clipboardBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background-color: #fef3c7;
+  border-bottom: 1px solid #fbbf24;
+}
+
+.clipboardContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clipboardIcon {
+  font-size: 16px;
+  color: #92400e;
+}
+
+/* Bulk Action Bar */
+.bulkActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background-color: #e6f7ff;
+  border-bottom: 1px solid #91d5ff;
+}
+
+.bulkActionButtons {
+  display: flex;
+  gap: 12px;
+}
+
+/* Details List */
+.detailsList {
+  background-color: #ffffff;
+  margin: 16px 24px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+.detailsHeader {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  gap: 12px;
+}
+
+.headerCheckbox {
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  flex: 1;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+  color: #595959;
+}
+
+.headerStatus {
+  min-width: 100px;
+  text-align: right;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+  color: #595959;
+}
+
+/* Detail Row */
+.detailRow {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailRowHeader {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+
+.detailRowHeader:hover {
+  background-color: #fafafa;
+}
+
+.detailRow.selected .detailRowHeader {
+  background-color: #e6f7ff;
+}
+
+.detailRow.expanded .detailRowHeader {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.rowCheckbox {
+  flex-shrink: 0;
+}
+
+.expandArrow {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: #8c8c8c;
+  transition: transform 0.2s ease;
+}
+
+.detailRow.expanded .expandArrow {
+  transform: rotate(90deg);
+}
+
+.detailName {
+  flex: 1;
+  font-weight: 500;
+}
+
+.rowStatus {
+  min-width: 100px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Expanded Content */
+.expandedContent {
+  padding: 16px 16px 16px 56px;
+  background-color: #fafafa;
+}
+
+.expandedSection {
+  margin-bottom: 16px;
+}
+
+.expandedSection:last-child {
+  margin-bottom: 0;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+/* Formula Components Table */
+.componentsTable {
+  background-color: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+
+.emptyComponents {
+  padding: 24px;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 4px;
+  border: 1px dashed #d9d9d9;
+}
+
+/* Expanded Actions */
+.expandedActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #e8e8e8;
+  margin-top: 16px;
+}
+
+.leftActions {
+  display: flex;
+  gap: 8px;
+}
+
+.rightActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Footer Progress */
+.footerProgress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #52c41a;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  white-space: nowrap;
+}
+
+/* Validation Message */
+.validationMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.validationWarning {
+  background-color: #fff7e6;
+  color: #d46b08;
+}
+
+.validationSuccess {
+  background-color: #f6ffed;
+  color: #389e0d;
+}
+
+/* Context Menu */
+.contextMenu {
+  position: fixed;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  min-width: 160px;
+  padding: 4px 0;
+}
+
+.contextMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.contextMenuItem:hover {
+  background-color: #f5f5f5;
+}
+
+.contextMenuItem.disabled {
+  color: #bfbfbf;
+  cursor: not-allowed;
+}
+
+.contextMenuItem.disabled:hover {
+  background-color: transparent;
+}
+
+.contextMenuDivider {
+  height: 1px;
+  background-color: #f0f0f0;
+  margin: 4px 0;
+}

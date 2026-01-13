@@ -7,7 +7,7 @@ import {
 
 export function OverviewTab() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minHeight: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PerformanceOverviewSection />
       <ContractDetailsSection />
       <QuickInsightsSection />

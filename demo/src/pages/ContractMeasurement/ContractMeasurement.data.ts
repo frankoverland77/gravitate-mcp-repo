@@ -116,3 +116,44 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     status: 'Active',
   },
 ];
+
+// Contract detail data (product/location combinations)
+// Used in scenario comparison table and formula scenario drawer
+export interface ContractDetail {
+  detailId: string;
+  product: string;
+  location: string;
+  volume: number;
+  percentTotal: number;
+}
+
+export const SAMPLE_DETAILS: ContractDetail[] = [
+  {
+    detailId: 'DTL-001',
+    product: '87 Gas',
+    location: 'Houston Terminal',
+    volume: 120000,
+    percentTotal: 25.8,
+  },
+  {
+    detailId: 'DTL-002',
+    product: '89 Gas',
+    location: 'Houston Terminal',
+    volume: 160000,
+    percentTotal: 34.4,
+  },
+  {
+    detailId: 'DTL-003',
+    product: 'Diesel #2',
+    location: 'Tulsa Terminal',
+    volume: 85000,
+    percentTotal: 18.3,
+  },
+  {
+    detailId: 'DTL-004',
+    product: 'Jet Fuel',
+    location: 'Dallas Terminal',
+    volume: 100000,
+    percentTotal: 21.5,
+  },
+];

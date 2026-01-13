@@ -9,8 +9,12 @@ export type ProductSelection = 'all' | 'gasoline' | 'diesel' | 'jet' | 'custom';
 export type EntryMethod = 'benchmark' | 'formula';
 export type ScenarioStatus = 'complete' | 'incomplete';
 
+// Detail status for formula scenario per-detail configuration
+export type DetailStatus = 'empty' | 'in-progress' | 'confirmed';
+
 // Benchmark selection types
-export type QuickBenchmarkType = 'rack-average' | 'rack-low' | 'spot-price';
+export type BenchmarkType = 'rack-average' | 'rack-low' | 'spot-price' | 'opis-contract' | 'custom';
+export type QuickBenchmarkType = 'rack-average' | 'rack-low' | 'spot-price' | 'opis-contract';
 export type BenchmarkPublisher = 'opis' | 'platts' | 'argus';
 export type BenchmarkTypeOption = 'rack-low' | 'rack-average' | 'contract-low' | 'spot';
 export type ProductHierarchy = 'target-index' | 'product-grade' | 'product-family' | 'any';
@@ -60,6 +64,25 @@ export interface ScenarioFormulaComponent {
   customDisplayName?: string | null;
 }
 
+// Per-detail formula configuration for formula scenarios
+export interface DetailFormulaConfig {
+  detailId: string;
+  name: string; // e.g., "Regular Gasoline - Houston"
+  product: string;
+  location: string;
+  status: DetailStatus;
+  components: ScenarioFormulaComponent[];
+  hasTemplate?: boolean;
+}
+
+// Clipboard state for copy/paste workflow
+export interface FormulaClipboard {
+  hasContent: boolean;
+  sourceId: string | null;
+  sourceName: string;
+  components: ScenarioFormulaComponent[];
+}
+
 export interface Scenario {
   id: string;
   name: string;
@@ -72,11 +95,17 @@ export interface Scenario {
   createdAt: string;
   updatedAt: string;
 
-  // Price Configuration (TBD - placeholder structure)
+  // Price Configuration
   priceConfig?: {
     benchmarkId?: string;
     formulaId?: string;
-    // Additional fields TBD
+    publisher?: BenchmarkPublisher;
+    productHierarchy?: ProductHierarchy;
+    locationHierarchy?: LocationHierarchy;
+    diff?: {
+      sign: '+' | '-';
+      amount: number;
+    };
   };
 
   // Volume Configuration (TBD - placeholder structure)
@@ -87,6 +116,9 @@ export interface Scenario {
     penaltiesEnabled?: boolean;
     // Additional fields TBD
   };
+
+  // Per-detail formula configurations (for formula entry method)
+  detailFormulas?: DetailFormulaConfig[];
 }
 
 export interface ScenarioFormData {

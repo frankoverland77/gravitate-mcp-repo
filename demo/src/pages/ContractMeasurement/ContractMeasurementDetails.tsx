@@ -26,27 +26,24 @@ export function ContractMeasurementDetails() {
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '24px', gap: '24px' }}>
-      {/* Back Button */}
-      <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '24px' }}>
+      {/* Page Header with Back Button */}
+      <Horizontal alignItems="center" style={{ gap: '12px', marginBottom: '16px' }}>
         <GraviButton
           type="text"
           icon={<LeftOutlined />}
           onClick={handleBack}
-        >
-          Back to Measurements
-        </GraviButton>
+          style={{ padding: '4px 8px' }}
+        />
+        <Texto category="h3" weight="600">
+          Measurement Details - ID: {data.id}
+        </Texto>
       </Horizontal>
-
-      {/* Page Header */}
-      <Texto category="h3" weight="600">
-        Measurement Details - ID: {data.id}
-      </Texto>
 
       {/* Tabs */}
       <Tabs defaultActiveKey="overview" style={{ flex: 1 }}>
         <TabPane tab="Overview" key="overview">
-          <div style={{ paddingTop: '40px', minHeight: '100%' }}>
+          <div style={{ paddingTop: '24px' }}>
             <OverviewTab />
           </div>
         </TabPane>

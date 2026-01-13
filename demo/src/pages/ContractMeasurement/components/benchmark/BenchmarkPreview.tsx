@@ -49,11 +49,7 @@ export function BenchmarkPreview({ selectedBenchmark }: BenchmarkPreviewProps) {
   }
 
   return (
-    <Vertical gap="16px">
-      <Texto category="p2" appearance="medium" weight="600" className={styles.sectionLabel}>
-        BENCHMARK PREVIEW
-      </Texto>
-
+    <Vertical style={{ gap: '16px' }}>
       <div className={styles.selectedBenchmark}>
         <Texto weight="600" className={styles.selectedBenchmarkText}>
           {displayName}

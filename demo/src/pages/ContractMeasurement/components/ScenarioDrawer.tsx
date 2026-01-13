@@ -52,6 +52,8 @@ export function ScenarioDrawer({ visible, onClose, scenario, onSave }: ScenarioD
   const [selectedBenchmark, setSelectedBenchmark] = useState<SelectedBenchmark | undefined>(
     undefined
   );
+  const [diffSign, setDiffSign] = useState<'+' | '-'>('+');
+  const [diffAmount, setDiffAmount] = useState<number>(0);
   const [showTemplateChooser, setShowTemplateChooser] = useState(false);
 
   useEffect(() => {
@@ -60,6 +62,8 @@ export function ScenarioDrawer({ visible, onClose, scenario, onSave }: ScenarioD
       setFormulaComponents([]);
       setShowTemplateChooser(false);
       setSelectedBenchmark(undefined);
+      setDiffSign('+');
+      setDiffAmount(0);
       if (scenario) {
         setName(scenario.name);
         setCounterparty(scenario.counterparty);
@@ -266,6 +270,10 @@ export function ScenarioDrawer({ visible, onClose, scenario, onSave }: ScenarioD
                     <BenchmarkSelector
                       selectedBenchmark={selectedBenchmark}
                       onBenchmarkChange={setSelectedBenchmark}
+                      diffSign={diffSign}
+                      diffAmount={diffAmount}
+                      onDiffSignChange={setDiffSign}
+                      onDiffAmountChange={(val) => setDiffAmount(val ?? 0)}
                     />
                   ) : (
                     <>
