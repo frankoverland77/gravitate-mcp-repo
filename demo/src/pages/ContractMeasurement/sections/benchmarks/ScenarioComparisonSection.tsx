@@ -7,6 +7,7 @@ import type { Scenario, ComparisonRowData, ScenarioCellData } from '../../types/
 import { ScenarioCellRenderer, getDeltaColorClass } from './ScenarioCellRenderer';
 import { BenchmarkScenarioDrawer } from '../../components/BenchmarkScenarioDrawer';
 import { FormulaScenarioDrawer } from '../../components/FormulaScenarioDrawer';
+import { UploadScenarioDrawer } from '../../components/UploadScenarioDrawer';
 import { SAMPLE_DETAILS } from '../../ContractMeasurement.data';
 import styles from './ScenarioComparisonSection.module.css';
 
@@ -58,6 +59,7 @@ export function ScenarioComparisonSection({
   const [showDraftColumn, setShowDraftColumn] = useState(false);
   const [benchmarkDrawerVisible, setBenchmarkDrawerVisible] = useState(false);
   const [formulaDrawerVisible, setFormulaDrawerVisible] = useState(false);
+  const [uploadDrawerVisible, setUploadDrawerVisible] = useState(false);
 
   // Edit mode state
   const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
@@ -69,6 +71,8 @@ export function ScenarioComparisonSection({
     setEditingDetailId(null); // Edit all details
     if (scenario.entryMethod === 'formula') {
       setFormulaDrawerVisible(true);
+    } else if (scenario.entryMethod === 'upload') {
+      setUploadDrawerVisible(true);
     } else {
       setBenchmarkDrawerVisible(true);
     }
@@ -86,13 +90,17 @@ export function ScenarioComparisonSection({
     setShowDraftColumn(true);
   }, []);
 
-  // Handle selecting a scenario type (Benchmark or Formula)
-  const handleSelectScenarioType = useCallback((type: 'benchmark' | 'formula') => {
+  // Handle selecting a scenario type (Benchmark, Formula, or Upload)
+  const handleSelectScenarioType = useCallback((type: 'benchmark' | 'formula' | 'upload') => {
     setShowDraftColumn(false);
+    setEditingScenario(null);
+    setEditingDetailId(null);
     if (type === 'benchmark') {
       setBenchmarkDrawerVisible(true);
-    } else {
+    } else if (type === 'formula') {
       setFormulaDrawerVisible(true);
+    } else {
+      setUploadDrawerVisible(true);
     }
   }, []);
 
@@ -136,6 +144,27 @@ export function ScenarioComparisonSection({
       handleCloseFormulaDrawer();
     },
     [editingScenario, onAddScenario, onUpdateScenario, handleCloseFormulaDrawer]
+  );
+
+  // Handle closing upload drawer
+  const handleCloseUploadDrawer = useCallback(() => {
+    setUploadDrawerVisible(false);
+    setEditingScenario(null);
+  }, []);
+
+  // Handle saving an upload scenario (new or update)
+  const handleSaveUploadScenario = useCallback(
+    (scenario: Scenario) => {
+      if (editingScenario) {
+        onUpdateScenario?.(scenario);
+        NotificationMessage('Success', `Scenario "${scenario.name}" updated successfully`, false);
+      } else {
+        onAddScenario?.(scenario);
+        NotificationMessage('Success', `Scenario "${scenario.name}" imported successfully`, false);
+      }
+      handleCloseUploadDrawer();
+    },
+    [editingScenario, onAddScenario, onUpdateScenario, handleCloseUploadDrawer]
   );
 
   const allRowsHaveSamePrimary = useMemo(() => {
@@ -389,6 +418,12 @@ export function ScenarioComparisonSection({
                       onClick={() => handleSelectScenarioType('formula')}
                       style={{ width: '100%' }}
                     />
+                    <GraviButton
+                      buttonText="Upload"
+                      appearance="outlined"
+                      onClick={() => handleSelectScenarioType('upload')}
+                      style={{ width: '100%' }}
+                    />
                   </Vertical>
                 </Vertical>
               );
@@ -520,6 +555,12 @@ export function ScenarioComparisonSection({
         onSave={handleSaveFormulaScenario}
         editingScenario={editingScenario?.entryMethod === 'formula' ? editingScenario : undefined}
         editingDetailId={editingDetailId}
+      />
+      <UploadScenarioDrawer
+        visible={uploadDrawerVisible}
+        onClose={handleCloseUploadDrawer}
+        onSave={handleSaveUploadScenario}
+        editingScenario={editingScenario?.entryMethod === 'upload' ? editingScenario : undefined}
       />
     </Vertical>
   );

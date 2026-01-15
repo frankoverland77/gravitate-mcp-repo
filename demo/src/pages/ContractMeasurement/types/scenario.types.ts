@@ -6,7 +6,7 @@
  */
 
 export type ProductSelection = 'all' | 'gasoline' | 'diesel' | 'jet' | 'custom';
-export type EntryMethod = 'benchmark' | 'formula';
+export type EntryMethod = 'benchmark' | 'formula' | 'upload';
 export type ScenarioStatus = 'complete' | 'incomplete';
 
 // Detail status for formula scenario per-detail configuration
