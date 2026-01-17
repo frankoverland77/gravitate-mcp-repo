@@ -1,0 +1,57 @@
+.eliminatedSection {
+  padding: 0 24px;
+  margin-top: 16px;
+  overflow: visible !important;
+  height: auto !important;
+  flex-shrink: 0;
+}
+
+.collapse {
+  background: var(--theme-bg-elevated, #fafafa);
+  border-radius: 8px;
+  border: 1px solid var(--theme-border-color, #e0e0e0);
+}
+
+.collapse :global(.ant-collapse-header) {
+  padding: 12px 16px !important;
+}
+
+.collapse :global(.ant-collapse-content-box) {
+  padding: 0 !important;
+}
+
+.panel {
+  background: transparent;
+}
+
+.eliminatedTable {
+  border-radius: 0;
+}
+
+.eliminatedTable :global(.ant-table) {
+  background: transparent;
+}
+
+.eliminatedTable :global(.ant-table-thead > tr > th) {
+  background: var(--theme-bg-elevated, #f5f5f5);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--theme-color-3, #666);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--theme-color-warning-light, #fff7e6);
+  color: var(--theme-color-warning, #faad14);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.totalLabel {
+  margin-top: 8px;
+  padding-left: 4px;
+}

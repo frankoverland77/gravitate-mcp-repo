@@ -1,0 +1,27 @@
+/* RFPTab - Layout styles */
+
+.roundPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: auto;
+  gap: 16px;
+}
+
+.pageHeader {
+  flex-shrink: 0 !important;
+}
+
+.contentSection {
+  flex-shrink: 0;
+}
+
+.stepperWrapper {
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.detailGridWrapper {
+  flex-shrink: 0;
+}

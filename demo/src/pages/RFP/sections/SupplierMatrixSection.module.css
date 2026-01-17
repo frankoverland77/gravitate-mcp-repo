@@ -1,0 +1,136 @@
+/* SupplierMatrixSection styles */
+
+.matrixContainer {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.supplierHeader {
+  padding: 8px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rankBadgeWrapper {
+  text-align: center;
+}
+
+.rankBadgeWrapper :global(.ant-tag) {
+  margin: 0;
+}
+
+.incumbent {
+  background-color: rgba(24, 144, 255, 0.04);
+  border-left: 3px solid var(--theme-color-1, #1890ff);
+  margin-left: -8px;
+  padding-left: 8px;
+}
+
+.incumbentColumn {
+  background-color: rgba(24, 144, 255, 0.02) !important;
+}
+
+.dimmed {
+  opacity: 0.3;
+}
+
+.dimmedColumn {
+  opacity: 0.3;
+}
+
+.incumbentBadge {
+  display: inline-block;
+  padding: 2px 6px;
+  background-color: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #1890ff;
+  text-transform: uppercase;
+}
+
+.incumbentFlag {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #1890ff;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  align-self: flex-start;
+}
+
+.rankBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #595959;
+}
+
+.actionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #8c8c8c;
+  transition: all 0.2s ease;
+}
+
+.actionIcon:hover {
+  background-color: #f5f5f5;
+  color: #1890ff;
+}
+
+.actionIcon.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.actionIcon.disabled:hover {
+  background-color: transparent;
+  color: #8c8c8c;
+}
+
+.metricLabel {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.metricLabel:hover {
+  background-color: #f5f5f5;
+}
+
+.metricActive {
+  background-color: #e6f4ff;
+}
+
+.metricActive:hover {
+  background-color: #bae0ff;
+}
+
+/* Status indicators */
+.statusPass {
+  color: var(--theme-success, #52c41a) !important;
+  font-size: 14px;
+}
+
+.statusFail {
+  color: var(--theme-warning, #faad14) !important;
+  font-size: 14px;
+}

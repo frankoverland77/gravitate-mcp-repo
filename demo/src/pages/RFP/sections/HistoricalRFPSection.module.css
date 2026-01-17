@@ -1,0 +1,127 @@
+/* HistoricalRFPSection - Chart styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.viewToggle {
+  align-self: flex-start;
+}
+
+.chartCard {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px 20px;
+  padding-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.controlsRow {
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.legend {
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chartContainer {
+  height: 400px;
+}
+
+.chartContainerLarge {
+  height: 450px;
+}
+
+.pendingMessage {
+  background-color: #fafafa;
+  border: 1px dashed #d9d9d9;
+  border-radius: 4px;
+  padding: 12px 16px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.emptyState {
+  padding: 48px 0;
+}
+
+.tooltip {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+}
+
+/* Series visibility toggles */
+.seriesToggles {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.seriesToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-color: #fafafa;
+  cursor: pointer;
+  font-size: 13px;
+  color: #8c8c8c;
+  transition: all 0.2s ease;
+}
+
+.seriesToggle:hover {
+  border-color: #1890ff;
+  background-color: #f0f5ff;
+}
+
+.seriesToggle.active {
+  border-color: #1890ff;
+  background-color: #ffffff;
+  color: #262626;
+}
+
+.seriesToggle span {
+  white-space: nowrap;
+}
+
+/* Reference line legend */
+.referenceLegend {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  flex-wrap: wrap;
+}
+
+.referenceLine {
+  width: 24px;
+  height: 0;
+  border-top: 2px solid;
+  flex-shrink: 0;
+}
+
+.referenceLine.dashed {
+  border-top-style: dashed;
+}

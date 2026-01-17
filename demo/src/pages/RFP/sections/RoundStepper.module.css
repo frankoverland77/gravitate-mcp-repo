@@ -1,0 +1,70 @@
+/* RoundStepper styles */
+
+.step {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  transition: all 0.2s ease;
+}
+
+.stepCurrent {
+  background-color: var(--theme-color-1, #1890ff);
+  border-color: var(--theme-color-1, #1890ff);
+}
+
+.stepCurrent * {
+  color: #ffffff !important;
+}
+
+.stepCompleted {
+  background-color: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.stepClickable {
+  cursor: pointer;
+}
+
+.stepClickable:hover {
+  border-color: var(--theme-color-1, #1890ff);
+  background-color: #e6f4ff;
+}
+
+.stepIcon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  font-size: 12px;
+}
+
+.stepCurrent .stepIcon {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.stepCompleted .stepIcon {
+  background-color: #52c41a;
+  color: #ffffff;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #8c8c8c;
+}
+
+.stepCurrent .stepDot {
+  background-color: #ffffff;
+}
+
+.connector {
+  width: 32px;
+  height: 2px;
+  background-color: #e8e8e8;
+}

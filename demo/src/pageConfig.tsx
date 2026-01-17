@@ -29,6 +29,7 @@ import { ContractMeasurementDetails } from './pages/ContractMeasurement/Contract
 import { ThemeRouteWrapper } from './components/shared/ThemeRouteWrapper';
 import { BulkChangeTest } from './pages/demos/BulkChangeTest/BulkChangeTest';
 import { SubscriptionManagement } from './pages/SubscriptionManagement/SubscriptionManagement';
+import { RFPManagement } from './pages/RFP';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -273,6 +274,18 @@ const getContractManagementRoutes = (): RouteConfig[] => [
     path: '/ContractFormulas/ContractDetails/:id',
     description: 'Contract details view',
     hidden: true,
+  },
+  {
+    hasPermission: () => true,
+    key: 'RFPManagement',
+    title: 'RFP Management',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <RFPManagement />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/RFPManagement',
+    description: 'Manage RFPs and supplier bidding rounds',
   },
 ];
 

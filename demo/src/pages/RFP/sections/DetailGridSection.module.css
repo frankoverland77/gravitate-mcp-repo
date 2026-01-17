@@ -1,0 +1,22 @@
+/* DetailGridSection styles */
+
+.tableContainer {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.filterIcon {
+  color: #8c8c8c;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.filterIcon:hover {
+  color: #1890ff;
+}
+
+.dimmedColumn {
+  opacity: 0.3;
+}
