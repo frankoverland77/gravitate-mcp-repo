@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
-import { SearchOutlined, SettingOutlined, SwapOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
-import { Select, Input, Popover, Checkbox } from 'antd'
+import { SearchOutlined, SettingOutlined, SwapOutlined, EyeInvisibleOutlined, StopOutlined } from '@ant-design/icons'
+import { Select, Input, Popover, Checkbox, Tooltip } from 'antd'
 import type { SortOption, ThresholdConfig } from '../rfp.types'
 import { SORT_OPTIONS, ALLOCATION_OPTIONS } from '../rfp.types'
 import styles from './ComparisonToolbar.module.css'
@@ -22,8 +22,8 @@ interface ComparisonToolbarProps {
   onOpenThresholds?: () => void
   onAdvanceToNextRound?: () => void // Generic handler for any round
   onAward?: () => void
-  onSendBack?: () => void
   onEditBids?: () => void
+  onOpenEliminationModal?: () => void // New: open elimination modal
   selectedCount?: number
   isViewingHistory?: boolean
 }
@@ -94,8 +94,8 @@ export function ComparisonToolbar({
   onOpenThresholds,
   onAdvanceToNextRound,
   onAward,
-  onSendBack,
   onEditBids,
+  onOpenEliminationModal,
   selectedCount = 0,
   isViewingHistory = false,
 }: ComparisonToolbarProps) {
@@ -103,15 +103,6 @@ export function ComparisonToolbar({
   const penaltyLabel = `≤${thresholds.penaltyMax}¢/gal`
   const ratabilityLabel = `${thresholds.ratabilityMin}-${thresholds.ratabilityMax}%`
   const allocationLabel = ALLOCATION_OPTIONS.find((opt) => opt.value === thresholds.allocationMin)?.label || 'Flexible'
-
-  // Handle send back click
-  const handleSendBack = useCallback(() => {
-    if (onSendBack) {
-      onSendBack()
-    } else {
-      NotificationMessage('Coming Soon', 'Send back functionality will be available in a future release.', false)
-    }
-  }, [onSendBack])
 
   // Handle edit bids click
   const handleEditBids = useCallback(() => {
@@ -123,10 +114,21 @@ export function ComparisonToolbar({
   }, [onEditBids])
 
   // Determine if actions should be disabled
+  // Can eliminate: need at least 1 supplier selected
+  const canEliminate = selectedCount >= 1
   // Can advance: need 2-3 suppliers selected to advance to next round
   const canAdvance = selectedCount >= 2 && selectedCount <= 3
   // Can award: need at least 1 supplier selected
   const canAward = selectedCount >= 1
+
+  // Tooltip for advance button when disabled
+  const advanceTooltip = !canAdvance
+    ? selectedCount === 0
+      ? 'Select 2-3 suppliers to advance to next round'
+      : selectedCount === 1
+        ? 'Select 1-2 more suppliers to advance'
+        : 'Select up to 3 suppliers to advance'
+    : undefined
 
   return (
     <Horizontal justifyContent="space-between" alignItems="center" className={styles.toolbar}>
@@ -188,21 +190,36 @@ export function ComparisonToolbar({
         {/* Actions (only if not viewing history) */}
         {!isViewingHistory && (
           <>
-            <GraviButton buttonText="Send Back" appearance="outlined" onClick={handleSendBack} />
-
             {round >= 2 && (
-              <GraviButton buttonText="Edit Bids" appearance="outlined" onClick={handleEditBids} />
+              <GraviButton buttonText='Edit Bids' appearance='outlined' onClick={handleEditBids} />
             )}
 
-            {/* Advance button - available on all rounds */}
-            <GraviButton
-              buttonText={`Advance to R${round + 1} (${selectedCount})`}
-              theme1
-              onClick={onAdvanceToNextRound}
-              disabled={!canAdvance}
-            />
+            {/* Eliminate button */}
+            <Tooltip title={!canEliminate ? 'Select suppliers to eliminate' : undefined}>
+              <span>
+                <GraviButton
+                  buttonText={`Eliminate (${selectedCount})`}
+                  icon={<StopOutlined />}
+                  appearance='warning'
+                  onClick={onOpenEliminationModal}
+                  disabled={!canEliminate}
+                />
+              </span>
+            </Tooltip>
 
-            <GraviButton buttonText="Award" success onClick={onAward} disabled={!canAward} />
+            {/* Advance button - available on all rounds */}
+            <Tooltip title={advanceTooltip}>
+              <span>
+                <GraviButton
+                  buttonText={`Advance to R${round + 1} (${selectedCount})`}
+                  theme1
+                  onClick={onAdvanceToNextRound}
+                  disabled={!canAdvance}
+                />
+              </span>
+            </Tooltip>
+
+            <GraviButton buttonText='Award' success onClick={onAward} disabled={!canAward} />
           </>
         )}
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Horizontal, Vertical, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import { ArrowUpOutlined, ArrowDownOutlined, ClockCircleOutlined, AimOutlined } from '@ant-design/icons';
-import { BehavioralMetrics } from '../CompetitorAnalysis.data';
+import { BehavioralMetrics } from '../SupplierAnalysis.data';
 
 interface BehavioralProfileCardsProps {
     metrics: BehavioralMetrics;

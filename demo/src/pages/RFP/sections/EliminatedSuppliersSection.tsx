@@ -38,19 +38,28 @@ export function EliminatedSuppliersSection({
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'name',
-      width: '40%',
+      width: '25%',
     },
     {
       title: 'Elimination Price',
       dataIndex: 'priceAtElimination',
       key: 'price',
-      width: '30%',
+      width: '15%',
       render: (price: number) => formatPrice(price),
+    },
+    {
+      title: 'Reason',
+      dataIndex: 'reason',
+      key: 'reason',
+      width: '40%',
+      render: (reason: string) => (
+        <span style={{ color: 'var(--theme-color-2)' }}>{reason || '—'}</span>
+      ),
     },
     {
       title: 'Status',
       key: 'status',
-      width: '30%',
+      width: '20%',
       render: (_: unknown, record: EliminatedSupplierInfo) => (
         <span className={styles.statusBadge}>Eliminated R{record.eliminatedInRound}</span>
       ),

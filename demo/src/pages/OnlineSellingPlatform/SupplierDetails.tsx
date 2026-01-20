@@ -4,7 +4,7 @@ import { AimOutlined, ArrowUpOutlined, ArrowDownOutlined, ClockCircleOutlined, L
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ResponsiveScatterPlot, ScatterPlotTooltipProps } from '@nivo/scatterplot';
 import { ResponsiveLine, PointTooltipProps } from '@nivo/line';
-import { getBehavioralMetrics, getCompetitorChartDataByPeriod, TimePeriod } from './CompetitorAnalysis.data';
+import { getBehavioralMetrics, getSupplierChartDataByPeriod, TimePeriod } from './SupplierAnalysis.data';
 
 // ============================================
 // CUSTOM TOOLTIPS
@@ -25,7 +25,7 @@ const PriceChangeTooltip = ({ node }: ScatterPlotTooltipProps<{ x: number; y: nu
             {node.data.x >= 0 ? 'Up Market' : 'Down Market'}
         </div>
         <div>Market Change: <strong>${node.data.x.toFixed(3)}</strong></div>
-        <div>Competitor Change: <strong>${node.data.y.toFixed(3)}</strong></div>
+        <div>Supplier Change: <strong>${node.data.y.toFixed(3)}</strong></div>
     </div>
 );
 
@@ -57,9 +57,9 @@ const cardStyle = {
 };
 
 // Default fallback data when accessed directly (no state)
-const DEFAULT_COMPETITOR = {
+const DEFAULT_SUPPLIER = {
     id: 1,
-    competitor: 'ExxonMobil',
+    supplier: 'ExxonMobil',
     product: '#2 ULSD',
     location: 'Houston TX'
 };
@@ -67,21 +67,21 @@ const DEFAULT_COMPETITOR = {
 // ============================================
 // COMPONENT
 // ============================================
-export function CompetitorDetails() {
+export function SupplierDetails() {
     const navigate = useNavigate();
     const location = useLocation();
     const [period, setPeriod] = useState<TimePeriod>('365');
 
-    // Get competitor from navigation state, or use default
-    const competitorData = location.state?.competitor || DEFAULT_COMPETITOR;
-    const competitorId = competitorData.id || 1;
+    // Get supplier from navigation state, or use default
+    const supplierData = location.state?.supplier || DEFAULT_SUPPLIER;
+    const supplierId = supplierData.id || 1;
 
-    // Get behavioral metrics and chart data based on competitor ID and period
-    const metrics = getBehavioralMetrics(competitorId);
-    const chartData = getCompetitorChartDataByPeriod(competitorId, period);
+    // Get behavioral metrics and chart data based on supplier ID and period
+    const metrics = getBehavioralMetrics(supplierId);
+    const chartData = getSupplierChartDataByPeriod(supplierId, period);
 
     const handleBackClick = () => {
-        navigate('/CompetitorAnalysis/CompetitorProfileAnalysis');
+        navigate('/SupplierAnalysis/SupplierProfileAnalysis');
     };
 
     // Button style helper
@@ -101,12 +101,12 @@ export function CompetitorDetails() {
                 onClick={handleBackClick}
             >
                 <LeftOutlined style={{ fontSize: '12px' }} />
-                <Texto category="p2" style={{ color: '#1890ff' }}>Back to Competitor Price Analysis</Texto>
+                <Texto category="p2" style={{ color: '#1890ff' }}>Back to Supplier Price Analysis</Texto>
             </Horizontal>
 
             {/* Title */}
             <Texto category="h3" weight="600">
-                Market Movement Analysis - {competitorData.competitor} - {competitorData.product} - {competitorData.location}
+                Market Movement Analysis - {supplierData.supplier} - {supplierData.product} - {supplierData.location}
             </Texto>
 
             {/* Section Label */}
@@ -226,7 +226,7 @@ export function CompetitorDetails() {
                                 axisLeft={{
                                     tickSize: 5,
                                     tickPadding: 5,
-                                    legend: 'Competitor Price Change ($/gal)',
+                                    legend: 'Supplier Price Change ($/gal)',
                                     legendPosition: 'middle',
                                     legendOffset: -60,
                                     format: (v) => `$${v.toFixed(2)}`

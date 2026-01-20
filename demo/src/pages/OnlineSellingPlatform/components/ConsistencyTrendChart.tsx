@@ -1,7 +1,7 @@
 import React from 'react';
 import { ResponsiveLine } from '@nivo/line';
 import { Vertical, Texto } from '@gravitate-js/excalibrr';
-import { ConsistencySeriesData } from '../CompetitorAnalysis.data';
+import { ConsistencySeriesData } from '../SupplierAnalysis.data';
 
 interface ConsistencyTrendChartProps {
     data: ConsistencySeriesData[];

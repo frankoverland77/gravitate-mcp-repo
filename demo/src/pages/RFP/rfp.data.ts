@@ -15,6 +15,7 @@ import type {
   TerminalHistoryData,
   TerminalHistoryDataPoint,
   TerminalHistoryPeriod,
+  ProductGroupMetrics,
 } from './rfp.types'
 
 // 4 Sample RFPs per spec
@@ -76,6 +77,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 80000,
       ratabilityStatus: 'pass',
       allocation: 'flexible',
+      allocationPeriod: 'daily',
       allocationStatus: 'pass',
       penalties: 0.02,
       penaltiesStatus: 'pass',
@@ -94,6 +96,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 75000,
       ratabilityStatus: 'pass',
       allocation: 'strict',
+      allocationPeriod: 'quarterly',
       allocationStatus: 'fail',
       penalties: 0.03,
       penaltiesStatus: 'pass',
@@ -112,6 +115,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 85000,
       ratabilityStatus: 'pass',
       allocation: 'flexible',
+      allocationPeriod: 'weekly',
       allocationStatus: 'pass',
       penalties: 0.02,
       penaltiesStatus: 'pass',
@@ -130,6 +134,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 90000,
       ratabilityStatus: 'fail',
       allocation: 'moderate',
+      allocationPeriod: 'monthly',
       allocationStatus: 'pass',
       penalties: 0.04,
       penaltiesStatus: 'fail',
@@ -148,6 +153,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 70000,
       ratabilityStatus: 'pass',
       allocation: 'flexible',
+      allocationPeriod: 'daily',
       allocationStatus: 'pass',
       penalties: 0.03,
       penaltiesStatus: 'pass',
@@ -166,6 +172,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 85000,
       ratabilityStatus: 'pass',
       allocation: 'strict',
+      allocationPeriod: 'quarterly',
       allocationStatus: 'fail',
       penalties: 0.05,
       penaltiesStatus: 'fail',
@@ -184,6 +191,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 80000,
       ratabilityStatus: 'pass',
       allocation: 'moderate',
+      allocationPeriod: 'tri-weekly',
       allocationStatus: 'pass',
       penalties: 0.02,
       penaltiesStatus: 'pass',
@@ -202,6 +210,7 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       ratability: 75000,
       ratabilityStatus: 'pass',
       allocation: 'flexible',
+      allocationPeriod: 'weekly',
       allocationStatus: 'pass',
       penalties: 0.04,
       penaltiesStatus: 'fail',
@@ -700,3 +709,83 @@ export function getTerminalHistoryByPeriod(period: TerminalHistoryPeriod): Termi
 
 // Default terminal history data (12 months)
 export const TERMINAL_HISTORY_DATA: TerminalHistoryData = getTerminalHistoryByPeriod('12mo')
+
+/**
+ * Per-product average prices (each product averaged across all locations)
+ */
+export interface PerProductAverages {
+  [productName: string]: {
+    [supplierId: string]: number
+  }
+}
+
+/**
+ * Calculate average prices per individual product per supplier
+ *
+ * Returns the average price for each specific product (across all locations) per supplier.
+ * Products: 87 Octane, 93 Octane, Diesel
+ *
+ * @param details - DetailRow array with supplier values
+ * @param supplierIds - Array of supplier IDs to calculate for
+ * @returns PerProductAverages with per-product averages per supplier
+ */
+export function calculatePerProductAverages(details: DetailRow[], supplierIds: string[]): PerProductAverages {
+  // Get unique products from details
+  const products = Array.from(new Set(details.map((d) => d.product)))
+
+  const result: PerProductAverages = {}
+
+  products.forEach((product) => {
+    result[product] = {}
+    const productRows = details.filter((d) => d.product === product)
+
+    supplierIds.forEach((supplierId) => {
+      const values = productRows.map((row) => row.supplierValues[supplierId]).filter((v) => v !== undefined)
+
+      if (values.length > 0) {
+        result[product][supplierId] = Number((values.reduce((a, b) => a + b, 0) / values.length).toFixed(2))
+      }
+    })
+  })
+
+  return result
+}
+
+/**
+ * Calculate average prices by product group (gasoline vs diesel) per supplier
+ *
+ * Product groups:
+ * - Gasoline: 87 Octane + 93 Octane (averaged across all locations)
+ * - Diesel: Diesel (averaged across all locations)
+ *
+ * @param details - DetailRow array with supplier values
+ * @param supplierIds - Array of supplier IDs to calculate for
+ * @returns ProductGroupMetrics with gasoline and diesel averages per supplier
+ */
+export function calculateProductGroupAverages(details: DetailRow[], supplierIds: string[]): ProductGroupMetrics {
+  const result: ProductGroupMetrics = {
+    gasoline: {},
+    diesel: {},
+  }
+
+  // Group details by product type
+  const gasolineRows = details.filter((d) => d.product === '87 Octane' || d.product === '93 Octane')
+  const dieselRows = details.filter((d) => d.product === 'Diesel')
+
+  // Calculate average for each supplier
+  supplierIds.forEach((supplierId) => {
+    // Gasoline average (all 87 + 93 octane rows across locations)
+    const gasolineValues = gasolineRows.map((row) => row.supplierValues[supplierId]).filter((v) => v !== undefined)
+    if (gasolineValues.length > 0) {
+      result.gasoline[supplierId] = Number((gasolineValues.reduce((a, b) => a + b, 0) / gasolineValues.length).toFixed(2))
+    }
+
+    // Diesel average (all diesel rows across locations)
+    const dieselValues = dieselRows.map((row) => row.supplierValues[supplierId]).filter((v) => v !== undefined)
+    if (dieselValues.length > 0) {
+      result.diesel[supplierId] = Number((dieselValues.reduce((a, b) => a + b, 0) / dieselValues.length).toFixed(2))
+    }
+  })
+
+  return result
+}

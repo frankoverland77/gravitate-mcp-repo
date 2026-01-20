@@ -5,7 +5,7 @@
 export interface PriceChangeDataPoint {
     id: string;
     x: number; // Market change
-    y: number; // Competitor change
+    y: number; // Supplier change
 }
 
 export interface CaptureRateDataPoint {
@@ -35,7 +35,7 @@ export interface BehavioralMetrics {
 }
 
 /**
- * Generate price change correlation data showing how competitor responds to market movements
+ * Generate price change correlation data showing how supplier responds to market movements
  */
 export function generatePriceChangeCorrelationData(
     upCapture: number = 90.2,
@@ -51,14 +51,14 @@ export function generatePriceChangeCorrelationData(
         // Determine if up or down market
         const captureRate = marketChange > 0 ? upCapture / 100 : downCapture / 100;
 
-        // Calculate competitor response with some noise
+        // Calculate supplier response with some noise
         const noise = (Math.random() - 0.5) * 0.03; // ±3 cents noise
-        const competitorChange = marketChange * captureRate + noise;
+        const supplierChange = marketChange * captureRate + noise;
 
         data.push({
             id: `point-${i}`,
             x: parseFloat(marketChange.toFixed(4)),
-            y: parseFloat(competitorChange.toFixed(4))
+            y: parseFloat(supplierChange.toFixed(4))
         });
     }
 
@@ -172,9 +172,9 @@ export function generateConsistencyData(
 }
 
 /**
- * Get behavioral metrics for a competitor
+ * Get behavioral metrics for a supplier
  */
-export function getBehavioralMetrics(competitorId: number): BehavioralMetrics {
+export function getBehavioralMetrics(supplierId: number): BehavioralMetrics {
     // Sample data - in real app would come from API
     const metricsMap: Record<number, BehavioralMetrics> = {
         1: {
@@ -269,19 +269,19 @@ export function getBehavioralMetrics(competitorId: number): BehavioralMetrics {
         }
     };
 
-    return metricsMap[competitorId] || metricsMap[1];
+    return metricsMap[supplierId] || metricsMap[1];
 }
 
 /**
- * Chart data for each competitor - pre-generated scatter and line data
+ * Chart data for each supplier - pre-generated scatter and line data
  */
-export interface CompetitorChartData {
+export interface SupplierChartData {
     scatterData1: { id: string; data: { x: number; y: number }[] }[];
     scatterData2: { id: string; data: { x: number; y: number }[] }[];
     lineData: { id: string; color: string; data: { x: string; y: number }[] }[];
 }
 
-// Pre-generated scatter data for Price Change vs Market (unique per competitor)
+// Pre-generated scatter data for Price Change vs Market (unique per supplier)
 const SCATTER_DATA_BY_ID: Record<number, { id: string; data: { x: number; y: number }[] }[]> = {
     1: [{ id: 'correlation', data: [
         { x: -0.20, y: -0.19 }, { x: -0.15, y: -0.14 }, { x: -0.10, y: -0.10 },
@@ -546,13 +546,13 @@ const LINE_DATA_BY_ID: Record<number, { id: string; color: string; data: { x: st
 };
 
 /**
- * Get all chart data for a competitor (legacy - use getCompetitorChartDataByPeriod for new implementations)
+ * Get all chart data for a supplier (legacy - use getSupplierChartDataByPeriod for new implementations)
  */
-export function getCompetitorChartData(competitorId: number): CompetitorChartData {
+export function getSupplierChartData(supplierId: number): SupplierChartData {
     return {
-        scatterData1: SCATTER_DATA_BY_ID[competitorId] || SCATTER_DATA_BY_ID[1],
-        scatterData2: CAPTURE_RATE_DATA_BY_ID[competitorId] || CAPTURE_RATE_DATA_BY_ID[1],
-        lineData: LINE_DATA_BY_ID[competitorId] || LINE_DATA_BY_ID[1]
+        scatterData1: SCATTER_DATA_BY_ID[supplierId] || SCATTER_DATA_BY_ID[1],
+        scatterData2: CAPTURE_RATE_DATA_BY_ID[supplierId] || CAPTURE_RATE_DATA_BY_ID[1],
+        lineData: LINE_DATA_BY_ID[supplierId] || LINE_DATA_BY_ID[1]
     };
 }
 
@@ -578,7 +578,7 @@ export interface ChartDataByPeriod {
  * More data points for longer time periods
  */
 function generatePriceChangeByPeriod(
-    competitorId: number,
+    supplierId: number,
     period: TimePeriod,
     upCapture: number,
     downCapture: number
@@ -587,8 +587,8 @@ function generatePriceChangeByPeriod(
     const pointCounts: Record<TimePeriod, number> = { '30': 30, '90': 60, '365': 120 };
     const numPoints = pointCounts[period];
 
-    // Use competitorId as seed for consistent random-looking data
-    const seed = competitorId * 1000 + parseInt(period);
+    // Use supplierId as seed for consistent random-looking data
+    const seed = supplierId * 1000 + parseInt(period);
     const seededRandom = (i: number) => {
         const x = Math.sin(seed + i * 9999) * 10000;
         return x - Math.floor(x);
@@ -601,11 +601,11 @@ function generatePriceChangeByPeriod(
         const marketChange = (seededRandom(i) - 0.5) * 0.5; // -0.25 to +0.25
         const captureRate = marketChange > 0 ? upCapture / 100 : downCapture / 100;
         const noise = (seededRandom(i + 1000) - 0.5) * 0.04;
-        const competitorChange = marketChange * captureRate + noise;
+        const supplierChange = marketChange * captureRate + noise;
 
         const point = {
             x: parseFloat(marketChange.toFixed(3)),
-            y: parseFloat(competitorChange.toFixed(3))
+            y: parseFloat(supplierChange.toFixed(3))
         };
 
         if (marketChange >= 0) {
@@ -625,14 +625,14 @@ function generatePriceChangeByPeriod(
  * Generate capture rate data with more points for longer periods
  */
 function generateCaptureRateByPeriod(
-    competitorId: number,
+    supplierId: number,
     period: TimePeriod,
     avgCapture: number
 ): { id: string; data: { x: number; y: number }[] }[] {
     const pointCounts: Record<TimePeriod, number> = { '30': 15, '90': 25, '365': 40 };
     const numPoints = pointCounts[period];
 
-    const seed = competitorId * 2000 + parseInt(period);
+    const seed = supplierId * 2000 + parseInt(period);
     const seededRandom = (i: number) => {
         const x = Math.sin(seed + i * 9999) * 10000;
         return x - Math.floor(x);
@@ -659,13 +659,13 @@ function generateCaptureRateByPeriod(
  * Samples data points to keep charts readable
  */
 function generateConsistencyByPeriod(
-    competitorId: number,
+    supplierId: number,
     period: TimePeriod,
     avgCapture: number
 ): { id: string; color: string; data: { x: string; y: number }[] }[] {
     const days = parseInt(period);
 
-    const seed = competitorId * 3000 + days;
+    const seed = supplierId * 3000 + days;
     const seededRandom = (i: number) => {
         const x = Math.sin(seed + i * 9999) * 10000;
         return x - Math.floor(x);
@@ -724,24 +724,24 @@ function generateConsistencyByPeriod(
 }
 
 /**
- * Get chart data for a competitor by time period
+ * Get chart data for a supplier by time period
  * This is the main function to use for time-period aware charts
  */
-export function getCompetitorChartDataByPeriod(
-    competitorId: number,
+export function getSupplierChartDataByPeriod(
+    supplierId: number,
     period: TimePeriod
 ): ChartDataByPeriod {
-    const metrics = getBehavioralMetrics(competitorId);
+    const metrics = getBehavioralMetrics(supplierId);
     const avgCapture = (metrics.upMarketCapture + metrics.downMarketCapture) / 2;
 
     return {
         priceChange: generatePriceChangeByPeriod(
-            competitorId,
+            supplierId,
             period,
             metrics.upMarketCapture,
             metrics.downMarketCapture
         ),
-        captureRate: generateCaptureRateByPeriod(competitorId, period, avgCapture),
-        consistency: generateConsistencyByPeriod(competitorId, period, avgCapture)
+        captureRate: generateCaptureRateByPeriod(supplierId, period, avgCapture),
+        consistency: generateConsistencyByPeriod(supplierId, period, avgCapture)
     };
 }

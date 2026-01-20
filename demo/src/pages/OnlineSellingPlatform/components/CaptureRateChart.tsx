@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ResponsiveScatterPlot } from '@nivo/scatterplot';
 import { Vertical, Texto } from '@gravitate-js/excalibrr';
-import { CaptureRateDataPoint } from '../CompetitorAnalysis.data';
+import { CaptureRateDataPoint } from '../SupplierAnalysis.data';
 
 interface CaptureRateChartProps {
     data: CaptureRateDataPoint[];

@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { GraviGrid, GraviButton, Vertical, BBDTag } from '@gravitate-js/excalibrr';
 import { RightOutlined, FilterOutlined, DownloadOutlined } from '@ant-design/icons';
 
-export function CompetitorAnalysis() {
+export function SupplierAnalysis() {
     const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
 
-    // Realistic competitor data
+    // Realistic supplier data
     const rowData = useMemo(() => [
         {
             id: 1,
-            competitor: 'ExxonMobil',
+            supplier: 'ExxonMobil',
             location: 'Houston TX',
             locationGroup: 'Gulf Coast',
             product: '#2 ULSD',
@@ -23,7 +23,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 2,
-            competitor: 'Valero',
+            supplier: 'Valero',
             location: 'Houston TX',
             locationGroup: 'Gulf Coast',
             product: 'Premium Gas',
@@ -35,7 +35,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 3,
-            competitor: 'Marathon',
+            supplier: 'Marathon',
             location: 'Des Moines IA',
             locationGroup: 'Midwest',
             product: 'Regular Gas',
@@ -47,7 +47,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 4,
-            competitor: 'Shell',
+            supplier: 'Shell',
             location: 'Chicago IL',
             locationGroup: 'Midwest',
             product: 'ULSD-0037',
@@ -59,7 +59,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 5,
-            competitor: 'Chevron',
+            supplier: 'Chevron',
             location: 'Denver CO',
             locationGroup: 'Mountain',
             product: 'Premium Gas',
@@ -71,7 +71,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 6,
-            competitor: 'BP America',
+            supplier: 'BP America',
             location: 'Cincinnati OH',
             locationGroup: 'East Coast',
             product: 'Regular Gas',
@@ -83,7 +83,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 7,
-            competitor: 'Phillips 66',
+            supplier: 'Phillips 66',
             location: 'Houston TX',
             locationGroup: 'Gulf Coast',
             product: '#2 ULSD',
@@ -95,7 +95,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 8,
-            competitor: 'Citgo',
+            supplier: 'Citgo',
             location: 'Chicago IL',
             locationGroup: 'Midwest',
             product: 'Regular Gas',
@@ -107,7 +107,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 9,
-            competitor: 'Sunoco',
+            supplier: 'Sunoco',
             location: 'Denver CO',
             locationGroup: 'Mountain',
             product: 'Premium Gas',
@@ -119,7 +119,7 @@ export function CompetitorAnalysis() {
         },
         {
             id: 10,
-            competitor: 'ConocoPhillips',
+            supplier: 'ConocoPhillips',
             location: 'Des Moines IA',
             locationGroup: 'Midwest',
             product: 'ULSD-0037',
@@ -133,8 +133,8 @@ export function CompetitorAnalysis() {
 
     const columnDefs = useMemo(() => [
         {
-            field: 'competitor',
-            headerName: 'COMPETITOR',
+            field: 'supplier',
+            headerName: 'SUPPLIER',
             width: 180,
             sortable: true,
             filter: true
@@ -240,8 +240,8 @@ export function CompetitorAnalysis() {
                             gap: '4px'
                         }}
                         onClick={() => {
-                            navigate('/CompetitorAnalysis/CompetitorDetails', {
-                                state: { competitor: params.data }
+                            navigate('/SupplierAnalysis/SupplierDetails', {
+                                state: { supplier: params.data }
                             });
                         }}
                     >
@@ -256,7 +256,7 @@ export function CompetitorAnalysis() {
     return (
         <Vertical style={{ height: '100%', gap: 0 }}>
             <GraviGrid
-                storageKey="competitor-analysis-grid"
+                storageKey="supplier-analysis-grid"
                 rowData={rowData}
                 columnDefs={columnDefs}
                 agPropOverrides={{
@@ -267,8 +267,8 @@ export function CompetitorAnalysis() {
                     rowGroupPanelShow: 'never'
                 }}
                 controlBarProps={{
-                    title: 'Competitor Price Analysis',
-                    subtitle: `${rowData.length} Competitors`,
+                    title: 'Supplier Price Analysis',
+                    subtitle: `${rowData.length} Suppliers`,
                     hideActiveFilters: true,
                     hideFilterRow: true,
                     actionButtons: (

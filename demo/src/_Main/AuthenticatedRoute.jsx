@@ -22,7 +22,7 @@ export function AuthenticatedRoute() {
     ContractFormulas: true,
     OnlineSellingPlatform: true,
     MarketPlatform: true,
-    CompetitorAnalysis: true,
+    SupplierAnalysis: true,
     GlobalTieredPricing: true,
     ContractMeasurement: true,
     SubscriptionManagement: true,

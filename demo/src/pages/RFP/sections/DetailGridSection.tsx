@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useMemo, useCallback } from 'react'
 import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { FilterOutlined } from '@ant-design/icons'
 import { Table, Select, Checkbox, Popover } from 'antd'
@@ -14,7 +14,11 @@ interface DetailGridSectionProps {
   pinnedSuppliers: Set<string>
   currentMetric: DetailMetric
   searchQuery?: string
+  selectedProducts: Set<string>
+  selectedLocations: Set<string>
   onMetricChange: (metric: DetailMetric) => void
+  onToggleProduct: (product: string) => void
+  onToggleLocation: (location: string) => void
 }
 
 // Filter dropdown content
@@ -53,41 +57,13 @@ export function DetailGridSection({
   pinnedSuppliers,
   currentMetric,
   searchQuery = '',
+  selectedProducts,
+  selectedLocations,
   onMetricChange,
+  onToggleProduct,
+  onToggleLocation,
 }: DetailGridSectionProps) {
-  // Filter state
-  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set(PRODUCT_OPTIONS))
-  const [selectedLocations, setSelectedLocations] = useState<Set<string>>(new Set(LOCATION_OPTIONS))
-
-  // Toggle product filter
-  const toggleProduct = useCallback((product: string) => {
-    setSelectedProducts((prev) => {
-      const next = new Set(prev)
-      if (next.has(product)) {
-        // Don't allow deselecting all
-        if (next.size > 1) next.delete(product)
-      } else {
-        next.add(product)
-      }
-      return next
-    })
-  }, [])
-
-  // Toggle location filter
-  const toggleLocation = useCallback((location: string) => {
-    setSelectedLocations((prev) => {
-      const next = new Set(prev)
-      if (next.has(location)) {
-        // Don't allow deselecting all
-        if (next.size > 1) next.delete(location)
-      } else {
-        next.add(location)
-      }
-      return next
-    })
-  }, [])
-
-  // Filter detail rows
+  // Filter detail rows (using props from parent)
   const filteredDetails = useMemo(() => {
     return SAMPLE_DETAILS.filter(
       (detail) => selectedProducts.has(detail.product) && selectedLocations.has(detail.location)
@@ -128,7 +104,7 @@ export function DetailGridSection({
                 <FilterDropdown
                   options={PRODUCT_OPTIONS}
                   selected={selectedProducts}
-                  onToggle={toggleProduct}
+                  onToggle={onToggleProduct}
                 />
               }
               trigger="click"
@@ -152,7 +128,7 @@ export function DetailGridSection({
                 <FilterDropdown
                   options={LOCATION_OPTIONS}
                   selected={selectedLocations}
-                  onToggle={toggleLocation}
+                  onToggle={onToggleLocation}
                 />
               }
               trigger="click"
@@ -187,7 +163,7 @@ export function DetailGridSection({
     })
 
     return cols
-  }, [sortedSuppliers, selectedProducts, selectedLocations, currentMetric, isDimmed, toggleProduct, toggleLocation])
+  }, [sortedSuppliers, selectedProducts, selectedLocations, currentMetric, isDimmed, onToggleProduct, onToggleLocation])
 
   // Filter status text
   const filterStatus = useMemo(() => {

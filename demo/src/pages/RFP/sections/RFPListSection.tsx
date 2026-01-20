@@ -61,17 +61,20 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
     return <Texto>${value.toFixed(2)}/gal</Texto>
   }, [])
 
-  // Action button cell renderer
+  // Action button cell renderer - now shows for all statuses
   const actionRenderer = useCallback(
     (params: ICellRendererParams<RFP>) => {
       const rfp = params.data
-      if (!rfp || rfp.status === 'draft' || rfp.status === 'awarded') {
-        return null
+      if (!rfp) return null
+      // Show View button for active RFPs (round1, round2)
+      // For draft/awarded, no click action but still render a placeholder for consistency
+      if (rfp.status === 'draft' || rfp.status === 'awarded') {
+        return <Texto appearance='medium'>—</Texto>
       }
       return (
         <GraviButton
-          type="link"
-          buttonText="View"
+          type='link'
+          buttonText='View'
           icon={<RightOutlined />}
           onClick={() => onRFPClick(rfp)}
           style={{ padding: 0 }}

@@ -21,8 +21,8 @@ import { FormulaTemplateDetails } from './pages/demos/grids/FormulaTemplateDetai
 import { ContractDetails } from './pages/demos/grids/ContractDetails';
 import { OnlineSellingPlatformHome } from './pages/OnlineSellingPlatform/OnlineSellingPlatformHome';
 import { IndexOfferManagement } from './pages/OnlineSellingPlatform/IndexOfferManagement';
-import { CompetitorAnalysis } from './pages/OnlineSellingPlatform/CompetitorAnalysis';
-import { CompetitorDetails } from './pages/OnlineSellingPlatform/CompetitorDetails';
+import { SupplierAnalysis } from './pages/OnlineSellingPlatform/SupplierAnalysis';
+import { SupplierDetails } from './pages/OnlineSellingPlatform/SupplierDetails';
 import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
 import { ContractMeasurementGrid } from './pages/ContractMeasurement/ContractMeasurementGrid';
 import { ContractMeasurementDetails } from './pages/ContractMeasurement/ContractMeasurementDetails';
@@ -169,28 +169,28 @@ export const demoRegistry: DemoRoute[] = [
     category: 'contract-management',
   },
   {
-    key: 'CompetitorAnalysis',
-    title: 'Competitor Price Analysis',
+    key: 'SupplierAnalysis',
+    title: 'Supplier Price Analysis',
     element: (
       <ThemeRouteWrapper theme="OSP">
-        <CompetitorAnalysis />
+        <SupplierAnalysis />
       </ThemeRouteWrapper>
     ),
-    path: '/CompetitorAnalysis/CompetitorAnalysis',
-    description: 'Analyze competitor profiles and pricing strategies',
+    path: '/SupplierAnalysis/SupplierAnalysis',
+    description: 'Analyze supplier profiles and pricing strategies',
     created: new Date().toISOString(),
     category: 'grids',
   },
   {
-    key: 'CompetitorDetails',
-    title: 'Competitor Details',
+    key: 'SupplierDetails',
+    title: 'Supplier Details',
     element: (
       <ThemeRouteWrapper theme="OSP">
-        <CompetitorDetails />
+        <SupplierDetails />
       </ThemeRouteWrapper>
     ),
-    path: '/CompetitorAnalysis/CompetitorDetails',
-    description: 'Detailed competitor analysis',
+    path: '/SupplierAnalysis/SupplierDetails',
+    description: 'Detailed supplier analysis',
     created: new Date().toISOString(),
     category: 'grids',
   },
@@ -289,31 +289,31 @@ const getContractManagementRoutes = (): RouteConfig[] => [
   },
 ];
 
-// Competitor Analysis routes configuration
-const getCompetitorAnalysisRoutes = (): RouteConfig[] => [
+// Supplier Analysis routes configuration
+const getSupplierAnalysisRoutes = (): RouteConfig[] => [
   {
     hasPermission: () => true,
-    key: 'CompetitorProfileAnalysis',
-    title: 'Competitor Price Analysis',
+    key: 'SupplierProfileAnalysis',
+    title: 'Supplier Price Analysis',
     element: (
       <ThemeRouteWrapper theme="OSP">
-        <CompetitorAnalysis />
+        <SupplierAnalysis />
       </ThemeRouteWrapper>
     ),
-    path: '/CompetitorAnalysis/CompetitorAnalysis',
-    description: 'Analyze competitor profiles and pricing strategies',
+    path: '/SupplierAnalysis/SupplierAnalysis',
+    description: 'Analyze supplier profiles and pricing strategies',
   },
   {
     hasPermission: () => true,
-    key: 'CompetitorDetails',
-    title: 'Competitor Details',
+    key: 'SupplierDetails',
+    title: 'Supplier Details',
     element: (
       <ThemeRouteWrapper theme="OSP">
-        <CompetitorDetails />
+        <SupplierDetails />
       </ThemeRouteWrapper>
     ),
-    path: '/CompetitorAnalysis/CompetitorDetails',
-    description: 'Detailed competitor analysis',
+    path: '/SupplierAnalysis/SupplierDetails',
+    description: 'Detailed supplier analysis',
     hidden: true,
   },
 ];
@@ -409,12 +409,12 @@ export const createPageConfig = (): PageConfig => {
     ],
   };
 
-  config.CompetitorAnalysis = {
+  config.SupplierAnalysis = {
     hasPermission: () => true,
-    key: 'CompetitorAnalysis',
+    key: 'SupplierAnalysis',
     icon: <DashboardOutlined />,
-    title: 'Competitor Analysis',
-    routes: getCompetitorAnalysisRoutes(),
+    title: 'Supplier Analysis',
+    routes: getSupplierAnalysisRoutes(),
   };
 
   config.GlobalTieredPricing = {

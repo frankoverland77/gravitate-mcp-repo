@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ResponsiveScatterPlot } from '@nivo/scatterplot';
 import { Vertical, Texto, Horizontal, BBDTag } from '@gravitate-js/excalibrr';
-import { PriceChangeDataPoint, calculateTrendLine } from '../CompetitorAnalysis.data';
+import { PriceChangeDataPoint, calculateTrendLine } from '../SupplierAnalysis.data';
 
 interface PriceChangeCorrelationChartProps {
     data: PriceChangeDataPoint[];

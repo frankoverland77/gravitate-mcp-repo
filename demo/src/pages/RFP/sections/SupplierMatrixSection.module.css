@@ -134,3 +134,83 @@
   color: var(--theme-warning, #faad14) !important;
   font-size: 14px;
 }
+
+/* Issues cell clickable indicator */
+.issuesClickable {
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.issuesClickable:hover {
+  background-color: rgba(250, 173, 20, 0.08);
+}
+
+/* Expand icon for collapsible rows */
+.expandIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #8c8c8c;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.expandIcon:hover {
+  background-color: #f5f5f5;
+  color: #1890ff;
+}
+
+/* Child rows (expanded sub-rows) */
+.childRow {
+  background-color: #fafafa !important;
+}
+
+.childRow td {
+  padding-left: 24px !important;
+  font-size: 12px;
+}
+
+.childRow td:first-child {
+  padding-left: 32px !important;
+}
+
+/* Drag handle */
+.dragHandle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: grab;
+  color: #bfbfbf;
+  transition: all 0.2s ease;
+}
+
+.dragHandle:hover {
+  background-color: #f0f0f0;
+  color: #595959;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+/* Supplier header drag states */
+.supplierHeaderDragging {
+  opacity: 0.5;
+  background-color: #e6f4ff !important;
+}
+
+.supplierHeaderDragOver {
+  border-left: 3px solid #1890ff !important;
+  background-color: rgba(24, 144, 255, 0.04) !important;
+}

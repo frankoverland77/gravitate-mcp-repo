@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Vertical, Texto, GraviButton, Horizontal, NotificationMessage } from '@gravitate-js/excalibrr'
 import { LeftOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { Tabs, Alert } from 'antd'
@@ -13,9 +13,9 @@ import type {
   EliminatedSupplierInfo,
 } from './rfp.types'
 import styles from './RFPTab.module.css'
-import { DEFAULT_THRESHOLDS, DEFAULT_PARAMETERS } from './rfp.types'
-import { ThresholdsModal } from './components/ThresholdsModal'
-import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA } from './rfp.data'
+import { DEFAULT_THRESHOLDS, DEFAULT_PARAMETERS, PRODUCT_OPTIONS, LOCATION_OPTIONS } from './rfp.types'
+import { ThresholdsModal, EliminationModal } from './components'
+import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS } from './rfp.data'
 import {
   RFPListSection,
   RoundStepper,
@@ -37,6 +37,7 @@ interface RFPTabState {
   currentScreen: RFPScreen
   selectedRFP: RFP | null
   currentRound: number // Now supports any round number
+  viewingRound: number // Which round we're viewing (when in history mode)
   isViewingHistory: boolean
   selectedSuppliers: Set<string>
   hiddenSuppliers: Set<string>
@@ -53,12 +54,20 @@ interface RFPTabState {
   // Multi-round support
   eliminatedSuppliers: Map<number, EliminatedSupplierInfo[]> // round -> eliminated suppliers
   activeSupplierIds: Set<string> // suppliers still in the running
+  // Elimination modal
+  isEliminationModalOpen: boolean
+  // Column reorder support
+  supplierColumnOrder: string[] | null // Custom column order (supplier IDs, excluding incumbent)
+  // Detail grid filters (lifted from DetailGridSection for summary grid sync)
+  selectedProducts: Set<string>
+  selectedLocations: Set<string>
 }
 
 const initialState: RFPTabState = {
   currentScreen: 'list',
   selectedRFP: null,
   currentRound: 1,
+  viewingRound: 1,
   isViewingHistory: false,
   selectedSuppliers: new Set(),
   hiddenSuppliers: new Set(),
@@ -75,17 +84,40 @@ const initialState: RFPTabState = {
   // Multi-round support
   eliminatedSuppliers: new Map(),
   activeSupplierIds: new Set(SAMPLE_SUPPLIERS.map((s) => s.id)),
+  // Elimination modal
+  isEliminationModalOpen: false,
+  // Column reorder support
+  supplierColumnOrder: null,
+  // Detail grid filters
+  selectedProducts: new Set(PRODUCT_OPTIONS),
+  selectedLocations: new Set(LOCATION_OPTIONS),
 }
 
 export function RFPTab() {
   const [state, setState] = useState<RFPTabState>(initialState)
 
   // Get sorted suppliers for current view (filtered by active suppliers)
+  // When viewing history, show suppliers that were present in that round
   const getSortedSuppliers = useCallback((): Supplier[] => {
-    // Filter to only active (non-eliminated) suppliers
+    if (state.isViewingHistory) {
+      // For historical view: show suppliers that were in that round (before elimination)
+      // Start with all suppliers, then remove those eliminated before the viewing round
+      const suppliersInRound = SAMPLE_SUPPLIERS.filter((s) => {
+        // Check if supplier was eliminated before this round
+        for (let round = 1; round < state.viewingRound; round++) {
+          const eliminatedInRound = state.eliminatedSuppliers.get(round) || []
+          if (eliminatedInRound.some((e) => e.supplierId === s.id)) {
+            return false // Was eliminated before viewing round
+          }
+        }
+        return true
+      })
+      return sortSuppliers(suppliersInRound, state.sortOrder)
+    }
+    // For current view: only active (non-eliminated) suppliers
     const activeSuppliers = SAMPLE_SUPPLIERS.filter((s) => state.activeSupplierIds.has(s.id))
     return sortSuppliers(activeSuppliers, state.sortOrder)
-  }, [state.activeSupplierIds, state.sortOrder])
+  }, [state.activeSupplierIds, state.sortOrder, state.isViewingHistory, state.viewingRound, state.eliminatedSuppliers])
 
   // Get the winner supplier for award/success screens
   const getWinnerSupplier = useCallback((): Supplier | null => {
@@ -185,8 +217,14 @@ export function RFPTab() {
 
   // Sort/filter handlers
   const handleSortChange = useCallback((sortOrder: SortOption) => {
-    setState((prev) => ({ ...prev, sortOrder, isManualMode: false }))
+    // Reset column order when sort changes
+    setState((prev) => ({ ...prev, sortOrder, isManualMode: false, supplierColumnOrder: null }))
     NotificationMessage('Sorted', `Suppliers sorted by ${sortOrder.replace('-', ' ')}`, false)
+  }, [])
+
+  // Column reorder handler
+  const handleSupplierColumnReorder = useCallback((newOrder: string[]) => {
+    setState((prev) => ({ ...prev, supplierColumnOrder: newOrder }))
   }, [])
 
   const handleSearchChange = useCallback((searchQuery: string) => {
@@ -196,6 +234,38 @@ export function RFPTab() {
   const handleMetricChange = useCallback((currentMetric: DetailMetric) => {
     setState((prev) => ({ ...prev, currentMetric }))
   }, [])
+
+  // Product/location filter handlers (lifted from DetailGridSection)
+  const handleToggleProduct = useCallback((product: string) => {
+    setState((prev) => {
+      const next = new Set(prev.selectedProducts)
+      if (next.has(product)) {
+        if (next.size > 1) next.delete(product)
+      } else {
+        next.add(product)
+      }
+      return { ...prev, selectedProducts: next }
+    })
+  }, [])
+
+  const handleToggleLocation = useCallback((location: string) => {
+    setState((prev) => {
+      const next = new Set(prev.selectedLocations)
+      if (next.has(location)) {
+        if (next.size > 1) next.delete(location)
+      } else {
+        next.add(location)
+      }
+      return { ...prev, selectedLocations: next }
+    })
+  }, [])
+
+  // Filtered detail data for both summary and detail grids
+  const filteredDetailData = useMemo(() => {
+    return SAMPLE_DETAILS.filter(
+      (detail) => state.selectedProducts.has(detail.product) && state.selectedLocations.has(detail.location)
+    )
+  }, [state.selectedProducts, state.selectedLocations])
 
   const handleToggleManualMode = useCallback(() => {
     setState((prev) => ({ ...prev, isManualMode: !prev.isManualMode }))
@@ -214,6 +284,65 @@ export function RFPTab() {
     setState((prev) => ({ ...prev, thresholds, parameters, isThresholdsModalOpen: false }))
     NotificationMessage('Settings Saved', 'Parameters and thresholds updated successfully.', false)
   }, [])
+
+  // Elimination handlers
+  const handleOpenEliminationModal = useCallback(() => {
+    if (state.selectedSuppliers.size === 0) {
+      NotificationMessage('No Selection', 'Please select suppliers to eliminate.', true)
+      return
+    }
+    setState((prev) => ({ ...prev, isEliminationModalOpen: true }))
+  }, [state.selectedSuppliers.size])
+
+  const handleCloseEliminationModal = useCallback(() => {
+    setState((prev) => ({ ...prev, isEliminationModalOpen: false }))
+  }, [])
+
+  const handleConfirmElimination = useCallback(
+    (reason: string) => {
+      const eliminatedInfo: EliminatedSupplierInfo[] = Array.from(state.selectedSuppliers).map((id) => {
+        const supplier = SAMPLE_SUPPLIERS.find((s) => s.id === id)
+        return {
+          supplierId: id,
+          supplierName: supplier?.name || '',
+          eliminatedInRound: state.currentRound,
+          priceAtElimination: supplier?.metrics.avgPrice || 0,
+          reason: reason,
+        }
+      })
+
+      // Update eliminated suppliers map
+      const newEliminatedSuppliers = new Map(state.eliminatedSuppliers)
+      const existingEliminated = newEliminatedSuppliers.get(state.currentRound) || []
+      newEliminatedSuppliers.set(state.currentRound, [...existingEliminated, ...eliminatedInfo])
+
+      // Remove eliminated suppliers from active
+      const newActiveSupplierIds = new Set(state.activeSupplierIds)
+      state.selectedSuppliers.forEach((id) => newActiveSupplierIds.delete(id))
+
+      setState((prev) => ({
+        ...prev,
+        eliminatedSuppliers: newEliminatedSuppliers,
+        activeSupplierIds: newActiveSupplierIds,
+        selectedSuppliers: new Set(),
+        isEliminationModalOpen: false,
+      }))
+
+      NotificationMessage(
+        'Suppliers Eliminated',
+        `${eliminatedInfo.length} supplier${eliminatedInfo.length !== 1 ? 's' : ''} eliminated from Round ${state.currentRound}.`,
+        false
+      )
+    },
+    [state.selectedSuppliers, state.currentRound, state.eliminatedSuppliers, state.activeSupplierIds]
+  )
+
+  // Get supplier names for elimination modal
+  const getSelectedSupplierNames = useCallback((): string[] => {
+    return Array.from(state.selectedSuppliers)
+      .map((id) => SAMPLE_SUPPLIERS.find((s) => s.id === id)?.name || '')
+      .filter(Boolean)
+  }, [state.selectedSuppliers])
 
   // Round progression handlers - now supports advancing to any round
   const handleAdvanceToNextRound = useCallback(() => {
@@ -235,6 +364,7 @@ export function RFPTab() {
         supplierName: s.name,
         eliminatedInRound: state.currentRound,
         priceAtElimination: s.metrics.avgPrice,
+        reason: 'Not selected for advancement', // Default reason for auto-elimination
       }))
 
     // Create new active suppliers set (only selected ones)
@@ -263,6 +393,7 @@ export function RFPTab() {
     setState((prev) => ({
       ...prev,
       currentScreen: `round${round}` as RFPScreen,
+      viewingRound: round,
       isViewingHistory: true,
     }))
   }, [])
@@ -271,6 +402,7 @@ export function RFPTab() {
     setState((prev) => ({
       ...prev,
       currentScreen: `round${prev.currentRound}` as RFPScreen,
+      viewingRound: prev.currentRound,
       isViewingHistory: false,
     }))
   }, [])
@@ -333,18 +465,21 @@ export function RFPTab() {
   const renderRoundScreen = () => {
     const suppliers = getSortedSuppliers()
     const roundSupplierCounts = getRoundSupplierCounts()
+    // Use viewingRound when in history mode, otherwise currentRound
+    const displayRound = state.isViewingHistory ? state.viewingRound : state.currentRound
 
     return (
       <div className={styles.roundPage}>
         {/* Header - won't shrink */}
-        <Horizontal alignItems="center" className={styles.pageHeader} style={{ gap: '12px' }}>
-          <GraviButton type="text" icon={<LeftOutlined />} onClick={handleBackToList} style={{ padding: '4px 8px' }} />
+        <Horizontal alignItems='center' className={styles.pageHeader} style={{ gap: '12px' }}>
+          <GraviButton type='text' icon={<LeftOutlined />} onClick={handleBackToList} style={{ padding: '4px 8px' }} />
           <Vertical>
-            <Texto category="h3" weight="600">
+            <Texto category='h3' weight='600'>
               {state.selectedRFP?.name}
             </Texto>
-            <Texto category="p2" appearance="medium">
-              Round {state.currentRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
+            <Texto category='p2' appearance='medium'>
+              Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
+              {state.isViewingHistory && ' (Read-Only)'}
             </Texto>
           </Vertical>
         </Horizontal>
@@ -353,12 +488,16 @@ export function RFPTab() {
         {state.isViewingHistory && (
           <Alert
             className={styles.contentSection}
-            message={`Viewing Round ${state.currentRound} (Completed) - This round is locked`}
-            type="info"
+            message={`Viewing Round ${state.viewingRound} (Completed) - This round is locked`}
+            type='info'
             showIcon
             icon={<InfoCircleOutlined />}
             action={
-              <GraviButton type="link" buttonText="Back to Current Round" onClick={handleBackToCurrentRound} />
+              <GraviButton
+                type='link'
+                buttonText={`Return to Round ${state.currentRound}`}
+                onClick={handleBackToCurrentRound}
+              />
             }
           />
         )}
@@ -420,6 +559,7 @@ export function RFPTab() {
               onOpenThresholds={handleOpenThresholds}
               onAdvanceToNextRound={handleAdvanceToNextRound}
               onAward={handleAward}
+              onOpenEliminationModal={handleOpenEliminationModal}
             />
 
             {/* Supplier matrix - now uses checkboxes for all rounds */}
@@ -432,10 +572,14 @@ export function RFPTab() {
               searchQuery={state.searchQuery}
               currentMetric={state.currentMetric}
               isViewingHistory={state.isViewingHistory}
+              detailData={filteredDetailData}
+              columnOrder={state.supplierColumnOrder ?? undefined}
+              isManualMode={state.isManualMode}
               onToggleSelection={handleToggleSelection}
               onToggleHide={handleToggleHide}
               onTogglePin={handleTogglePin}
               onMetricClick={handleMetricChange}
+              onColumnReorder={handleSupplierColumnReorder}
             />
 
             {/* Eliminated suppliers section (Round 2+) */}
@@ -455,7 +599,11 @@ export function RFPTab() {
                 pinnedSuppliers={state.pinnedSuppliers}
                 currentMetric={state.currentMetric}
                 searchQuery={state.searchQuery}
+                selectedProducts={state.selectedProducts}
+                selectedLocations={state.selectedLocations}
                 onMetricChange={handleMetricChange}
+                onToggleProduct={handleToggleProduct}
+                onToggleLocation={handleToggleLocation}
               />
             </div>
           </>
@@ -548,6 +696,12 @@ export function RFPTab() {
         parameters={state.parameters}
         onClose={handleCloseThresholds}
         onSave={handleSaveThresholds}
+      />
+      <EliminationModal
+        visible={state.isEliminationModalOpen}
+        supplierNames={getSelectedSupplierNames()}
+        onConfirm={handleConfirmElimination}
+        onCancel={handleCloseEliminationModal}
       />
     </div>
   )

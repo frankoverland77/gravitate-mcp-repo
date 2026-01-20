@@ -280,12 +280,75 @@ After (correct): [AI Panel full-width]
 **Verified Flow:**
 List → R1 (select 3) → R2 (see 5 eliminated, select 2) → R3 (see R1+R2 eliminated) → Award
 
+### Session 4 (2026-01-19) - Product Review & UX Refinements
+
+**Meeting:** Product-Design Daily Sync (Reece Johnson, Agustin Reichhardt, Frank Overland)
+
+**Completed:**
+- Prototype review of RFP list, round screens, supplier matrix, and detail grid
+- Full conversation transcript archived in `conversation-archive.md`
+
+**Key Decisions:**
+- Round progression is NOT one-way - users can navigate back to view previous round decisions
+- Before advancing rounds, ALL suppliers must have explicit disposition (advance/eliminate/pending)
+- Round advancement blocked with validation message until all suppliers processed
+- Elimination requires explicit action with required note/reason (not passive)
+- "Send Back" action removed - replaced with "Edit Bid" for inline modifications
+- Parameters split into two concepts: (1) Price/Volume history (aligned with Contract Measurement), (2) Thresholds (ratability/allocation/penalties)
+- Allocation changes from Flexible/Moderate/Strict → Daily/Weekly/Tri-Weekly/Monthly/Quarterly
+- Average price row should expand to show product group breakdowns (gasoline, diesel separately)
+- Support multiple bids from same supplier: "Supplier Name - Bid Description" pattern
+- RFP responses treated as "price scenarios" - same editing workflow as Contract Measurement
+- Bid edits require version tracking (version number, editor, timestamp) for audit trail
+- Scenarios have "working" and "ready to compare" states
+
+**UX Changes Needed:**
+- Add issues detail popup/tooltip explaining threshold violations
+- Remove incumbent pin/unpin (incumbent locked to first position)
+- Add explicit "Eliminate" action with required note modal
+- Show "Reason" column in eliminated suppliers table
+- Add validation blocking round advancement until all suppliers dispositioned
+- Separate parameters modal into history lookback vs thresholds
+- Implement collapsible product group rows for price/volume
+- Responsive filtering: bottom grid filters update top summary calculations
+- Support supplier subtitle for multiple bids from same company
+
+**Technical Implications:**
+- Backend needs version tracking on every bid field edit
+- Need scenario status field ("working" | "ready_to_compare")
+- Round advancement API should validate all suppliers have disposition
+- Elimination API requires note/reason field (required)
+
+**Files to Update:**
+- `RFPTab.tsx` - Round navigation, elimination flow, validation
+- `ComparisonToolbar.tsx` - Remove "Send Back", add parameter importance
+- `SupplierMatrixSection.tsx` - Multiple bids per supplier, issues popup
+- `rfp.types.ts` - Add scenario status, bid version types
+- Parameters modal (placeholder) - Split into two modals or tabbed sections
+
+**Next Actions:**
+See detailed action items in `conversation-archive.md` (2026-01-19 entry)
+
 ---
 
 ## Next Steps
 
-1. API integration for real RFP data
-2. Edit Bids modal implementation
-3. Threshold configuration persistence
-4. Historical round viewing with actual historical data
-5. Create New RFP flow
+1. **High Priority:**
+   - Implement round completion validation before advancement
+   - Restructure parameters into history + thresholds
+   - Add explicit elimination workflow with required notes
+   - Product group breakdown for price/volume rows
+   - Bid editing workflow with scenario states
+
+2. **Medium Priority:**
+   - Issues detail popup
+   - Multiple bids per supplier support
+   - Responsive grid filtering
+   - Version tracking design
+   - Bulk change modal
+
+3. **Future Work:**
+   - API integration for real RFP data
+   - Create New RFP flow
+   - Historical round comparison with data diffs
+   - Parameter importance weighting for AI recommendations

@@ -6,9 +6,12 @@
  */
 
 export type RFPStatus = 'draft' | 'round1' | 'round2' | 'awarded'
+export type ProductGroup = 'gasoline' | 'diesel'
 export type RFPRound = number // 1, 2, 3, 4... (any positive integer)
-export type AllocationLevel = 'flexible' | 'moderate' | 'strict'
+export type AllocationLevel = 'flexible' | 'moderate' | 'strict' // Legacy - use AllocationPeriod for new code
+export type AllocationPeriod = 'daily' | 'weekly' | 'tri-weekly' | 'monthly' | 'quarterly'
 export type MetricStatus = 'pass' | 'fail'
+export type SupplierDisposition = 'advance' | 'eliminate' | 'pending'
 export type SortOption = 'recommended' | 'price-low' | 'volume' | 'fewest-issues'
 export type DetailMetric = 'price' | 'volume' | 'ratability' | 'allocation' | 'penalties'
 export type HistoricalMetric = 'price' | 'volume'
@@ -40,7 +43,8 @@ export interface SupplierMetrics {
   totalVolume: number // gallons/month
   ratability: number // volume requirement (e.g., 80000 = 80K/mo)
   ratabilityStatus: MetricStatus
-  allocation: AllocationLevel
+  allocation: AllocationLevel // Legacy field - kept for backwards compatibility
+  allocationPeriod: AllocationPeriod // New field - actual allocation frequency
   allocationStatus: MetricStatus
   penalties: number // $/gal
   penaltiesStatus: MetricStatus
@@ -235,12 +239,33 @@ export const COMPARISON_PERIOD_OPTIONS = [
   { value: 'custom', label: 'Custom Range' },
 ]
 
-// Allocation level options
+// Allocation level options (legacy)
 export const ALLOCATION_OPTIONS: Array<{ value: AllocationLevel; label: string }> = [
   { value: 'flexible', label: 'Flexible only' },
   { value: 'moderate', label: 'Moderate OK' },
   { value: 'strict', label: 'Any' },
 ]
+
+// Allocation period options (new)
+export const ALLOCATION_PERIOD_OPTIONS: Array<{ value: AllocationPeriod; label: string }> = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'tri-weekly', label: 'Tri-Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+]
+
+// Helper to format allocation period for display
+export function formatAllocationPeriod(period: AllocationPeriod): string {
+  const labels: Record<AllocationPeriod, string> = {
+    daily: 'Daily',
+    weekly: 'Weekly',
+    'tri-weekly': 'Tri-Weekly',
+    monthly: 'Monthly',
+    quarterly: 'Quarterly',
+  }
+  return labels[period]
+}
 
 // Helper to generate RFP ID
 export function generateRFPId(): string {
@@ -260,4 +285,14 @@ export interface EliminatedSupplierInfo {
   supplierName: string
   eliminatedInRound: number
   priceAtElimination: number
+  reason: string // User-provided elimination reason
+}
+
+/**
+ * Product group averages per supplier
+ * Used for collapsible "Avg Price" row breakdown
+ */
+export interface ProductGroupMetrics {
+  gasoline: Record<string, number> // supplierId -> avg price for gasoline (87 + 93 octane)
+  diesel: Record<string, number> // supplierId -> avg price for diesel
 }
