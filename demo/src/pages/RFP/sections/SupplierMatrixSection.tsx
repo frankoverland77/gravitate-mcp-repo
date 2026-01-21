@@ -14,8 +14,11 @@ import { Table, Checkbox, Tooltip, Popover } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { Supplier, DetailMetric, DetailRow } from '../rfp.types'
 import { formatAllocationPeriod } from '../rfp.types'
-import { formatPrice, formatVolume, formatRatability, formatPenalties, calculatePerProductAverages } from '../rfp.data'
+import { formatPrice, formatVolume, formatRatability, formatPenalties, calculatePerProductAverages, calculatePerProductVolumes } from '../rfp.data'
 import styles from './SupplierMatrixSection.module.css'
+
+// Supplier disposition type
+type SupplierDisposition = 'advance' | 'eliminate' | 'pending'
 
 interface SupplierMatrixSectionProps {
   suppliers: Supplier[]
@@ -29,6 +32,7 @@ interface SupplierMatrixSectionProps {
   detailData?: DetailRow[] // For calculating product group averages
   columnOrder?: string[] // Custom column order (supplier IDs)
   isManualMode?: boolean // Controls drag reorder availability
+  supplierDispositions?: Map<string, SupplierDisposition> // Supplier disposition status
   onToggleSelection: (supplierId: string) => void
   onToggleHide: (supplierId: string) => void
   onTogglePin: (supplierId: string) => void
@@ -107,6 +111,7 @@ export function SupplierMatrixSection({
   detailData,
   columnOrder,
   isManualMode = false,
+  supplierDispositions,
   onToggleSelection,
   onToggleHide,
   onTogglePin,
@@ -154,6 +159,12 @@ export function SupplierMatrixSection({
     return calculatePerProductAverages(detailData, supplierIds)
   }, [detailData, sortedSuppliers])
 
+  // Calculate per-product volumes
+  const perProductVolumes = useMemo(() => {
+    if (sortedSuppliers.length === 0) return null
+    return calculatePerProductVolumes(sortedSuppliers)
+  }, [sortedSuppliers])
+
   // Build metric rows
   const metricRows: MetricRow[] = useMemo(() => {
     // Build children rows for Avg Price if we have per-product data
@@ -179,6 +190,28 @@ export function SupplierMatrixSection({
       })
     }
 
+    // Build children rows for Total Volume if we have per-product data
+    const volumeChildren: MetricRow[] = []
+    if (perProductVolumes) {
+      const productOrder = ['87 Octane', '93 Octane', 'Diesel']
+
+      productOrder.forEach((product) => {
+        if (perProductVolumes[product]) {
+          const productValues: Record<string, { value: string }> = {}
+          sortedSuppliers.forEach((supplier) => {
+            const volumeValue = perProductVolumes[product][supplier.id]
+            productValues[supplier.id] = { value: volumeValue ? formatVolume(volumeValue) : '—' }
+          })
+          volumeChildren.push({
+            key: `volume-${product.toLowerCase().replace(' ', '-')}`,
+            metric: 'volume',
+            label: product,
+            values: productValues,
+          })
+        }
+      })
+    }
+
     const rows: MetricRow[] = [
       {
         key: 'avgPrice',
@@ -193,6 +226,8 @@ export function SupplierMatrixSection({
         metric: 'volume',
         label: 'Total Volume',
         values: {},
+        isExpandable: volumeChildren.length > 0,
+        children: volumeChildren.length > 0 ? volumeChildren : undefined,
       },
       {
         key: 'ratability',
@@ -238,7 +273,7 @@ export function SupplierMatrixSection({
     })
 
     return rows
-  }, [sortedSuppliers, perProductAverages])
+  }, [sortedSuppliers, perProductAverages, perProductVolumes])
 
   // Check if supplier is dimmed by search
   const isDimmed = useCallback(
@@ -324,6 +359,7 @@ export function SupplierMatrixSection({
       const isDragging = draggingId === supplier.id
       const isDragOver = dragOverId === supplier.id
       const canDrag = !supplier.isIncumbent && !isViewingHistory && isManualMode && onColumnReorder
+      const disposition = supplierDispositions?.get(supplier.id)
 
       const headerClasses = [
         styles.supplierHeader,
@@ -394,7 +430,22 @@ export function SupplierMatrixSection({
           {/* Supplier name and badges */}
           <Vertical style={{ gap: '4px' }}>
             {supplier.isIncumbent && <span className={styles.incumbentFlag}>INCUMBENT</span>}
-            <Texto weight="600">{supplier.name}</Texto>
+            {/* Disposition badge */}
+            {!isViewingHistory && disposition === 'advance' && (
+              <span className={styles.dispositionAdvancing}>ADVANCING</span>
+            )}
+            {!isViewingHistory && disposition === 'eliminate' && (
+              <span className={styles.dispositionEliminated}>ELIMINATED</span>
+            )}
+            <Texto weight="600">
+              {supplier.name}
+              {supplier.bidCode && ` (${supplier.bidCode})`}
+            </Texto>
+            {supplier.bidName && (
+              <Texto category="p2" appearance="medium" className={styles.bidNameSubtitle}>
+                {supplier.bidName}
+              </Texto>
+            )}
 
             {/* Rank badge - centered */}
             <div className={styles.rankBadgeWrapper}>
@@ -410,6 +461,7 @@ export function SupplierMatrixSection({
       isDimmed,
       isViewingHistory,
       isManualMode,
+      supplierDispositions,
       onToggleSelection,
       onTogglePin,
       onToggleHide,
@@ -541,9 +593,11 @@ export function SupplierMatrixSection({
         bordered
         tableLayout="auto"
         expandable={{ childrenColumnName: 'notUsed' }}
-        rowClassName={(record) =>
-          record.key.startsWith('avgPrice-') && record.key !== 'avgPrice' ? styles.childRow : ''
-        }
+        rowClassName={(record) => {
+          const isAvgPriceChild = record.key.startsWith('avgPrice-') && record.key !== 'avgPrice'
+          const isVolumeChild = record.key.startsWith('volume-') && record.key !== 'totalVolume'
+          return isAvgPriceChild || isVolumeChild ? styles.childRow : ''
+        }}
       />
     </div>
   )

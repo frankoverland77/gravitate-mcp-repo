@@ -146,8 +146,9 @@ export function DetailGridSection({
 
     // Add supplier columns
     sortedSuppliers.forEach((supplier) => {
+      const displayName = supplier.bidCode ? `${supplier.name} (${supplier.bidCode})` : supplier.name
       cols.push({
-        title: <Texto weight="600">{supplier.name}</Texto>,
+        title: <Texto weight="600">{displayName}</Texto>,
         dataIndex: ['supplierValues', supplier.id],
         key: supplier.id,
         width: 100,

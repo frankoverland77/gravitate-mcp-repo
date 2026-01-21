@@ -68,6 +68,12 @@
   align-self: flex-start;
 }
 
+.bidNameSubtitle {
+  font-size: 11px;
+  line-height: 1.2;
+  margin-top: -2px;
+}
+
 .rankBadge {
   display: inline-block;
   padding: 2px 8px;
@@ -213,4 +219,31 @@
 .supplierHeaderDragOver {
   border-left: 3px solid #1890ff !important;
   background-color: rgba(24, 144, 255, 0.04) !important;
+}
+
+/* Disposition badges */
+.dispositionAdvancing {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #52c41a;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  align-self: flex-start;
+}
+
+.dispositionEliminated {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 2px;
+  align-self: flex-start;
 }

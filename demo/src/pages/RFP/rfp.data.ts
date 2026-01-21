@@ -125,6 +125,8 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
   {
     id: 'supplier-valero',
     name: 'Valero',
+    bidName: 'Best Price Option',
+    bidCode: 'A',
     isIncumbent: false,
     rank: 4,
     score: 78,
@@ -139,6 +141,27 @@ export const SAMPLE_SUPPLIERS: Supplier[] = [
       penalties: 0.04,
       penaltiesStatus: 'fail',
       issues: 2,
+    },
+  },
+  {
+    id: 'supplier-valero-2',
+    name: 'Valero',
+    bidName: 'Volume Tier 1',
+    bidCode: 'B',
+    isIncumbent: false,
+    rank: 9,
+    score: 71,
+    metrics: {
+      avgPrice: 2.38,
+      totalVolume: 2800000,
+      ratability: 100000,
+      ratabilityStatus: 'fail',
+      allocation: 'flexible',
+      allocationPeriod: 'weekly',
+      allocationStatus: 'pass',
+      penalties: 0.03,
+      penaltiesStatus: 'pass',
+      issues: 1,
     },
   },
   {
@@ -235,6 +258,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.29,
       'supplier-shell': 2.3,
       'supplier-valero': 2.33,
+      'supplier-valero-2': 2.36,
       'supplier-fhr': 2.31,
       'supplier-hf-sinclair': 2.34,
       'supplier-bp': 2.32,
@@ -250,6 +274,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.31,
       'supplier-shell': 2.32,
       'supplier-valero': 2.35,
+      'supplier-valero-2': 2.38,
       'supplier-fhr': 2.33,
       'supplier-hf-sinclair': 2.36,
       'supplier-bp': 2.34,
@@ -265,6 +290,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.3,
       'supplier-shell': 2.31,
       'supplier-valero': 2.34,
+      'supplier-valero-2': 2.37,
       'supplier-fhr': 2.32,
       'supplier-hf-sinclair': 2.35,
       'supplier-bp': 2.33,
@@ -280,6 +306,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.39,
       'supplier-shell': 2.4,
       'supplier-valero': 2.43,
+      'supplier-valero-2': 2.46,
       'supplier-fhr': 2.41,
       'supplier-hf-sinclair': 2.44,
       'supplier-bp': 2.42,
@@ -295,6 +322,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.41,
       'supplier-shell': 2.42,
       'supplier-valero': 2.45,
+      'supplier-valero-2': 2.48,
       'supplier-fhr': 2.43,
       'supplier-hf-sinclair': 2.46,
       'supplier-bp': 2.44,
@@ -310,6 +338,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.4,
       'supplier-shell': 2.41,
       'supplier-valero': 2.44,
+      'supplier-valero-2': 2.47,
       'supplier-fhr': 2.42,
       'supplier-hf-sinclair': 2.45,
       'supplier-bp': 2.43,
@@ -325,6 +354,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.25,
       'supplier-shell': 2.26,
       'supplier-valero': 2.29,
+      'supplier-valero-2': 2.32,
       'supplier-fhr': 2.27,
       'supplier-hf-sinclair': 2.3,
       'supplier-bp': 2.28,
@@ -340,6 +370,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.27,
       'supplier-shell': 2.28,
       'supplier-valero': 2.31,
+      'supplier-valero-2': 2.34,
       'supplier-fhr': 2.29,
       'supplier-hf-sinclair': 2.32,
       'supplier-bp': 2.3,
@@ -355,6 +386,7 @@ export const SAMPLE_DETAILS: DetailRow[] = [
       'supplier-p66': 2.26,
       'supplier-shell': 2.27,
       'supplier-valero': 2.3,
+      'supplier-valero-2': 2.33,
       'supplier-fhr': 2.28,
       'supplier-hf-sinclair': 2.31,
       'supplier-bp': 2.29,
@@ -445,10 +477,20 @@ export const HISTORICAL_BID_DATA: RoundBidData[] = [
   },
   {
     supplierId: 'supplier-valero',
-    supplierName: 'Valero',
+    supplierName: 'Valero (Best Price)',
     isIncumbent: false,
     r1Price: 2.35,
     r1Volume: 2200000,
+    r2Price: null,
+    r2Volume: null,
+    priceChange: null,
+  },
+  {
+    supplierId: 'supplier-valero-2',
+    supplierName: 'Valero (Volume Tier 1)',
+    isIncumbent: false,
+    r1Price: 2.38,
+    r1Volume: 2800000,
     r2Price: null,
     r2Volume: null,
     priceChange: null,
@@ -745,6 +787,39 @@ export function calculatePerProductAverages(details: DetailRow[], supplierIds: s
       if (values.length > 0) {
         result[product][supplierId] = Number((values.reduce((a, b) => a + b, 0) / values.length).toFixed(2))
       }
+    })
+  })
+
+  return result
+}
+
+/**
+ * Calculate volume breakdown by product for each supplier
+ * Distributes total volume proportionally: 87 Octane (45%), 93 Octane (25%), Diesel (30%)
+ *
+ * @param suppliers - Array of Supplier objects
+ * @returns PerProductAverages with volumes per product per supplier
+ */
+export function calculatePerProductVolumes(suppliers: Supplier[]): PerProductAverages {
+  const result: PerProductAverages = {}
+
+  // Product distribution ratios (should sum to 1)
+  const productDistribution: Record<string, number> = {
+    '87 Octane': 0.45,
+    '93 Octane': 0.25,
+    Diesel: 0.30,
+  }
+
+  // Initialize products
+  Object.keys(productDistribution).forEach((product) => {
+    result[product] = {}
+  })
+
+  // Calculate volume per product for each supplier
+  suppliers.forEach((supplier) => {
+    const totalVolume = supplier.metrics.totalVolume
+    Object.entries(productDistribution).forEach(([product, ratio]) => {
+      result[product][supplier.id] = Math.round(totalVolume * ratio)
     })
   })
 

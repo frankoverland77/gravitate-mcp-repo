@@ -1,10 +1,26 @@
 import { useCallback } from 'react'
-import { Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
-import { SearchOutlined, SettingOutlined, SwapOutlined, EyeInvisibleOutlined, StopOutlined } from '@ant-design/icons'
+import { Horizontal, Vertical, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
+import { SearchOutlined, SettingOutlined, SwapOutlined, EyeInvisibleOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { Select, Input, Popover, Checkbox, Tooltip } from 'antd'
 import type { SortOption, ThresholdConfig } from '../rfp.types'
-import { SORT_OPTIONS, ALLOCATION_OPTIONS } from '../rfp.types'
+import { SORT_OPTIONS, ALLOCATION_PERIOD_OPTIONS } from '../rfp.types'
 import styles from './ComparisonToolbar.module.css'
+
+// Round completion status from parent
+interface RoundCompletionStatus {
+  advancingCount: number
+  eliminatedCount: number
+  pendingCount: number
+  canAdvance: boolean
+  activeCount: number
+}
+
+// Historical outcome for completed rounds
+interface HistoricalOutcome {
+  advancedCount: number
+  eliminatedCount: number
+  nextRound: number
+}
 
 interface ComparisonToolbarProps {
   round: number // Now supports any round number
@@ -23,9 +39,16 @@ interface ComparisonToolbarProps {
   onAdvanceToNextRound?: () => void // Generic handler for any round
   onAward?: () => void
   onEditBids?: () => void
-  onOpenEliminationModal?: () => void // New: open elimination modal
+  onOpenEliminationModal?: () => void // Open elimination modal
+  onMarkAdvancing?: () => void // Mark selected as advancing
   selectedCount?: number
   isViewingHistory?: boolean
+  // Disposition status
+  roundCompletionStatus?: RoundCompletionStatus
+  // Historical view support
+  viewingRound?: number // Which round we're viewing (for history)
+  historicalOutcome?: HistoricalOutcome // Outcome of a completed round
+  onViewCurrentRound?: () => void // Navigate to current round
 }
 
 // Threshold pill component
@@ -96,13 +119,17 @@ export function ComparisonToolbar({
   onAward,
   onEditBids,
   onOpenEliminationModal,
+  onMarkAdvancing,
   selectedCount = 0,
   isViewingHistory = false,
+  roundCompletionStatus,
+  historicalOutcome,
+  onViewCurrentRound,
 }: ComparisonToolbarProps) {
   // Format threshold labels
   const penaltyLabel = `≤${thresholds.penaltyMax}¢/gal`
   const ratabilityLabel = `${thresholds.ratabilityMin}-${thresholds.ratabilityMax}%`
-  const allocationLabel = ALLOCATION_OPTIONS.find((opt) => opt.value === thresholds.allocationMin)?.label || 'Flexible'
+  const allocationLabel = ALLOCATION_PERIOD_OPTIONS.find((opt) => opt.value === thresholds.allocationMin)?.label || 'Monthly'
 
   // Handle edit bids click
   const handleEditBids = useCallback(() => {
@@ -113,131 +140,171 @@ export function ComparisonToolbar({
     }
   }, [onEditBids])
 
-  // Determine if actions should be disabled
-  // Can eliminate: need at least 1 supplier selected
+  // Determine if actions should be disabled based on disposition status
   const canEliminate = selectedCount >= 1
-  // Can advance: need 2-3 suppliers selected to advance to next round
-  const canAdvance = selectedCount >= 2 && selectedCount <= 3
-  // Can award: need at least 1 supplier selected
+  const canMarkAdvancing = selectedCount >= 1
   const canAward = selectedCount >= 1
 
+  // For advancing, use disposition-based validation if available
+  const canAdvanceRound = roundCompletionStatus?.canAdvance ?? false
+
   // Tooltip for advance button when disabled
-  const advanceTooltip = !canAdvance
-    ? selectedCount === 0
-      ? 'Select 2-3 suppliers to advance to next round'
-      : selectedCount === 1
-        ? 'Select 1-2 more suppliers to advance'
-        : 'Select up to 3 suppliers to advance'
-    : undefined
+  const getAdvanceTooltip = () => {
+    if (!roundCompletionStatus) return 'Loading...'
+    const { pendingCount, advancingCount } = roundCompletionStatus
+    if (pendingCount > 0) {
+      return `Set disposition for all ${pendingCount} pending supplier${pendingCount !== 1 ? 's' : ''} first`
+    }
+    if (advancingCount < 2) {
+      return 'Mark at least 2 suppliers as advancing'
+    }
+    return undefined
+  }
+
+  const advanceTooltip = !canAdvanceRound ? getAdvanceTooltip() : undefined
 
   return (
-    <Horizontal justifyContent="space-between" alignItems="center" className={styles.toolbar}>
-      {/* Left section - Controls */}
-      <Horizontal alignItems="center" style={{ gap: '12px' }}>
-        {/* Sort dropdown */}
-        <Select
-          value={sortOrder}
-          onChange={onSortChange}
-          options={SORT_OPTIONS}
-          style={{ width: 200 }}
-          disabled={isViewingHistory}
-        />
-
-        {/* Manual reorder toggle */}
-        {!isViewingHistory && (
-          <GraviButton
-            buttonText="Manual"
-            icon={<SwapOutlined />}
-            appearance={isManualMode ? 'theme1' : 'outlined'}
-            onClick={onToggleManualMode}
+    <Vertical className={styles.toolbar}>
+      {/* Row 1: Controls + Action buttons + Parameters */}
+      <Horizontal justifyContent="space-between" alignItems="center">
+        {/* Left: Sort, Manual, Search, Hidden */}
+        <Horizontal alignItems="center" style={{ gap: '12px' }}>
+          <Select
+            value={sortOrder}
+            onChange={onSortChange}
+            options={SORT_OPTIONS}
+            style={{ width: 200 }}
+            disabled={isViewingHistory}
           />
-        )}
 
-        {/* Search input */}
-        <Input
-          placeholder="Search suppliers..."
-          prefix={<SearchOutlined />}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={{ width: 180 }}
-          allowClear
-        />
+          {!isViewingHistory && (
+            <GraviButton
+              buttonText="Manual"
+              icon={<SwapOutlined />}
+              appearance={isManualMode ? 'theme1' : 'outlined'}
+              onClick={onToggleManualMode}
+            />
+          )}
 
-        {/* Hidden suppliers badge */}
-        {hiddenSuppliers.size > 0 && (
-          <Popover
-            content={
-              <HiddenSuppliersPopover
-                hiddenSuppliers={hiddenSuppliers}
-                hiddenSupplierNames={hiddenSupplierNames}
-                onShowSupplier={onShowSupplier}
-                onShowAllSuppliers={onShowAllSuppliers}
-              />
-            }
-            trigger="click"
-            placement="bottomRight"
-          >
-            <span className={styles.hiddenBadge}>
-              <EyeInvisibleOutlined />
-              {hiddenSuppliers.size} hidden
-            </span>
-          </Popover>
-        )}
+          <Input
+            placeholder="Search suppliers..."
+            prefix={<SearchOutlined />}
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{ width: 180 }}
+            allowClear
+          />
+
+          {hiddenSuppliers.size > 0 && (
+            <Popover
+              content={
+                <HiddenSuppliersPopover
+                  hiddenSuppliers={hiddenSuppliers}
+                  hiddenSupplierNames={hiddenSupplierNames}
+                  onShowSupplier={onShowSupplier}
+                  onShowAllSuppliers={onShowAllSuppliers}
+                />
+              }
+              trigger="click"
+              placement="bottomRight"
+            >
+              <span className={styles.hiddenBadge}>
+                <EyeInvisibleOutlined />
+                {hiddenSuppliers.size} hidden
+              </span>
+            </Popover>
+          )}
+        </Horizontal>
+
+        {/* Right: Action buttons + Parameters */}
+        <Horizontal alignItems="center" style={{ gap: '12px' }}>
+          {!isViewingHistory && (
+            <>
+              {round >= 2 && (
+                <GraviButton buttonText="Edit Bids" appearance="outlined" onClick={handleEditBids} />
+              )}
+
+              <Tooltip title={!canMarkAdvancing ? 'Select suppliers to mark as advancing' : undefined}>
+                <span>
+                  <GraviButton
+                    buttonText={`Mark Advancing (${selectedCount})`}
+                    icon={<CheckCircleOutlined />}
+                    success
+                    onClick={onMarkAdvancing}
+                    disabled={!canMarkAdvancing}
+                  />
+                </span>
+              </Tooltip>
+
+              <Tooltip title={!canEliminate ? 'Select suppliers to eliminate' : undefined}>
+                <span>
+                  <GraviButton
+                    buttonText={`Eliminate (${selectedCount})`}
+                    icon={<StopOutlined />}
+                    appearance="warning"
+                    onClick={onOpenEliminationModal}
+                    disabled={!canEliminate}
+                  />
+                </span>
+              </Tooltip>
+
+              <GraviButton buttonText="Award" success onClick={onAward} disabled={!canAward} />
+            </>
+          )}
+
+          <GraviButton
+            type="text"
+            icon={<SettingOutlined />}
+            onClick={onOpenThresholds}
+            style={{ padding: '4px 8px' }}
+          />
+        </Horizontal>
       </Horizontal>
 
-      {/* Right section - Actions & Thresholds */}
-      <Horizontal alignItems="center" style={{ gap: '12px' }}>
-        {/* Actions (only if not viewing history) */}
-        {!isViewingHistory && (
-          <>
-            {round >= 2 && (
-              <GraviButton buttonText='Edit Bids' appearance='outlined' onClick={handleEditBids} />
-            )}
+      {/* Row 2: Disposition counter + Advance on left, Threshold pills on right */}
+      <Horizontal justifyContent="space-between" alignItems="center">
+        {/* Left: Counter + Advance button (current) OR Historical summary + View button (history view) */}
+        <Horizontal alignItems="center" style={{ gap: '12px' }}>
+          {isViewingHistory && historicalOutcome ? (
+            <>
+              <Texto category="p2" appearance="medium">
+                Sent {historicalOutcome.advancedCount} to Round {historicalOutcome.nextRound} · Eliminated{' '}
+                {historicalOutcome.eliminatedCount}
+              </Texto>
+              <GraviButton
+                buttonText={`View Round ${historicalOutcome.nextRound}`}
+                appearance="outlined"
+                onClick={onViewCurrentRound}
+              />
+            </>
+          ) : roundCompletionStatus ? (
+            <>
+              <Texto category="p2" appearance="medium">
+                {roundCompletionStatus.advancingCount} advancing · {roundCompletionStatus.eliminatedCount} eliminated ·{' '}
+                {roundCompletionStatus.pendingCount} pending
+              </Texto>
 
-            {/* Eliminate button */}
-            <Tooltip title={!canEliminate ? 'Select suppliers to eliminate' : undefined}>
-              <span>
-                <GraviButton
-                  buttonText={`Eliminate (${selectedCount})`}
-                  icon={<StopOutlined />}
-                  appearance='warning'
-                  onClick={onOpenEliminationModal}
-                  disabled={!canEliminate}
-                />
-              </span>
-            </Tooltip>
+              <Tooltip title={advanceTooltip}>
+                <span>
+                  <GraviButton
+                    buttonText={`Advance to R${round + 1}`}
+                    theme1
+                    onClick={onAdvanceToNextRound}
+                    disabled={!canAdvanceRound}
+                  />
+                </span>
+              </Tooltip>
+            </>
+          ) : null}
+        </Horizontal>
 
-            {/* Advance button - available on all rounds */}
-            <Tooltip title={advanceTooltip}>
-              <span>
-                <GraviButton
-                  buttonText={`Advance to R${round + 1} (${selectedCount})`}
-                  theme1
-                  onClick={onAdvanceToNextRound}
-                  disabled={!canAdvance}
-                />
-              </span>
-            </Tooltip>
-
-            <GraviButton buttonText='Award' success onClick={onAward} disabled={!canAward} />
-          </>
-        )}
-
-        {/* Threshold pills */}
+        {/* Right: Threshold pills only */}
         <Horizontal alignItems="center" style={{ gap: '8px' }}>
           <ThresholdPill label={penaltyLabel} onClick={onOpenThresholds} />
           <ThresholdPill label={ratabilityLabel} onClick={onOpenThresholds} />
           <ThresholdPill label={allocationLabel} onClick={onOpenThresholds} />
         </Horizontal>
-
-        {/* Parameters button */}
-        <GraviButton
-          type="text"
-          icon={<SettingOutlined />}
-          onClick={onOpenThresholds}
-          style={{ padding: '4px 8px' }}
-        />
       </Horizontal>
-    </Horizontal>
+    </Vertical>
   )
 }
