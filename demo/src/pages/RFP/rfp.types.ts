@@ -376,3 +376,133 @@ export interface ProductGroupMetrics {
   gasoline: Record<string, number>; // supplierId -> avg price for gasoline (87 + 93 octane)
   diesel: Record<string, number>; // supplierId -> avg price for diesel
 }
+
+// ============================================================================
+// FORMULA/PROVISION TYPES - For Excel bid editing workflow
+// Matches Contract Management FormulaVariable structure for seamless RFP-to-Contract transitions
+// ============================================================================
+
+/**
+ * Formula variable - matches Contract Management FormulaVariable
+ * Represents a single price index component in a formula
+ */
+export interface FormulaVariable {
+  id: string;
+  variableName: string; // Pattern: var_{index}_group_{groupNum}
+  displayName: string | null;
+
+  // Price Source
+  pricePublisher: PricePublisher;
+  priceInstrument: string; // 'CBOB USGC', 'ULSD Gulf', etc.
+  priceType: PriceType;
+  dateRule: DateRule;
+
+  // Calculation
+  percentage: number; // Default 100
+  differential: number; // +/- adjustment in $/gal
+}
+
+/**
+ * Formula definition for structured pricing
+ */
+export interface Formula {
+  id: string;
+  name: string;
+  formulaExpression: string; // Human-readable expression
+  variables: FormulaVariable[];
+}
+
+/**
+ * Provision type for bid pricing
+ */
+export type ProvisionType = 'Fixed' | 'Formula' | 'Lesser Of 2' | 'Lesser Of 3';
+
+/**
+ * Provision status for validation
+ */
+export type ProvisionStatus = 'Valid' | 'Needs Configuration' | 'Needs Price';
+
+/**
+ * Bid provision - pricing configuration for a supplier's bid on a detail row
+ */
+export interface BidProvision {
+  id: string;
+  supplierId: string;
+  detailId: string;
+  provisionType: ProvisionType;
+  fixedValue: number | null;
+  formula: Formula | null;
+  displayPrice: number; // Resolved price for display
+  status: ProvisionStatus;
+}
+
+/**
+ * Extended DetailRow with formula support - backward compatible
+ */
+export interface DetailRowExtended extends Omit<DetailRow, 'supplierValues'> {
+  supplierValues: Record<string, number>; // For existing UI
+  supplierProvisions: Record<string, BidProvision>; // Formula data
+}
+
+// Price publisher options
+export type PricePublisher = 'OPIS' | 'Platts' | 'Argus';
+
+// Price type options
+export type PriceType = 'Low' | 'High' | 'Average' | 'Mean';
+
+// Date rule options
+export type DateRule = 'Prior Day' | 'Month Average' | 'Week Average' | 'Day Of';
+
+// Reference data options for Excel dropdowns
+export const PRICE_PUBLISHER_OPTIONS: PricePublisher[] = ['OPIS', 'Platts', 'Argus'];
+
+export const PRICE_TYPE_OPTIONS: PriceType[] = ['Low', 'High', 'Average', 'Mean'];
+
+export const DATE_RULE_OPTIONS: DateRule[] = ['Prior Day', 'Month Average', 'Week Average', 'Day Of'];
+
+export const PROVISION_TYPE_OPTIONS: ProvisionType[] = ['Fixed', 'Formula', 'Lesser Of 2', 'Lesser Of 3'];
+
+// Common price instruments by product type
+export const PRICE_INSTRUMENT_OPTIONS: Record<string, string[]> = {
+  gasoline: ['CBOB USGC', 'CBOB Atlantic', 'RBOB USGC', 'RBOB NYH'],
+  diesel: ['ULSD USGC', 'ULSD NYH', 'ULSD Midwest', 'ULSD LA'],
+};
+
+/**
+ * Bid change tracking for import validation
+ */
+export interface BidChange {
+  detailId: string;
+  supplierId: string;
+  supplierName: string;
+  product: string;
+  location: string;
+  field: string;
+  oldValue: string | number;
+  newValue: string | number;
+  changeType: 'price' | 'formula' | 'provision_type';
+}
+
+/**
+ * Validation result for imported bids
+ */
+export interface BidValidationResult {
+  isValid: boolean;
+  errors: BidValidationError[];
+  warnings: BidValidationWarning[];
+  changes: BidChange[];
+}
+
+export interface BidValidationError {
+  row: number;
+  field: string;
+  message: string;
+  value?: string | number;
+}
+
+export interface BidValidationWarning {
+  row: number;
+  field: string;
+  message: string;
+  value?: string | number;
+}

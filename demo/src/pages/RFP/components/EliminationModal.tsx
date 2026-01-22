@@ -23,12 +23,8 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
   }, [visible])
 
   const handleConfirm = useCallback(() => {
-    if (reason.trim()) {
-      onConfirm(reason.trim())
-    }
+    onConfirm(reason.trim())
   }, [reason, onConfirm])
-
-  const isReasonValid = reason.trim().length > 0
 
   return (
     <Modal
@@ -61,7 +57,7 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
         {/* Reason input */}
         <Vertical style={{ gap: '8px' }}>
           <Texto category='p2' weight='600'>
-            Reason for elimination <span style={{ color: '#ff4d4f' }}>*</span>
+            Reason for elimination
           </Texto>
           <TextArea
             placeholder='Enter the reason for eliminating these suppliers...'
@@ -76,12 +72,7 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
         {/* Actions */}
         <Horizontal justifyContent='flex-end' style={{ gap: '8px', marginTop: '8px' }}>
           <GraviButton buttonText='Cancel' appearance='outlined' onClick={onCancel} />
-          <GraviButton
-            buttonText='Confirm Elimination'
-            appearance='warning'
-            onClick={handleConfirm}
-            disabled={!isReasonValid}
-          />
+          <GraviButton buttonText='Confirm Elimination' appearance='warning' onClick={handleConfirm} />
         </Horizontal>
       </Vertical>
     </Modal>

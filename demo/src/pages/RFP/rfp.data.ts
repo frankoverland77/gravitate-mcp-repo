@@ -16,6 +16,9 @@ import type {
   TerminalHistoryDataPoint,
   TerminalHistoryPeriod,
   ProductGroupMetrics,
+  Formula,
+  BidProvision,
+  DetailRowExtended,
 } from './rfp.types'
 
 // 4 Sample RFPs per spec
@@ -863,4 +866,170 @@ export function calculateProductGroupAverages(details: DetailRow[], supplierIds:
   })
 
   return result
+}
+
+// ============================================================================
+// FORMULA/PROVISION DATA - For Excel bid editing workflow
+// ============================================================================
+
+/**
+ * Sample formulas representing common pricing structures
+ */
+export const SAMPLE_FORMULAS: Formula[] = [
+  {
+    id: 'formula-opis-low-minus-2',
+    name: 'OPIS Low - 2¢',
+    formulaExpression: 'OPIS CBOB USGC Low - $0.02',
+    variables: [
+      {
+        id: 'var-1',
+        variableName: 'var_1_group_1',
+        displayName: 'OPIS CBOB',
+        pricePublisher: 'OPIS',
+        priceInstrument: 'CBOB USGC',
+        priceType: 'Low',
+        dateRule: 'Prior Day',
+        percentage: 100,
+        differential: -0.02,
+      },
+    ],
+  },
+  {
+    id: 'formula-opis-low-minus-3',
+    name: 'OPIS Low - 3¢',
+    formulaExpression: 'OPIS CBOB USGC Low - $0.03',
+    variables: [
+      {
+        id: 'var-2',
+        variableName: 'var_1_group_1',
+        displayName: 'OPIS CBOB',
+        pricePublisher: 'OPIS',
+        priceInstrument: 'CBOB USGC',
+        priceType: 'Low',
+        dateRule: 'Prior Day',
+        percentage: 100,
+        differential: -0.03,
+      },
+    ],
+  },
+  {
+    id: 'formula-platts-avg',
+    name: 'Platts Average',
+    formulaExpression: 'Platts CBOB USGC Average',
+    variables: [
+      {
+        id: 'var-3',
+        variableName: 'var_1_group_1',
+        displayName: 'Platts CBOB',
+        pricePublisher: 'Platts',
+        priceInstrument: 'CBOB USGC',
+        priceType: 'Average',
+        dateRule: 'Prior Day',
+        percentage: 100,
+        differential: 0,
+      },
+    ],
+  },
+  {
+    id: 'formula-opis-ulsd-low-minus-2',
+    name: 'OPIS ULSD Low - 2¢',
+    formulaExpression: 'OPIS ULSD USGC Low - $0.02',
+    variables: [
+      {
+        id: 'var-4',
+        variableName: 'var_1_group_1',
+        displayName: 'OPIS ULSD',
+        pricePublisher: 'OPIS',
+        priceInstrument: 'ULSD USGC',
+        priceType: 'Low',
+        dateRule: 'Prior Day',
+        percentage: 100,
+        differential: -0.02,
+      },
+    ],
+  },
+]
+
+/**
+ * Helper to get a formula by ID
+ */
+export function getFormulaById(id: string): Formula | undefined {
+  return SAMPLE_FORMULAS.find((f) => f.id === id)
+}
+
+/**
+ * Create a BidProvision for a supplier/detail combination
+ */
+function createBidProvision(
+  supplierId: string,
+  detailId: string,
+  price: number,
+  formulaId?: string
+): BidProvision {
+  const formula = formulaId ? getFormulaById(formulaId) : null
+
+  return {
+    id: `provision-${supplierId}-${detailId}`,
+    supplierId,
+    detailId,
+    provisionType: formula ? 'Formula' : 'Fixed',
+    fixedValue: formula ? null : price,
+    formula: formula ?? null,
+    displayPrice: price,
+    status: 'Valid',
+  }
+}
+
+/**
+ * Extended detail data with formula support
+ * Includes both supplierValues (for backward compatibility) and supplierProvisions (for formula editing)
+ */
+export const SAMPLE_DETAILS_EXTENDED: DetailRowExtended[] = SAMPLE_DETAILS.map((detail) => {
+  // Determine which formula to use based on product type
+  const isGasoline = detail.product.includes('Octane')
+  const defaultFormulaId = isGasoline ? 'formula-opis-low-minus-2' : 'formula-opis-ulsd-low-minus-2'
+
+  // Create provisions for each supplier
+  const supplierProvisions: Record<string, BidProvision> = {}
+
+  Object.entries(detail.supplierValues).forEach(([supplierId, price]) => {
+    // Marathon and P66 use formulas, others use fixed prices
+    const useFormula = ['supplier-marathon', 'supplier-p66', 'supplier-shell'].includes(supplierId)
+    supplierProvisions[supplierId] = createBidProvision(
+      supplierId,
+      detail.id,
+      price,
+      useFormula ? defaultFormulaId : undefined
+    )
+  })
+
+  return {
+    ...detail,
+    supplierProvisions,
+  }
+})
+
+/**
+ * Get extended details with provisions
+ */
+export function getExtendedDetails(): DetailRowExtended[] {
+  return SAMPLE_DETAILS_EXTENDED
+}
+
+/**
+ * Sample market prices for formula resolution (mock data)
+ */
+export const SAMPLE_MARKET_PRICES: Record<string, number> = {
+  'OPIS-CBOB USGC-Low': 2.30,
+  'OPIS-CBOB USGC-High': 2.35,
+  'OPIS-CBOB USGC-Average': 2.325,
+  'OPIS-ULSD USGC-Low': 2.26,
+  'OPIS-ULSD USGC-High': 2.31,
+  'OPIS-ULSD USGC-Average': 2.285,
+  'Platts-CBOB USGC-Low': 2.31,
+  'Platts-CBOB USGC-High': 2.36,
+  'Platts-CBOB USGC-Average': 2.335,
+  'Argus-CBOB USGC-Low': 2.29,
+  'Argus-CBOB USGC-High': 2.34,
+  'Argus-CBOB USGC-Average': 2.315,
 }

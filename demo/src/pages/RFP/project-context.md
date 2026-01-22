@@ -1,5 +1,5 @@
 # RFP Management Feature - Project Context
-*Last Updated: 2026-01-16 (Session 3)*
+*Last Updated: 2026-01-21 (Session 5)*
 
 ## Overview
 RFP (Request for Proposal) Management is a new tab within Contract Measurement that enables users to manage supplier bidding rounds, compare proposals, and award contracts.
@@ -329,26 +329,81 @@ List → R1 (select 3) → R2 (see 5 eliminated, select 2) → R3 (see R1+R2 eli
 **Next Actions:**
 See detailed action items in `conversation-archive.md` (2026-01-19 entry)
 
+### Session 5 (2026-01-21) - Bid Editing Complexity & UX Refinements
+
+**Meeting:** Product-Design Daily Sync (Agustin Reichhardt, Frank Overland)
+
+**Critical Insight - Bids are Formula-Based:**
+- Bids are NOT simple price numbers - they are collections of contract details with pricing formulas
+- Each cell in product/location grid represents a full pricing formula with variables
+- Formula variables include: percentage, publisher, instrument, price type, differential, date rule
+- When editing bids, users edit the formula (e.g., change Platts to Argus), not just a number
+- This is the same data model as Contract Measurement price scenarios
+
+**Key Decisions:**
+- Issue importance ranking: Use drag-and-drop (not arrows), must support ties
+- Elimination reason: Optional (not required) - can be null
+- Product click filtering: Clicking product in summary filters detail grid to that product
+- Eliminated suppliers: Stay visible with red highlight until round advancement (not immediate removal)
+- Bulk selection: Add "Select remaining"/"Select undesignated" button
+- Bid editing timing: Happens BETWEEN rounds (after R1 complete, before R2 starts)
+- Bid editing method: Consider Excel upload given formula complexity
+- Version history: Git-style commit history for bid changes (version, editor, timestamp, description)
+- Multi-bid descriptions: Same pattern as contract description/comments field
+
+**UX Changes Needed:**
+- Parameter importance: Drag-and-drop with tie support (replace up/down arrows)
+- Elimination flow: Make reason optional, keep eliminated visible with red highlight until advancement
+- Supplier matrix: Product click filters detail grid
+- Bulk advancement: "Select remaining" button
+- Bid editing: Move to between-round step, add Excel upload + version history panel
+
+**Research Needed:**
+- Ratability: How do buyers receive ratability offers from sellers? (volume/month? percentage? other?)
+- Bid objects: Should bids require draft contracts or be simpler objects?
+
+**Technical Implications:**
+- Need to document Contract Measurement data model (details, formulas, variables) for bid editing
+- Bid versioning follows round boundaries
+- Excel upload/download for formula editing
+- Future: LLM prompting for bulk formula changes (not MVP)
+
+**Files to Consider:**
+- Contract Measurement details/formulas as reference for bid structure
+- Excel template design for bid import/export
+
+**Next Actions:**
+See detailed action items in `conversation-archive.md` (2026-01-21 entry)
+
 ---
 
 ## Next Steps
 
 1. **High Priority:**
    - Implement round completion validation before advancement
+   - Add "Select remaining"/"Select undesignated" button for bulk advancement
+   - Keep eliminated suppliers visible with red highlight until round advancement
+   - Make elimination reason optional (not required)
+   - Product click filtering (summary -> detail grid)
    - Restructure parameters into history + thresholds
-   - Add explicit elimination workflow with required notes
-   - Product group breakdown for price/volume rows
-   - Bid editing workflow with scenario states
+   - Parameter importance: drag-and-drop with tie support
 
 2. **Medium Priority:**
+   - Bid editing workflow between rounds (not during)
+   - Document Contract Measurement data model for bid editing reference
+   - Design bid version history panel (git-style commits)
+   - Excel upload/download for formula-based bid editing
+   - Product group breakdown for price/volume rows
+   - Multiple bids per supplier support with description field
    - Issues detail popup
-   - Multiple bids per supplier support
-   - Responsive grid filtering
-   - Version tracking design
-   - Bulk change modal
 
-3. **Future Work:**
+3. **Research Required:**
+   - Ratability representation: How do sellers offer ratability to buyers?
+   - Should bids require draft contracts or be simpler bid-specific objects?
+
+4. **Future Work:**
    - API integration for real RFP data
    - Create New RFP flow
    - Historical round comparison with data diffs
    - Parameter importance weighting for AI recommendations
+   - LLM prompting for bulk bid formula changes (demo/selling concept)

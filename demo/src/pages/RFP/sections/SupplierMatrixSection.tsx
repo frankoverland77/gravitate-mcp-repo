@@ -1,5 +1,5 @@
-import { useMemo, useCallback, useState } from 'react'
-import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr'
+import { useMemo, useCallback, useState } from 'react';
+import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import {
   CheckOutlined,
   WarningOutlined,
@@ -9,94 +9,103 @@ import {
   LockOutlined,
   RightOutlined,
   HolderOutlined,
-} from '@ant-design/icons'
-import { Table, Checkbox, Tooltip, Popover } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
-import type { Supplier, DetailMetric, DetailRow } from '../rfp.types'
-import { formatAllocationPeriod } from '../rfp.types'
-import { formatPrice, formatVolume, formatRatability, formatPenalties, calculatePerProductAverages, calculatePerProductVolumes } from '../rfp.data'
-import styles from './SupplierMatrixSection.module.css'
+  UndoOutlined,
+} from '@ant-design/icons';
+import { Table, Checkbox, Tooltip, Popover } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import type { Supplier, DetailMetric, DetailRow } from '../rfp.types';
+import { formatAllocationPeriod } from '../rfp.types';
+import {
+  formatPrice,
+  formatVolume,
+  formatRatability,
+  formatPenalties,
+  calculatePerProductAverages,
+  calculatePerProductVolumes,
+} from '../rfp.data';
+import styles from './SupplierMatrixSection.module.css';
 
 // Supplier disposition type
-type SupplierDisposition = 'advance' | 'eliminate' | 'pending'
+type SupplierDisposition = 'advance' | 'eliminate' | 'pending';
 
 interface SupplierMatrixSectionProps {
-  suppliers: Supplier[]
-  round: number // Now supports any round number
-  selectedSuppliers: Set<string>
-  hiddenSuppliers: Set<string>
-  pinnedSuppliers: Set<string>
-  searchQuery?: string
-  currentMetric?: DetailMetric
-  isViewingHistory?: boolean
-  detailData?: DetailRow[] // For calculating product group averages
-  columnOrder?: string[] // Custom column order (supplier IDs)
-  isManualMode?: boolean // Controls drag reorder availability
-  supplierDispositions?: Map<string, SupplierDisposition> // Supplier disposition status
-  onToggleSelection: (supplierId: string) => void
-  onToggleHide: (supplierId: string) => void
-  onTogglePin: (supplierId: string) => void
-  onMetricClick?: (metric: DetailMetric) => void
-  onColumnReorder?: (newOrder: string[]) => void
+  suppliers: Supplier[];
+  round: number; // Now supports any round number
+  selectedSuppliers: Set<string>;
+  hiddenSuppliers: Set<string>;
+  pinnedSuppliers: Set<string>;
+  searchQuery?: string;
+  currentMetric?: DetailMetric;
+  isViewingHistory?: boolean;
+  detailData?: DetailRow[]; // For calculating product group averages
+  columnOrder?: string[]; // Custom column order (supplier IDs)
+  isManualMode?: boolean; // Controls drag reorder availability
+  supplierDispositions?: Map<string, SupplierDisposition>; // Supplier disposition status
+  onToggleSelection: (supplierId: string) => void;
+  onToggleHide: (supplierId: string) => void;
+  onTogglePin: (supplierId: string) => void;
+  onMetricClick?: (metric: DetailMetric, product?: string) => void;
+  onColumnReorder?: (newOrder: string[]) => void;
+  onUndoElimination?: (supplierId: string) => void; // Undo elimination within current round
 }
 
 // Metric row data structure
 interface MetricRow {
-  key: string
-  metric: DetailMetric
-  label: string
-  values: Record<string, { value: string; status?: 'pass' | 'fail' }>
-  isExpandable?: boolean
-  children?: MetricRow[]
+  key: string;
+  metric: DetailMetric;
+  label: string;
+  values: Record<string, { value: string; status?: 'pass' | 'fail' }>;
+  isExpandable?: boolean;
+  children?: MetricRow[];
 }
 
 // Status indicator component
 function StatusIndicator({ status }: { status?: 'pass' | 'fail' }) {
-  if (!status) return null
+  if (!status) return null;
   return status === 'pass' ? (
     <CheckOutlined className={styles.statusPass} style={{ color: '#52c41a' }} />
   ) : (
     <WarningOutlined className={styles.statusFail} style={{ color: '#faad14' }} />
-  )
+  );
 }
 
 // Issues detail popup content
 function IssuesDetailContent({ supplier }: { supplier: Supplier }) {
-  const { metrics } = supplier
+  const { metrics } = supplier;
   const issues: Array<{ label: string; hasFailed: boolean }> = [
     { label: 'Ratability', hasFailed: metrics.ratabilityStatus === 'fail' },
     { label: 'Allocation', hasFailed: metrics.allocationStatus === 'fail' },
     { label: 'Penalties', hasFailed: metrics.penaltiesStatus === 'fail' },
-  ]
+  ];
 
-  const failedIssues = issues.filter((i) => i.hasFailed)
+  const failedIssues = issues.filter((i) => i.hasFailed);
 
   if (failedIssues.length === 0) {
     return (
       <Vertical style={{ gap: '4px', maxWidth: '200px' }}>
-        <Texto category='p2' weight='600'>
+        <Texto category="p2" weight="600">
           No Issues
         </Texto>
-        <Texto category='p2' appearance='medium'>
+        <Texto category="p2" appearance="medium">
           All metrics within threshold
         </Texto>
       </Vertical>
-    )
+    );
   }
 
   return (
     <Vertical style={{ gap: '8px', maxWidth: '220px' }}>
-      <Texto category='p2' weight='600'>
+      <Texto category="p2" weight="600">
         {failedIssues.length} Issue{failedIssues.length !== 1 ? 's' : ''} Flagged
       </Texto>
       {failedIssues.map((issue) => (
-        <Horizontal key={issue.label} alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal key={issue.label} alignItems="center" style={{ gap: '8px' }}>
           <WarningOutlined style={{ color: '#faad14' }} />
-          <Texto category='p2'>{issue.label} out of threshold</Texto>
+          <Texto category="p2">{issue.label} out of threshold</Texto>
         </Horizontal>
       ))}
     </Vertical>
-  )
+  );
 }
 
 export function SupplierMatrixSection({
@@ -117,99 +126,102 @@ export function SupplierMatrixSection({
   onTogglePin,
   onMetricClick,
   onColumnReorder,
+  onUndoElimination,
 }: SupplierMatrixSectionProps) {
   // State for expanded rows
-  const [expandedRows, setExpandedRows] = useState<string[]>([])
+  const [expandedRows, setExpandedRows] = useState<string[]>([]);
 
   // State for drag-and-drop
-  const [draggingId, setDraggingId] = useState<string | null>(null)
-  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   // Sort suppliers: incumbent first, then by columnOrder if provided, else pinned then others by rank
   const sortedSuppliers = useMemo(() => {
-    const visible = suppliers.filter((s) => !hiddenSuppliers.has(s.id))
-    const incumbent = visible.find((s) => s.isIncumbent)
-    const nonIncumbent = visible.filter((s) => !s.isIncumbent)
+    const visible = suppliers.filter((s) => !hiddenSuppliers.has(s.id));
+    const incumbent = visible.find((s) => s.isIncumbent);
+    const nonIncumbent = visible.filter((s) => !s.isIncumbent);
 
     // If columnOrder is provided, use it (keeping incumbent first)
     if (columnOrder && columnOrder.length > 0) {
       const orderedNonIncumbent = columnOrder
         .filter((id) => nonIncumbent.some((s) => s.id === id))
         .map((id) => nonIncumbent.find((s) => s.id === id)!)
-        .filter(Boolean)
+        .filter(Boolean);
       // Add any suppliers not in columnOrder at the end
-      const remainingSuppliers = nonIncumbent.filter((s) => !columnOrder.includes(s.id))
-      return incumbent ? [incumbent, ...orderedNonIncumbent, ...remainingSuppliers] : [...orderedNonIncumbent, ...remainingSuppliers]
+      const remainingSuppliers = nonIncumbent.filter((s) => !columnOrder.includes(s.id));
+      return incumbent
+        ? [incumbent, ...orderedNonIncumbent, ...remainingSuppliers]
+        : [...orderedNonIncumbent, ...remainingSuppliers];
     }
 
     // Default: pinned first, then others by rank
-    const pinned = nonIncumbent.filter((s) => pinnedSuppliers.has(s.id))
-    const others = nonIncumbent.filter((s) => !pinnedSuppliers.has(s.id))
+    const pinned = nonIncumbent.filter((s) => pinnedSuppliers.has(s.id));
+    const others = nonIncumbent.filter((s) => !pinnedSuppliers.has(s.id));
 
     // Sort pinned and others by rank
-    pinned.sort((a, b) => a.rank - b.rank)
-    others.sort((a, b) => a.rank - b.rank)
+    pinned.sort((a, b) => a.rank - b.rank);
+    others.sort((a, b) => a.rank - b.rank);
 
-    return incumbent ? [incumbent, ...pinned, ...others] : [...pinned, ...others]
-  }, [suppliers, hiddenSuppliers, pinnedSuppliers, columnOrder])
+    return incumbent ? [incumbent, ...pinned, ...others] : [...pinned, ...others];
+  }, [suppliers, hiddenSuppliers, pinnedSuppliers, columnOrder]);
 
   // Calculate per-product averages if detailData is provided
   const perProductAverages = useMemo(() => {
-    if (!detailData) return null
-    const supplierIds = sortedSuppliers.map((s) => s.id)
-    return calculatePerProductAverages(detailData, supplierIds)
-  }, [detailData, sortedSuppliers])
+    if (!detailData) return null;
+    const supplierIds = sortedSuppliers.map((s) => s.id);
+    return calculatePerProductAverages(detailData, supplierIds);
+  }, [detailData, sortedSuppliers]);
 
   // Calculate per-product volumes
   const perProductVolumes = useMemo(() => {
-    if (sortedSuppliers.length === 0) return null
-    return calculatePerProductVolumes(sortedSuppliers)
-  }, [sortedSuppliers])
+    if (sortedSuppliers.length === 0) return null;
+    return calculatePerProductVolumes(sortedSuppliers);
+  }, [sortedSuppliers]);
 
   // Build metric rows
   const metricRows: MetricRow[] = useMemo(() => {
     // Build children rows for Avg Price if we have per-product data
-    const avgPriceChildren: MetricRow[] = []
+    const avgPriceChildren: MetricRow[] = [];
     if (perProductAverages) {
       // Order products in desired display order
-      const productOrder = ['87 Octane', '93 Octane', 'Diesel']
+      const productOrder = ['87 Octane', '93 Octane', 'Diesel'];
 
       productOrder.forEach((product) => {
         if (perProductAverages[product]) {
-          const productValues: Record<string, { value: string }> = {}
+          const productValues: Record<string, { value: string }> = {};
           sortedSuppliers.forEach((supplier) => {
-            const avgValue = perProductAverages[product][supplier.id]
-            productValues[supplier.id] = { value: avgValue ? formatPrice(avgValue) : '—' }
-          })
+            const avgValue = perProductAverages[product][supplier.id];
+            productValues[supplier.id] = { value: avgValue ? formatPrice(avgValue) : '—' };
+          });
           avgPriceChildren.push({
             key: `avgPrice-${product.toLowerCase().replace(' ', '-')}`,
             metric: 'price',
             label: product,
             values: productValues,
-          })
+          });
         }
-      })
+      });
     }
 
     // Build children rows for Total Volume if we have per-product data
-    const volumeChildren: MetricRow[] = []
+    const volumeChildren: MetricRow[] = [];
     if (perProductVolumes) {
-      const productOrder = ['87 Octane', '93 Octane', 'Diesel']
+      const productOrder = ['87 Octane', '93 Octane', 'Diesel'];
 
       productOrder.forEach((product) => {
         if (perProductVolumes[product]) {
-          const productValues: Record<string, { value: string }> = {}
+          const productValues: Record<string, { value: string }> = {};
           sortedSuppliers.forEach((supplier) => {
-            const volumeValue = perProductVolumes[product][supplier.id]
-            productValues[supplier.id] = { value: volumeValue ? formatVolume(volumeValue) : '—' }
-          })
+            const volumeValue = perProductVolumes[product][supplier.id];
+            productValues[supplier.id] = { value: volumeValue ? formatVolume(volumeValue) : '—' };
+          });
           volumeChildren.push({
             key: `volume-${product.toLowerCase().replace(' ', '-')}`,
             metric: 'volume',
             label: product,
             values: productValues,
-          })
+          });
         }
-      })
+      });
     }
 
     const rows: MetricRow[] = [
@@ -253,113 +265,116 @@ export function SupplierMatrixSection({
         label: 'Issues',
         values: {},
       },
-    ]
+    ];
 
     // Populate values for each supplier
     sortedSuppliers.forEach((supplier) => {
-      const m = supplier.metrics
-      rows[0].values[supplier.id] = { value: formatPrice(m.avgPrice) }
-      rows[1].values[supplier.id] = { value: formatVolume(m.totalVolume) }
-      rows[2].values[supplier.id] = { value: formatRatability(m.ratability), status: m.ratabilityStatus }
+      const m = supplier.metrics;
+      rows[0].values[supplier.id] = { value: formatPrice(m.avgPrice) };
+      rows[1].values[supplier.id] = { value: formatVolume(m.totalVolume) };
+      rows[2].values[supplier.id] = {
+        value: formatRatability(m.ratability),
+        status: m.ratabilityStatus,
+      };
       rows[3].values[supplier.id] = {
         value: formatAllocationPeriod(m.allocationPeriod),
         status: m.allocationStatus,
-      }
-      rows[4].values[supplier.id] = { value: formatPenalties(m.penalties), status: m.penaltiesStatus }
+      };
+      rows[4].values[supplier.id] = {
+        value: formatPenalties(m.penalties),
+        status: m.penaltiesStatus,
+      };
       rows[5].values[supplier.id] = {
         value: m.issues.toString(),
         status: m.issues > 0 ? 'fail' : 'pass',
-      }
-    })
+      };
+    });
 
-    return rows
-  }, [sortedSuppliers, perProductAverages, perProductVolumes])
+    return rows;
+  }, [sortedSuppliers, perProductAverages, perProductVolumes]);
 
   // Check if supplier is dimmed by search
   const isDimmed = useCallback(
     (supplier: Supplier) => {
-      if (!searchQuery) return false
-      return !supplier.name.toLowerCase().includes(searchQuery.toLowerCase())
+      if (!searchQuery) return false;
+      return !supplier.name.toLowerCase().includes(searchQuery.toLowerCase());
     },
     [searchQuery]
-  )
+  );
 
   // Drag handlers for column reordering
-  const handleDragStart = useCallback(
-    (e: React.DragEvent, supplierId: string) => {
-      setDraggingId(supplierId)
-      e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/plain', supplierId)
-    },
-    []
-  )
+  const handleDragStart = useCallback((e: React.DragEvent, supplierId: string) => {
+    setDraggingId(supplierId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', supplierId);
+  }, []);
 
   const handleDragOver = useCallback(
     (e: React.DragEvent, supplierId: string) => {
-      e.preventDefault()
-      e.dataTransfer.dropEffect = 'move'
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
       if (supplierId !== draggingId) {
-        setDragOverId(supplierId)
+        setDragOverId(supplierId);
       }
     },
     [draggingId]
-  )
+  );
 
   const handleDragLeave = useCallback(() => {
-    setDragOverId(null)
-  }, [])
+    setDragOverId(null);
+  }, []);
 
   const handleDrop = useCallback(
     (e: React.DragEvent, targetSupplierId: string) => {
-      e.preventDefault()
-      const sourceSupplierId = e.dataTransfer.getData('text/plain')
+      e.preventDefault();
+      const sourceSupplierId = e.dataTransfer.getData('text/plain');
 
       if (sourceSupplierId && sourceSupplierId !== targetSupplierId && onColumnReorder) {
         // Get current order (excluding incumbent)
-        const nonIncumbent = sortedSuppliers.filter((s) => !s.isIncumbent)
-        const currentOrder = nonIncumbent.map((s) => s.id)
+        const nonIncumbent = sortedSuppliers.filter((s) => !s.isIncumbent);
+        const currentOrder = nonIncumbent.map((s) => s.id);
 
         // Find positions
-        const sourceIndex = currentOrder.indexOf(sourceSupplierId)
-        const targetIndex = currentOrder.indexOf(targetSupplierId)
+        const sourceIndex = currentOrder.indexOf(sourceSupplierId);
+        const targetIndex = currentOrder.indexOf(targetSupplierId);
 
         if (sourceIndex !== -1 && targetIndex !== -1) {
           // Reorder
-          const newOrder = [...currentOrder]
-          newOrder.splice(sourceIndex, 1)
-          newOrder.splice(targetIndex, 0, sourceSupplierId)
-          onColumnReorder(newOrder)
+          const newOrder = [...currentOrder];
+          newOrder.splice(sourceIndex, 1);
+          newOrder.splice(targetIndex, 0, sourceSupplierId);
+          onColumnReorder(newOrder);
         }
       }
 
-      setDraggingId(null)
-      setDragOverId(null)
+      setDraggingId(null);
+      setDragOverId(null);
     },
     [sortedSuppliers, onColumnReorder]
-  )
+  );
 
   const handleDragEnd = useCallback(() => {
-    setDraggingId(null)
-    setDragOverId(null)
-  }, [])
+    setDraggingId(null);
+    setDragOverId(null);
+  }, []);
 
   // Toggle row expansion
   const handleToggleExpand = useCallback((key: string) => {
     setExpandedRows((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    )
-  }, [])
+    );
+  }, []);
 
   // Render supplier header cell
   const renderSupplierHeader = useCallback(
     (supplier: Supplier) => {
-      const isSelected = selectedSuppliers.has(supplier.id)
-      const isPinned = pinnedSuppliers.has(supplier.id)
-      const dimmed = isDimmed(supplier)
-      const isDragging = draggingId === supplier.id
-      const isDragOver = dragOverId === supplier.id
-      const canDrag = !supplier.isIncumbent && !isViewingHistory && isManualMode && onColumnReorder
-      const disposition = supplierDispositions?.get(supplier.id)
+      const isSelected = selectedSuppliers.has(supplier.id);
+      const isPinned = pinnedSuppliers.has(supplier.id);
+      const dimmed = isDimmed(supplier);
+      const isDragging = draggingId === supplier.id;
+      const isDragOver = dragOverId === supplier.id;
+      const canDrag = !supplier.isIncumbent && !isViewingHistory && isManualMode && onColumnReorder;
+      const disposition = supplierDispositions?.get(supplier.id);
 
       const headerClasses = [
         styles.supplierHeader,
@@ -367,9 +382,10 @@ export function SupplierMatrixSection({
         dimmed ? styles.dimmed : '',
         isDragging ? styles.supplierHeaderDragging : '',
         isDragOver ? styles.supplierHeaderDragOver : '',
+        disposition === 'eliminate' ? styles.eliminated : '',
       ]
         .filter(Boolean)
-        .join(' ')
+        .join(' ');
 
       return (
         <div
@@ -384,7 +400,11 @@ export function SupplierMatrixSection({
           {/* Selection - always checkbox for multi-select in all rounds */}
           <Horizontal justifyContent="space-between" alignItems="center" className="mb-1">
             {!isViewingHistory && (
-              <Checkbox checked={isSelected} onChange={() => onToggleSelection(supplier.id)} />
+              <Checkbox
+                checked={isSelected}
+                onChange={() => onToggleSelection(supplier.id)}
+                disabled={disposition === 'eliminate'}
+              />
             )}
             {isViewingHistory && <div />}
 
@@ -394,7 +414,7 @@ export function SupplierMatrixSection({
                 <>
                   {/* Drag handle - only for non-incumbent when reorder is enabled */}
                   {canDrag && (
-                    <Tooltip title='Drag to reorder'>
+                    <Tooltip title="Drag to reorder">
                       <span className={styles.dragHandle}>
                         <HolderOutlined />
                       </span>
@@ -410,13 +430,13 @@ export function SupplierMatrixSection({
                   )}
                   {/* Hide icon - not available for incumbent */}
                   {!supplier.isIncumbent ? (
-                    <Tooltip title='Hide'>
+                    <Tooltip title="Hide">
                       <span className={styles.actionIcon} onClick={() => onToggleHide(supplier.id)}>
                         <EyeInvisibleOutlined />
                       </span>
                     </Tooltip>
                   ) : (
-                    <Tooltip title='Incumbent'>
+                    <Tooltip title="Incumbent">
                       <span className={`${styles.actionIcon} ${styles.disabled}`}>
                         <LockOutlined />
                       </span>
@@ -435,7 +455,22 @@ export function SupplierMatrixSection({
               <span className={styles.dispositionAdvancing}>ADVANCING</span>
             )}
             {!isViewingHistory && disposition === 'eliminate' && (
-              <span className={styles.dispositionEliminated}>ELIMINATED</span>
+              <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                <span className={styles.dispositionEliminated}>ELIMINATED</span>
+                {onUndoElimination && (
+                  <Tooltip title="Undo elimination">
+                    <span
+                      className={styles.undoIcon}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUndoElimination(supplier.id);
+                      }}
+                    >
+                      <UndoOutlined />
+                    </span>
+                  </Tooltip>
+                )}
+              </Horizontal>
             )}
             <Texto weight="600">
               {supplier.name}
@@ -453,7 +488,7 @@ export function SupplierMatrixSection({
             </div>
           </Vertical>
         </div>
-      )
+      );
     },
     [
       selectedSuppliers,
@@ -466,6 +501,7 @@ export function SupplierMatrixSection({
       onTogglePin,
       onToggleHide,
       onColumnReorder,
+      onUndoElimination,
       draggingId,
       dragOverId,
       handleDragStart,
@@ -474,7 +510,7 @@ export function SupplierMatrixSection({
       handleDrop,
       handleDragEnd,
     ]
-  )
+  );
 
   // Build table columns
   const columns: ColumnsType<MetricRow> = useMemo(() => {
@@ -486,21 +522,25 @@ export function SupplierMatrixSection({
         width: 140,
         fixed: 'left',
         render: (label: string, record: MetricRow) => {
-          const isExpanded = expandedRows.includes(record.key)
-          const isExpandable = record.isExpandable && record.children && record.children.length > 0
+          const isExpanded = expandedRows.includes(record.key);
+          const isExpandable = record.isExpandable && record.children && record.children.length > 0;
+          // Check if this is a child row (product-specific) by checking if it's a nested row
+          const isChildRow = record.key.startsWith('avgPrice-') || record.key.startsWith('volume-');
+          // Extract product name for child rows (label contains the product like "87 Octane")
+          const productFilter = isChildRow ? record.label : undefined;
 
           return (
             <div
               className={`${styles.metricLabel} ${record.metric === currentMetric ? styles.metricActive : ''}`}
-              onClick={() => onMetricClick?.(record.metric)}
+              onClick={() => onMetricClick?.(record.metric, productFilter)}
             >
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+              <Horizontal alignItems="center" style={{ gap: '8px' }}>
                 {isExpandable && (
                   <span
                     className={styles.expandIcon}
                     onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleExpand(record.key)
+                      e.stopPropagation();
+                      handleToggleExpand(record.key);
                     }}
                     style={{
                       transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
@@ -513,34 +553,35 @@ export function SupplierMatrixSection({
                 <Texto weight="600">{label}</Texto>
               </Horizontal>
             </div>
-          )
+          );
         },
       },
-    ]
+    ];
 
     // Add a column for each supplier
     sortedSuppliers.forEach((supplier) => {
+      const isEliminated = supplierDispositions?.get(supplier.id) === 'eliminate';
       cols.push({
         title: renderSupplierHeader(supplier),
         dataIndex: ['values', supplier.id, 'value'],
         key: supplier.id,
         width: 150,
-        className: `${supplier.isIncumbent ? styles.incumbentColumn : ''} ${isDimmed(supplier) ? styles.dimmedColumn : ''}`,
+        className: `${supplier.isIncumbent ? styles.incumbentColumn : ''} ${isDimmed(supplier) ? styles.dimmedColumn : ''} ${isEliminated ? styles.eliminatedColumn : ''}`,
         render: (_: unknown, record: MetricRow) => {
-          const cellData = record.values[supplier.id]
-          if (!cellData) return null
+          const cellData = record.values[supplier.id];
+          if (!cellData) return null;
 
           // Special rendering for Issues row - wrap in Popover
           if (record.key === 'issues') {
-            const hasIssues = supplier.metrics.issues > 0
+            const hasIssues = supplier.metrics.issues > 0;
             return (
               <Popover
                 content={<IssuesDetailContent supplier={supplier} />}
-                trigger='click'
-                placement='bottom'
+                trigger="click"
+                placement="bottom"
               >
                 <Horizontal
-                  alignItems='center'
+                  alignItems="center"
                   style={{ gap: '8px', cursor: 'pointer' }}
                   className={hasIssues ? styles.issuesClickable : undefined}
                 >
@@ -548,42 +589,54 @@ export function SupplierMatrixSection({
                   <StatusIndicator status={cellData.status} />
                 </Horizontal>
               </Popover>
-            )
+            );
           }
 
           return (
-            <Horizontal alignItems='center' style={{ gap: '8px' }}>
+            <Horizontal alignItems="center" style={{ gap: '8px' }}>
               <Texto>{cellData.value}</Texto>
               <StatusIndicator status={cellData.status} />
             </Horizontal>
-          )
+          );
         },
-      })
-    })
+      });
+    });
 
-    return cols
-  }, [sortedSuppliers, currentMetric, renderSupplierHeader, isDimmed, onMetricClick, expandedRows, handleToggleExpand])
+    return cols;
+  }, [
+    sortedSuppliers,
+    currentMetric,
+    renderSupplierHeader,
+    isDimmed,
+    onMetricClick,
+    expandedRows,
+    handleToggleExpand,
+    supplierDispositions,
+  ]);
 
   // Build table data with expanded children
   const tableData = useMemo(() => {
-    const result: MetricRow[] = []
+    const result: MetricRow[] = [];
     metricRows.forEach((row) => {
-      result.push(row)
+      result.push(row);
       // If this row is expanded and has children, add them
       if (expandedRows.includes(row.key) && row.children) {
         row.children.forEach((child) => {
           result.push({
             ...child,
             key: child.key, // Keep the child key
-          })
-        })
+          });
+        });
       }
-    })
-    return result
-  }, [metricRows, expandedRows])
+    });
+    return result;
+  }, [metricRows, expandedRows]);
 
   return (
-    <div className={styles.matrixContainer} style={{ height: 'auto', minHeight: 'fit-content', flexShrink: 0 }}>
+    <div
+      className={styles.matrixContainer}
+      style={{ height: 'auto', minHeight: 'fit-content', flexShrink: 0 }}
+    >
       <Table
         columns={columns}
         dataSource={tableData}
@@ -594,11 +647,11 @@ export function SupplierMatrixSection({
         tableLayout="auto"
         expandable={{ childrenColumnName: 'notUsed' }}
         rowClassName={(record) => {
-          const isAvgPriceChild = record.key.startsWith('avgPrice-') && record.key !== 'avgPrice'
-          const isVolumeChild = record.key.startsWith('volume-') && record.key !== 'totalVolume'
-          return isAvgPriceChild || isVolumeChild ? styles.childRow : ''
+          const isAvgPriceChild = record.key.startsWith('avgPrice-') && record.key !== 'avgPrice';
+          const isVolumeChild = record.key.startsWith('volume-') && record.key !== 'totalVolume';
+          return isAvgPriceChild || isVolumeChild ? styles.childRow : '';
         }}
       />
     </div>
-  )
+  );
 }

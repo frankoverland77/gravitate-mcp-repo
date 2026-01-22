@@ -88,3 +88,81 @@ Product and design team reviewed prototype for RFP Management feature, focusing 
 - Deferred from: RFP creation flow, bulk change implementation, historical round comparison with actual data diffs
 
 ---
+
+## [CONVERSATION: 2026-01-21 | Type: Product-Design Daily Sync]
+Participants: Agustin Reichhardt (Product), Frank Overland (Design)
+Project: RFP Management
+Prior Reference: Session 4 (2026-01-19) from project-context.md
+
+### Summary
+Product and design reviewed latest RFP prototype with focus on parameter configuration UX, elimination flow details, supplier matrix interactions, and bid editing complexity. Key insight emerged that bids are collections of contract details with formula-based pricing, not simple numeric values. Discussion identified need for research on ratability representation before finalizing that section.
+
+### Key Points
+- Issue importance parameter section needs UX rethink - drag-and-drop instead of up/down arrows, must support ties in rankings
+- Elimination flow with reason text box is good, but reason should NOT be required (can be null)
+- Product clicks in supplier matrix should filter the detail grid below (e.g., click 87 octane in summary -> filter detail grid to 87 octane)
+- Ratability representation unclear - need research on how buyers get offered ratability from sellers (volume per month? percentage min/max? other?)
+- Eliminated suppliers should stay visible with red highlight in current round until advancement, not disappear immediately
+- Need "Select remaining" or "Select undesignated" button for easier bulk advancement marking
+- Edit bids should happen BETWEEN rounds (after R1 completion, before R2 comparison begins), not during round 2
+- Critical insight: Bids are NOT simple prices - they are formulas equivalent to contract details with variables (publisher, instrument, price type, differential, date rule)
+- Each cell in the product/location detail grid represents a full pricing formula, not a single number
+- Excel upload may be preferable to UI editing given complexity of formula editing
+- Need version history for bid changes (like git commits with version number, editor, timestamp, description)
+- Future state idea: LLM-powered prompting for bulk bid formula changes (e.g., "change Platts to Argus for all Marathon 87 octane products")
+- Multiple bids from same supplier need description field (like contract description/comments field)
+
+### Decisions
+- [DECIDED] Issue importance ranking UX should use drag-and-drop instead of up/down arrows | Decided by: Agustin Reichhardt
+- [DECIDED] Issue importance must support ties (not all parameters ranked sequentially) | Decided by: Agustin Reichhardt
+- [DECIDED] Elimination reason text box should NOT be required - can be null | Decided by: Agustin Reichhardt
+- [DECIDED] Clicking product in supplier matrix summary should filter the detail grid to that product | Decided by: Agustin Reichhardt, Frank Overland
+- [DECIDED] Eliminated suppliers should remain visible with red highlight in current round until advancement to next round | Decided by: Agustin Reichhardt
+- [DECIDED] Add "Select remaining" or "Select undesignated" button to quickly mark all non-eliminated suppliers for advancement | Decided by: Agustin Reichhardt, Frank Overland
+- [DECIDED] Bid editing happens BETWEEN rounds, not during round 2 - complete R1 -> edit bids -> start R2 | Decided by: Agustin Reichhardt
+- [DECIDED] Bids = collections of contract details with formulas - same data model as Contract Measurement price scenarios | Decided by: Agustin Reichhardt
+- [DECIDED] Consider Excel upload for bid editing instead of/in addition to UI editing due to formula complexity | Decided by: Agustin Reichhardt
+- [DECIDED] Bid edits need version history with metadata (like git commits) | Decided by: Agustin Reichhardt, Frank Overland
+- [DECIDED] Multiple bids from same supplier get description via text field (same pattern as contract description/comments) | Decided by: Agustin Reichhardt
+
+### Action Items
+- [OWNER: Frank Overland] Change issue importance parameter UX from up/down arrows to drag-and-drop with tie support | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Make elimination reason text box optional (not required) | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Implement product click filtering - clicking product in summary filters detail grid | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Keep eliminated suppliers visible with red highlight until round advancement | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Add "Select remaining" / "Select undesignated" button for bulk advancement marking | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Move bid editing to happen between rounds (after R1 complete, before R2 starts) | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Design version history panel for bid changes (git-style with version, editor, timestamp, description) | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Add upload button for Excel bid imports | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Document Contract Measurement data model (details, formulas, variables) for bid editing design | Due: unspecified | Status: OPEN
+- [OWNER: Frank Overland] Design future-state LLM prompting concept for bulk bid changes (for demo/selling purposes) | Due: unspecified | Priority: LOW | Status: OPEN
+- [OWNER: Product Team] Research how ratability is offered from sellers to buyers (volume per month vs percentage vs other) | Due: unspecified | Status: OPEN
+- [OWNER: Product Team] Decide if bids require draft contracts or can be simpler bid-specific objects | Due: unspecified | Status: OPEN
+
+### Open Threads
+- Ratability representation: Need customer research on how buyers receive ratability offers from sellers
+- Bid creation flow: Should bids require creating draft contracts first, or should bids be simpler objects?
+- Bid editing: UI editing vs Excel upload - may support both, but prioritize Excel given formula complexity
+- LLM prompting: Future state concept for bulk formula changes (not MVP priority)
+
+### Technical Insights
+**Bid = Collection of Contract Details with Formulas**
+- Each product/location cell represents a pricing formula, not a simple number
+- Formulas have variables: percentage, publisher, instrument, price type, differential, date rule
+- A formula can have multiple variables
+- Example: "87 Octane Dallas" has a formula with variables like Platts + Argus percentages, differential, etc.
+- When editing bids, users edit the formula (e.g., change Platts to Argus), not just a price number
+- This complexity makes UI-based editing challenging - Excel upload may be more practical
+
+**Bid Versioning**
+- Each bid edit creates a new version
+- Version metadata: version number, edited by, timestamp, description of changes
+- Display like git commit history in right panel
+- Versions should follow round boundaries (R1 = original, post-R1 edits = v2, etc.)
+
+### Context Links
+- Relates to: Session 4 (2026-01-19) - Product review and UX refinements
+- Relates to: Contract Measurement details/formulas data model
+- Builds on: Sessions 1-4 establishing core RFP flow, supplier comparison, elimination tracking
+
+---

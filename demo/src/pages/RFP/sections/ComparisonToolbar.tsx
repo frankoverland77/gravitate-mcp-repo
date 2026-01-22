@@ -1,69 +1,77 @@
-import { useCallback } from 'react'
-import { Horizontal, Vertical, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
-import { SearchOutlined, SettingOutlined, SwapOutlined, EyeInvisibleOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons'
-import { Select, Input, Popover, Checkbox, Tooltip } from 'antd'
-import type { SortOption, ThresholdConfig } from '../rfp.types'
-import { SORT_OPTIONS, ALLOCATION_PERIOD_OPTIONS } from '../rfp.types'
-import styles from './ComparisonToolbar.module.css'
+import { useCallback } from 'react';
+import {
+  Horizontal,
+  Vertical,
+  Texto,
+  GraviButton,
+  NotificationMessage,
+} from '@gravitate-js/excalibrr';
+import {
+  SearchOutlined,
+  SettingOutlined,
+  SwapOutlined,
+  EyeInvisibleOutlined,
+  StopOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
+import { Select, Input, Popover, Checkbox, Tooltip } from 'antd';
+import type { SortOption, ThresholdConfig } from '../rfp.types';
+import { SORT_OPTIONS, ALLOCATION_PERIOD_OPTIONS } from '../rfp.types';
+import styles from './ComparisonToolbar.module.css';
 
 // Round completion status from parent
 interface RoundCompletionStatus {
-  advancingCount: number
-  eliminatedCount: number
-  pendingCount: number
-  canAdvance: boolean
-  activeCount: number
+  advancingCount: number;
+  eliminatedCount: number;
+  pendingCount: number;
+  canAdvance: boolean;
+  activeCount: number;
 }
 
 // Historical outcome for completed rounds
 interface HistoricalOutcome {
-  advancedCount: number
-  eliminatedCount: number
-  nextRound: number
+  advancedCount: number;
+  eliminatedCount: number;
+  nextRound: number;
 }
 
 interface ComparisonToolbarProps {
-  round: number // Now supports any round number
-  sortOrder: SortOption
-  searchQuery: string
-  thresholds: ThresholdConfig
-  hiddenSuppliers: Set<string>
-  hiddenSupplierNames?: Record<string, string>
-  isManualMode?: boolean
-  onSortChange: (sortOrder: SortOption) => void
-  onSearchChange: (query: string) => void
-  onToggleManualMode?: () => void
-  onShowSupplier?: (supplierId: string) => void
-  onShowAllSuppliers?: () => void
-  onOpenThresholds?: () => void
-  onAdvanceToNextRound?: () => void // Generic handler for any round
-  onAward?: () => void
-  onEditBids?: () => void
-  onOpenEliminationModal?: () => void // Open elimination modal
-  onMarkAdvancing?: () => void // Mark selected as advancing
-  selectedCount?: number
-  isViewingHistory?: boolean
+  round: number; // Now supports any round number
+  sortOrder: SortOption;
+  searchQuery: string;
+  thresholds: ThresholdConfig;
+  hiddenSuppliers: Set<string>;
+  hiddenSupplierNames?: Record<string, string>;
+  isManualMode?: boolean;
+  onSortChange: (sortOrder: SortOption) => void;
+  onSearchChange: (query: string) => void;
+  onToggleManualMode?: () => void;
+  onShowSupplier?: (supplierId: string) => void;
+  onShowAllSuppliers?: () => void;
+  onOpenThresholds?: () => void;
+  onAdvanceToNextRound?: () => void; // Generic handler for any round
+  onAward?: () => void;
+  onEditBids?: () => void;
+  onOpenEliminationModal?: () => void; // Open elimination modal
+  onMarkAdvancing?: () => void; // Mark selected as advancing
+  onSelectPending?: () => void; // Select all pending suppliers
+  selectedCount?: number;
+  isViewingHistory?: boolean;
   // Disposition status
-  roundCompletionStatus?: RoundCompletionStatus
+  roundCompletionStatus?: RoundCompletionStatus;
   // Historical view support
-  viewingRound?: number // Which round we're viewing (for history)
-  historicalOutcome?: HistoricalOutcome // Outcome of a completed round
-  onViewCurrentRound?: () => void // Navigate to current round
+  viewingRound?: number; // Which round we're viewing (for history)
+  historicalOutcome?: HistoricalOutcome; // Outcome of a completed round
+  onViewCurrentRound?: () => void; // Navigate to current round
 }
 
 // Threshold pill component
-function ThresholdPill({
-  label,
-  onClick,
-}: {
-  label: string
-  onClick?: () => void
-}) {
+function ThresholdPill({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <span className={styles.thresholdPill} onClick={onClick}>
       {label}
     </span>
-  )
+  );
 }
 
 // Hidden suppliers popover content
@@ -73,12 +81,12 @@ function HiddenSuppliersPopover({
   onShowSupplier,
   onShowAllSuppliers,
 }: {
-  hiddenSuppliers: Set<string>
-  hiddenSupplierNames: Record<string, string>
-  onShowSupplier?: (supplierId: string) => void
-  onShowAllSuppliers?: () => void
+  hiddenSuppliers: Set<string>;
+  hiddenSupplierNames: Record<string, string>;
+  onShowSupplier?: (supplierId: string) => void;
+  onShowAllSuppliers?: () => void;
 }) {
-  const hiddenList = Array.from(hiddenSuppliers)
+  const hiddenList = Array.from(hiddenSuppliers);
 
   return (
     <div className={styles.hiddenPopover}>
@@ -98,7 +106,7 @@ function HiddenSuppliersPopover({
         style={{ padding: 0, marginTop: '8px' }}
       />
     </div>
-  )
+  );
 }
 
 export function ComparisonToolbar({
@@ -120,6 +128,7 @@ export function ComparisonToolbar({
   onEditBids,
   onOpenEliminationModal,
   onMarkAdvancing,
+  onSelectPending,
   selectedCount = 0,
   isViewingHistory = false,
   roundCompletionStatus,
@@ -127,41 +136,47 @@ export function ComparisonToolbar({
   onViewCurrentRound,
 }: ComparisonToolbarProps) {
   // Format threshold labels
-  const penaltyLabel = `≤${thresholds.penaltyMax}¢/gal`
-  const ratabilityLabel = `${thresholds.ratabilityMin}-${thresholds.ratabilityMax}%`
-  const allocationLabel = ALLOCATION_PERIOD_OPTIONS.find((opt) => opt.value === thresholds.allocationMin)?.label || 'Monthly'
+  const penaltyLabel = `≤${thresholds.penaltyMax}¢/gal`;
+  const ratabilityLabel = `${thresholds.ratabilityMin}-${thresholds.ratabilityMax}%`;
+  const allocationLabel =
+    ALLOCATION_PERIOD_OPTIONS.find((opt) => opt.value === thresholds.allocationMin)?.label ||
+    'Monthly';
 
   // Handle edit bids click
   const handleEditBids = useCallback(() => {
     if (onEditBids) {
-      onEditBids()
+      onEditBids();
     } else {
-      NotificationMessage('Coming Soon', 'Edit bids functionality will be available in a future release.', false)
+      NotificationMessage(
+        'Coming Soon',
+        'Edit bids functionality will be available in a future release.',
+        false
+      );
     }
-  }, [onEditBids])
+  }, [onEditBids]);
 
   // Determine if actions should be disabled based on disposition status
-  const canEliminate = selectedCount >= 1
-  const canMarkAdvancing = selectedCount >= 1
-  const canAward = selectedCount >= 1
+  const canEliminate = selectedCount >= 1;
+  const canMarkAdvancing = selectedCount >= 1;
+  const canAward = selectedCount >= 1;
 
   // For advancing, use disposition-based validation if available
-  const canAdvanceRound = roundCompletionStatus?.canAdvance ?? false
+  const canAdvanceRound = roundCompletionStatus?.canAdvance ?? false;
 
   // Tooltip for advance button when disabled
   const getAdvanceTooltip = () => {
-    if (!roundCompletionStatus) return 'Loading...'
-    const { pendingCount, advancingCount } = roundCompletionStatus
+    if (!roundCompletionStatus) return 'Loading...';
+    const { pendingCount, advancingCount } = roundCompletionStatus;
     if (pendingCount > 0) {
-      return `Set disposition for all ${pendingCount} pending supplier${pendingCount !== 1 ? 's' : ''} first`
+      return `Set disposition for all ${pendingCount} pending supplier${pendingCount !== 1 ? 's' : ''} first`;
     }
     if (advancingCount < 2) {
-      return 'Mark at least 2 suppliers as advancing'
+      return 'Mark at least 2 suppliers as advancing';
     }
-    return undefined
-  }
+    return undefined;
+  };
 
-  const advanceTooltip = !canAdvanceRound ? getAdvanceTooltip() : undefined
+  const advanceTooltip = !canAdvanceRound ? getAdvanceTooltip() : undefined;
 
   return (
     <Vertical className={styles.toolbar}>
@@ -221,10 +236,27 @@ export function ComparisonToolbar({
           {!isViewingHistory && (
             <>
               {round >= 2 && (
-                <GraviButton buttonText="Edit Bids" appearance="outlined" onClick={handleEditBids} />
+                <GraviButton
+                  buttonText="Edit Bids"
+                  appearance="outlined"
+                  onClick={handleEditBids}
+                />
               )}
 
-              <Tooltip title={!canMarkAdvancing ? 'Select suppliers to mark as advancing' : undefined}>
+              {onSelectPending &&
+                roundCompletionStatus &&
+                roundCompletionStatus.pendingCount > 0 && (
+                  <GraviButton
+                    buttonText={`Select Remaining (${roundCompletionStatus.pendingCount})`}
+                    icon={<CheckCircleOutlined />}
+                    appearance="outlined"
+                    onClick={onSelectPending}
+                  />
+                )}
+
+              <Tooltip
+                title={!canMarkAdvancing ? 'Select suppliers to mark as advancing' : undefined}
+              >
                 <span>
                   <GraviButton
                     buttonText={`Mark Advancing (${selectedCount})`}
@@ -268,8 +300,8 @@ export function ComparisonToolbar({
           {isViewingHistory && historicalOutcome ? (
             <>
               <Texto category="p2" appearance="medium">
-                Sent {historicalOutcome.advancedCount} to Round {historicalOutcome.nextRound} · Eliminated{' '}
-                {historicalOutcome.eliminatedCount}
+                Sent {historicalOutcome.advancedCount} to Round {historicalOutcome.nextRound} ·
+                Eliminated {historicalOutcome.eliminatedCount}
               </Texto>
               <GraviButton
                 buttonText={`View Round ${historicalOutcome.nextRound}`}
@@ -280,7 +312,8 @@ export function ComparisonToolbar({
           ) : roundCompletionStatus ? (
             <>
               <Texto category="p2" appearance="medium">
-                {roundCompletionStatus.advancingCount} advancing · {roundCompletionStatus.eliminatedCount} eliminated ·{' '}
+                {roundCompletionStatus.advancingCount} advancing ·{' '}
+                {roundCompletionStatus.eliminatedCount} eliminated ·{' '}
                 {roundCompletionStatus.pendingCount} pending
               </Texto>
 
@@ -306,5 +339,5 @@ export function ComparisonToolbar({
         </Horizontal>
       </Horizontal>
     </Vertical>
-  )
+  );
 }

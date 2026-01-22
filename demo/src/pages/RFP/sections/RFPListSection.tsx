@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
 import { PlusOutlined, RightOutlined } from '@ant-design/icons'
-import type { ColDef, ICellRendererParams, RowClassParams, RowStyle } from 'ag-grid-community'
+import type { ColDef, ICellRendererParams, RowStyle } from 'ag-grid-community'
 import type { RFP } from '../rfp.types'
 import { SAMPLE_RFPS, RFP_LIST_STATS } from '../rfp.data'
 import styles from './RFPListSection.module.css'
@@ -61,16 +61,11 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
     return <Texto>${value.toFixed(2)}/gal</Texto>
   }, [])
 
-  // Action button cell renderer - now shows for all statuses
+  // Action button cell renderer - shows View button for all RFPs
   const actionRenderer = useCallback(
     (params: ICellRendererParams<RFP>) => {
       const rfp = params.data
       if (!rfp) return null
-      // Show View button for active RFPs (round1, round2)
-      // For draft/awarded, no click action but still render a placeholder for consistency
-      if (rfp.status === 'draft' || rfp.status === 'awarded') {
-        return <Texto appearance='medium'>—</Texto>
-      }
       return (
         <GraviButton
           type='link'
@@ -128,11 +123,11 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
     [statusRenderer, suppliersRenderer, targetRenderer, actionRenderer]
   )
 
-  // Row click handler
+  // Row click handler - all RFPs are clickable
   const handleRowClick = useCallback(
     (params: { data: RFP | undefined }) => {
       const rfp = params.data
-      if (rfp && rfp.status !== 'draft' && rfp.status !== 'awarded') {
+      if (rfp) {
         onRFPClick(rfp)
       }
     },
@@ -175,11 +170,7 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
           agPropOverrides={{
             domLayout: 'autoHeight',
             onRowClicked: handleRowClick,
-            getRowStyle: (params: RowClassParams<RFP>): RowStyle | undefined => {
-              const rfp = params.data
-              if (rfp && (rfp.status === 'draft' || rfp.status === 'awarded')) {
-                return { cursor: 'default', opacity: 0.7 }
-              }
+            getRowStyle: (): RowStyle | undefined => {
               return { cursor: 'pointer' }
             },
           }}

@@ -1,5 +1,6 @@
-import { Vertical, Texto } from '@gravitate-js/excalibrr'
+import { Vertical, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Collapse, Table } from 'antd'
+import { RollbackOutlined } from '@ant-design/icons'
 import type { Supplier, EliminatedSupplierInfo } from '../rfp.types'
 import { formatPrice } from '../rfp.data'
 import styles from './EliminatedSuppliersSection.module.css'
@@ -10,12 +11,14 @@ interface EliminatedSuppliersSectionProps {
   eliminatedSuppliers: Map<number, EliminatedSupplierInfo[]>
   allSuppliers: Supplier[] // For potential future use (e.g., cross-referencing)
   currentRound: number
+  onRestoreSupplier?: (supplierId: string, fromRound: number) => void
 }
 
 export function EliminatedSuppliersSection({
   eliminatedSuppliers,
   allSuppliers: _allSuppliers, // Prefixed with _ to indicate intentionally unused
   currentRound,
+  onRestoreSupplier,
 }: EliminatedSuppliersSectionProps) {
   // Only show on Round 2+
   if (currentRound < 2) return null
@@ -33,25 +36,25 @@ export function EliminatedSuppliersSection({
   }, 0)
 
   // Build table columns
-  const columns = [
+  const baseColumns = [
     {
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'name',
-      width: '25%',
+      width: onRestoreSupplier ? '20%' : '25%',
     },
     {
       title: 'Elimination Price',
       dataIndex: 'priceAtElimination',
       key: 'price',
-      width: '15%',
+      width: onRestoreSupplier ? '12%' : '15%',
       render: (price: number) => formatPrice(price),
     },
     {
       title: 'Reason',
       dataIndex: 'reason',
       key: 'reason',
-      width: '40%',
+      width: onRestoreSupplier ? '30%' : '40%',
       render: (reason: string) => (
         <span style={{ color: 'var(--theme-color-2)' }}>{reason || '—'}</span>
       ),
@@ -59,12 +62,32 @@ export function EliminatedSuppliersSection({
     {
       title: 'Status',
       key: 'status',
-      width: '20%',
+      width: onRestoreSupplier ? '15%' : '20%',
       render: (_: unknown, record: EliminatedSupplierInfo) => (
         <span className={styles.statusBadge}>Eliminated R{record.eliminatedInRound}</span>
       ),
     },
   ]
+
+  // Add actions column if onRestoreSupplier is provided
+  const columns = onRestoreSupplier
+    ? [
+        ...baseColumns,
+        {
+          title: 'Actions',
+          key: 'actions',
+          width: '23%',
+          render: (_: unknown, record: EliminatedSupplierInfo) => (
+            <GraviButton
+              type="link"
+              buttonText={`Send to Round ${currentRound}`}
+              icon={<RollbackOutlined />}
+              onClick={() => onRestoreSupplier(record.supplierId, record.eliminatedInRound)}
+            />
+          ),
+        },
+      ]
+    : baseColumns
 
   return (
     <Vertical className={styles.eliminatedSection}>

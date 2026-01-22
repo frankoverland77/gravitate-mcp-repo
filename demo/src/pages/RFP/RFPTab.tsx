@@ -18,6 +18,7 @@ import type {
   DetailMetric,
   Supplier,
   EliminatedSupplierInfo,
+  DetailRowExtended,
 } from './rfp.types';
 import styles from './RFPTab.module.css';
 import {
@@ -27,8 +28,8 @@ import {
   PRODUCT_OPTIONS,
   LOCATION_OPTIONS,
 } from './rfp.types';
-import { ThresholdsModal, EliminationModal } from './components';
-import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS } from './rfp.data';
+import { ThresholdsModal, EliminationModal, EditBidsDrawer } from './components';
+import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS, SAMPLE_DETAILS_EXTENDED } from './rfp.data';
 import {
   RFPListSection,
   RoundStepper,
@@ -73,6 +74,8 @@ interface RFPTabState {
   activeSupplierIds: Set<string>; // suppliers still in the running
   // Disposition tracking for round completion
   supplierDispositions: Map<string, SupplierDisposition>; // supplierId -> disposition
+  // Pending elimination reasons (stored until round advances)
+  pendingEliminationReasons: Map<string, string>; // supplierId -> reason
   // Elimination modal
   isEliminationModalOpen: boolean;
   // Column reorder support
@@ -80,6 +83,9 @@ interface RFPTabState {
   // Detail grid filters (lifted from DetailGridSection for summary grid sync)
   selectedProducts: Set<string>;
   selectedLocations: Set<string>;
+  // Edit bids drawer
+  isEditBidsDrawerOpen: boolean;
+  extendedDetails: DetailRowExtended[];
 }
 
 const initialState: RFPTabState = {
@@ -105,7 +111,11 @@ const initialState: RFPTabState = {
   eliminatedSuppliers: new Map(),
   activeSupplierIds: new Set(SAMPLE_SUPPLIERS.map((s) => s.id)),
   // Disposition tracking - all active suppliers start as pending
-  supplierDispositions: new Map(SAMPLE_SUPPLIERS.map((s) => [s.id, 'pending' as SupplierDisposition])),
+  supplierDispositions: new Map(
+    SAMPLE_SUPPLIERS.map((s) => [s.id, 'pending' as SupplierDisposition])
+  ),
+  // Pending elimination reasons
+  pendingEliminationReasons: new Map(),
   // Elimination modal
   isEliminationModalOpen: false,
   // Column reorder support
@@ -113,6 +123,9 @@ const initialState: RFPTabState = {
   // Detail grid filters
   selectedProducts: new Set(PRODUCT_OPTIONS),
   selectedLocations: new Set(LOCATION_OPTIONS),
+  // Edit bids drawer
+  isEditBidsDrawerOpen: false,
+  extendedDetails: SAMPLE_DETAILS_EXTENDED,
 };
 
 export function RFPTab() {
@@ -183,6 +196,8 @@ export function RFPTab() {
         supplierDispositions: new Map(
           SAMPLE_SUPPLIERS.map((s) => [s.id, 'pending' as SupplierDisposition])
         ),
+        // Reset pending elimination reasons
+        pendingEliminationReasons: new Map(),
       }));
     }
   }, []);
@@ -209,6 +224,26 @@ export function RFPTab() {
       return { ...prev, selectedSuppliers: newSelections };
     });
   }, []);
+
+  // Select all pending suppliers
+  const handleSelectPending = useCallback(() => {
+    const pendingSupplierIds = new Set<string>();
+    state.activeSupplierIds.forEach((id) => {
+      if (state.supplierDispositions.get(id) === 'pending') {
+        pendingSupplierIds.add(id);
+      }
+    });
+
+    if (pendingSupplierIds.size === 0) {
+      NotificationMessage('No Pending Suppliers', 'All suppliers have been designated.', false);
+      return;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      selectedSuppliers: pendingSupplierIds,
+    }));
+  }, [state.activeSupplierIds, state.supplierDispositions]);
 
   // Hide/Pin handlers
   const handleToggleHide = useCallback((supplierId: string) => {
@@ -263,8 +298,12 @@ export function RFPTab() {
     setState((prev) => ({ ...prev, searchQuery }));
   }, []);
 
-  const handleMetricChange = useCallback((currentMetric: DetailMetric) => {
-    setState((prev) => ({ ...prev, currentMetric }));
+  const handleMetricChange = useCallback((currentMetric: DetailMetric, product?: string) => {
+    setState((prev) => {
+      // If a product is provided (clicking on child row), filter to only that product
+      const newProducts = product ? new Set([product]) : prev.selectedProducts;
+      return { ...prev, currentMetric, selectedProducts: newProducts };
+    });
   }, []);
 
   // Product/location filter handlers (lifted from DetailGridSection)
@@ -350,56 +389,33 @@ export function RFPTab() {
 
   const handleConfirmElimination = useCallback(
     (reason: string) => {
-      const eliminatedInfo: EliminatedSupplierInfo[] = Array.from(state.selectedSuppliers).map(
-        (id) => {
-          const supplier = SAMPLE_SUPPLIERS.find((s) => s.id === id);
-          return {
-            supplierId: id,
-            supplierName: supplier?.name || '',
-            eliminatedInRound: state.currentRound,
-            priceAtElimination: supplier?.metrics.avgPrice || 0,
-            reason: reason,
-          };
-        }
-      );
-
-      // Update eliminated suppliers map
-      const newEliminatedSuppliers = new Map(state.eliminatedSuppliers);
-      const existingEliminated = newEliminatedSuppliers.get(state.currentRound) || [];
-      newEliminatedSuppliers.set(state.currentRound, [...existingEliminated, ...eliminatedInfo]);
-
-      // Remove eliminated suppliers from active
-      const newActiveSupplierIds = new Set(state.activeSupplierIds);
-      state.selectedSuppliers.forEach((id) => newActiveSupplierIds.delete(id));
-
-      // Also set disposition to 'eliminate' for these suppliers
+      // Store elimination reasons for when we finalize eliminations on round advance
+      // For now, just mark the disposition as 'eliminate' - they stay visible in the table
       const newDispositions = new Map(state.supplierDispositions);
+      const newPendingReasons = new Map(state.pendingEliminationReasons);
+
       state.selectedSuppliers.forEach((id) => {
         newDispositions.set(id, 'eliminate');
+        newPendingReasons.set(id, reason);
       });
+
+      const count = state.selectedSuppliers.size;
 
       setState((prev) => ({
         ...prev,
-        eliminatedSuppliers: newEliminatedSuppliers,
-        activeSupplierIds: newActiveSupplierIds,
         supplierDispositions: newDispositions,
+        pendingEliminationReasons: newPendingReasons,
         selectedSuppliers: new Set(),
         isEliminationModalOpen: false,
       }));
 
       NotificationMessage(
-        'Suppliers Eliminated',
-        `${eliminatedInfo.length} supplier${eliminatedInfo.length !== 1 ? 's' : ''} eliminated from Round ${state.currentRound}.`,
+        'Marked for Elimination',
+        `${count} supplier${count !== 1 ? 's' : ''} marked for elimination. Use "Undo" to restore before advancing.`,
         false
       );
     },
-    [
-      state.selectedSuppliers,
-      state.currentRound,
-      state.eliminatedSuppliers,
-      state.activeSupplierIds,
-      state.supplierDispositions,
-    ]
+    [state.selectedSuppliers, state.supplierDispositions, state.pendingEliminationReasons]
   );
 
   // Get supplier names for elimination modal
@@ -435,6 +451,57 @@ export function RFPTab() {
       false
     );
   }, [state.selectedSuppliers]);
+
+  // Undo elimination - restore supplier to pending status (within current round)
+  const handleUndoElimination = useCallback((supplierId: string) => {
+    setState((prev) => {
+      const newDispositions = new Map(prev.supplierDispositions);
+      newDispositions.set(supplierId, 'pending');
+
+      // Remove from pending elimination reasons
+      const newPendingReasons = new Map(prev.pendingEliminationReasons);
+      newPendingReasons.delete(supplierId);
+
+      return {
+        ...prev,
+        supplierDispositions: newDispositions,
+        pendingEliminationReasons: newPendingReasons,
+      };
+    });
+    NotificationMessage('Restored', 'Supplier restored to pending status.', false);
+  }, []);
+
+  // Restore supplier from previous round eliminations (between-round restore)
+  const handleRestoreSupplier = useCallback(
+    (supplierId: string, fromRound: number) => {
+      setState((prev) => {
+        // Remove from eliminatedSuppliers
+        const newEliminatedSuppliers = new Map(prev.eliminatedSuppliers);
+        const roundEliminated = newEliminatedSuppliers.get(fromRound) || [];
+        newEliminatedSuppliers.set(
+          fromRound,
+          roundEliminated.filter((e) => e.supplierId !== supplierId)
+        );
+
+        // Add back to activeSupplierIds
+        const newActiveSupplierIds = new Set(prev.activeSupplierIds);
+        newActiveSupplierIds.add(supplierId);
+
+        // Set disposition to pending
+        const newDispositions = new Map(prev.supplierDispositions);
+        newDispositions.set(supplierId, 'pending');
+
+        return {
+          ...prev,
+          eliminatedSuppliers: newEliminatedSuppliers,
+          activeSupplierIds: newActiveSupplierIds,
+          supplierDispositions: newDispositions,
+        };
+      });
+      NotificationMessage('Restored', `Supplier restored to Round ${state.currentRound}.`, false);
+    },
+    [state.currentRound]
+  );
 
   // Round completion validation
   const getRoundCompletionStatus = useCallback(() => {
@@ -505,31 +572,27 @@ export function RFPTab() {
       }
     });
 
-    // Get eliminated suppliers (not in eliminatedSuppliers map yet but marked eliminate)
-    const currentSuppliers = getSortedSuppliers();
-    const alreadyEliminatedThisRound = state.eliminatedSuppliers.get(state.currentRound) || [];
-    const alreadyEliminatedIds = new Set(alreadyEliminatedThisRound.map((e) => e.supplierId));
-
-    // Only add new eliminations for suppliers not already in the eliminated list
-    const newEliminations: EliminatedSupplierInfo[] = currentSuppliers
-      .filter(
-        (s) =>
-          !advancingSupplierIds.has(s.id) && !alreadyEliminatedIds.has(s.id)
-      )
-      .map((s) => ({
-        supplierId: s.id,
-        supplierName: s.name,
-        eliminatedInRound: state.currentRound,
-        priceAtElimination: s.metrics.avgPrice,
-        reason: 'Not marked for advancement',
-      }));
+    // NOW finalize eliminations - get all suppliers marked as 'eliminate' and add to eliminated map
+    const eliminatedThisRound: EliminatedSupplierInfo[] = [];
+    state.activeSupplierIds.forEach((id) => {
+      if (state.supplierDispositions.get(id) === 'eliminate') {
+        const supplier = SAMPLE_SUPPLIERS.find((s) => s.id === id);
+        if (supplier) {
+          eliminatedThisRound.push({
+            supplierId: id,
+            supplierName: supplier.name,
+            eliminatedInRound: state.currentRound,
+            priceAtElimination: supplier.metrics.avgPrice,
+            reason: state.pendingEliminationReasons.get(id) || 'Eliminated in round',
+          });
+        }
+      }
+    });
 
     // Update eliminated suppliers map
     const newEliminatedSuppliers = new Map(state.eliminatedSuppliers);
-    newEliminatedSuppliers.set(state.currentRound, [
-      ...alreadyEliminatedThisRound,
-      ...newEliminations,
-    ]);
+    const existingEliminated = newEliminatedSuppliers.get(state.currentRound) || [];
+    newEliminatedSuppliers.set(state.currentRound, [...existingEliminated, ...eliminatedThisRound]);
 
     const nextRound = state.currentRound + 1;
 
@@ -549,9 +612,21 @@ export function RFPTab() {
       eliminatedSuppliers: newEliminatedSuppliers,
       activeSupplierIds: advancingSupplierIds,
       supplierDispositions: newDispositions,
+      pendingEliminationReasons: new Map(), // Clear pending reasons after finalization
     }));
-    NotificationMessage('Advanced', `${advancingSupplierIds.size} suppliers advanced to Round ${nextRound}!`, false);
-  }, [state.activeSupplierIds, state.supplierDispositions, state.currentRound, state.eliminatedSuppliers, getSortedSuppliers, getRoundCompletionStatus]);
+    NotificationMessage(
+      'Advanced',
+      `${advancingSupplierIds.size} suppliers advanced to Round ${nextRound}!`,
+      false
+    );
+  }, [
+    state.activeSupplierIds,
+    state.supplierDispositions,
+    state.currentRound,
+    state.eliminatedSuppliers,
+    state.pendingEliminationReasons,
+    getRoundCompletionStatus,
+  ]);
 
   const handleViewHistoricalRound = useCallback((round: number) => {
     setState((prev) => ({
@@ -607,6 +682,25 @@ export function RFPTab() {
       false
     );
     // In production, this would navigate to the Pricing Engine
+  }, []);
+
+  // Edit Bids drawer handlers
+  const handleOpenEditBids = useCallback(() => {
+    setState((prev) => ({ ...prev, isEditBidsDrawerOpen: true }));
+  }, []);
+
+  const handleCloseEditBids = useCallback(() => {
+    setState((prev) => ({ ...prev, isEditBidsDrawerOpen: false }));
+  }, []);
+
+  const handleSaveEditedBids = useCallback((updatedDetails: DetailRowExtended[]) => {
+    setState((prev) => ({
+      ...prev,
+      extendedDetails: updatedDetails,
+      isEditBidsDrawerOpen: false,
+    }));
+    // Recalculate supplier metrics would happen here in production
+    NotificationMessage('Bids Updated', 'Bid changes applied successfully.', false);
   }, []);
 
   // Build hidden supplier names map
@@ -741,8 +835,10 @@ export function RFPTab() {
               onOpenThresholds={handleOpenThresholds}
               onAdvanceToNextRound={handleAdvanceToNextRound}
               onAward={handleAward}
+              onEditBids={handleOpenEditBids}
               onOpenEliminationModal={handleOpenEliminationModal}
               onMarkAdvancing={handleMarkAdvancing}
+              onSelectPending={handleSelectPending}
             />
 
             {/* Supplier matrix - now uses checkboxes for all rounds */}
@@ -764,6 +860,7 @@ export function RFPTab() {
               onTogglePin={handleTogglePin}
               onMetricClick={handleMetricChange}
               onColumnReorder={handleSupplierColumnReorder}
+              onUndoElimination={handleUndoElimination}
             />
 
             {/* Eliminated suppliers section (Round 2+) */}
@@ -772,6 +869,7 @@ export function RFPTab() {
                 eliminatedSuppliers={state.eliminatedSuppliers}
                 allSuppliers={SAMPLE_SUPPLIERS}
                 currentRound={state.currentRound}
+                onRestoreSupplier={handleRestoreSupplier}
               />
             )}
 
@@ -890,6 +988,15 @@ export function RFPTab() {
         supplierNames={getSelectedSupplierNames()}
         onConfirm={handleConfirmElimination}
         onCancel={handleCloseEliminationModal}
+      />
+      <EditBidsDrawer
+        visible={state.isEditBidsDrawerOpen}
+        onClose={handleCloseEditBids}
+        rfp={state.selectedRFP}
+        round={state.currentRound}
+        suppliers={getSortedSuppliers()}
+        details={state.extendedDetails}
+        onSave={handleSaveEditedBids}
       />
     </div>
   );
