@@ -1,5 +1,5 @@
 # RFP Management Feature - Project Context
-*Last Updated: 2026-01-21 (Session 5)*
+*Last Updated: 2026-01-22 (Session 6)*
 
 ## Overview
 RFP (Request for Proposal) Management is a new tab within Contract Measurement that enables users to manage supplier bidding rounds, compare proposals, and award contracts.
@@ -53,6 +53,13 @@ src/pages/RFP/
 │   ├── ThresholdsModal.tsx     # Threshold configuration (placeholder)
 │   ├── AdvanceToR2Modal.tsx    # Confirm advancement
 │   ├── AwardConfirmModal.tsx   # Confirm contract creation
+│   ├── EliminationModal.tsx    # Elimination with reason
+│   ├── EditBidsDrawer.tsx      # Edit bids workflow
+│   ├── BidLogDrawer/           # Edit history panel (Session 6)
+│   │   ├── BidLogDrawer.tsx
+│   │   ├── HistoryEntry.tsx
+│   │   ├── BidLogDrawer.module.css
+│   │   └── index.ts
 │   └── index.ts
 └── project-context.md          # This file
 ```
@@ -374,6 +381,67 @@ See detailed action items in `conversation-archive.md` (2026-01-19 entry)
 
 **Next Actions:**
 See detailed action items in `conversation-archive.md` (2026-01-21 entry)
+
+### Session 6 (2026-01-22) - Inline Editable Bid Table with Edit History Panel
+
+**Completed:**
+- Implemented inline editing for product/location details table
+- Created BidLogDrawer component showing chronological edit history
+- Added visual indicators for edited cells (amber left border + subtle background tint)
+- Added "Bid Log" button with edit count badge to toolbar
+- Implemented revert functionality with cascade warning for multi-edit cells
+
+**New Types (rfp.types.ts):**
+```typescript
+interface BidEdit {
+  id: string
+  cellKey: string  // "product-location-supplierId"
+  productName: string
+  locationName: string
+  supplierName: string
+  supplierId: string
+  previousValue: number
+  newValue: number
+  timestamp: Date
+  userId: string
+  userName: string
+  source: 'inline' | 'bulk-upload'
+  bulkUploadId?: string
+  bulkUploadFilename?: string
+  isReverted: boolean
+  revertedAt?: Date
+  revertedBy?: string
+}
+type BidEditFilter = 'all' | 'inline' | 'bulk-upload'
+```
+
+**New Files Created:**
+- `components/BidLogDrawer/BidLogDrawer.tsx` - Drawer with filter tabs, entry list, cascade revert modal
+- `components/BidLogDrawer/HistoryEntry.tsx` - Individual edit entry component
+- `components/BidLogDrawer/BidLogDrawer.module.css` - Drawer and entry styling
+- `components/BidLogDrawer/index.ts` - Exports
+
+**Files Modified:**
+- `rfp.types.ts` - Added BidEdit interface and BidEditFilter type
+- `sections/DetailGridSection.tsx` - Added EditableCell component and inline editing
+- `sections/DetailGridSection.module.css` - Added .editedCell styling
+- `sections/ComparisonToolbar.tsx` - Added Bid Log button with edit count
+- `RFPTab.tsx` - State management (bidEdits, isBidLogOpen), handlers, drawer integration
+- `components/index.ts` - Added BidLogDrawer export
+
+**Key UX Decisions:**
+- Button label: "Bid Log" (concise, domain-specific)
+- Edited cells: Left amber border + subtle background tint
+- History grouping: Chronological (bulk uploads as collapsible groups)
+- Revert behavior: Point-in-time with cascade warning for multi-edit cells
+
+**Key Learnings:**
+- Click-to-edit with Enter/Escape for commit/cancel provides good UX
+- Derived state (editedCellKeys) efficiently tracks visual indicators
+- Cascade revert handling requires tracking edit sequence per cell
+
+**Verified Flow:**
+Click cell → Edit value → Press Enter → Cell shows amber indicator → Bid Log button shows "(1)" → Open Bid Log → See edit entry → Revert → Cell returns to original
 
 ---
 

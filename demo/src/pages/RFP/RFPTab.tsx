@@ -6,8 +6,8 @@ import {
   Horizontal,
   NotificationMessage,
 } from '@gravitate-js/excalibrr';
-import { LeftOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Tabs, Alert } from 'antd';
+import { LeftOutlined, InfoCircleOutlined, BulbOutlined, StarFilled, TrophyOutlined, DownOutlined } from '@ant-design/icons';
+import { Tabs, Alert, Drawer, Dropdown, Menu } from 'antd';
 import type {
   RFPScreen,
   RFP,
@@ -19,6 +19,8 @@ import type {
   Supplier,
   EliminatedSupplierInfo,
   DetailRowExtended,
+  BidEdit,
+  BidChange,
 } from './rfp.types';
 import styles from './RFPTab.module.css';
 import {
@@ -28,8 +30,8 @@ import {
   PRODUCT_OPTIONS,
   LOCATION_OPTIONS,
 } from './rfp.types';
-import { ThresholdsModal, EliminationModal, EditBidsDrawer } from './components';
-import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS, SAMPLE_DETAILS_EXTENDED } from './rfp.data';
+import { ThresholdsModal, EliminationModal, EditBidsDrawer, BidLogDrawer } from './components';
+import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS, SAMPLE_DETAILS_EXTENDED, AI_RECOMMENDATIONS } from './rfp.data';
 import {
   RFPListSection,
   RoundStepper,
@@ -67,7 +69,6 @@ interface RFPTabState {
   importanceRanking: ImportanceRankingConfig;
   isThresholdsModalOpen: boolean;
   winnerId: string | null;
-  isManualMode: boolean;
   viewTab: 'comparison' | 'historical';
   // Multi-round support
   eliminatedSuppliers: Map<number, EliminatedSupplierInfo[]>; // round -> eliminated suppliers
@@ -86,6 +87,11 @@ interface RFPTabState {
   // Edit bids drawer
   isEditBidsDrawerOpen: boolean;
   extendedDetails: DetailRowExtended[];
+  // Bid edit history
+  bidEdits: BidEdit[];
+  isBidLogOpen: boolean;
+  // Key Insights drawer
+  isInsightsPanelOpen: boolean;
 }
 
 const initialState: RFPTabState = {
@@ -105,7 +111,6 @@ const initialState: RFPTabState = {
   importanceRanking: DEFAULT_IMPORTANCE_RANKING,
   isThresholdsModalOpen: false,
   winnerId: null,
-  isManualMode: false,
   viewTab: 'comparison',
   // Multi-round support
   eliminatedSuppliers: new Map(),
@@ -126,6 +131,11 @@ const initialState: RFPTabState = {
   // Edit bids drawer
   isEditBidsDrawerOpen: false,
   extendedDetails: SAMPLE_DETAILS_EXTENDED,
+  // Bid edit history
+  bidEdits: [],
+  isBidLogOpen: false,
+  // Key Insights drawer
+  isInsightsPanelOpen: false,
 };
 
 export function RFPTab() {
@@ -285,7 +295,7 @@ export function RFPTab() {
   // Sort/filter handlers
   const handleSortChange = useCallback((sortOrder: SortOption) => {
     // Reset column order when sort changes
-    setState((prev) => ({ ...prev, sortOrder, isManualMode: false, supplierColumnOrder: null }));
+    setState((prev) => ({ ...prev, sortOrder, supplierColumnOrder: null }));
     NotificationMessage('Sorted', `Suppliers sorted by ${sortOrder.replace('-', ' ')}`, false);
   }, []);
 
@@ -329,18 +339,6 @@ export function RFPTab() {
       }
       return { ...prev, selectedLocations: next };
     });
-  }, []);
-
-  // Filtered detail data for both summary and detail grids
-  const filteredDetailData = useMemo(() => {
-    return SAMPLE_DETAILS.filter(
-      (detail) =>
-        state.selectedProducts.has(detail.product) && state.selectedLocations.has(detail.location)
-    );
-  }, [state.selectedProducts, state.selectedLocations]);
-
-  const handleToggleManualMode = useCallback(() => {
-    setState((prev) => ({ ...prev, isManualMode: !prev.isManualMode }));
   }, []);
 
   // Threshold handlers
@@ -549,7 +547,7 @@ export function RFPTab() {
     if (status.pendingCount > 0) {
       NotificationMessage(
         'Round Not Complete',
-        `Set disposition for all ${status.pendingCount} pending supplier${status.pendingCount !== 1 ? 's' : ''} before advancing.`,
+        `You must eliminate or advance all ${status.pendingCount} remaining supplier${status.pendingCount !== 1 ? 's' : ''} to continue.`,
         true
       );
       return;
@@ -693,14 +691,142 @@ export function RFPTab() {
     setState((prev) => ({ ...prev, isEditBidsDrawerOpen: false }));
   }, []);
 
-  const handleSaveEditedBids = useCallback((updatedDetails: DetailRowExtended[]) => {
-    setState((prev) => ({
-      ...prev,
-      extendedDetails: updatedDetails,
-      isEditBidsDrawerOpen: false,
-    }));
-    // Recalculate supplier metrics would happen here in production
-    NotificationMessage('Bids Updated', 'Bid changes applied successfully.', false);
+  const handleSaveEditedBids = useCallback(
+    (updatedDetails: DetailRowExtended[], changes: BidChange[]) => {
+      // Generate unique bulk upload ID for grouping
+      const bulkUploadId = `upload-${Date.now()}`;
+      const timestamp = new Date();
+
+      // Convert BidChange[] to BidEdit[]
+      const newBidEdits: BidEdit[] = changes
+        .filter((change) => change.changeType === 'price')
+        .map((change) => ({
+          id: `edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          cellKey: `${change.product}-${change.location}-${change.supplierId}`,
+          productName: change.product,
+          locationName: change.location,
+          supplierId: change.supplierId,
+          supplierName: change.supplierName,
+          previousValue: change.oldValue as number,
+          newValue: change.newValue as number,
+          timestamp,
+          userId: 'current-user',
+          userName: 'Jane Smith',
+          source: 'bulk-upload',
+          bulkUploadId,
+          bulkUploadFilename: 'Simulated Upload',
+          isReverted: false,
+        }));
+
+      setState((prev) => ({
+        ...prev,
+        extendedDetails: updatedDetails,
+        bidEdits: [...newBidEdits, ...prev.bidEdits],
+        isEditBidsDrawerOpen: false,
+      }));
+
+      NotificationMessage(
+        'Bids Updated',
+        `${newBidEdits.length} bid changes applied and logged.`,
+        false
+      );
+    },
+    []
+  );
+
+  // Bid Log drawer handlers
+  const handleOpenBidLog = useCallback(() => {
+    setState((prev) => ({ ...prev, isBidLogOpen: true }));
+  }, []);
+
+  const handleCloseBidLog = useCallback(() => {
+    setState((prev) => ({ ...prev, isBidLogOpen: false }));
+  }, []);
+
+  // Key Insights panel handlers
+  const handleOpenInsightsPanel = useCallback(() => {
+    setState((prev) => ({ ...prev, isInsightsPanelOpen: true }));
+  }, []);
+
+  const handleCloseInsightsPanel = useCallback(() => {
+    setState((prev) => ({ ...prev, isInsightsPanelOpen: false }));
+  }, []);
+
+  // Derived: Set of edited cell keys for visual indicator
+  const editedCellKeys = useMemo(() => {
+    return new Set(
+      state.bidEdits.filter((e) => !e.isReverted).map((e) => e.cellKey)
+    );
+  }, [state.bidEdits]);
+
+  // Active edit count for Bid Log button badge
+  const activeEditCount = useMemo(() => {
+    return state.bidEdits.filter((e) => !e.isReverted).length;
+  }, [state.bidEdits]);
+
+  // Handle inline cell edit
+  const handleCellEdit = useCallback(
+    (
+      cellKey: string,
+      oldValue: number,
+      newValue: number,
+      product: string,
+      location: string,
+      supplierId: string,
+      supplierName: string
+    ) => {
+      const edit: BidEdit = {
+        id: `edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        cellKey,
+        productName: product,
+        locationName: location,
+        supplierId,
+        supplierName,
+        previousValue: oldValue,
+        newValue,
+        timestamp: new Date(),
+        userId: 'current-user',
+        userName: 'Jane Smith', // Mock for demo
+        source: 'inline',
+        isReverted: false,
+      };
+
+      setState((prev) => {
+        // Update bid edits (newest first)
+        const newBidEdits = [edit, ...prev.bidEdits];
+
+        // Update the actual SAMPLE_DETAILS data
+        // Note: In production this would update the extendedDetails
+        // For the prototype, we update SAMPLE_DETAILS directly via reference
+
+        return { ...prev, bidEdits: newBidEdits };
+      });
+
+      NotificationMessage('Bid Updated', `Price updated to $${newValue.toFixed(4)}`, false);
+    },
+    []
+  );
+
+  // Handle revert - reverts all edits on the same cell up to the specified edit
+  const handleRevert = useCallback((editId: string) => {
+    setState((prev) => {
+      const editIndex = prev.bidEdits.findIndex((e) => e.id === editId);
+      if (editIndex === -1) return prev;
+
+      const edit = prev.bidEdits[editIndex];
+
+      // Mark all edits on this cell from this one forward as reverted
+      const updatedEdits = prev.bidEdits.map((e, idx) => {
+        if (e.cellKey === edit.cellKey && idx <= editIndex && !e.isReverted) {
+          return { ...e, isReverted: true, revertedAt: new Date(), revertedBy: 'Jane Smith' };
+        }
+        return e;
+      });
+
+      return { ...prev, bidEdits: updatedEdits };
+    });
+
+    NotificationMessage('Reverted', 'Bid change has been reverted.', false);
   }, []);
 
   // Build hidden supplier names map
@@ -737,22 +863,55 @@ export function RFPTab() {
     return (
       <div className={styles.roundPage}>
         {/* Header - won't shrink */}
-        <Horizontal alignItems="center" className={styles.pageHeader} style={{ gap: '12px' }}>
+        <Horizontal alignItems="center" justifyContent="space-between" className={styles.pageHeader}>
+          <Horizontal alignItems="center" style={{ gap: '12px' }}>
+            <GraviButton
+              type="text"
+              icon={<LeftOutlined />}
+              onClick={handleBackToList}
+              style={{ padding: '4px 8px' }}
+            />
+            <Vertical>
+              <Texto category="h3" weight="600">
+                {state.selectedRFP?.name}
+              </Texto>
+              {state.currentRound > 1 ? (
+                <Dropdown
+                  overlay={
+                    <Menu onClick={({ key }) => handleViewHistoricalRound(Number(key))}>
+                      {Array.from({ length: state.currentRound }, (_, i) => (
+                        <Menu.Item key={i + 1} disabled={i + 1 === displayRound}>
+                          Round {i + 1}
+                        </Menu.Item>
+                      ))}
+                    </Menu>
+                  }
+                  trigger={['click']}
+                >
+                  <span style={{ cursor: 'pointer' }}>
+                    <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                      <Texto category="p2" appearance="medium">
+                        Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
+                        {state.isViewingHistory && ' (Read-Only)'}
+                      </Texto>
+                      <DownOutlined style={{ fontSize: '10px', color: 'var(--theme-color-2)' }} />
+                    </Horizontal>
+                  </span>
+                </Dropdown>
+              ) : (
+                <Texto category="p2" appearance="medium">
+                  Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
+                  {state.isViewingHistory && ' (Read-Only)'}
+                </Texto>
+              )}
+            </Vertical>
+          </Horizontal>
           <GraviButton
-            type="text"
-            icon={<LeftOutlined />}
-            onClick={handleBackToList}
-            style={{ padding: '4px 8px' }}
+            buttonText="Key Insights"
+            icon={<BulbOutlined />}
+            onClick={handleOpenInsightsPanel}
+            style={{ backgroundColor: '#722ed1', borderColor: '#722ed1', color: '#fff' }}
           />
-          <Vertical>
-            <Texto category="h3" weight="600">
-              {state.selectedRFP?.name}
-            </Texto>
-            <Texto category="p2" appearance="medium">
-              Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
-              {state.isViewingHistory && ' (Read-Only)'}
-            </Texto>
-          </Vertical>
         </Horizontal>
 
         {/* Historical view banner */}
@@ -821,7 +980,6 @@ export function RFPTab() {
               thresholds={state.thresholds}
               hiddenSuppliers={state.hiddenSuppliers}
               hiddenSupplierNames={hiddenSupplierNames}
-              isManualMode={state.isManualMode}
               selectedCount={state.selectedSuppliers.size}
               isViewingHistory={state.isViewingHistory}
               roundCompletionStatus={getRoundCompletionStatus()}
@@ -829,13 +987,14 @@ export function RFPTab() {
               onViewCurrentRound={handleBackToCurrentRound}
               onSortChange={handleSortChange}
               onSearchChange={handleSearchChange}
-              onToggleManualMode={handleToggleManualMode}
               onShowSupplier={handleShowSupplier}
               onShowAllSuppliers={handleShowAllSuppliers}
               onOpenThresholds={handleOpenThresholds}
               onAdvanceToNextRound={handleAdvanceToNextRound}
               onAward={handleAward}
               onEditBids={handleOpenEditBids}
+              onOpenBidLog={handleOpenBidLog}
+              bidEditCount={activeEditCount}
               onOpenEliminationModal={handleOpenEliminationModal}
               onMarkAdvancing={handleMarkAdvancing}
               onSelectPending={handleSelectPending}
@@ -851,9 +1010,8 @@ export function RFPTab() {
               searchQuery={state.searchQuery}
               currentMetric={state.currentMetric}
               isViewingHistory={state.isViewingHistory}
-              detailData={filteredDetailData}
+              detailData={SAMPLE_DETAILS}
               columnOrder={state.supplierColumnOrder ?? undefined}
-              isManualMode={state.isManualMode}
               supplierDispositions={state.supplierDispositions}
               onToggleSelection={handleToggleSelection}
               onToggleHide={handleToggleHide}
@@ -883,9 +1041,11 @@ export function RFPTab() {
                 searchQuery={state.searchQuery}
                 selectedProducts={state.selectedProducts}
                 selectedLocations={state.selectedLocations}
+                editedCellKeys={editedCellKeys}
                 onMetricChange={handleMetricChange}
                 onToggleProduct={handleToggleProduct}
                 onToggleLocation={handleToggleLocation}
+                onCellEdit={handleCellEdit}
               />
             </div>
           </>
@@ -998,6 +1158,96 @@ export function RFPTab() {
         details={state.extendedDetails}
         onSave={handleSaveEditedBids}
       />
+      <BidLogDrawer
+        visible={state.isBidLogOpen}
+        onClose={handleCloseBidLog}
+        bidEdits={state.bidEdits}
+        onRevert={handleRevert}
+      />
+      <Drawer
+        title="Key Insights"
+        placement="right"
+        width={400}
+        visible={state.isInsightsPanelOpen}
+        onClose={handleCloseInsightsPanel}
+        mask={false}
+      >
+        <Vertical className="p-3" style={{ gap: '24px' }}>
+          {/* Top Recommendation Section */}
+          <Vertical style={{ gap: '12px' }}>
+            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              <StarFilled style={{ color: '#faad14', fontSize: '16px' }} />
+              <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Top Recommendation
+              </Texto>
+            </Horizontal>
+            <Vertical style={{ gap: '8px' }}>
+              <Texto category="h4" weight="600">
+                {AI_RECOMMENDATIONS[0]?.supplierName}
+              </Texto>
+              <Texto category="p1" appearance="medium">
+                {AI_RECOMMENDATIONS[0]?.price}
+              </Texto>
+              <Horizontal style={{ gap: '6px', flexWrap: 'wrap' }}>
+                {AI_RECOMMENDATIONS[0]?.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    style={{
+                      display: 'inline-block',
+                      padding: '2px 8px',
+                      backgroundColor: '#e6f4ff',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      color: '#1890ff',
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </Horizontal>
+            </Vertical>
+          </Vertical>
+
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #e8e8e8' }} />
+
+          {/* Supplier Rankings Section */}
+          <Vertical style={{ gap: '12px' }}>
+            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              <TrophyOutlined style={{ color: '#722ed1', fontSize: '16px' }} />
+              <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Supplier Rankings
+              </Texto>
+            </Horizontal>
+            <Vertical style={{ gap: '10px' }}>
+              {AI_RECOMMENDATIONS.map((rec) => (
+                <Horizontal key={rec.supplierId} alignItems="center" style={{ gap: '12px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '32px',
+                      padding: '4px 8px',
+                      backgroundColor: rec.rank === 1 ? '#fff7e6' : '#f5f5f5',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: rec.rank === 1 ? '#d46b08' : '#595959',
+                    }}
+                  >
+                    #{rec.rank}
+                  </div>
+                  <Texto weight={rec.rank === 1 ? '600' : '400'}>{rec.supplierName}</Texto>
+                  <Texto category="p2" appearance="medium" style={{ marginLeft: 'auto' }}>
+                    {rec.price}
+                  </Texto>
+                </Horizontal>
+              ))}
+            </Vertical>
+          </Vertical>
+        </Vertical>
+      </Drawer>
     </div>
   );
 }

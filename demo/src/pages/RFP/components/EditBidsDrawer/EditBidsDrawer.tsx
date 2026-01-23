@@ -9,7 +9,7 @@ import { useState, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { CloseOutlined } from '@ant-design/icons'
 import { Drawer, Steps } from 'antd'
-import type { RFP, Supplier, DetailRowExtended, BidValidationResult } from '../../rfp.types'
+import type { RFP, Supplier, DetailRowExtended, BidValidationResult, BidChange } from '../../rfp.types'
 import type { ParseResult } from '../../utils/excelImport'
 import { matchUploadedBids } from '../../utils/excelImport'
 import { validateBidsComplete } from '../../utils/bidValidation'
@@ -31,7 +31,7 @@ interface EditBidsDrawerProps {
   round: number
   suppliers: Supplier[]
   details: DetailRowExtended[]
-  onSave: (updatedDetails: DetailRowExtended[]) => void
+  onSave: (updatedDetails: DetailRowExtended[], changes: BidChange[]) => void
 }
 
 export function EditBidsDrawer({
@@ -88,8 +88,8 @@ export function EditBidsDrawer({
   }, [])
 
   const handleApplyChanges = useCallback(
-    (finalDetails: DetailRowExtended[]) => {
-      onSave(finalDetails)
+    (finalDetails: DetailRowExtended[], changes: BidChange[]) => {
+      onSave(finalDetails, changes)
       handleClose()
     },
     [onSave, handleClose]

@@ -9,10 +9,10 @@ import {
 import {
   SearchOutlined,
   SettingOutlined,
-  SwapOutlined,
   EyeInvisibleOutlined,
   StopOutlined,
   CheckCircleOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import { Select, Input, Popover, Checkbox, Tooltip } from 'antd';
 import type { SortOption, ThresholdConfig } from '../rfp.types';
@@ -42,16 +42,16 @@ interface ComparisonToolbarProps {
   thresholds: ThresholdConfig;
   hiddenSuppliers: Set<string>;
   hiddenSupplierNames?: Record<string, string>;
-  isManualMode?: boolean;
   onSortChange: (sortOrder: SortOption) => void;
   onSearchChange: (query: string) => void;
-  onToggleManualMode?: () => void;
   onShowSupplier?: (supplierId: string) => void;
   onShowAllSuppliers?: () => void;
   onOpenThresholds?: () => void;
   onAdvanceToNextRound?: () => void; // Generic handler for any round
   onAward?: () => void;
   onEditBids?: () => void;
+  onOpenBidLog?: () => void; // Open bid log drawer
+  bidEditCount?: number; // Number of active bid edits
   onOpenEliminationModal?: () => void; // Open elimination modal
   onMarkAdvancing?: () => void; // Mark selected as advancing
   onSelectPending?: () => void; // Select all pending suppliers
@@ -116,16 +116,16 @@ export function ComparisonToolbar({
   thresholds,
   hiddenSuppliers,
   hiddenSupplierNames = {},
-  isManualMode = false,
   onSortChange,
   onSearchChange,
-  onToggleManualMode,
   onShowSupplier,
   onShowAllSuppliers,
   onOpenThresholds,
   onAdvanceToNextRound,
   onAward,
   onEditBids,
+  onOpenBidLog,
+  bidEditCount = 0,
   onOpenEliminationModal,
   onMarkAdvancing,
   onSelectPending,
@@ -192,15 +192,6 @@ export function ComparisonToolbar({
             disabled={isViewingHistory}
           />
 
-          {!isViewingHistory && (
-            <GraviButton
-              buttonText="Manual"
-              icon={<SwapOutlined />}
-              appearance={isManualMode ? 'theme1' : 'outlined'}
-              onClick={onToggleManualMode}
-            />
-          )}
-
           <Input
             placeholder="Search suppliers..."
             prefix={<SearchOutlined />}
@@ -242,6 +233,13 @@ export function ComparisonToolbar({
                   onClick={handleEditBids}
                 />
               )}
+
+              <GraviButton
+                buttonText={bidEditCount > 0 ? `Bid Log (${bidEditCount})` : 'Bid Log'}
+                icon={<HistoryOutlined />}
+                ghost
+                onClick={onOpenBidLog}
+              />
 
               {onSelectPending &&
                 roundCompletionStatus &&

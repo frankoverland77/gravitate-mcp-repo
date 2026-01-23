@@ -16,7 +16,7 @@ import styles from './EditBidsDrawer.module.css'
 interface ConfirmStepProps {
   changes: BidChange[]
   updatedDetails: DetailRowExtended[]
-  onApply: (details: DetailRowExtended[]) => void
+  onApply: (details: DetailRowExtended[], changes: BidChange[]) => void
   onBack: () => void
 }
 
@@ -37,7 +37,7 @@ export function ConfirmStep({ changes, updatedDetails, onApply, onBack }: Confir
 
     // Wait a moment to show success, then call onApply
     setTimeout(() => {
-      onApply(updatedDetails)
+      onApply(updatedDetails, changes)
     }, 1500)
   }
 

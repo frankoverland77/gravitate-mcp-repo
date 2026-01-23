@@ -506,3 +506,31 @@ export interface BidValidationWarning {
   message: string;
   value?: string | number;
 }
+
+/**
+ * Bid edit tracking for inline editing and history
+ */
+export interface BidEdit {
+  id: string;
+  cellKey: string; // "product-location-supplierId"
+  productName: string;
+  locationName: string;
+  supplierName: string;
+  supplierId: string;
+  previousValue: number;
+  newValue: number;
+  timestamp: Date;
+  userId: string;
+  userName: string;
+  source: 'inline' | 'bulk-upload';
+  bulkUploadId?: string;
+  bulkUploadFilename?: string;
+  isReverted: boolean;
+  revertedAt?: Date;
+  revertedBy?: string;
+}
+
+/**
+ * Filter options for bid log drawer
+ */
+export type BidEditFilter = 'all' | 'inline' | 'bulk-upload';

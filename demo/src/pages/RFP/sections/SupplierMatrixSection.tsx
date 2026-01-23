@@ -39,7 +39,6 @@ interface SupplierMatrixSectionProps {
   isViewingHistory?: boolean;
   detailData?: DetailRow[]; // For calculating product group averages
   columnOrder?: string[]; // Custom column order (supplier IDs)
-  isManualMode?: boolean; // Controls drag reorder availability
   supplierDispositions?: Map<string, SupplierDisposition>; // Supplier disposition status
   onToggleSelection: (supplierId: string) => void;
   onToggleHide: (supplierId: string) => void;
@@ -119,7 +118,6 @@ export function SupplierMatrixSection({
   isViewingHistory = false,
   detailData,
   columnOrder,
-  isManualMode = false,
   supplierDispositions,
   onToggleSelection,
   onToggleHide,
@@ -373,7 +371,7 @@ export function SupplierMatrixSection({
       const dimmed = isDimmed(supplier);
       const isDragging = draggingId === supplier.id;
       const isDragOver = dragOverId === supplier.id;
-      const canDrag = !supplier.isIncumbent && !isViewingHistory && isManualMode && onColumnReorder;
+      const canDrag = !supplier.isIncumbent && !isViewingHistory && onColumnReorder;
       const disposition = supplierDispositions?.get(supplier.id);
 
       const headerClasses = [
@@ -403,7 +401,6 @@ export function SupplierMatrixSection({
               <Checkbox
                 checked={isSelected}
                 onChange={() => onToggleSelection(supplier.id)}
-                disabled={disposition === 'eliminate'}
               />
             )}
             {isViewingHistory && <div />}
@@ -495,7 +492,6 @@ export function SupplierMatrixSection({
       pinnedSuppliers,
       isDimmed,
       isViewingHistory,
-      isManualMode,
       supplierDispositions,
       onToggleSelection,
       onTogglePin,
