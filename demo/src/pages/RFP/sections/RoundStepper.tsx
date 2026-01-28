@@ -16,6 +16,7 @@ interface RoundStepperProps {
   totalRounds: number // Total number of rounds to display
   roundSupplierCounts: Map<number, number> // round -> supplier count at that round
   isViewingHistory: boolean
+  viewingRound?: number // Which round user is viewing (when in history mode)
   onRoundClick?: (round: number) => void
 }
 
@@ -24,6 +25,7 @@ export function RoundStepper({
   totalRounds,
   roundSupplierCounts,
   isViewingHistory,
+  viewingRound,
   onRoundClick,
 }: RoundStepperProps) {
   // Build steps array dynamically based on total rounds
@@ -56,9 +58,18 @@ export function RoundStepper({
     })
   }
 
+  // Determine if a step is clickable
+  const isClickable = (step: RoundStep): boolean => {
+    // Completed rounds are always clickable
+    if (step.isCompleted) return true
+    // Current round (by number) is clickable when viewing a different (historical) round
+    if (step.round === currentRound && viewingRound && viewingRound !== currentRound) return true
+    return false
+  }
+
   const handleStepClick = (step: RoundStep) => {
-    // Only allow clicking completed rounds
-    if (step.isCompleted && onRoundClick && step.round > 0) {
+    // Allow clicking if step is clickable
+    if (isClickable(step) && onRoundClick && step.round > 0) {
       onRoundClick(step.round)
     }
   }
@@ -71,7 +82,7 @@ export function RoundStepper({
           <Horizontal
             alignItems="center"
             style={{ gap: '12px' }}
-            className={`${styles.step} ${step.isCompleted ? styles.stepCompleted : ''} ${step.isCurrent ? styles.stepCurrent : ''} ${step.isCompleted && onRoundClick ? styles.stepClickable : ''}`}
+            className={`${styles.step} ${step.isCompleted ? styles.stepCompleted : ''} ${step.isCurrent ? styles.stepCurrent : ''} ${isClickable(step) && onRoundClick ? styles.stepClickable : ''}`}
             onClick={() => handleStepClick(step)}
           >
             <div className={styles.stepIcon}>

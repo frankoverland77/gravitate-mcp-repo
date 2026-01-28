@@ -310,7 +310,7 @@ export function ThresholdsModal({
                   <Texto category="p2" appearance="medium">
                     Ratability Min:
                   </Texto>
-                  <Horizontal alignItems="center" style={{ gap: '4px', overflow: 'visible' }}>
+                  <Horizontal alignItems="center" justifyContent="flex-end" style={{ width: '140px', gap: '4px' }}>
                     <InputNumber
                       value={localThresholds.ratabilityMin}
                       onChange={(value) => setLocalThresholds((prev) => ({ ...prev, ratabilityMin: value || 0 }))}
@@ -327,7 +327,7 @@ export function ThresholdsModal({
                   <Texto category="p2" appearance="medium">
                     Ratability Max:
                   </Texto>
-                  <Horizontal alignItems="center" style={{ gap: '4px', overflow: 'visible' }}>
+                  <Horizontal alignItems="center" justifyContent="flex-end" style={{ width: '140px', gap: '4px' }}>
                     <InputNumber
                       value={localThresholds.ratabilityMax}
                       onChange={(value) => setLocalThresholds((prev) => ({ ...prev, ratabilityMax: value || 100 }))}
@@ -355,7 +355,7 @@ export function ThresholdsModal({
                   <Texto category="p2" appearance="medium">
                     Max Penalties:
                   </Texto>
-                  <Horizontal alignItems="center" style={{ gap: '4px', overflow: 'visible' }}>
+                  <Horizontal alignItems="center" justifyContent="flex-end" style={{ width: '140px', gap: '4px' }}>
                     <InputNumber
                       value={localThresholds.penaltyMax}
                       onChange={(value) => setLocalThresholds((prev) => ({ ...prev, penaltyMax: value || 0 }))}

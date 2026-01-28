@@ -6,7 +6,7 @@ import {
   Horizontal,
   NotificationMessage,
 } from '@gravitate-js/excalibrr';
-import { LeftOutlined, InfoCircleOutlined, BulbOutlined, StarFilled, TrophyOutlined, DownOutlined } from '@ant-design/icons';
+import { LeftOutlined, BulbOutlined, StarFilled, TrophyOutlined, DownOutlined } from '@ant-design/icons';
 import { Tabs, Alert, Drawer, Dropdown, Menu } from 'antd';
 import type {
   RFPScreen,
@@ -311,7 +311,8 @@ export function RFPTab() {
   const handleMetricChange = useCallback((currentMetric: DetailMetric, product?: string) => {
     setState((prev) => {
       // If a product is provided (clicking on child row), filter to only that product
-      const newProducts = product ? new Set([product]) : prev.selectedProducts;
+      // If no product (clicking parent row), reset to show all products
+      const newProducts = product ? new Set([product]) : new Set(PRODUCT_OPTIONS);
       return { ...prev, currentMetric, selectedProducts: newProducts };
     });
   }, []);
@@ -644,6 +645,28 @@ export function RFPTab() {
     }));
   }, []);
 
+  // Handler for round stepper clicks - routes to current or historical view
+  const handleRoundStepperClick = useCallback((round: number) => {
+    setState((prev) => {
+      // If clicking current round while viewing history, go back to current round view
+      if (round === prev.currentRound) {
+        return {
+          ...prev,
+          currentScreen: `round${round}` as RFPScreen,
+          viewingRound: round,
+          isViewingHistory: false,
+        };
+      }
+      // Otherwise, view historical round
+      return {
+        ...prev,
+        currentScreen: `round${round}` as RFPScreen,
+        viewingRound: round,
+        isViewingHistory: true,
+      };
+    });
+  }, []);
+
   const handleAward = useCallback(() => {
     // Now all rounds use checkboxes - require at least 1 selection to award
     if (state.selectedSuppliers.size === 0) {
@@ -875,35 +898,28 @@ export function RFPTab() {
               <Texto category="h3" weight="600">
                 {state.selectedRFP?.name}
               </Texto>
-              {state.currentRound > 1 ? (
-                <Dropdown
-                  overlay={
-                    <Menu onClick={({ key }) => handleViewHistoricalRound(Number(key))}>
-                      {Array.from({ length: state.currentRound }, (_, i) => (
-                        <Menu.Item key={i + 1} disabled={i + 1 === displayRound}>
-                          Round {i + 1}
-                        </Menu.Item>
-                      ))}
-                    </Menu>
-                  }
-                  trigger={['click']}
-                >
-                  <span style={{ cursor: 'pointer' }}>
-                    <Horizontal alignItems="center" style={{ gap: '4px' }}>
-                      <Texto category="p2" appearance="medium">
-                        Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
-                        {state.isViewingHistory && ' (Read-Only)'}
-                      </Texto>
-                      <DownOutlined style={{ fontSize: '10px', color: 'var(--theme-color-2)' }} />
-                    </Horizontal>
-                  </span>
-                </Dropdown>
-              ) : (
-                <Texto category="p2" appearance="medium">
-                  Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
-                  {state.isViewingHistory && ' (Read-Only)'}
-                </Texto>
-              )}
+              <Dropdown
+                overlay={
+                  <Menu onClick={({ key }) => handleViewHistoricalRound(Number(key))}>
+                    {Array.from({ length: state.currentRound }, (_, i) => (
+                      <Menu.Item key={i + 1} disabled={i + 1 === displayRound}>
+                        Round {i + 1}
+                      </Menu.Item>
+                    ))}
+                  </Menu>
+                }
+                trigger={['click']}
+              >
+                <span style={{ cursor: 'pointer' }}>
+                  <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                    <Texto category="p2" appearance="medium">
+                      Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
+                      {state.isViewingHistory && ' (Read-Only)'}
+                    </Texto>
+                    <DownOutlined style={{ fontSize: '10px', color: 'var(--theme-color-2)' }} />
+                  </Horizontal>
+                </span>
+              </Dropdown>
             </Vertical>
           </Horizontal>
           <GraviButton
@@ -914,24 +930,6 @@ export function RFPTab() {
           />
         </Horizontal>
 
-        {/* Historical view banner */}
-        {state.isViewingHistory && (
-          <Alert
-            className={styles.contentSection}
-            message={`Viewing Round ${state.viewingRound} (Completed) - This round is locked`}
-            type="info"
-            showIcon
-            icon={<InfoCircleOutlined />}
-            action={
-              <GraviButton
-                type="link"
-                buttonText={`Return to Round ${state.currentRound}`}
-                onClick={handleBackToCurrentRound}
-              />
-            }
-          />
-        )}
-
         {/* Round stepper */}
         <div className={styles.stepperWrapper}>
           <RoundStepper
@@ -939,9 +937,32 @@ export function RFPTab() {
             totalRounds={state.currentRound}
             roundSupplierCounts={roundSupplierCounts}
             isViewingHistory={state.isViewingHistory}
-            onRoundClick={handleViewHistoricalRound}
+            viewingRound={state.viewingRound}
+            onRoundClick={handleRoundStepperClick}
           />
         </div>
+
+        {/* Historical view banner - styled like success banner */}
+        {state.isViewingHistory && (
+          <Alert
+            className={styles.contentSection}
+            message={
+              <Horizontal alignItems="center" style={{ gap: '8px' }}>
+                <GraviButton
+                  type="link"
+                  buttonText={`Go to Round ${state.currentRound}`}
+                  onClick={handleBackToCurrentRound}
+                  style={{ padding: 0 }}
+                />
+                <Texto category="p2">
+                  Round {state.viewingRound} is completed. This round is locked.
+                </Texto>
+              </Horizontal>
+            }
+            type="info"
+            showIcon
+          />
+        )}
 
         {/* Updated bids banner (Round 2+ only) */}
         {state.currentRound >= 2 && !state.isViewingHistory && (

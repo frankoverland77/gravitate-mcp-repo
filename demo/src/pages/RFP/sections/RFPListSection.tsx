@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
-import { PlusOutlined, RightOutlined } from '@ant-design/icons'
+import { PlusOutlined, RightOutlined, CheckCircleFilled } from '@ant-design/icons'
 import type { ColDef, ICellRendererParams, RowStyle } from 'ag-grid-community'
 import type { RFP } from '../rfp.types'
 import { SAMPLE_RFPS, RFP_LIST_STATS } from '../rfp.data'
@@ -28,18 +28,23 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
   // Status cell renderer
   const statusRenderer = useCallback((params: ICellRendererParams<RFP>) => {
     const status = params.value as RFP['status']
-    const statusConfig: Record<RFP['status'], { label: string; className: string }> = {
-      draft: { label: 'Draft', className: styles.statusDraft },
-      round1: { label: 'Round 1', className: styles.statusRound1 },
-      round2: { label: 'Round 2', className: styles.statusRound2 },
-      awarded: { label: 'Awarded', className: styles.statusAwarded },
+
+    if (status === 'draft') {
+      return <span className={styles.statusDraft}>Draft</span>
     }
-    const config = statusConfig[status]
-    return (
-      <span className={`${styles.statusBadge} ${config.className}`}>
-        {config.label}
-      </span>
-    )
+
+    if (status === 'awarded') {
+      return (
+        <span className={styles.statusAwarded}>
+          <CheckCircleFilled className={styles.awardedIcon} />
+          Awarded
+        </span>
+      )
+    }
+
+    // Round 1 and Round 2 - just plain text
+    const label = status === 'round1' ? 'Round 1' : 'Round 2'
+    return <span>{label}</span>
   }, [])
 
   // Suppliers cell renderer
@@ -61,18 +66,15 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
     return <Texto>${value.toFixed(2)}/gal</Texto>
   }, [])
 
-  // Action button cell renderer - shows View button for all RFPs
+  // Action cell renderer - shows chevron icon for all RFPs
   const actionRenderer = useCallback(
     (params: ICellRendererParams<RFP>) => {
       const rfp = params.data
       if (!rfp) return null
       return (
-        <GraviButton
-          type='link'
-          buttonText='View'
-          icon={<RightOutlined />}
+        <RightOutlined
+          className={styles.actionChevron}
           onClick={() => onRFPClick(rfp)}
-          style={{ padding: 0 }}
         />
       )
     },
@@ -114,7 +116,7 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
       {
         headerName: '',
         field: 'id',
-        width: 100,
+        width: 60,
         cellRenderer: actionRenderer,
         sortable: false,
         filter: false,
@@ -171,7 +173,7 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
             domLayout: 'autoHeight',
             onRowClicked: handleRowClick,
             getRowStyle: (): RowStyle | undefined => {
-              return { cursor: 'pointer' }
+              return { cursor: 'pointer', backgroundColor: '#ffffff' }
             },
           }}
           storageKey="RFPListGrid"

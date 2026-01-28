@@ -10,14 +10,22 @@
 
 .supplierHeader {
   padding: 8px;
-  min-height: 80px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.supplierContent {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  flex: 1;
+  min-height: 0;
 }
 
 .rankBadgeWrapper {
   text-align: center;
+  margin-top: 8px;
 }
 
 .rankBadgeWrapper :global(.ant-tag) {
@@ -68,10 +76,17 @@
   align-self: flex-start;
 }
 
+.supplierName {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 .bidNameSubtitle {
   font-size: 11px;
+  font-weight: 400;
   line-height: 1.2;
-  margin-top: -2px;
+  margin-top: 2px;
 }
 
 .rankBadge {

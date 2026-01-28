@@ -395,15 +395,18 @@ export function SupplierMatrixSection({
           onDrop={canDrag ? (e) => handleDrop(e, supplier.id) : undefined}
           onDragEnd={canDrag ? handleDragEnd : undefined}
         >
-          {/* Selection - always checkbox for multi-select in all rounds */}
+          {/* Top row: checkbox, incumbent flag, and actions */}
           <Horizontal justifyContent="space-between" alignItems="center" className="mb-1">
-            {!isViewingHistory && (
-              <Checkbox
-                checked={isSelected}
-                onChange={() => onToggleSelection(supplier.id)}
-              />
-            )}
-            {isViewingHistory && <div />}
+            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              {!isViewingHistory && (
+                <Checkbox
+                  checked={isSelected}
+                  onChange={() => onToggleSelection(supplier.id)}
+                />
+              )}
+              {isViewingHistory && <div style={{ width: 16 }} />}
+              {supplier.isIncumbent && <span className={styles.incumbentFlag}>INCUMBENT</span>}
+            </Horizontal>
 
             {/* Actions */}
             <Horizontal style={{ gap: '4px' }}>
@@ -444,46 +447,48 @@ export function SupplierMatrixSection({
             </Horizontal>
           </Horizontal>
 
-          {/* Supplier name and badges */}
-          <Vertical style={{ gap: '4px' }}>
-            {supplier.isIncumbent && <span className={styles.incumbentFlag}>INCUMBENT</span>}
-            {/* Disposition badge */}
-            {!isViewingHistory && disposition === 'advance' && (
-              <span className={styles.dispositionAdvancing}>ADVANCING</span>
-            )}
-            {!isViewingHistory && disposition === 'eliminate' && (
-              <Horizontal alignItems="center" style={{ gap: '4px' }}>
-                <span className={styles.dispositionEliminated}>ELIMINATED</span>
-                {onUndoElimination && (
-                  <Tooltip title="Undo elimination">
-                    <span
-                      className={styles.undoIcon}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onUndoElimination(supplier.id);
-                      }}
-                    >
-                      <UndoOutlined />
-                    </span>
-                  </Tooltip>
-                )}
-              </Horizontal>
-            )}
-            <Texto weight="600">
-              {supplier.name}
-              {supplier.bidCode && ` (${supplier.bidCode})`}
-            </Texto>
-            {supplier.bidName && (
-              <Texto category="p2" appearance="medium" className={styles.bidNameSubtitle}>
-                {supplier.bidName}
+          {/* Content wrapper - pushes overall tag to bottom */}
+          <div className={styles.supplierContent}>
+            {/* Top-aligned section: disposition badges, name, bid name */}
+            <Vertical style={{ gap: '4px' }}>
+              {/* Disposition badge */}
+              {!isViewingHistory && disposition === 'advance' && (
+                <span className={styles.dispositionAdvancing}>ADVANCING</span>
+              )}
+              {!isViewingHistory && disposition === 'eliminate' && (
+                <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                  <span className={styles.dispositionEliminated}>ELIMINATED</span>
+                  {onUndoElimination && (
+                    <Tooltip title="Undo elimination">
+                      <span
+                        className={styles.undoIcon}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUndoElimination(supplier.id);
+                        }}
+                      >
+                        <UndoOutlined />
+                      </span>
+                    </Tooltip>
+                  )}
+                </Horizontal>
+              )}
+              <Texto category="p1" className={styles.supplierName}>
+                {supplier.name}
+                {supplier.bidCode && ` (${supplier.bidCode})`}
               </Texto>
-            )}
+              {supplier.bidName && (
+                <Texto category="p2" className={styles.bidNameSubtitle}>
+                  {supplier.bidName}
+                </Texto>
+              )}
+            </Vertical>
 
-            {/* Rank badge - centered */}
+            {/* Bottom-pushed section: rank badge */}
             <div className={styles.rankBadgeWrapper}>
               <BBDTag>#{supplier.rank} OVERALL</BBDTag>
             </div>
-          </Vertical>
+          </div>
         </div>
       );
     },
