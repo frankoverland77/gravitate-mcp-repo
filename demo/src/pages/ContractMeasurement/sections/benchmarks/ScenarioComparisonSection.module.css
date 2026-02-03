@@ -24,7 +24,7 @@
   background-color: #ffffff;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .scenarioCell {

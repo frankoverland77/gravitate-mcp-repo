@@ -3,9 +3,17 @@
  *
  * A Scenario represents a complete pricing configuration containing
  * both price formula AND volume settings for comparison analysis.
+ *
+ * Uses shared types for consistency with other fuel industry demos.
  */
 
-export type ProductSelection = 'all' | 'gasoline' | 'diesel' | 'jet' | 'custom';
+// Import shared types for price publisher consistency
+import type { PricePublisher } from '../../../shared/types'
+
+// Re-export for backward compatibility
+export type { PricePublisher as BenchmarkPublisherType }
+
+export type ProductSelection = 'all' | 'gasoline' | 'diesel' | 'biodiesel' | 'custom';
 export type EntryMethod = 'benchmark' | 'formula' | 'upload';
 export type ScenarioStatus = 'complete' | 'incomplete';
 
@@ -183,30 +191,28 @@ export const DEFAULT_PARAMETERS: AnalysisParameters = {
   },
 };
 
-// Product selection options for dropdown
-export const PRODUCT_OPTIONS = [
-  { value: 'all', label: 'All Details (47)' },
-  { value: 'gasoline', label: 'Gasoline Only (32)' },
-  { value: 'diesel', label: 'Diesel Only (12)' },
-  { value: 'jet', label: 'Jet Fuel Only (3)' },
-  { value: 'custom', label: 'Custom Selection...' },
-];
+// Product selection options for dropdown - dynamically generated from shared data
+import { generateProductSelectionOptions } from '../../../shared/data'
 
-// Counterparty options for dropdown (sample data)
-export const COUNTERPARTY_OPTIONS = [
-  { value: 'circle-k', label: 'Circle K Stores' },
-  { value: 'costco', label: 'Costco Wholesale' },
-  { value: 'growmark', label: 'Growmark' },
-  { value: 'pilot', label: 'Pilot Flying J' },
-  { value: 'loves', label: "Love's Travel Stops" },
-];
+export const PRODUCT_OPTIONS = generateProductSelectionOptions()
 
-// Benchmark dropdown options
-export const PUBLISHER_OPTIONS = [
-  { value: 'opis', label: 'OPIS' },
-  { value: 'platts', label: 'Platts' },
-  { value: 'argus', label: 'Argus' },
-];
+// Counterparty options for dropdown - using shared data
+// Note: These are derived from shared counterparties for consistency
+import { getCustomerOptions } from '../../../shared/data'
+
+// Generate COUNTERPARTY_OPTIONS from shared customer data
+export const COUNTERPARTY_OPTIONS = getCustomerOptions().map((c) => ({
+  value: c.label.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+  label: c.label,
+}))
+
+// Benchmark dropdown options - using shared price publisher data
+import { PRICE_PUBLISHER_OPTIONS } from '../../../shared/data'
+
+export const PUBLISHER_OPTIONS = PRICE_PUBLISHER_OPTIONS.map((p) => ({
+  value: p.toLowerCase(),
+  label: p,
+}))
 
 export const BENCHMARK_TYPE_OPTIONS = [
   { value: 'rack-low', label: 'Rack Low' },

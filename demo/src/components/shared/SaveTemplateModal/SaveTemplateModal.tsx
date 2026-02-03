@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Input, Select, Checkbox, Button } from 'antd';
 import { Texto, GraviButton, Horizontal, Vertical, GraviGrid } from '@gravitate-js/excalibrr';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { getTerminalLocations } from '../../../shared/data';
 
 export interface SaveTemplateModalProps {
     visible: boolean;
@@ -295,9 +296,7 @@ export function SaveTemplateModal({
                                     { value: 'Cushing', label: 'Cushing' },
                                     { value: 'PADD 1', label: 'PADD 1' },
                                     { value: 'PADD 5', label: 'PADD 5' },
-                                    { value: 'Columbus Terminal', label: 'Columbus Terminal' },
-                                    { value: 'Toledo Terminal', label: 'Toledo Terminal' },
-                                    { value: 'Cincinnati Rack', label: 'Cincinnati Rack' }
+                                    ...getTerminalLocations().slice(0, 5).map(loc => ({ value: loc.Name, label: loc.Name }))
                                 ]}
                             />
                         </div>

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Vertical, Horizontal, Texto, GraviGrid, BBDTag } from '@gravitate-js/excalibrr'
+import { GraviGrid, BBDTag } from '@gravitate-js/excalibrr'
 import {
   ShopOutlined,
   EnvironmentOutlined,
@@ -260,7 +260,7 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
 
   const agPropOverrides = useMemo(
     () => ({
-      domLayout: 'normal' as const,
+      domLayout: 'autoHeight' as const,
       headerHeight: 40,
       rowHeight: 70,
       suppressRowClickSelection: true,
@@ -282,28 +282,15 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
   )
 
   return (
-    <Vertical style={{ gap: '16px' }}>
-      {/* Section Header */}
-      <div>
-        <Texto category='h4' weight='600'>
-          Product Performance
-        </Texto>
-        <Texto category='p2' appearance='medium'>
-          Detailed analysis by product and location
-        </Texto>
-      </div>
-
-      {/* Grid Container - calculated height to fill remaining viewport */}
-      <div style={{ height: 'calc(100vh - 675px)', minHeight: '200px' }}>
-        <GraviGrid
+    <div style={{ marginTop: '16px' }}>
+      <GraviGrid
           rowData={data}
           columnDefs={columnDefs}
           agPropOverrides={agPropOverrides}
           controlBarProps={controlBarProps}
           storageKey='ProductPerformanceGrid'
         />
-      </div>
-    </Vertical>
+    </div>
   )
 }
 

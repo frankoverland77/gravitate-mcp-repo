@@ -4,6 +4,7 @@ import { Tabs, Drawer, Radio, Button, Form, InputNumber, DatePicker, Input, Sele
 import { EyeOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import { useFeatureMode } from '../../contexts/FeatureModeContext';
+import { generateBuyPromptsData, generateBuyForwardsData, generateHomeIndexOffersData } from '../../shared/data';
 
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -29,47 +30,14 @@ export function OnlineSellingPlatformHome() {
         setOrderDrawerVisible(true);
     }, []);
 
-    // Buy Prompts tab data
-    const buyPromptsRowData = useMemo(() => [
-        { id: 1, location: 'Nashville Terminal', product: 'ULSD 2', price: '$2.2521', dailyHigh: '$2.3038', dailyLow: '$2.2359' },
-        { id: 2, location: 'Nashville Terminal', product: 'CBNV REG 87 H RVP ETH 10%', price: '$2.0706', dailyHigh: '$2.0890', dailyLow: '$2.0494' },
-        { id: 3, location: 'Nashville Terminal', product: 'CBNV PRE 93 H RVP ETH 10%', price: '$2.7006', dailyHigh: '$2.7190', dailyLow: '$2.6794' },
-        { id: 4, location: 'Nashville Terminal', product: 'CBNV REG 87 H RVP', price: '$2.0706', dailyHigh: '$2.0890', dailyLow: '$2.0494' },
-        { id: 5, location: 'Detroit Terminal', product: 'ULSD 2', price: '$2.3359', dailyHigh: '$2.3876', dailyLow: '$2.3197' },
-        { id: 6, location: 'Detroit Terminal', product: '#2HO U.S 15 D', price: '$2.2559', dailyHigh: '$2.3076', dailyLow: '$2.2397' },
-        { id: 7, location: 'Columbia Terminal', product: 'CONV PRE 93 H RVP', price: '$2.8139', dailyHigh: '$2.8523', dailyLow: '$2.7927' },
-        { id: 8, location: 'Columbia Terminal', product: 'CONV REG 86.3 H RVP ETH 10%', price: '$2.0639', dailyHigh: '$2.0823', dailyLow: '$2.0427' },
-        { id: 9, location: 'Columbia Terminal', product: 'B7 GHL', price: '$2.0639', dailyHigh: '$2.0823', dailyLow: '$2.0427' },
-        { id: 10, location: 'Columbia Terminal', product: 'CONV MID 88 H RVP ETH 10%', price: '$2.2539', dailyHigh: '$2.2723', dailyLow: '$2.2327' },
-        { id: 11, location: 'Columbia Terminal', product: '93 PRE', price: '$2.5639', dailyHigh: '$2.5823', dailyLow: '$2.5427' },
-        { id: 12, location: 'Columbia Terminal', product: 'ULSD 2', price: '$1.0000', dailyHigh: '$1.0000', dailyLow: '$1.0000' },
-        { id: 13, location: 'Columbia Terminal', product: '#2DSL U.S 15 DW', price: '$2.4043', dailyHigh: '$2.4560', dailyLow: '$2.3881' },
-        { id: 14, location: 'COMMERCE CTY,CO', product: 'REG REG 87 - 10769631', price: '$2.0639', dailyHigh: '$2.0823', dailyLow: '$2.0427' },
-    ], []);
+    // Buy Prompts tab data - generated from shared data
+    const buyPromptsRowData = useMemo(() => generateBuyPromptsData(15), []);
 
-    // Buy Forwards tab data - placeholder
-    const buyForwardsRowData = useMemo(() => [
-        { id: 1, location: 'Houston Terminal', product: 'ULSD 2', deliveryMonth: 'Dec 2025', price: '$2.5000', dailyHigh: '$2.5500', dailyLow: '$2.4800' },
-        { id: 2, location: 'Houston Terminal', product: '87 Gas', deliveryMonth: 'Jan 2026', price: '$2.3000', dailyHigh: '$2.3200', dailyLow: '$2.2900' },
-        { id: 3, location: 'Nashville Terminal', product: 'ULSD 2', deliveryMonth: 'Dec 2025', price: '$2.5200', dailyHigh: '$2.5600', dailyLow: '$2.5000' },
-        { id: 4, location: 'Nashville Terminal', product: '87 Gas', deliveryMonth: 'Jan 2026', price: '$2.3100', dailyHigh: '$2.3300', dailyLow: '$2.3000' },
-        { id: 5, location: 'Detroit Terminal', product: 'ULSD 2', deliveryMonth: 'Dec 2025', price: '$2.5500', dailyHigh: '$2.5800', dailyLow: '$2.5300' },
-        { id: 6, location: 'Columbia Terminal', product: '93 Premium', deliveryMonth: 'Feb 2026', price: '$2.9000', dailyHigh: '$2.9200', dailyLow: '$2.8800' },
-    ], []);
+    // Buy Forwards tab data - generated from shared data
+    const buyForwardsRowData = useMemo(() => generateBuyForwardsData(10), []);
 
-    // Index Offers tab data - focused on formula details
-    const indexOffersRowData = useMemo(() => [
-        { id: 1, terminal: 'Houston', product: '87 Gas', type: 'Spot Index', formulaName: '90% Prior Day Argus CBOB USGC, 10% Prior Day Argus CBOB USGC, Less 10% OPIS Current Year RIN', diff: '0.02' },
-        { id: 2, terminal: 'Houston', product: 'ULSD 2', type: 'OPIS', formulaName: '100% Prior Day OPIS Houston ULSD', diff: '0.00' },
-        { id: 3, terminal: 'Nashville Terminal', product: '87 Gas', type: 'Spot Index', formulaName: '90% Prior Day Argus CBOB USGC, 10% Current OPIS RIN', diff: '0.03' },
-        { id: 4, terminal: 'Nashville Terminal', product: 'ULSD 2', type: 'OPIS Rack', formulaName: '100% Prior Day OPIS Nashville ULSD Rack', diff: '0.01' },
-        { id: 5, terminal: 'Detroit Terminal', product: '87 Gas', type: 'Spot Index', formulaName: '95% Prior Day Argus CBOB Group 3, Less 5% OPIS RIN', diff: '0.02' },
-        { id: 6, terminal: 'Detroit Terminal', product: 'ULSD 2', type: 'OPIS', formulaName: '100% Prior Day OPIS Detroit ULSD', diff: '0.00' },
-        { id: 7, terminal: 'Columbia Terminal', product: '93 Premium', type: 'Spot Index', formulaName: '90% Prior Day Argus Premium USGC, 10% Prior Day Argus RFG USGC', diff: '0.05' },
-        { id: 8, terminal: 'Columbia Terminal', product: '87 Gas', type: 'OPIS Rack', formulaName: '100% Current Day OPIS Columbia Rack', diff: '0.01' },
-        { id: 9, terminal: 'Columbia Terminal', product: 'B7 GHL', type: 'Spot Index', formulaName: '93% Prior Day Argus ULSD, 7% Prior Day Argus Biodiesel', diff: '0.00' },
-        { id: 10, terminal: 'Columbia Terminal', product: 'Mid-Grade 88', type: 'OPIS', formulaName: '50% Prior Day OPIS 87 Gas, 50% Prior Day OPIS 93 Premium', diff: '0.02' },
-    ], []);
+    // Index Offers tab data - generated from shared data
+    const indexOffersRowData = useMemo(() => generateHomeIndexOffersData(12), []);
 
     // Buy Prompts column definitions
     const buyPromptsColumnDefs = useMemo(() => [

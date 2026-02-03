@@ -6,6 +6,7 @@ import { Modal, message, Tag, Input, Select } from 'antd';
 import { useFormulaTemplateContext } from '../../../contexts/FormulaTemplateContext';
 import { SearchableSelect } from '@components/shared/Grid/cellEditors/SelectCellEditor';
 import { suppressKeyboardEvent } from '@components/shared/Grid/cellEditors';
+import { getTerminalLocations } from '../../../shared/data';
 
 export function FormulaTemplateDetails() {
     const navigate = useNavigate();
@@ -409,13 +410,7 @@ export function FormulaTemplateDetails() {
                             onChange={setUsedInLocations}
                             style={{ width: '100%' }}
                             placeholder="Select locations..."
-                            options={[
-                                { value: 'Columbus Terminal', label: 'Columbus Terminal' },
-                                { value: 'Cincinnati Rack', label: 'Cincinnati Rack' },
-                                { value: 'Toledo Terminal', label: 'Toledo Terminal' },
-                                { value: 'Chicago Terminal', label: 'Chicago Terminal' },
-                                { value: 'Detroit Hub', label: 'Detroit Hub' }
-                            ]}
+                            options={getTerminalLocations().slice(0, 10).map(loc => ({ value: loc.Name, label: loc.Name }))}
                         />
                     </div>
                     <div style={{ flex: 1 }}>

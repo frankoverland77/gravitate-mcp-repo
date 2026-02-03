@@ -1,6 +1,8 @@
 // Mock data for Contract Measurement grid
 // Based on screenshot specifications
 
+import { generateContractDetails, getCustomers, type GeneratedContractDetail } from '../../shared/data'
+
 export interface ContractMeasurementRecord {
   id: number;
   contractId: string;
@@ -18,11 +20,14 @@ export interface ContractMeasurementRecord {
   status: 'Active' | 'Inactive' | 'Pending';
 }
 
+// Get customer names from shared data for contract records
+const customers = getCustomers()
+
 export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
   {
     id: 1,
     contractId: 'CTR-001',
-    customer: 'Acme Energy Corp',
+    customer: customers[0]?.Name || 'Circle K Stores',
     type: 'Sale',
     startDate: '2024-12-31',
     endDate: '2025-12-30',
@@ -38,7 +43,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
   {
     id: 2,
     contractId: 'CTR-002',
-    customer: 'Peak Petroleum LLC',
+    customer: customers[1]?.Name || 'Costco Wholesale',
     type: 'Purchase',
     startDate: '2025-02-28',
     endDate: '2026-02-27',
@@ -54,7 +59,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
   {
     id: 3,
     contractId: 'CTR-003',
-    customer: 'Global Fuels Inc',
+    customer: customers[2]?.Name || 'Growmark',
     type: 'Sale',
     startDate: '2025-01-15',
     endDate: '2025-07-15',
@@ -70,7 +75,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
   {
     id: 4,
     contractId: 'CTR-004',
-    customer: 'Sunrise Energy Partners',
+    customer: customers[3]?.Name || 'Pilot Flying J',
     type: 'Purchase',
     startDate: '2024-11-01',
     endDate: '2025-04-30',
@@ -86,7 +91,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
   {
     id: 5,
     contractId: 'CTR-005',
-    customer: 'Midwest Gas Co',
+    customer: customers[4]?.Name || "Love's Travel Stops",
     type: 'Sale',
     startDate: '2025-03-01',
     endDate: '2026-02-28',
@@ -102,7 +107,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
   {
     id: 6,
     contractId: 'CTR-006',
-    customer: 'Coastal Refineries',
+    customer: customers[5]?.Name || 'Gravitate Purchasing',
     type: 'Purchase',
     startDate: '2024-09-15',
     endDate: '2025-03-15',
@@ -119,41 +124,8 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
 
 // Contract detail data (product/location combinations)
 // Used in scenario comparison table and formula scenario drawer
-export interface ContractDetail {
-  detailId: string;
-  product: string;
-  location: string;
-  volume: number;
-  percentTotal: number;
-}
+// Now generated from shared products and locations
+export interface ContractDetail extends GeneratedContractDetail {}
 
-export const SAMPLE_DETAILS: ContractDetail[] = [
-  {
-    detailId: 'DTL-001',
-    product: '87 Gas',
-    location: 'Houston Terminal',
-    volume: 120000,
-    percentTotal: 25.8,
-  },
-  {
-    detailId: 'DTL-002',
-    product: '89 Gas',
-    location: 'Houston Terminal',
-    volume: 160000,
-    percentTotal: 34.4,
-  },
-  {
-    detailId: 'DTL-003',
-    product: 'Diesel #2',
-    location: 'Tulsa Terminal',
-    volume: 85000,
-    percentTotal: 18.3,
-  },
-  {
-    detailId: 'DTL-004',
-    product: 'Jet Fuel',
-    location: 'Dallas Terminal',
-    volume: 100000,
-    percentTotal: 21.5,
-  },
-];
+// Generate 10 contract details from shared products and terminal locations
+export const SAMPLE_DETAILS: ContractDetail[] = generateContractDetails(10);

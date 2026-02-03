@@ -1,10 +1,29 @@
-export const tieredPricingData = [
-    { id: 1, location: 'Houston', product: 'ULSD 2', tier1: 2.5000, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 2, location: 'Houston', product: '87 Gas', tier1: 2.2500, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 3, location: 'Nashville Terminal', product: 'ULSD 2', tier1: 2.5500, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 4, location: 'Nashville Terminal', product: '87 Gas', tier1: 2.3000, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 5, location: 'Detroit Terminal', product: 'ULSD 2', tier1: 2.6000, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 6, location: 'Detroit Terminal', product: '93 Premium', tier1: 2.8500, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 7, location: 'Columbia Terminal', product: 'ULSD 2', tier1: 2.5200, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-    { id: 8, location: 'Columbia Terminal', product: '87 Gas', tier1: 2.2800, tier2: null, tier3: null, tier2Override: false, tier3Override: false },
-];
+/**
+ * Global Tiered Pricing Data
+ *
+ * Sample data for tiered pricing demonstration.
+ * Dynamically generated from shared terminal and product data for consistency.
+ */
+
+import { generateTieredPricingData, type GeneratedTieredPricingRow } from '../../shared/data'
+
+// Type for tiered pricing row - extends generated type for backward compatibility
+export interface TieredPricingRow extends GeneratedTieredPricingRow {}
+
+// Generate tiered pricing data from shared products and locations
+// Creates 30 rows with 5 locations per product
+export const tieredPricingData: TieredPricingRow[] = generateTieredPricingData(30, 5)
+
+/**
+ * Get unique locations from the tiered pricing data
+ */
+export function getTieredPricingLocations(): string[] {
+  return [...new Set(tieredPricingData.map((row) => row.location))]
+}
+
+/**
+ * Get unique products from the tiered pricing data
+ */
+export function getTieredPricingProducts(): string[] {
+  return [...new Set(tieredPricingData.map((row) => row.product))]
+}

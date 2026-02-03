@@ -2,134 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraviGrid, GraviButton, Vertical, BBDTag } from '@gravitate-js/excalibrr';
 import { RightOutlined, FilterOutlined, DownloadOutlined } from '@ant-design/icons';
+import { generateSupplierAnalysisData } from '../../shared/data';
 
 export function SupplierAnalysis() {
     const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
 
-    // Realistic supplier data
-    const rowData = useMemo(() => [
-        {
-            id: 1,
-            supplier: 'ExxonMobil',
-            location: 'Houston TX',
-            locationGroup: 'Gulf Coast',
-            product: '#2 ULSD',
-            productGroup: 'Diesel',
-            brand: 'Branded',
-            strategyTag: 'Leader',
-            spotDeltaCapture: 96.5,
-            consistency: { level: 'High', percentage: 89.2 }
-        },
-        {
-            id: 2,
-            supplier: 'Valero',
-            location: 'Houston TX',
-            locationGroup: 'Gulf Coast',
-            product: 'Premium Gas',
-            productGroup: 'Premium',
-            brand: 'Unbranded',
-            strategyTag: 'Follower',
-            spotDeltaCapture: 89.6,
-            consistency: { level: 'High', percentage: 85.3 }
-        },
-        {
-            id: 3,
-            supplier: 'Marathon',
-            location: 'Des Moines IA',
-            locationGroup: 'Midwest',
-            product: 'Regular Gas',
-            productGroup: 'Regular',
-            brand: 'Branded',
-            strategyTag: 'Position',
-            spotDeltaCapture: 82.3,
-            consistency: { level: 'Medium', percentage: 80.8 }
-        },
-        {
-            id: 4,
-            supplier: 'Shell',
-            location: 'Chicago IL',
-            locationGroup: 'Midwest',
-            product: 'ULSD-0037',
-            productGroup: 'Diesel',
-            brand: 'Branded',
-            strategyTag: 'Leader',
-            spotDeltaCapture: 94.1,
-            consistency: { level: 'High', percentage: 87.5 }
-        },
-        {
-            id: 5,
-            supplier: 'Chevron',
-            location: 'Denver CO',
-            locationGroup: 'Mountain',
-            product: 'Premium Gas',
-            productGroup: 'Premium',
-            brand: 'Branded',
-            strategyTag: 'Leader',
-            spotDeltaCapture: 91.8,
-            consistency: { level: 'Medium', percentage: 73.8 }
-        },
-        {
-            id: 6,
-            supplier: 'BP America',
-            location: 'Cincinnati OH',
-            locationGroup: 'East Coast',
-            product: 'Regular Gas',
-            productGroup: 'Regular',
-            brand: 'Unbranded',
-            strategyTag: 'Follower',
-            spotDeltaCapture: 85.4,
-            consistency: { level: 'High', percentage: 82.1 }
-        },
-        {
-            id: 7,
-            supplier: 'Phillips 66',
-            location: 'Houston TX',
-            locationGroup: 'Gulf Coast',
-            product: '#2 ULSD',
-            productGroup: 'Diesel',
-            brand: 'Branded',
-            strategyTag: 'Position',
-            spotDeltaCapture: 78.9,
-            consistency: { level: 'Medium', percentage: 76.4 }
-        },
-        {
-            id: 8,
-            supplier: 'Citgo',
-            location: 'Chicago IL',
-            locationGroup: 'Midwest',
-            product: 'Regular Gas',
-            productGroup: 'Gasoline',
-            brand: 'Unbranded',
-            strategyTag: 'Follower',
-            spotDeltaCapture: 88.2,
-            consistency: { level: 'High', percentage: 84.7 }
-        },
-        {
-            id: 9,
-            supplier: 'Sunoco',
-            location: 'Denver CO',
-            locationGroup: 'Mountain',
-            product: 'Premium Gas',
-            productGroup: 'Premium',
-            brand: 'Branded',
-            strategyTag: 'Position',
-            spotDeltaCapture: 72.6,
-            consistency: { level: 'Low', percentage: 23.1 }
-        },
-        {
-            id: 10,
-            supplier: 'ConocoPhillips',
-            location: 'Des Moines IA',
-            locationGroup: 'Midwest',
-            product: 'ULSD-0037',
-            productGroup: 'Diesel',
-            brand: 'Branded',
-            strategyTag: 'Leader',
-            spotDeltaCapture: 93.2,
-            consistency: { level: 'High', percentage: 86.9 }
-        }
-    ], []);
+    // Generate supplier analysis data from shared suppliers, locations, and products
+    const rowData = useMemo(() => generateSupplierAnalysisData(15), []);
 
     const columnDefs = useMemo(() => [
         {

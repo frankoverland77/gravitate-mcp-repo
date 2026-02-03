@@ -536,7 +536,7 @@ export function ScenarioComparisonSection({
           dataSource={comparisonData}
           rowKey="detailId"
           pagination={false}
-          scroll={{ x: 'max-content' }}
+          scroll={{ x: 'max-content', y: 800 }}
           summary={allRowsHaveSamePrimary ? summaryRow : undefined}
           size="small"
         />

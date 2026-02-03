@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ResponsiveScatterPlot, ScatterPlotTooltipProps } from '@nivo/scatterplot';
 import { ResponsiveLine, PointTooltipProps } from '@nivo/line';
 import { getBehavioralMetrics, getSupplierChartDataByPeriod, TimePeriod } from './SupplierAnalysis.data';
+import { getSuppliers, getTerminalLocations, getProductsByGroup } from '../../shared/data';
 
 // ============================================
 // CUSTOM TOOLTIPS
@@ -56,12 +57,17 @@ const cardStyle = {
     padding: '16px'
 };
 
-// Default fallback data when accessed directly (no state)
-const DEFAULT_SUPPLIER = {
-    id: 1,
-    supplier: 'ExxonMobil',
-    product: '#2 ULSD',
-    location: 'Houston TX'
+// Default fallback data when accessed directly (no state) - uses shared data
+const getDefaultSupplier = () => {
+    const suppliers = getSuppliers();
+    const terminals = getTerminalLocations();
+    const products = getProductsByGroup('diesel');
+    return {
+        id: 1,
+        supplier: suppliers[0]?.Name || 'Marathon Petroleum',
+        product: products[0]?.Name || 'ULSD 2',
+        location: terminals[0]?.Name || 'Houston Terminal'
+    };
 };
 
 // ============================================
@@ -73,7 +79,7 @@ export function SupplierDetails() {
     const [period, setPeriod] = useState<TimePeriod>('365');
 
     // Get supplier from navigation state, or use default
-    const supplierData = location.state?.supplier || DEFAULT_SUPPLIER;
+    const supplierData = location.state?.supplier || getDefaultSupplier();
     const supplierId = supplierData.id || 1;
 
     // Get behavioral metrics and chart data based on supplier ID and period

@@ -2,6 +2,7 @@
  * RFP Mock Data
  *
  * Sample data for RFP Management feature demonstration
+ * Uses shared data for products, locations, and counterparties.
  */
 
 import type {
@@ -20,6 +21,9 @@ import type {
   BidProvision,
   DetailRowExtended,
 } from './rfp.types'
+
+// Import shared data references
+import { PRODUCT_NAMES, RFP_LOCATION_NAMES, generateRFPDetails } from '../../shared/data'
 
 // 4 Sample RFPs per spec
 export const SAMPLE_RFPS: RFP[] = [
@@ -250,153 +254,16 @@ export const ROUND2_FINALISTS = SAMPLE_SUPPLIERS.filter((s) =>
   ['supplier-marathon', 'supplier-p66', 'supplier-shell'].includes(s.id)
 )
 
-// Detail grid data - 9 rows (3 products x 3 locations)
-export const SAMPLE_DETAILS: DetailRow[] = [
-  {
-    id: 'detail-87-dallas',
-    product: '87 Octane',
-    location: 'Dallas',
-    supplierValues: {
-      'supplier-marathon': 2.32,
-      'supplier-p66': 2.29,
-      'supplier-shell': 2.3,
-      'supplier-valero': 2.33,
-      'supplier-valero-2': 2.36,
-      'supplier-fhr': 2.31,
-      'supplier-hf-sinclair': 2.34,
-      'supplier-bp': 2.32,
-      'supplier-cenex': 2.35,
-    },
-  },
-  {
-    id: 'detail-87-beaumont',
-    product: '87 Octane',
-    location: 'Beaumont',
-    supplierValues: {
-      'supplier-marathon': 2.34,
-      'supplier-p66': 2.31,
-      'supplier-shell': 2.32,
-      'supplier-valero': 2.35,
-      'supplier-valero-2': 2.38,
-      'supplier-fhr': 2.33,
-      'supplier-hf-sinclair': 2.36,
-      'supplier-bp': 2.34,
-      'supplier-cenex': 2.37,
-    },
-  },
-  {
-    id: 'detail-87-houston',
-    product: '87 Octane',
-    location: 'Houston',
-    supplierValues: {
-      'supplier-marathon': 2.33,
-      'supplier-p66': 2.3,
-      'supplier-shell': 2.31,
-      'supplier-valero': 2.34,
-      'supplier-valero-2': 2.37,
-      'supplier-fhr': 2.32,
-      'supplier-hf-sinclair': 2.35,
-      'supplier-bp': 2.33,
-      'supplier-cenex': 2.36,
-    },
-  },
-  {
-    id: 'detail-93-dallas',
-    product: '93 Octane',
-    location: 'Dallas',
-    supplierValues: {
-      'supplier-marathon': 2.42,
-      'supplier-p66': 2.39,
-      'supplier-shell': 2.4,
-      'supplier-valero': 2.43,
-      'supplier-valero-2': 2.46,
-      'supplier-fhr': 2.41,
-      'supplier-hf-sinclair': 2.44,
-      'supplier-bp': 2.42,
-      'supplier-cenex': 2.45,
-    },
-  },
-  {
-    id: 'detail-93-beaumont',
-    product: '93 Octane',
-    location: 'Beaumont',
-    supplierValues: {
-      'supplier-marathon': 2.44,
-      'supplier-p66': 2.41,
-      'supplier-shell': 2.42,
-      'supplier-valero': 2.45,
-      'supplier-valero-2': 2.48,
-      'supplier-fhr': 2.43,
-      'supplier-hf-sinclair': 2.46,
-      'supplier-bp': 2.44,
-      'supplier-cenex': 2.47,
-    },
-  },
-  {
-    id: 'detail-93-houston',
-    product: '93 Octane',
-    location: 'Houston',
-    supplierValues: {
-      'supplier-marathon': 2.43,
-      'supplier-p66': 2.4,
-      'supplier-shell': 2.41,
-      'supplier-valero': 2.44,
-      'supplier-valero-2': 2.47,
-      'supplier-fhr': 2.42,
-      'supplier-hf-sinclair': 2.45,
-      'supplier-bp': 2.43,
-      'supplier-cenex': 2.46,
-    },
-  },
-  {
-    id: 'detail-diesel-dallas',
-    product: 'Diesel',
-    location: 'Dallas',
-    supplierValues: {
-      'supplier-marathon': 2.28,
-      'supplier-p66': 2.25,
-      'supplier-shell': 2.26,
-      'supplier-valero': 2.29,
-      'supplier-valero-2': 2.32,
-      'supplier-fhr': 2.27,
-      'supplier-hf-sinclair': 2.3,
-      'supplier-bp': 2.28,
-      'supplier-cenex': 2.31,
-    },
-  },
-  {
-    id: 'detail-diesel-beaumont',
-    product: 'Diesel',
-    location: 'Beaumont',
-    supplierValues: {
-      'supplier-marathon': 2.3,
-      'supplier-p66': 2.27,
-      'supplier-shell': 2.28,
-      'supplier-valero': 2.31,
-      'supplier-valero-2': 2.34,
-      'supplier-fhr': 2.29,
-      'supplier-hf-sinclair': 2.32,
-      'supplier-bp': 2.3,
-      'supplier-cenex': 2.33,
-    },
-  },
-  {
-    id: 'detail-diesel-houston',
-    product: 'Diesel',
-    location: 'Houston',
-    supplierValues: {
-      'supplier-marathon': 2.29,
-      'supplier-p66': 2.26,
-      'supplier-shell': 2.27,
-      'supplier-valero': 2.3,
-      'supplier-valero-2': 2.33,
-      'supplier-fhr': 2.28,
-      'supplier-hf-sinclair': 2.31,
-      'supplier-bp': 2.29,
-      'supplier-cenex': 2.32,
-    },
-  },
-]
+// Detail grid data - dynamically generated from shared products and locations
+// Uses PRODUCT_NAMES, RFP_LOCATION_NAMES, and supplier IDs from SAMPLE_SUPPLIERS
+const SUPPLIER_IDS = SAMPLE_SUPPLIERS.map((s) => s.id)
+
+// Generate RFP details with typed product/location names
+export const SAMPLE_DETAILS: DetailRow[] = generateRFPDetails(
+  [...PRODUCT_NAMES],
+  [...RFP_LOCATION_NAMES],
+  SUPPLIER_IDS
+) as DetailRow[]
 
 // AI Recommendations for Round 1
 export const AI_RECOMMENDATIONS: AIRecommendation[] = [

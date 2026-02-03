@@ -147,8 +147,8 @@ export function ContractDetails() {
         contractDate: '09/30/2025',
         requireQuantities: 'No',
         product: '87 GHL',
-        originLocation: 'Columbus Terminal',
-        destinationLocation: 'Columbus Terminal',
+        originLocation: 'Houston Terminal',
+        destinationLocation: 'Houston Terminal',
         volumeBasis: 'Gross',
         unitOfMeasure: 'gal'
     };

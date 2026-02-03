@@ -5,6 +5,15 @@
  * enabling large retail fuel buyers to compare supplier bids.
  */
 
+// Import shared types for consistency
+import type { PricePublisher, PriceType, DateRule } from '../../shared/types'
+import { PRODUCT_NAMES, RFP_LOCATION_NAMES, type RFPProductName, type RFPLocationName } from '../../shared/data'
+
+// Re-export shared types for backward compatibility
+export type { PricePublisher, PriceType, DateRule }
+export { PRODUCT_NAMES as PRODUCT_OPTIONS, RFP_LOCATION_NAMES as LOCATION_OPTIONS }
+export type { RFPProductName, RFPLocationName }
+
 export type RFPStatus = 'draft' | 'round1' | 'round2' | 'awarded';
 export type ProductGroup = 'gasoline' | 'diesel';
 export type RFPRound = number; // 1, 2, 3, 4... (any positive integer)
@@ -112,11 +121,12 @@ export interface ParameterConfig {
 
 /**
  * Product/location detail row data
+ * Uses shared product/location types for consistency
  */
 export interface DetailRow {
   id: string;
-  product: '87 Octane' | '93 Octane' | 'Diesel';
-  location: 'Dallas' | 'Beaumont' | 'Houston';
+  product: RFPProductName;
+  location: RFPLocationName;
   supplierValues: Record<string, number>; // supplierId -> value for current metric
 }
 
@@ -288,11 +298,8 @@ export const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
   { value: 'fewest-issues', label: 'Fewest Issues' },
 ];
 
-// Product options for filtering
-export const PRODUCT_OPTIONS = ['87 Octane', '93 Octane', 'Diesel'] as const;
-
-// Location options for filtering
-export const LOCATION_OPTIONS = ['Dallas', 'Beaumont', 'Houston'] as const;
+// Note: PRODUCT_OPTIONS and LOCATION_OPTIONS are now imported from shared data
+// and re-exported at the top of this file for backward compatibility
 
 // Market index options
 export const MARKET_INDEX_OPTIONS = [
@@ -444,21 +451,13 @@ export interface DetailRowExtended extends Omit<DetailRow, 'supplierValues'> {
   supplierProvisions: Record<string, BidProvision>; // Formula data
 }
 
-// Price publisher options
-export type PricePublisher = 'OPIS' | 'Platts' | 'Argus';
-
-// Price type options
-export type PriceType = 'Low' | 'High' | 'Average' | 'Mean';
-
-// Date rule options
-export type DateRule = 'Prior Day' | 'Month Average' | 'Week Average' | 'Day Of';
+// Note: PricePublisher, PriceType, DateRule are now imported from shared types
+// and re-exported at the top of this file for backward compatibility
 
 // Reference data options for Excel dropdowns
-export const PRICE_PUBLISHER_OPTIONS: PricePublisher[] = ['OPIS', 'Platts', 'Argus'];
-
-export const PRICE_TYPE_OPTIONS: PriceType[] = ['Low', 'High', 'Average', 'Mean'];
-
-export const DATE_RULE_OPTIONS: DateRule[] = ['Prior Day', 'Month Average', 'Week Average', 'Day Of'];
+// Import from shared data
+import { PRICE_PUBLISHER_OPTIONS, PRICE_TYPE_OPTIONS, DATE_RULE_OPTIONS } from '../../shared/data/pricePublishers.data';
+export { PRICE_PUBLISHER_OPTIONS, PRICE_TYPE_OPTIONS, DATE_RULE_OPTIONS };
 
 export const PROVISION_TYPE_OPTIONS: ProvisionType[] = ['Fixed', 'Formula', 'Lesser Of 2', 'Lesser Of 3'];
 

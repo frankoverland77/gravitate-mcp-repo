@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import { Main } from "./_Main";
 import { themeConfigs } from "./components/shared/Theming/themeconfigs";
+import { SharedDataProvider } from "./shared/contexts/SharedDataContext";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: false } },
@@ -14,7 +15,9 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeWrapper themeConfigs={themeConfigs} />
+      <SharedDataProvider>
+        <ThemeWrapper themeConfigs={themeConfigs} />
+      </SharedDataProvider>
     </QueryClientProvider>
   );
 }

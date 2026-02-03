@@ -11,22 +11,10 @@ import type {
   BenchmarkImpactEstimate,
   ProductMatchDetail,
 } from '../../types/scenario.types';
+import { generateContractProducts } from '../../../../shared/data';
 
-// Sample products for demo (would come from API in production)
-export const SAMPLE_CONTRACT_PRODUCTS = [
-  { id: 'P001', name: '87 Gas', location: 'Houston Terminal', volume: 120000, currentPrice: 2.45 },
-  { id: 'P002', name: '89 Gas', location: 'Houston Terminal', volume: 160000, currentPrice: 2.52 },
-  { id: 'P003', name: 'Diesel #2', location: 'Tulsa Terminal', volume: 85000, currentPrice: 2.78 },
-  { id: 'P004', name: 'Jet Fuel', location: 'Dallas Terminal', volume: 100000, currentPrice: 2.95 },
-  { id: 'P005', name: '87 Gas', location: 'Austin Terminal', volume: 75000, currentPrice: 2.48 },
-  {
-    id: 'P006',
-    name: 'Diesel #2',
-    location: 'Dallas Terminal',
-    volume: 110000,
-    currentPrice: 2.81,
-  },
-];
+// Sample products for demo (generated from shared data)
+export const SAMPLE_CONTRACT_PRODUCTS = generateContractProducts(6);
 
 /**
  * Get display name for a benchmark selection

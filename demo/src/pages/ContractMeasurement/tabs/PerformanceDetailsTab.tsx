@@ -31,7 +31,7 @@ export function PerformanceDetailsTab() {
   }
 
   return (
-    <Vertical style={{ gap: '24px' }}>
+    <Vertical>
       <PerformanceSummaryTiles summary={summary} />
       <ProductPerformanceTable data={PRODUCT_PERFORMANCE_DATA} onRowClick={handleRowClick} />
       <DetailedAnalysisModal visible={modalVisible} onClose={handleCloseModal} data={analysisData} />

@@ -4,6 +4,7 @@ import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibr
 import { PlusOutlined, LeftOutlined } from '@ant-design/icons';
 import { FormulaComponentsGrid } from '../Grid/FormulaComponentsGrid';
 import { PLACEHOLDER_VALUES, buildAutoFormulaPreview } from '../../../pages/demos/grids/FormulaTemplates.data';
+import { getTerminalLocations } from '../../../shared/data';
 
 export interface SaveTemplateFormProps {
     initialData: {
@@ -244,9 +245,7 @@ export function SaveTemplateForm({
                                         { value: 'Cushing', label: 'Cushing' },
                                         { value: 'PADD 1', label: 'PADD 1' },
                                         { value: 'PADD 5', label: 'PADD 5' },
-                                        { value: 'Columbus Terminal', label: 'Columbus Terminal' },
-                                        { value: 'Toledo Terminal', label: 'Toledo Terminal' },
-                                        { value: 'Cincinnati Rack', label: 'Cincinnati Rack' }
+                                        ...getTerminalLocations().slice(0, 5).map(loc => ({ value: loc.Name, label: loc.Name }))
                                     ]}
                                 />
                             </div>

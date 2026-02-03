@@ -16,33 +16,15 @@ import {
   formatCurrency,
   formatDecimal,
 } from '../IndexOfferManagement.constants';
+import { generatePricingData, generateAnalyticsData } from '../../../shared/data';
 
 // =============================================================================
-// Sample Data
+// Sample Data - Generated from shared data
 // =============================================================================
 
-const INITIAL_PRICING_DATA: PricingRow[] = [
-  { id: 1, product: '87 Gas', location: 'Houston', type: 'Argus', formula: '90% Prior Day Argus CBOB USGC, 10% Prior Day Argus CBOB USGC', currentDiff: 0.0200, currentPrice: 2.4500, proposedDiff: 0.0250, proposedPrice: 2.4550 },
-  { id: 2, product: 'ULSD 2', location: 'Houston', type: 'OPIS', formula: '100% Prior Day OPIS Houston ULSD', currentDiff: 0.0000, currentPrice: 2.7800, proposedDiff: 0.0050, proposedPrice: 2.7850 },
-  { id: 3, product: '87 Gas', location: 'Nashville Terminal', type: 'Argus', formula: '90% Prior Day Argus CBOB USGC, 10% Current OPIS RIN', currentDiff: 0.0300, currentPrice: 2.4700, proposedDiff: 0.0280, proposedPrice: 2.4680 },
-  { id: 4, product: 'ULSD 2', location: 'Nashville Terminal', type: 'OPIS', formula: '100% Prior Day OPIS Nashville ULSD Rack', currentDiff: 0.0100, currentPrice: 2.7900, proposedDiff: 0.0120, proposedPrice: 2.7920 },
-  { id: 5, product: '87 Gas', location: 'Detroit Terminal', type: 'Argus', formula: '95% Prior Day Argus CBOB Group 3, Less 5% OPIS RIN', currentDiff: 0.0200, currentPrice: 2.4600, proposedDiff: 0.0180, proposedPrice: 2.4580 },
-  { id: 6, product: 'ULSD 2', location: 'Detroit Terminal', type: 'OPIS', formula: '100% Prior Day OPIS Detroit ULSD', currentDiff: 0.0000, currentPrice: 2.7750, proposedDiff: 0.0075, proposedPrice: 2.7825 },
-  { id: 7, product: '93 Premium', location: 'Columbia Terminal', type: 'Argus', formula: '90% Prior Day Argus Premium USGC, 10% Prior Day Argus RFG USGC', currentDiff: 0.0500, currentPrice: 2.8200, proposedDiff: 0.0450, proposedPrice: 2.8150 },
-  { id: 8, product: '87 Gas', location: 'Columbia Terminal', type: 'OPIS', formula: '100% Current Day OPIS Columbia Rack', currentDiff: 0.0100, currentPrice: 2.4650, proposedDiff: 0.0150, proposedPrice: 2.4700 },
-  { id: 9, product: 'B7 GHL', location: 'Columbia Terminal', type: 'Argus', formula: '93% Prior Day Argus ULSD, 7% Prior Day Argus Biodiesel', currentDiff: 0.0000, currentPrice: 2.8100, proposedDiff: 0.0100, proposedPrice: 2.8200 },
-  { id: 10, product: 'Mid-Grade 88', location: 'Columbia Terminal', type: 'Platts', formula: '50% Prior Day OPIS 87 Gas, 50% Prior Day OPIS 93 Premium', currentDiff: 0.0200, currentPrice: 2.6400, proposedDiff: 0.0220, proposedPrice: 2.6420 }
-];
+const INITIAL_PRICING_DATA: PricingRow[] = generatePricingData(10);
 
-const ANALYTICS_DATA: AnalyticsRow[] = [
-  { id: 1, competitor: 'Your Offer (Selected)', currentPrice: '$2.4500', rank: 'Position 4', trendIndicator: 'normal', lastRevalueDate: '2025-11-02', changeFromPrevious: '+$0.02', differenceToSelected: '$0.00', isSelected: true },
-  { id: 2, competitor: 'Platts USGC Index', currentPrice: '$2.4800', rank: 'Position 1', trendIndicator: 'above', lastRevalueDate: '2025-11-03', changeFromPrevious: '+$0.01', differenceToSelected: '+$0.03', isSelected: false },
-  { id: 3, competitor: 'Argus CBOB Index', currentPrice: '$2.4700', rank: 'Position 2', trendIndicator: 'above', lastRevalueDate: '2025-11-03', changeFromPrevious: '-$0.01', differenceToSelected: '+$0.02', isSelected: false },
-  { id: 4, competitor: 'Competitor A Rack Post', currentPrice: '$2.4600', rank: 'Position 3', trendIndicator: 'above', lastRevalueDate: '2025-11-02', changeFromPrevious: '$0.00', differenceToSelected: '+$0.01', isSelected: false },
-  { id: 5, competitor: 'Competitor B Rack Post', currentPrice: '$2.4400', rank: 'Position 5', trendIndicator: 'below', lastRevalueDate: '2025-11-01', changeFromPrevious: '-$0.02', differenceToSelected: '-$0.01', isSelected: false },
-  { id: 6, competitor: 'Bottom Line Average', currentPrice: '$2.4200', rank: 'Position 6', trendIndicator: 'below', lastRevalueDate: '2025-11-03', changeFromPrevious: '+$0.03', differenceToSelected: '-$0.03', isSelected: false },
-  { id: 7, competitor: 'Internal Contract Low', currentPrice: '$2.4000', rank: 'Position 7', trendIndicator: 'below', lastRevalueDate: '2025-11-01', changeFromPrevious: '+$0.01', differenceToSelected: '-$0.05', isSelected: false }
-];
+const ANALYTICS_DATA: AnalyticsRow[] = generateAnalyticsData(7);
 
 // =============================================================================
 // Component

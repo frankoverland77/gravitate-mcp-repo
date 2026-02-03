@@ -53,6 +53,7 @@ import {
   getMarketContextForOffer,
   MarketContextData,
 } from './IndexOfferManagement.data';
+import { generateIndexOfferData } from '../../shared/data';
 import { MarketContextPanel } from './components/MarketContextPanel';
 import { RankBadge } from './components/RankBadge';
 import { useFeatureMode } from '../../contexts/FeatureModeContext';
@@ -319,113 +320,8 @@ export function IndexOfferManagement() {
     setPublishSearchText('');
   }, [selectedRowsToPublish, publishDateTime]);
 
-  // Mock data for index offers
-  const rowData = useMemo(
-    () => [
-      {
-        id: 1,
-        terminal: 'Houston',
-        product: '87 Gas',
-        formulaTemplate:
-          '90% Prior Day Argus CBOB USGC, 10% Prior Day Argus CBOB USGC, Less 10% OPIS Current Year RIN',
-        differential: '0.02',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-01',
-      },
-      {
-        id: 2,
-        terminal: 'Houston',
-        product: 'ULSD 2',
-        formulaTemplate: '100% Prior Day OPIS Houston ULSD',
-        differential: '0.00',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-01',
-      },
-      {
-        id: 3,
-        terminal: 'Nashville Terminal',
-        product: '87 Gas',
-        formulaTemplate: '90% Prior Day Argus CBOB USGC, 10% Current OPIS RIN',
-        differential: '0.03',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-02',
-      },
-      {
-        id: 4,
-        terminal: 'Nashville Terminal',
-        product: 'ULSD 2',
-        formulaTemplate: '100% Prior Day OPIS Nashville ULSD Rack',
-        differential: '0.01',
-        status: 'Inactive',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-09-28',
-      },
-      {
-        id: 5,
-        terminal: 'Detroit Terminal',
-        product: '87 Gas',
-        formulaTemplate: '95% Prior Day Argus CBOB Group 3, Less 5% OPIS RIN',
-        differential: '0.02',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-03',
-      },
-      {
-        id: 6,
-        terminal: 'Detroit Terminal',
-        product: 'ULSD 2',
-        formulaTemplate: '100% Prior Day OPIS Detroit ULSD',
-        differential: '0.00',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-03',
-      },
-      {
-        id: 7,
-        terminal: 'Columbia Terminal',
-        product: '93 Premium',
-        formulaTemplate: '90% Prior Day Argus Premium USGC, 10% Prior Day Argus RFG USGC',
-        differential: '0.05',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-04',
-      },
-      {
-        id: 8,
-        terminal: 'Columbia Terminal',
-        product: '87 Gas',
-        formulaTemplate: '100% Current Day OPIS Columbia Rack',
-        differential: '0.01',
-        status: 'Inactive',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-09-25',
-      },
-      {
-        id: 9,
-        terminal: 'Columbia Terminal',
-        product: 'B7 GHL',
-        formulaTemplate: '93% Prior Day Argus ULSD, 7% Prior Day Argus Biodiesel',
-        differential: '0.00',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-05',
-      },
-      {
-        id: 10,
-        terminal: 'Columbia Terminal',
-        product: 'Mid-Grade 88',
-        formulaTemplate: '50% Prior Day OPIS 87 Gas, 50% Prior Day OPIS 93 Premium',
-        differential: '0.02',
-        status: 'Active',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-10-05',
-      },
-    ],
-    []
-  );
+  // Generate index offers from shared data (15 rows from shared terminals and products)
+  const rowData = useMemo(() => generateIndexOfferData(15), []);
 
   // Analytics Grid Sample Data
   const analyticsRowData = useMemo(

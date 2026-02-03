@@ -15,6 +15,8 @@ interface PerformanceSummaryTilesProps {
 }
 
 const cardStyle = {
+  flex: 1,
+  minWidth: 0,
   backgroundColor: '#ffffff',
   border: '1px solid #e8e8e8',
   borderRadius: '8px',
@@ -53,9 +55,9 @@ function MetricTile({ icon, iconColor = '#8c8c8c', label, value, valueColor, for
 
 export function PerformanceSummaryTiles({ summary }: PerformanceSummaryTilesProps) {
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <div>
       {/* Section Header */}
-      <div>
+      <div style={{ marginBottom: '16px' }}>
         <Texto category='h4' weight='600'>
           Performance Summary
         </Texto>
@@ -64,11 +66,10 @@ export function PerformanceSummaryTiles({ summary }: PerformanceSummaryTilesProp
         </Texto>
       </div>
 
-      {/* 7 Metric Tiles in responsive grid */}
+      {/* 7 Metric Tiles in single row - squeeze instead of stack */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          display: 'flex',
           gap: '16px',
         }}
       >
@@ -115,7 +116,7 @@ export function PerformanceSummaryTiles({ summary }: PerformanceSummaryTilesProp
           valueColor='#fa8c16'
         />
       </div>
-    </Vertical>
+    </div>
   )
 }
 

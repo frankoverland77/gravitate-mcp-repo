@@ -10,6 +10,7 @@ import {
   DEFAULT_BENCHMARKS,
   MAX_BENCHMARKS,
 } from '../../types/benchmark.types';
+import { generateComparisonData } from '../../../../shared/data';
 
 // Delta cell renderer - shows arrow, value, and "avg historical"
 const renderDeltaCell = (value: number | null) => {
@@ -45,53 +46,8 @@ const renderImpactCell = (value: number | null) => {
   );
 };
 
-// Initial comparison data with benchmark values
-const initialComparisonData: ComparisonRowData[] = [
-  {
-    key: '1',
-    product: '87 Octane',
-    location: 'Houston Terminal',
-    volume: 24000,
-    percentTotal: 25.2,
-    benchmarkData: {
-      'rack-average': { delta: -0.0439, impact: -1 },
-      'rack-low': { delta: -0.0212, impact: -508 },
-    },
-  },
-  {
-    key: '2',
-    product: '89 Octane',
-    location: 'Houston Terminal',
-    volume: 19000,
-    percentTotal: 19.9,
-    benchmarkData: {
-      'rack-average': { delta: -0.0821, impact: -2 },
-      'rack-low': { delta: 0.0288, impact: 547 },
-    },
-  },
-  {
-    key: '3',
-    product: 'Diesel',
-    location: 'Dallas Terminal',
-    volume: 28500,
-    percentTotal: 29.9,
-    benchmarkData: {
-      'rack-average': { delta: 0.0686, impact: 2 },
-      'rack-low': { delta: -0.0521, impact: -1 },
-    },
-  },
-  {
-    key: '4',
-    product: '93 Octane',
-    location: 'Austin Terminal',
-    volume: 23750,
-    percentTotal: 24.9,
-    benchmarkData: {
-      'rack-average': { delta: -0.0321, impact: 762 },
-      'rack-low': { delta: 0.0788, impact: 2 },
-    },
-  },
-];
+// Initial comparison data with benchmark values - generated from shared data
+const initialComparisonData: ComparisonRowData[] = generateComparisonData(4);
 
 // Generate random placeholder data for new benchmarks
 const generatePlaceholderData = (): BenchmarkData => ({
