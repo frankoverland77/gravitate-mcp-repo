@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Drawer, Select } from 'antd';
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { PlusOutlined } from '@ant-design/icons';
@@ -10,23 +11,72 @@ interface AddBenchmarkDrawerProps {
   currentCount: number;
 }
 
+// Options for each dropdown
+const publisherOptions = [
+  { value: 'opis', label: 'OPIS' },
+  { value: 'platts', label: 'Platts' },
+  { value: 'argus', label: 'Argus' },
+];
+
+const benchmarkTypeOptions = [
+  { value: 'rack-low', label: 'Rack Low' },
+  { value: 'rack-average', label: 'Rack Average' },
+  { value: 'spot', label: 'Spot' },
+  { value: 'opis-contract', label: 'OPIS Contract' },
+];
+
+const productHierarchyOptions = [
+  { value: 'target-index', label: 'Target Index ~85%' },
+  { value: 'product-grade', label: 'Product Grade ~75%' },
+  { value: 'product-family', label: 'Product Family ~60%' },
+  { value: 'any', label: 'Any 100%' },
+];
+
+const locationHierarchyOptions = [
+  { value: 'city', label: 'OPIS City' },
+  { value: 'state', label: 'State/Region' },
+  { value: 'padd', label: 'PADD District' },
+  { value: 'national', label: 'National' },
+];
+
+// Helper to get display name for benchmark type
+const getBenchmarkDisplayName = (type: string): string => {
+  const option = benchmarkTypeOptions.find((opt) => opt.value === type);
+  return option?.label || 'Benchmark';
+};
+
 export function AddBenchmarkDrawer({
   visible,
   onClose,
   onAddBenchmark,
   currentCount,
 }: AddBenchmarkDrawerProps) {
+  // State for all configuration fields
+  const [publisher, setPublisher] = useState<string>('opis');
+  const [benchmarkType, setBenchmarkType] = useState<string>('rack-low');
+  const [productHierarchy, setProductHierarchy] = useState<string>('target-index');
+  const [locationHierarchy, setLocationHierarchy] = useState<string>('city');
+
   const handleAdd = () => {
     const newBenchmark: Benchmark = {
       id: `benchmark-${Date.now()}`,
-      name: 'Example',
+      name: getBenchmarkDisplayName(benchmarkType),
       isPrimary: currentCount === 0,
-      publisher: 'TBD',
-      benchmarkType: 'TBD',
-      productHierarchy: 'TBD',
-      locationHierarchy: 'TBD',
+      publisher: publisher,
+      benchmarkType: benchmarkType,
+      productHierarchy: productHierarchy,
+      locationHierarchy: locationHierarchy,
     };
     onAddBenchmark(newBenchmark);
+    onClose();
+  };
+
+  // Reset form when drawer closes
+  const handleClose = () => {
+    setPublisher('opis');
+    setBenchmarkType('rack-low');
+    setProductHierarchy('target-index');
+    setLocationHierarchy('city');
     onClose();
   };
 
@@ -40,22 +90,14 @@ export function AddBenchmarkDrawer({
       }
       placement="right"
       width={500}
-      onClose={onClose}
+      onClose={handleClose}
       visible={visible}
       zIndex={2000}
       maskClosable={true}
       footer={
         <Horizontal style={{ justifyContent: 'flex-end', gap: '12px', padding: '12px 0' }}>
-          <GraviButton
-            buttonText="Cancel"
-            appearance="outlined"
-            onClick={onClose}
-          />
-          <GraviButton
-            buttonText="Add Benchmark"
-            appearance="success"
-            onClick={handleAdd}
-          />
+          <GraviButton buttonText="Cancel" appearance="outlined" onClick={handleClose} />
+          <GraviButton buttonText="Add Benchmark" appearance="success" onClick={handleAdd} />
         </Horizontal>
       }
     >
@@ -94,10 +136,10 @@ export function AddBenchmarkDrawer({
               Publisher
             </Texto>
             <Select
-              value="TBD"
-              disabled
+              value={publisher}
+              onChange={(value) => setPublisher(value)}
               style={{ width: '100%' }}
-              options={[{ value: 'TBD', label: 'TBD' }]}
+              options={publisherOptions}
             />
           </div>
 
@@ -111,10 +153,10 @@ export function AddBenchmarkDrawer({
               Benchmark Type
             </Texto>
             <Select
-              value="TBD"
-              disabled
+              value={benchmarkType}
+              onChange={(value) => setBenchmarkType(value)}
               style={{ width: '100%' }}
-              options={[{ value: 'TBD', label: 'TBD' }]}
+              options={benchmarkTypeOptions}
             />
           </div>
 
@@ -128,10 +170,10 @@ export function AddBenchmarkDrawer({
               Product Hierarchy
             </Texto>
             <Select
-              value="TBD"
-              disabled
+              value={productHierarchy}
+              onChange={(value) => setProductHierarchy(value)}
               style={{ width: '100%' }}
-              options={[{ value: 'TBD', label: 'TBD' }]}
+              options={productHierarchyOptions}
             />
           </div>
 
@@ -145,10 +187,10 @@ export function AddBenchmarkDrawer({
               Location Hierarchy
             </Texto>
             <Select
-              value="TBD"
-              disabled
+              value={locationHierarchy}
+              onChange={(value) => setLocationHierarchy(value)}
               style={{ width: '100%' }}
-              options={[{ value: 'TBD', label: 'TBD' }]}
+              options={locationHierarchyOptions}
             />
           </div>
         </div>
@@ -156,7 +198,7 @@ export function AddBenchmarkDrawer({
         {/* Divider */}
         <div style={{ borderTop: '1px solid #e8e8e8' }} />
 
-        {/* Matching Info Placeholder */}
+        {/* Matching Summary */}
         <div
           style={{
             padding: '16px',
@@ -168,9 +210,20 @@ export function AddBenchmarkDrawer({
           <Texto category="p2" weight="600" style={{ marginBottom: '8px', display: 'block' }}>
             Matching Summary
           </Texto>
-          <Texto category="p2" appearance="medium">
-            Product and location matching information will be displayed here once configured.
-          </Texto>
+          <Vertical style={{ gap: '4px' }}>
+            <Texto category="p2" appearance="medium">
+              Publisher: <strong>{publisherOptions.find((o) => o.value === publisher)?.label}</strong>
+            </Texto>
+            <Texto category="p2" appearance="medium">
+              Type: <strong>{benchmarkTypeOptions.find((o) => o.value === benchmarkType)?.label}</strong>
+            </Texto>
+            <Texto category="p2" appearance="medium">
+              Product: <strong>{productHierarchyOptions.find((o) => o.value === productHierarchy)?.label}</strong>
+            </Texto>
+            <Texto category="p2" appearance="medium">
+              Location: <strong>{locationHierarchyOptions.find((o) => o.value === locationHierarchy)?.label}</strong>
+            </Texto>
+          </Vertical>
         </div>
       </Vertical>
     </Drawer>

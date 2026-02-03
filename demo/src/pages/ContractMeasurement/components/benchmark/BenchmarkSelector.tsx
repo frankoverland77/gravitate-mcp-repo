@@ -158,6 +158,7 @@ export function BenchmarkSelector({
                       onChange={setBenchmarkTypeOption}
                       options={BENCHMARK_TYPE_OPTIONS}
                       style={{ width: '100%' }}
+                      getPopupContainer={(trigger) => trigger.parentElement || document.body}
                     />
                   </div>
                 )}
@@ -173,6 +174,7 @@ export function BenchmarkSelector({
                     onChange={setPublisher}
                     options={PUBLISHER_OPTIONS}
                     style={{ width: '100%' }}
+                    getPopupContainer={(trigger) => trigger.parentElement || document.body}
                   />
                 </div>
 
@@ -187,6 +189,7 @@ export function BenchmarkSelector({
                     onChange={setProductHierarchy}
                     options={PRODUCT_HIERARCHY_OPTIONS}
                     style={{ width: '100%' }}
+                    getPopupContainer={(trigger) => trigger.parentElement || document.body}
                   />
                 </div>
 
@@ -201,6 +204,7 @@ export function BenchmarkSelector({
                     onChange={setLocationHierarchy}
                     options={LOCATION_HIERARCHY_OPTIONS}
                     style={{ width: '100%' }}
+                    getPopupContainer={(trigger) => trigger.parentElement || document.body}
                   />
                 </div>
 
@@ -218,6 +222,7 @@ export function BenchmarkSelector({
                         { value: '-', label: '-' },
                       ]}
                       style={{ width: '60px' }}
+                      getPopupContainer={(trigger) => trigger.parentElement || document.body}
                     />
                     <InputNumber
                       placeholder="0.00"
