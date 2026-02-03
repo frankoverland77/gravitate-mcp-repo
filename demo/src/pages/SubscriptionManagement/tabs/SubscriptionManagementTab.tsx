@@ -9,7 +9,7 @@ import {
   GraviButton,
   NotificationMessage,
 } from '@gravitate-js/excalibrr';
-import { PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import type { GridApi } from 'ag-grid-community';
 import { getSubscriptionColumnDefs } from '../components/columnDefs';
 import { BulkChangeDrawer } from '../components/BulkChangeDrawer';
@@ -23,6 +23,7 @@ export function SubscriptionManagementTab() {
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
   const [bulkEditRows, setBulkEditRows] = useState<SubscriptionData[]>([]);
   const [isBulkChangeDrawerOpen, setIsBulkChangeDrawerOpen] = useState(false);
+  const [isContentConfigLocked, setIsContentConfigLocked] = useState(true);
   const canWrite = true; // In real app, this would come from permissions
 
   // Handle row selection for bulk edit mode
@@ -150,6 +151,20 @@ export function SubscriptionManagementTab() {
     NotificationMessage('Create', 'Opening create subscription modal', false);
   }, []);
 
+  const handleToggleContentConfigLock = useCallback(() => {
+    setIsContentConfigLocked((prev) => {
+      const newValue = !prev;
+      NotificationMessage(
+        newValue ? 'Content Config Locked' : 'Content Config Unlocked',
+        newValue
+          ? 'Content Configuration checkboxes are now locked'
+          : 'Content Configuration checkboxes are now editable',
+        false
+      );
+      return newValue;
+    });
+  }, []);
+
   // Column definitions
   const columnDefs = useMemo(
     () =>
@@ -157,6 +172,7 @@ export function SubscriptionManagementTab() {
         isBulkEditMode,
         canWrite,
         bulkEditRows,
+        isContentConfigLocked,
         onStatusChange: handleStatusChange,
         onOpenProducts: handleOpenProducts,
         onOpenLocations: handleOpenLocations,
@@ -166,6 +182,7 @@ export function SubscriptionManagementTab() {
       isBulkEditMode,
       canWrite,
       bulkEditRows,
+      isContentConfigLocked,
       handleStatusChange,
       handleOpenProducts,
       handleOpenLocations,
@@ -205,15 +222,24 @@ export function SubscriptionManagementTab() {
           <GraviButton buttonText="Cancel" size="small" onClick={handleCancel} />
         </Horizontal>
       ) : (
-        <GraviButton
-          buttonText="Create"
-          success
-          icon={<PlusCircleOutlined />}
-          onClick={handleCreate}
-        />
+        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+          <GraviButton
+            buttonText={isContentConfigLocked ? 'Unlock Content Config' : 'Lock Content Config'}
+            size="small"
+            icon={isContentConfigLocked ? <LockOutlined /> : <UnlockOutlined />}
+            onClick={handleToggleContentConfigLock}
+            theme1={!isContentConfigLocked}
+          />
+          <GraviButton
+            buttonText="Create"
+            success
+            icon={<PlusCircleOutlined />}
+            onClick={handleCreate}
+          />
+        </Horizontal>
       ),
     }),
-    [isBulkEditMode, handleActivateAll, handleDeactivateAll, handleCancel, handleCreate, handleOpenBulkChange]
+    [isBulkEditMode, isContentConfigLocked, handleActivateAll, handleDeactivateAll, handleCancel, handleCreate, handleOpenBulkChange, handleToggleContentConfigLock]
   );
 
   return (

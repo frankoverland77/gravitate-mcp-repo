@@ -77,7 +77,6 @@ export const DEFAULT_CONTENT_CONFIG = {
 
 // Content configuration field metadata for column generation
 export const CONTENT_CONFIG_FIELDS = [
-  { field: 'IncludeCounterparty', headerName: 'Counterparty' },
   { field: 'IncludeLoadingNumber', headerName: 'Loading Number' },
   { field: 'IncludePortalLink', headerName: 'Portal Link' },
   { field: 'IncludeEffectiveDate', headerName: 'Effective Date' },

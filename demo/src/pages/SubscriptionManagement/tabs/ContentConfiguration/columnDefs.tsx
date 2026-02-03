@@ -1,6 +1,6 @@
 // Column definitions for Content Configuration grid
 
-import { BBDTag, Horizontal, Texto } from '@gravitate-js/excalibrr'
+import { Texto } from '@gravitate-js/excalibrr'
 import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
 
@@ -32,44 +32,17 @@ export function getColumnDefs(): ColDef[] {
       },
     },
     {
-      headerName: 'Price Change',
-      field: 'IncludePriceChange',
-      minWidth: 120,
-      cellRenderer: (params: { value: boolean }) => {
+      headerName: 'Email Body Template',
+      field: 'EmailBody',
+      minWidth: 300,
+      flex: 1,
+      cellRenderer: (params: { value: string }) => {
+        // Truncate for display and replace newlines with spaces
+        const truncated = params.value?.replace(/\n/g, ' ').substring(0, 100) + (params.value?.length > 100 ? '...' : '')
         return (
-          <Horizontal>
-            <BBDTag success={params.value} warning={!params.value}>
-              {params.value ? 'Included' : 'Excluded'}
-            </BBDTag>
-          </Horizontal>
-        )
-      },
-    },
-    {
-      headerName: 'Effective Date',
-      field: 'IncludeEffectiveDate',
-      minWidth: 120,
-      cellRenderer: (params: { value: boolean }) => {
-        return (
-          <Horizontal>
-            <BBDTag success={params.value} warning={!params.value}>
-              {params.value ? 'Included' : 'Excluded'}
-            </BBDTag>
-          </Horizontal>
-        )
-      },
-    },
-    {
-      headerName: 'Location Details',
-      field: 'IncludeLocationDetails',
-      minWidth: 130,
-      cellRenderer: (params: { value: boolean }) => {
-        return (
-          <Horizontal>
-            <BBDTag success={params.value} warning={!params.value}>
-              {params.value ? 'Included' : 'Excluded'}
-            </BBDTag>
-          </Horizontal>
+          <Texto category='p2' style={{ fontFamily: 'monospace', fontSize: '12px' }}>
+            {truncated}
+          </Texto>
         )
       },
     },

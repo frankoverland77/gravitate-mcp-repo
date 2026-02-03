@@ -63,10 +63,6 @@ export function ContentConfigurationTab() {
                 ...row,
                 EmailSubject: sourceConfig.EmailSubject,
                 EmailBody: sourceConfig.EmailBody,
-                DTNMessageFormat: sourceConfig.DTNMessageFormat,
-                IncludePriceChange: sourceConfig.IncludePriceChange,
-                IncludeEffectiveDate: sourceConfig.IncludeEffectiveDate,
-                IncludeLocationDetails: sourceConfig.IncludeLocationDetails,
                 LastModified: new Date().toISOString(),
                 ModifiedBy: 'Current User',
               }
@@ -91,12 +87,8 @@ export function ContentConfigurationTab() {
             row.QuoteConfigId === config.QuoteConfigId
               ? {
                   ...row,
-                  EmailSubject: 'Price Update - {LocationName} - {ProductName}',
-                  EmailBody: 'Dear Customer,\n\nThe price for {ProductName} at {LocationName} has been updated.\n\nNew Price: {Price}\nEffective: {EffectiveDate}',
-                  DTNMessageFormat: '{LocationCode}|{ProductCode}|{Price}|{EffectiveDate}',
-                  IncludePriceChange: true,
-                  IncludeEffectiveDate: true,
-                  IncludeLocationDetails: true,
+                  EmailSubject: 'Delivered Price Notification Effective From {EffectiveDate}',
+                  EmailBody: 'Dear Customer,\n\nPlease be advised of the posted price changes below:\n\n{Table}\n\nThank you for your business.',
                   LastModified: new Date().toISOString(),
                   ModifiedBy: 'Current User',
                 }

@@ -29,7 +29,6 @@ export interface ContentConfiguration {
 
 // Field metadata for generating UI
 export const CONTENT_CONFIG_FIELDS = [
-  { field: 'IncludeCounterparty', label: 'Counterparty' },
   { field: 'IncludeLoadingNumber', label: 'Loading Number' },
   { field: 'IncludePortalLink', label: 'Portal Link' },
   { field: 'IncludeEffectiveDate', label: 'Effective Date' },

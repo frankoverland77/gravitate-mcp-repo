@@ -217,6 +217,7 @@ interface ContentCheckboxColumnProps extends BulkEditProps {
   field: string;
   headerName: string;
   isFirstColumn?: boolean;
+  isContentConfigLocked?: boolean;
   onCheckboxChange?: (row: SubscriptionData, field: string, newValue: boolean) => void;
 }
 
@@ -224,6 +225,7 @@ function contentCheckboxColumn({
   field,
   headerName,
   isFirstColumn = false,
+  isContentConfigLocked = true,
   isBulkEditMode,
   canWrite,
   bulkEditRows,
@@ -241,10 +243,10 @@ function contentCheckboxColumn({
     cellStyle: (params) => ({
       ...getCellStyle({ row: params.data, isBulkEditMode, canWrite, bulkEditRows }),
       textAlign: 'center',
-      backgroundColor: 'rgba(100, 210, 141, 0.03)',
+      backgroundColor: isContentConfigLocked ? 'rgba(128, 128, 128, 0.05)' : 'rgba(100, 210, 141, 0.03)',
     }),
     cellRenderer: (params: ICellRendererParams<SubscriptionData>) => {
-      const editable = getIsRowEditable({
+      const editable = !isContentConfigLocked && getIsRowEditable({
         row: params.data!,
         isBulkEditMode,
         canWrite,
@@ -270,6 +272,7 @@ function contentCheckboxColumn({
 }
 
 interface ContentConfigGroupProps extends BulkEditProps {
+  isContentConfigLocked?: boolean;
   onCheckboxChange?: (row: SubscriptionData, field: string, newValue: boolean) => void;
 }
 
@@ -277,10 +280,11 @@ export function getContentConfigColumnGroup({
   isBulkEditMode,
   canWrite,
   bulkEditRows,
+  isContentConfigLocked = true,
   onCheckboxChange,
 }: ContentConfigGroupProps): ColGroupDef {
   return {
-    headerName: 'Content Configuration',
+    headerName: isContentConfigLocked ? 'Content Configuration 🔒' : 'Content Configuration',
     headerClass: 'content-config-header-group',
     marryChildren: true,
     children: CONTENT_CONFIG_FIELDS.map((fieldConfig, index) =>
@@ -288,6 +292,7 @@ export function getContentConfigColumnGroup({
         field: fieldConfig.field,
         headerName: fieldConfig.headerName,
         isFirstColumn: index === 0,
+        isContentConfigLocked,
         isBulkEditMode,
         canWrite,
         bulkEditRows,
@@ -302,6 +307,7 @@ export function getContentConfigColumnGroup({
 // ========================================
 
 interface SubscriptionColumnDefsProps extends BulkEditProps {
+  isContentConfigLocked?: boolean;
   onStatusChange?: (row: SubscriptionData, newStatus: boolean) => void;
   onOpenProducts?: (row: SubscriptionData) => void;
   onOpenLocations?: (row: SubscriptionData) => void;
@@ -312,6 +318,7 @@ export function getSubscriptionColumnDefs({
   isBulkEditMode,
   canWrite,
   bulkEditRows,
+  isContentConfigLocked = true,
   onStatusChange,
   onOpenProducts,
   onOpenLocations,
@@ -326,7 +333,7 @@ export function getSubscriptionColumnDefs({
     quoteConfigColumn(),
     productsColumn({ ...bulkProps, onOpenProducts }),
     locationsColumn({ ...bulkProps, onOpenLocations }),
-    getContentConfigColumnGroup({ ...bulkProps, onCheckboxChange }),
+    getContentConfigColumnGroup({ ...bulkProps, isContentConfigLocked, onCheckboxChange }),
   ];
 }
 

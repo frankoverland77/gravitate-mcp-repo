@@ -2,7 +2,7 @@
 // Based on Gravitate ManagePriceNotifications module patterns and Reece's mockup designs
 
 import { Vertical } from '@gravitate-js/excalibrr';
-import { Tabs } from 'antd';
+import { Tabs, Tooltip } from 'antd';
 import { ContentConfigurationTab } from './tabs/ContentConfigurationTab';
 import { SubscriptionManagementTab } from './tabs/SubscriptionManagementTab';
 import { NotificationDestinationsTab } from './tabs/NotificationDestinationsTab';
@@ -16,7 +16,7 @@ export function SubscriptionManagement() {
         <Tabs.TabPane tab="Subscription Management" key="subscriptions">
           <SubscriptionManagementTab />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Content Configuration" key="content">
+        <Tabs.TabPane tab={<Tooltip title="Build default email templates for each quote configuration">Content Configuration (Email Template)</Tooltip>} key="content">
           <ContentConfigurationTab />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Notification Destinations" key="destinations">
