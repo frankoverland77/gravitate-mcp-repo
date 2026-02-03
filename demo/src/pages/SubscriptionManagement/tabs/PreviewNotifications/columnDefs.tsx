@@ -111,18 +111,36 @@ export function getColumnDefs(): ColDef[] {
       filter: 'agNumberColumnFilter',
     },
     {
-      headerName: 'Status',
-      field: 'HasBeenSent',
-      minWidth: 120,
+      headerName: 'DTN Message',
+      field: 'DTNSent',
+      minWidth: 130,
       valueGetter: (params) => {
-        return params.data?.HasBeenSent ? 'Sent' : 'Not Sent'
+        return params.data?.DTNSent ? 'Sent' : 'Not Sent'
       },
-      cellRenderer: (params: { data: { HasBeenSent: boolean } }) => {
-        const hasBeenSent = params.data?.HasBeenSent
+      cellRenderer: (params: { data: { DTNSent: boolean } }) => {
+        const dtnSent = params.data?.DTNSent
         return (
           <Horizontal>
-            <BBDTag success={hasBeenSent} warning={!hasBeenSent}>
-              {hasBeenSent ? 'Sent' : 'Not Sent'}
+            <BBDTag success={dtnSent} warning={!dtnSent}>
+              {dtnSent ? 'Sent' : 'Not Sent'}
+            </BBDTag>
+          </Horizontal>
+        )
+      },
+    },
+    {
+      headerName: 'Email',
+      field: 'EmailSent',
+      minWidth: 120,
+      valueGetter: (params) => {
+        return params.data?.EmailSent ? 'Sent' : 'Not Sent'
+      },
+      cellRenderer: (params: { data: { EmailSent: boolean } }) => {
+        const emailSent = params.data?.EmailSent
+        return (
+          <Horizontal>
+            <BBDTag success={emailSent} warning={!emailSent}>
+              {emailSent ? 'Sent' : 'Not Sent'}
             </BBDTag>
           </Horizontal>
         )

@@ -7,13 +7,13 @@ import { PreviewMode, PriceNotification } from './types'
 
 interface PreviewActionButtonsProps {
   selectedRows: PriceNotification[]
-  setIsShowingConfirmModal: React.Dispatch<React.SetStateAction<boolean>>
+  onNotifyClick: () => void
   mode: PreviewMode
   setMode: React.Dispatch<React.SetStateAction<PreviewMode>>
 }
 
 export function PreviewActionButtons({
-  setIsShowingConfirmModal,
+  onNotifyClick,
   selectedRows,
   mode,
   setMode,
@@ -33,7 +33,7 @@ export function PreviewActionButtons({
           buttonText={`Notify Selected (${selectedRows.length})`}
           disabled={!selectedRows.length}
           theme1
-          onClick={() => setIsShowingConfirmModal(true)}
+          onClick={onNotifyClick}
         />
       </Horizontal>
     </Horizontal>

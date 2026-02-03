@@ -5,7 +5,7 @@ import { Modal } from 'antd'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
-import { PreviewMode, PriceNotification } from './types'
+import { NotificationMethod, PreviewMode, PriceNotification } from './types'
 
 interface ConfirmModalProps {
   isShowingConfirmModal: boolean
@@ -13,6 +13,7 @@ interface ConfirmModalProps {
   sendNotifications: () => void
   selectedQuoteConfigs: PriceNotification[]
   mode: PreviewMode
+  notificationMethod: NotificationMethod | null
   isSending: boolean
 }
 
@@ -22,6 +23,7 @@ export function ConfirmModal({
   sendNotifications,
   selectedQuoteConfigs,
   mode,
+  notificationMethod,
   isSending,
 }: ConfirmModalProps) {
   const hasMissingPrices = useMemo(
@@ -56,6 +58,19 @@ export function ConfirmModal({
         return 'Current Period'
       default:
         return m
+    }
+  }
+
+  const getMethodDisplayName = (method: NotificationMethod | null): string => {
+    switch (method) {
+      case 'DTN':
+        return 'DTN Message'
+      case 'Email':
+        return 'Emails'
+      case 'Both':
+        return 'DTN Message & Emails'
+      default:
+        return 'Unknown'
     }
   }
 
@@ -102,6 +117,7 @@ export function ConfirmModal({
 
         <Vertical className='mt-2'>
           <Texto category='h6'>Notification Summary</Texto>
+          <Texto>• Method: {getMethodDisplayName(notificationMethod)}</Texto>
           <Texto>• Mode: {getModeDisplayName(mode)}</Texto>
           <Texto>• Total Prices: {selectedQuoteConfigs?.length.toLocaleString()}</Texto>
           <Texto>• Effective Date: {effectiveDateTime}</Texto>
