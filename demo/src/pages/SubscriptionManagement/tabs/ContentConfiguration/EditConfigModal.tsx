@@ -104,28 +104,30 @@ export function EditConfigModal({ visible, config, onClose, onSave }: EditConfig
 
           <Horizontal style={{ gap: '32px' }}>
             {/* Left Column */}
-            <Vertical flex='1' style={{ gap: '8px' }}>
+            <Vertical flex='1' style={{ gap: '8px', minWidth: '140px' }}>
               {leftColumnFields.map((fieldConfig) => (
-                <Checkbox
-                  key={fieldConfig.field}
-                  checked={formData[fieldConfig.field as keyof ContentConfiguration] as boolean}
-                  onChange={(e) => handleCheckboxChange(fieldConfig.field, e.target.checked)}
-                >
-                  {fieldConfig.label}
-                </Checkbox>
+                <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
+                  <Checkbox
+                    checked={formData[fieldConfig.field as keyof ContentConfiguration] as boolean}
+                    onChange={(e) => handleCheckboxChange(fieldConfig.field, e.target.checked)}
+                  >
+                    {fieldConfig.label}
+                  </Checkbox>
+                </div>
               ))}
             </Vertical>
 
             {/* Right Column */}
-            <Vertical flex='1' style={{ gap: '8px' }}>
+            <Vertical flex='1' style={{ gap: '8px', minWidth: '160px' }}>
               {rightColumnFields.map((fieldConfig) => (
-                <Checkbox
-                  key={fieldConfig.field}
-                  checked={formData[fieldConfig.field as keyof ContentConfiguration] as boolean}
-                  onChange={(e) => handleCheckboxChange(fieldConfig.field, e.target.checked)}
-                >
-                  {fieldConfig.label}
-                </Checkbox>
+                <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
+                  <Checkbox
+                    checked={formData[fieldConfig.field as keyof ContentConfiguration] as boolean}
+                    onChange={(e) => handleCheckboxChange(fieldConfig.field, e.target.checked)}
+                  >
+                    {fieldConfig.label}
+                  </Checkbox>
+                </div>
               ))}
             </Vertical>
           </Horizontal>
