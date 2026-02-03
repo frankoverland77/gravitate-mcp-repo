@@ -3,6 +3,7 @@
 
 import { Vertical } from '@gravitate-js/excalibrr';
 import { Tabs } from 'antd';
+import { ContentConfigurationTab } from './tabs/ContentConfigurationTab';
 import { SubscriptionManagementTab } from './tabs/SubscriptionManagementTab';
 import { NotificationDestinationsTab } from './tabs/NotificationDestinationsTab';
 import { PreviewNotificationsTab } from './tabs/PreviewNotificationsTab';
@@ -14,6 +15,9 @@ export function SubscriptionManagement() {
       <Tabs defaultActiveKey="subscriptions" style={{ height: '100%' }}>
         <Tabs.TabPane tab="Subscription Management" key="subscriptions">
           <SubscriptionManagementTab />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Content Configuration" key="content">
+          <ContentConfigurationTab />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Notification Destinations" key="destinations">
           <NotificationDestinationsTab />
