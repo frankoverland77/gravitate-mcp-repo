@@ -10,12 +10,14 @@ import { ContentDetailPanel } from './ContentDetailPanel'
 import { CopyConfigModal } from './CopyConfigModal'
 import { EditConfigModal } from './EditConfigModal'
 import { mockContentConfigurations } from './mockData'
+import { PreviewEmailModal } from './PreviewEmailModal'
 import { ContentConfiguration } from './types'
 
 export function ContentConfigurationTab() {
   const [rowData, setRowData] = useState<ContentConfiguration[]>(mockContentConfigurations)
   const [editingConfig, setEditingConfig] = useState<ContentConfiguration | null>(null)
   const [copyingConfig, setCopyingConfig] = useState<ContentConfiguration | null>(null)
+  const [previewingConfig, setPreviewingConfig] = useState<ContentConfiguration | null>(null)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
 
   const formatLastSaved = (date: Date) => {
@@ -32,8 +34,7 @@ export function ContentConfigurationTab() {
   const storageKey = 'SubscriptionManagement/ContentConfigurationTab'
 
   const handlePreview = (config: ContentConfiguration) => {
-    // Placeholder - will show email preview modal in future implementation
-    NotificationMessage('Preview', `Email preview for "${config.QuoteConfigName}" - Coming soon`, false)
+    setPreviewingConfig(config)
   }
 
   const handleEdit = (config: ContentConfiguration) => {
@@ -164,6 +165,11 @@ export function ContentConfigurationTab() {
         allConfigs={rowData}
         onClose={() => setCopyingConfig(null)}
         onCopy={handleCopyConfirm}
+      />
+      <PreviewEmailModal
+        visible={previewingConfig !== null}
+        config={previewingConfig}
+        onClose={() => setPreviewingConfig(null)}
       />
     </Vertical>
   )

@@ -87,28 +87,30 @@ export function ContentDetailPanel({ data, onEdit, onCopy, onReset, onPreview }:
 
           <Horizontal style={{ gap: '24px' }}>
             {/* Left Column of Checkboxes */}
-            <Vertical style={{ gap: '4px' }}>
+            <Vertical style={{ gap: '4px', minWidth: '140px' }}>
               {leftColumnFields.map((fieldConfig) => (
-                <Checkbox
-                  key={fieldConfig.field}
-                  checked={data[fieldConfig.field as keyof ContentConfiguration] as boolean}
-                  disabled
-                >
-                  {fieldConfig.label}
-                </Checkbox>
+                <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
+                  <Checkbox
+                    checked={data[fieldConfig.field as keyof ContentConfiguration] as boolean}
+                    disabled
+                  >
+                    {fieldConfig.label}
+                  </Checkbox>
+                </div>
               ))}
             </Vertical>
 
             {/* Right Column of Checkboxes */}
-            <Vertical style={{ gap: '4px' }}>
+            <Vertical style={{ gap: '4px', minWidth: '160px' }}>
               {rightColumnFields.map((fieldConfig) => (
-                <Checkbox
-                  key={fieldConfig.field}
-                  checked={data[fieldConfig.field as keyof ContentConfiguration] as boolean}
-                  disabled
-                >
-                  {fieldConfig.label}
-                </Checkbox>
+                <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
+                  <Checkbox
+                    checked={data[fieldConfig.field as keyof ContentConfiguration] as boolean}
+                    disabled
+                  >
+                    {fieldConfig.label}
+                  </Checkbox>
+                </div>
               ))}
             </Vertical>
           </Horizontal>

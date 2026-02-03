@@ -233,6 +233,7 @@ function contentCheckboxColumn({
     headerName,
     field,
     width: 90,
+    hide: true,
     headerClass: 'content-config-header',
     cellClass: isFirstColumn
       ? 'content-config-cell content-config-first-col'
