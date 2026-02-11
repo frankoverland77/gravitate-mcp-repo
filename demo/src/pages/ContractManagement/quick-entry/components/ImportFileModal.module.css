@@ -1,0 +1,66 @@
+/**
+ * Import File Modal Styles
+ */
+
+.dropzone {
+  padding: 32px;
+  border: 1px dashed var(--theme-border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.dropzone:hover {
+  border-color: var(--theme-color-link);
+}
+
+.dropzoneIcon {
+  font-size: 48px;
+  color: var(--theme-color-link);
+  margin-bottom: 16px;
+}
+
+.validating {
+  padding: 48px;
+}
+
+.fileIcon {
+  font-size: 48px;
+  color: var(--theme-color-link);
+  margin-bottom: 16px;
+}
+
+.summaryCard {
+  flex: 1;
+  padding: 16px;
+  background: var(--theme-bg-1);
+  border: 1px solid var(--theme-border-color);
+  border-radius: 8px;
+}
+
+.errorList {
+  padding: 12px;
+  background: rgba(255, 77, 79, 0.05);
+  border: 1px solid rgba(255, 77, 79, 0.2);
+  border-radius: 6px;
+  gap: 4px;
+}
+
+.warningList {
+  padding: 12px;
+  background: rgba(250, 173, 20, 0.05);
+  border: 1px solid rgba(250, 173, 20, 0.2);
+  border-radius: 6px;
+  gap: 4px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+}

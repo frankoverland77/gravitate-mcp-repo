@@ -10,22 +10,29 @@ import type { PricePublisher, PriceType, DateRule } from './price.types'
 /**
  * Formula variable - matches Contract Management FormulaVariable
  * Represents a single price index component in a formula
+ *
+ * Fields use `string` (not strict enums) to accommodate placeholder values
+ * like [*SRC*], [*TYPE*], [*DATE*] from formula templates.
+ * PricePublisher, PriceType, DateRule are the "happy path" values.
  */
 export interface FormulaVariable {
   id: string
   variableName: string // Pattern: var_{index}_group_{groupNum}
   displayName?: string | null
 
-  // Price Source
-  pricePublisher: PricePublisher
+  // Price Source — string to support placeholder values from templates
+  pricePublisher: string
   priceInstrument: string // 'CBOB USGC', 'ULSD Gulf', etc.
-  priceType: PriceType
-  dateRule: DateRule
+  priceType: string
+  dateRule: string
 
-  // Calculation
-  percentage: number // Default 100
+  // Calculation — percentage can be string when placeholder '[*PCT*]'
+  percentage: number | string // Default 100
   differential: number // +/- adjustment in $/gal
 }
+
+// Re-export enum types for consumers that need the strict values
+export type { PricePublisher, PriceType, DateRule }
 
 /**
  * Formula definition for structured pricing
@@ -54,6 +61,11 @@ export interface FormulaTemplate {
  * Provision type for bid/contract pricing
  */
 export type ProvisionType = 'Fixed' | 'Formula' | 'Lesser Of 2' | 'Lesser Of 3'
+
+/**
+ * Formula editor UI mode (maps to ProvisionType on save)
+ */
+export type FormulaMode = 'formula' | 'lower-of-2' | 'lower-of-3'
 
 /**
  * Provision status for validation

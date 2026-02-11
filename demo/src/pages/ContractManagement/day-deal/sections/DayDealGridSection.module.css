@@ -1,0 +1,14 @@
+/**
+ * Day Deal Grid Section Styles
+ */
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-wrapper {
+  padding: 0;
+  overflow: hidden;
+}

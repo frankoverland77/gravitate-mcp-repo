@@ -33,7 +33,7 @@ export function AuthenticatedRoute() {
     CustomerList: true,
     InventoryGrid: true,
     BulkChangeTest: true,
-    SubscriptionManagement: true,
+    Contracts: true,
   };
   return (
     <FeatureModeProvider>

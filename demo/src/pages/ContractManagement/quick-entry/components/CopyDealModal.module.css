@@ -1,0 +1,37 @@
+/**
+ * Copy Deal Modal Styles
+ */
+
+.contractList {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--theme-border-color);
+  border-radius: 6px;
+}
+
+.contractItem {
+  display: flex;
+  width: 100%;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--theme-border-color);
+  cursor: pointer;
+}
+
+.contractItem:last-child {
+  border-bottom: none;
+}
+
+.contractItem:hover {
+  background: var(--theme-bg-hover);
+}
+
+.emptyState {
+  padding: 24px;
+}
+
+.preview {
+  padding: 12px 16px;
+  background: var(--theme-bg-1);
+  border: 1px dashed var(--theme-border-color);
+  border-radius: 6px;
+}

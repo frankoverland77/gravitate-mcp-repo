@@ -1,0 +1,32 @@
+/**
+ * Edit Header Modal Styles
+ */
+
+.formContainer {
+  padding: 8px 0;
+}
+
+.sectionDivider {
+  margin: 16px 0 12px;
+}
+
+.collapseSection:global(.ant-collapse) {
+  font-size: inherit;
+}
+
+.collapseSection :global(.ant-collapse-header) {
+  padding: 8px 0 !important;
+  font-size: 11px;
+}
+
+.collapseSection :global(.ant-collapse-content-box) {
+  padding: 8px 0 16px !important;
+}
+
+.sectionHeader {
+  margin-top: 16px;
+}
+
+.sectionHeader:first-child {
+  margin-top: 0;
+}

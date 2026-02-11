@@ -1,0 +1,31 @@
+/**
+ * Bulk Create Drawer Styles
+ */
+
+.checkboxList {
+  padding: 12px;
+  background: var(--theme-bg-1);
+  border: 1px solid var(--theme-border-color);
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  gap: 8px;
+}
+
+.checkboxItem {
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.checkboxItem:hover {
+  background: var(--theme-bg-hover);
+}
+
+.preview {
+  padding: 12px 16px;
+  background: var(--theme-bg-1);
+  border: 1px dashed var(--theme-border-color);
+  border-radius: 6px;
+}

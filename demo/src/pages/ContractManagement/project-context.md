@@ -1,0 +1,288 @@
+# Contract Management Demo - Project Context
+*Last Updated: 2026-02-10*
+
+## Purpose
+Demo/prototype of the Gravitate Contract Management module using Excalibrr components.
+
+---
+
+## Source of Truth - Gravitate Repo Locations
+
+All contract creation components come from:
+**`/Users/frankoverland/Documents/Gravitate Repo/Gravitate.Dotnet.Next/frontend/src/`**
+
+### Main Entry Point
+- **`/modules/ContractManagement/page.tsx`** - Main router (header vs details mode)
+
+### Header Entry View (Contract Creation Form)
+- **`/modules/ContractManagement/components/HeaderEntry/index.tsx`** - Main header form container
+
+### Form Sections
+
+| Section | Gravitate Component | Fields |
+|---------|---------------------|--------|
+| Contract Type | `/components/ContractTypeCheckboxGroup/index.tsx` | TradeInstrumentId (radio), Description, Comments |
+| Counterparty Info | `/modules/ContractManagement/components/CounterpartyInfoForm/index.tsx` | Internal/External cascaders |
+| Trade Info | `/modules/ContractManagement/components/TradeInfoForm/index.tsx` | Calendar, Dates, Quantities switch |
+| Additional Info | `/modules/ContractManagement/components/AdditionalInfoForm/index.tsx` | Contract #s, Movement Type, Strategy |
+
+### Shared Components
+- **`/components/shared/Navigation/Footer/Footer.tsx`** - Footer bar with icon+title and action buttons
+
+### API & Types
+- **`/modules/ContractManagement/api/useContracts.ts`** - All API hooks
+- **`/modules/ContractManagement/api/types.schema.ts`** - TypeScript types
+- **Metadata endpoint:** `ContractManagement/MetaData`
+- **Submit endpoint:** `ContractManagement/Upsert`
+
+---
+
+## Contract Creation Data Flow
+
+```
+1. User navigates to /Contracts/CreateContract
+2. Load Metadata (dropdowns, options)
+3. Render HeaderEntryView with 4 sections:
+   - Contract Type & Description (sidebar)
+   - Counterparty Info
+   - Trade Info
+   - Additional Info
+4. Click "Manage Details" → validates & saves header
+5. Switch to Details mode → add line items
+6. Click "Save As..." or "Activate" → submit contract
+```
+
+---
+
+## Required Fields (Header → Details)
+
+**Must have:**
+1. Trade Instrument (Contract Type)
+2. Internal Counterparty & Contact
+3. External Counterparty (contact optional)
+4. Contract Calendar
+5. Contract Date
+6. Effective Dates (range)
+
+**Optional:**
+- Description, Comments
+- Internal/External Contract Numbers
+- Movement Type, Strategy
+
+---
+
+## Metadata Structure
+
+```typescript
+{
+  InternalCounterPartyList: SelectOption[]
+  InternalColleagueList: SelectOption[]  // filtered by GroupingValue
+  ExternalCounterPartyList: SelectOption[]
+  ExternalColleagueList: SelectOption[]  // filtered by GroupingValue
+  TradeInstrumentList: SelectOption[]    // Contract types
+  PricingCalendars: SelectOption[]
+  MovementTypes: SelectOption[]
+  Books: SelectOption[]                  // Strategies
+}
+```
+
+---
+
+## Layout Pattern (Gravitate Production)
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│ Page Header: Back button + "Create Contract" + Mode selector   │
+├─────────────────┬──────────────────────────────────────────────┤
+│ LEFT SIDEBAR    │ RIGHT MAIN PANEL                              │
+│ flex='1 0 150px'│ flex={5}                                      │
+│ bg-2 p-5 border │                                               │
+│                 │ ┌──────────────────────────────────────────┐ │
+│ Contract Type   │ │ Form Container: bg-2 bordered p-5        │ │
+│ (Radio buttons) │ │                                          │ │
+│                 │ │ "Contract Header" title                  │ │
+│ Description     │ │                                          │ │
+│ (Input)         │ │ CounterpartyInfoForm                     │ │
+│                 │ │ TradeInfoForm                            │ │
+│ Comments        │ │ AdditionalInfoForm                       │ │
+│ (TextArea)      │ │                                          │ │
+│                 │ └──────────────────────────────────────────┘ │
+│                 │                                               │
+│                 │ ┌──────────────────────────────────────────┐ │
+│                 │ │ FOOTER BAR                               │ │
+│                 │ │ [Icon] Header Entry    [Cancel] [Manage] │ │
+│                 │ │ (blue underline)                         │ │
+│                 │ └──────────────────────────────────────────┘ │
+└─────────────────┴──────────────────────────────────────────────┘
+```
+
+---
+
+## Gravitate File Structure Reference
+
+```
+/modules/ContractManagement/
+├── page.tsx                          # Main router
+├── api/
+│   ├── useContracts.ts              # API hooks
+│   └── types.schema.ts              # Types
+├── components/
+│   ├── HeaderEntry/index.tsx        # Header form container
+│   ├── ContractTypeCheckboxGroup/   # Contract type radios
+│   ├── CounterpartyInfoForm/        # Internal/External parties
+│   ├── TradeInfoForm/               # Dates & quantities
+│   ├── AdditionalInfoForm/          # Optional fields
+│   ├── DetailsView/                 # Post-header details
+│   ├── DetailManager/               # Detail line editor
+│   └── SaveAsModal.tsx              # Save/activate modal
+└── utils/
+```
+
+---
+
+## Demo Progress
+
+### Completed
+- [x] CreateContractPage with mode selector (Quick/Full)
+- [x] QuickEntryFlow - Simplified single-page flow
+- [x] FullEntryFlow - Two-column layout matching Gravitate
+- [x] Footer component with icon+title pattern
+- [x] ContractTypeSidebar (Contract Type, Description, Comments)
+- [x] CounterpartySection (Internal/External parties)
+- [x] TradeInfoSection (Calendar, Dates, Quantities)
+- [x] AdditionalInfoSection (Contract #s, Movement, Strategy)
+
+### TODO
+- [ ] Wire up actual Cascader components for counterparties (currently using Select — sufficient for demo)
+- [ ] Add form validation matching Gravitate rules
+- [x] Implement Details View mode — `CreateContractPage` supports create/edit/view via `derivePageMode()`
+- [ ] Add Save/Activate modal flow
+- [ ] Connect to mock API endpoints (mock data in `data/contract.data.ts` sufficient for demo)
+
+---
+
+## ContractManagementPage (List Page)
+
+Master-detail contracts list built with GraviGrid:
+- **5 mock contracts** in `data/contract.data.ts` with varied statuses (active, draft, pending, expired)
+- **Status column** uses `BBDTag` with success/warning/error colors
+- **Expandable rows** — `ContractDetailCellRenderer` shows nested detail grid with contract line items
+- **Actions** — "Create Contract" button navigates to `/Contracts/CreateContract`; row click navigates to edit/view
+- **PE_LIGHT theme** via `ThemeRouteWrapper`
+
+---
+
+## Routing Structure
+
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/Contracts/ContractsList` | `ContractManagementPage` | All contracts list (master-detail grid) |
+| `/Contracts/CreateContract` | `CreateContractPage` | New contract (Quick/Full entry toggle) |
+| `/Contracts/EditContract?contractId=X` | `CreateContractPage` | Edit/view existing contract |
+
+- All 3 routes configured in `pageConfig.tsx` under `getContractManagementRoutes()`
+- Scope: `Contracts` in `AuthenticatedRoute.jsx`
+- Theme: `PE_LIGHT` on all routes
+- Navigation: sidebar item "Contracts" with sub-item "All Contracts"
+
+---
+
+## CreateContractPage Modes
+
+`CreateContractPage.tsx` supports three modes derived from contract status:
+
+| Mode | When | Behavior |
+|------|------|----------|
+| `create` | No `contractId` param | Empty form, all fields editable |
+| `edit` | `contractId` with draft/pending/active status | Pre-populated, editable with status-based restrictions |
+| `view` | `contractId` with expired status | Read-only, "Extend Contract" option via `ExtendContractModal` |
+
+Mode is derived by `derivePageMode()` in `data/contract.data.ts`. The page uses `Segmented` control to toggle between Quick Entry and Full Entry tabs.
+
+---
+
+## Quick Entry Sidebar Layout
+
+The Quick Entry flow uses a collapsible sidebar (`ContractHeaderSidebar.tsx`) instead of the original dark green inline bar:
+- **Expanded**: 445px wide — shows contract title, status badge, type tag, description, counterparty, dates, quantities
+- **Collapsed**: 44px wide — just a chevron button to re-expand
+- **Toggle**: `useSidebarLayout = true` in `QuickEntryFlow.tsx` (line 47)
+- The original `ContractHeaderSection` (dark green bar) still exists but is inactive
+
+---
+
+## Shared Data (`data/contract.data.ts`)
+
+Centralized mock data and helper functions:
+- `PRODUCT_OPTIONS` — 6 products (CBOB, RBOB, Premium, ULSD, Biodiesel B5/B20)
+- `LOCATION_OPTIONS` — 6 terminals across regions
+- `INTERNAL_PARTY_OPTIONS` — 3 internal entities
+- `EXTERNAL_PARTY_OPTIONS` — 8 counterparties
+- `MOCK_CONTRACTS` — 5 contracts with nested details, formulas, statuses
+- `getContractById()` — lookup by ID
+- `contractToHeader()` — convert list item to header form
+- `derivePageMode()` — status → create/edit/view mode
+
+---
+
+## Session Log
+
+### Session 1 (2026-02-04) - Layout Rebuild
+
+**Completed:**
+- Rebuilt FullEntryFlow to match Gravitate production layout
+- Created Footer component matching Gravitate pattern
+- Removed Steps wizard navigation
+- Implemented two-column layout (sidebar + main panel)
+
+**Key Decisions:**
+- Footer uses `borderBottom: 3px solid var(--theme-color-2)` for blue underline
+- Sidebar uses `flex: 1 0 150px`, main panel uses `flex: 5`
+- No Steps navigation - direct form layout like production
+
+**Verification:**
+- Page loads with correct two-column layout
+- Footer shows "Header Entry" with icon and action buttons
+- No Steps navigation at top
+
+### Session 2 (2026-02-05) - Formula Editor Variables Grid
+
+**Completed:**
+- Replaced custom VariablesTable with GraviGrid implementation
+- Pattern based on ContractDetails demo grid (lines 840-1132)
+- Simplified CSS from 68 lines to 10 lines (GraviGrid handles most styling)
+
+**Key Changes:**
+- Uses `agSelectCellEditor` for dropdown columns (Publisher, Instrument, Type, Date Rule)
+- Configured `domLayout: 'autoHeight'` for proper sizing in drawer
+- Cell value changes handled via `onCellValueChanged` in agPropOverrides
+- Delete action via custom cellRenderer with DeleteOutlined icon
+- Empty state via `overlayNoRowsTemplate`
+
+**Reference Pattern:**
+- `src/pages/demos/grids/ContractDetails.tsx` - Formula grid pattern
+- `src/components/shared/Grid/FormulaComponentsGrid.tsx` - GraviGrid with hideControlBar
+
+**Files Modified:**
+- `quick-entry/components/formula/VariablesTable.tsx` - Full rewrite
+- `quick-entry/components/formula/VariablesTable.module.css` - Simplified
+
+### Session 3 (2026-02-10) - Full Integration: List Page, Routing, Sidebar, Templates
+
+**Completed:**
+- **ContractManagementPage** — Master-detail list page with GraviGrid, 5 mock contracts, BBDTag status rendering, expandable detail rows, navigation to create/edit
+- **3-route structure** — ContractsList, CreateContract, EditContract all configured in pageConfig.tsx with PE_LIGHT theme
+- **Create/Edit/View modes** — `CreateContractPage` derives mode from contract status via `derivePageMode()`. View mode (expired contracts) is read-only with ExtendContractModal option
+- **ContractHeaderSidebar** — Collapsible left sidebar (445px/44px) replaces dark green inline bar for Quick Entry. Shows contract metadata cards
+- **ExtendContractModal** — Modal for extending expired contracts with new date range
+- **Template Chooser** — Integrated into FormulaEditorDrawer as inline TemplateChooser (not a separate modal)
+- **FormulaEditorPanel layout fix** — Restored CSS flex layout that was broken in Session 3 of quick-entry context
+- **formulaUtils.ts** — Extracted formula helper functions (buildExpression, etc.)
+- **Formula mode support** — Standard, Lower of Two, Lower of Three modes with grouped variable sections
+- **Shared data layer** — `data/contract.data.ts` with mock contracts, reference arrays, helper functions
+
+**Key Decisions:**
+- Sidebar layout over inline bar — more space for metadata display
+- Template chooser inline in drawer — reduces modal nesting
+- Mock data sufficient for demo — no API needed
+- PE_LIGHT theme for all contract routes — matches Pricing Engine aesthetic

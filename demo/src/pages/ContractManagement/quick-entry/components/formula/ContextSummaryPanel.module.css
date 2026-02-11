@@ -1,0 +1,13 @@
+/**
+ * Context Summary Panel Styles
+ * Matches wireframe prototype v4 left panel
+ */
+
+.container {
+  height: 100%;
+  gap: 12px;
+}
+
+.field {
+  gap: 2px;
+}

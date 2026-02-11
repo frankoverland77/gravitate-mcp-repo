@@ -8,9 +8,11 @@ import {
   GlobalOutlined,
   CreditCardOutlined,
   BellOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
+import { ContractManagementPage, CreateContractPage } from './pages/ContractManagement';
 import { CustomerForm } from './pages/demos/forms/CustomerForm/CustomerForm';
 import { ProductGrid } from './pages/demos/grids/ProductGrid/ProductGrid';
 import { FormulaManager } from './pages/demos/grids/FormulaManager';
@@ -219,6 +221,46 @@ export const demoRegistry: DemoRoute[] = [
     description: 'Contract measurement details view',
     created: new Date().toISOString(),
     category: 'grids',
+  },
+  // Contract Management routes
+  {
+    key: 'ContractsList',
+    title: 'All Contracts',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <ContractManagementPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/Contracts/ContractsList',
+    description: 'View and manage all contracts',
+    created: new Date().toISOString(),
+    category: 'contract-management',
+  },
+  {
+    key: 'CreateContract',
+    title: 'Create Contract',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <CreateContractPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/Contracts/CreateContract',
+    description: 'Create a new contract',
+    created: new Date().toISOString(),
+    category: 'contract-management',
+  },
+  {
+    key: 'EditContract',
+    title: 'Edit Contract',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <CreateContractPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/Contracts/EditContract',
+    description: 'Edit or view an existing contract',
+    created: new Date().toISOString(),
+    category: 'contract-management',
   },
   // MCP server will add more demos here automatically
 ];
@@ -491,6 +533,53 @@ export const createPageConfig = (): PageConfig => {
     title: 'Subscription Management',
     element: <SubscriptionManagement />,
     path: '/SubscriptionManagement',
+  };
+
+  // Contract Management (Quick Entry / Full Entry)
+  config.Contracts = {
+    hasPermission: () => true,
+    key: 'Contracts',
+    icon: <FileTextOutlined />,
+    title: 'Contracts',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'ContractsList',
+        title: 'All Contracts',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ContractManagementPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/Contracts/ContractsList',
+        description: 'View and manage all contracts',
+      },
+      {
+        hasPermission: () => true,
+        key: 'CreateContract',
+        title: 'Create Contract',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <CreateContractPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/Contracts/CreateContract',
+        description: 'Create a new contract',
+        hidden: true,
+      },
+      {
+        hasPermission: () => true,
+        key: 'EditContract',
+        title: 'Edit Contract',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <CreateContractPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/Contracts/EditContract',
+        hidden: true,
+      },
+    ],
   };
 
   return config;

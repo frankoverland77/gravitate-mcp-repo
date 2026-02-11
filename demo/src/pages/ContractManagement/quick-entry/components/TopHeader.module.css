@@ -1,0 +1,19 @@
+/**
+ * Top Header Styles
+ */
+
+.container {
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.badge {
+  background: #e6fffb;
+  color: #006d75;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}

@@ -1,0 +1,121 @@
+/**
+ * Formula Editor Panel Styles
+ *
+ * Simplified styles - layout handled by Excalibrr component props.
+ * Only visual styling (colors, borders, typography) remains here.
+ */
+
+/* Formula section — takes only natural size */
+.formulaSection {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Variables section — fills remaining space, scrolls */
+.variablesSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Formula Display Box */
+.formulaDisplay {
+  flex: 1;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.formulaDisplayContent.empty {
+  color: #9ca3af;
+  font-style: italic;
+  font-family: inherit;
+}
+
+.formulaTextarea {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+}
+
+/* Status Badge */
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.statusBadge.valid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusBadge.invalid {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* Quick Help */
+.quickHelp {
+  padding: 6px 10px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.quickHelp strong {
+  color: #374151;
+}
+
+.quickHelp code {
+  background: #e5e7eb;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 10px;
+}
+
+/* Advanced Checkbox */
+.advancedCheckbox {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* Mode Dropdown */
+.modeDropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Group Sections for Lower of Two/Three */
+.groupSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.groupSection:last-child {
+  border-bottom: none;
+}
