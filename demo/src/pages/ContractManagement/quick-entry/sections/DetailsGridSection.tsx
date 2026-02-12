@@ -7,7 +7,7 @@
  */
 
 import { useMemo, useCallback, useRef } from 'react'
-import { Vertical, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
+import { Vertical, Horizontal, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
 import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ColDef, ICellRendererParams, GetContextMenuItemsParams, GridApi } from 'ag-grid-community'
 
@@ -70,7 +70,7 @@ function FormulaRenderer({
   if (!value) {
     return (
       <span
-        style={{ cursor: 'pointer', fontStyle: 'italic', color: 'var(--theme-color-3)' }}
+        style={{ cursor: 'pointer', fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.35)' }}
         onClick={handleClick}
       >
         Click to configure...
@@ -133,10 +133,14 @@ export function DetailsGridSection({
             {
               headerCheckboxSelection: true,
               checkboxSelection: true,
-              width: 50,
+              width: 48,
+              maxWidth: 48,
+              minWidth: 48,
               pinned: 'left' as const,
               lockPosition: true,
               suppressMenu: true,
+              resizable: false,
+              suppressMovable: true,
             },
           ]
         : []),
@@ -230,7 +234,7 @@ export function DetailsGridSection({
                   : data.provisionType === 'Lesser Of 3'
                     ? 'MIN\u2083: '
                     : ''
-              if (!formula) return <span style={{ fontStyle: 'italic', color: 'var(--theme-color-3)' }}>—</span>
+              if (!formula) return <span style={{ fontStyle: 'italic', color: 'rgba(0, 0, 0, 0.35)' }}>—</span>
               return (
                 <span>
                   {prefix}
@@ -264,18 +268,24 @@ export function DetailsGridSection({
         minWidth: 110,
         cellRenderer: StatusRenderer,
         pinned: 'right',
+        cellStyle: { display: 'flex', alignItems: 'center' },
       },
       ...(!isExpired
         ? [
             {
               headerName: '',
-              width: 50,
+              width: 48,
+              maxWidth: 48,
+              minWidth: 48,
               pinned: 'right' as const,
               lockPosition: true,
               suppressMenu: true,
+              resizable: false,
+              suppressMovable: true,
+              cellClass: 'action-cell',
               cellRenderer: (params: ICellRendererParams<ContractDetail>) => (
                 <DeleteOutlined
-                  style={{ cursor: 'pointer', color: 'var(--theme-color-3)' }}
+                  style={{ cursor: 'pointer', color: 'rgba(0, 0, 0, 0.45)', fontSize: 16 }}
                   onClick={() => params.data && onDetailDelete(params.data.id)}
                 />
               ),
@@ -307,6 +317,9 @@ export function DetailsGridSection({
   const getContextMenuItems = useCallback(
     (params: GetContextMenuItemsParams<ContractDetail>) => {
       const result = [
+        'copy',
+        'copyWithHeaders',
+        'separator',
         {
           name: 'Copy Formula',
           action: () => {
@@ -370,15 +383,18 @@ export function DetailsGridSection({
             undoRedoCellEditing: true,
             undoRedoCellEditingLimit: 20,
             rowSelection: 'multiple' as const,
+            enableFillHandle: true,
+            enableRangeSelection: true,
+            allowContextMenuWithControlKey: true,
           }}
           columnDefs={columnDefs}
           rowData={details}
-          storageKey='QuickEntryDetailsGrid'
+          storageKey='QuickEntryDetailsGrid_v2'
           controlBarProps={{
-            title: `Contract Details (${details.length} Results)`,
+            title: 'Contract Details',
             hideActiveFilters: true,
             actionButtons: isExpired ? undefined : (
-              <>
+              <Horizontal alignItems='center' style={{ gap: '8px' }}>
                 {selectedIds.length > 0 && (
                   <GraviButton
                     buttonText={`Apply to Selected (${selectedIds.length})`}
@@ -392,7 +408,7 @@ export function DetailsGridSection({
                   icon={<PlusOutlined />}
                   onClick={onAddDetail}
                 />
-              </>
+              </Horizontal>
             ),
           }}
         />

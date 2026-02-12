@@ -18,3 +18,11 @@
   color: var(--theme-color-3, #999) !important;
   cursor: not-allowed;
 }
+
+:global(.action-cell) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}

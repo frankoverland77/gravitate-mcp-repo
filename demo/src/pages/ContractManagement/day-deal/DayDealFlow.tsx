@@ -3,19 +3,23 @@
  *
  * Flat grid-first entry for day deals. No header bar, no calendar —
  * each row is a fully independent deal with its own supplier, product,
- * location, dates, and price. Users land directly on an editable grid
- * with one empty row ready to fill.
+ * location, dates, and price.
+ *
+ * In create mode, users land on an empty state with 4 entry paths
+ * (Upload, Add Row, Bulk Add, Copy). Once rows exist the grid takes over.
  *
  * Layout:
- * - DayDealGridSection (fills the screen)
+ * - EmptyStateSection (when no details, create mode)
+ * - DayDealGridSection (when details exist)
  * - FooterBar (Create Day Deals)
  * - Modals/Drawers for bulk operations
  */
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { Vertical } from '@gravitate-js/excalibrr'
 import { NotificationMessage } from '@gravitate-js/excalibrr'
 
+import { EmptyStateSection } from '../quick-entry/sections/EmptyStateSection'
 import { FooterBar } from '../quick-entry/components/FooterBar'
 import { BulkCreateDrawer } from '../quick-entry/components/BulkCreateDrawer'
 import { ImportFileModal } from '../quick-entry/components/ImportFileModal'
@@ -82,12 +86,25 @@ export function DayDealFlow({
   const [importFileModalOpen, setImportFileModalOpen] = useState(false)
   const [copyDealModalOpen, setCopyDealModalOpen] = useState(false)
 
-  // Initialize with 1 empty row on mount
-  useEffect(() => {
-    if (details.length === 0) {
-      onDetailAdd(createEmptyRow())
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Screen state: show empty state or grid
+  const screen = details.length > 0 ? 'grid' : 'empty'
+
+  // Empty-state entry-path callbacks
+  const handleUploadFile = useCallback(() => {
+    setImportFileModalOpen(true)
+  }, [])
+
+  const handleAddRowManually = useCallback(() => {
+    onDetailAdd(createEmptyRow())
+  }, [onDetailAdd])
+
+  const handleAddMultipleRows = useCallback(() => {
+    setBulkCreateDrawerOpen(true)
+  }, [])
+
+  const handleCopyFromExisting = useCallback(() => {
+    setCopyDealModalOpen(true)
+  }, [])
 
   // Action handlers
   const handleCancel = useCallback(() => {
@@ -202,19 +219,28 @@ export function DayDealFlow({
 
   return (
     <Vertical height='100%' className={styles['page-wrapper']}>
-      {/* Grid fills the screen */}
+      {/* Empty state or grid */}
       <Vertical flex='1'>
-        <DayDealGridSection
-          details={details}
-          selectedIds={selectedDetailIds}
-          onDetailUpdate={handleDetailUpdate}
-          onDetailDelete={handleDetailDelete}
-          onSelectionChange={handleSelectionChange}
-          onAddDetail={handleAddDetail}
-          onBulkEdit={handleBulkEdit}
-          onBulkCreate={() => setBulkCreateDrawerOpen(true)}
-          onImport={() => setImportFileModalOpen(true)}
-        />
+        {screen === 'empty' && mode === 'create' ? (
+          <EmptyStateSection
+            onUploadFile={handleUploadFile}
+            onAddRowManually={handleAddRowManually}
+            onAddMultipleRows={handleAddMultipleRows}
+            onCopyFromExisting={handleCopyFromExisting}
+          />
+        ) : (
+          <DayDealGridSection
+            details={details}
+            selectedIds={selectedDetailIds}
+            onDetailUpdate={handleDetailUpdate}
+            onDetailDelete={handleDetailDelete}
+            onSelectionChange={handleSelectionChange}
+            onAddDetail={handleAddDetail}
+            onBulkEdit={handleBulkEdit}
+            onBulkCreate={() => setBulkCreateDrawerOpen(true)}
+            onImport={() => setImportFileModalOpen(true)}
+          />
+        )}
       </Vertical>
 
       {/* Footer Bar */}

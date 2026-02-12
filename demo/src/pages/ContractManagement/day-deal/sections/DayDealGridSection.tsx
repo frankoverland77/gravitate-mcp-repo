@@ -7,7 +7,7 @@
  */
 
 import { useMemo, useCallback, useRef } from 'react'
-import { Vertical, GraviGrid, GraviButton } from '@gravitate-js/excalibrr'
+import { Vertical, Horizontal, GraviGrid, GraviButton } from '@gravitate-js/excalibrr'
 import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons'
 import type { ColDef, ICellRendererParams, GetContextMenuItemsParams, GridApi } from 'ag-grid-community'
 
@@ -56,10 +56,14 @@ export function DayDealGridSection({
       {
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width: 50,
+        width: 48,
+        maxWidth: 48,
+        minWidth: 48,
         pinned: 'left',
         lockPosition: true,
         suppressMenu: true,
+        resizable: false,
+        suppressMovable: true,
       },
       {
         field: 'supplier',
@@ -142,13 +146,18 @@ export function DayDealGridSection({
       },
       {
         headerName: '',
-        width: 50,
+        width: 48,
+        maxWidth: 48,
+        minWidth: 48,
         pinned: 'right',
         lockPosition: true,
         suppressMenu: true,
+        resizable: false,
+        suppressMovable: true,
+        cellClass: 'action-cell',
         cellRenderer: (params: ICellRendererParams<ContractDetail>) => (
           <DeleteOutlined
-            style={{ cursor: 'pointer', color: 'var(--theme-color-3)' }}
+            style={{ cursor: 'pointer', color: 'rgba(0, 0, 0, 0.45)', fontSize: 16 }}
             onClick={() => params.data && onDetailDelete(params.data.id)}
           />
         ),
@@ -174,6 +183,9 @@ export function DayDealGridSection({
 
   const getContextMenuItems = useCallback(
     (params: GetContextMenuItemsParams<ContractDetail>) => [
+      'copy',
+      'copyWithHeaders',
+      'separator',
       {
         name: 'Duplicate Row',
         action: () => {
@@ -216,15 +228,16 @@ export function DayDealGridSection({
             rowSelection: 'multiple' as const,
             enableFillHandle: true,
             enableRangeSelection: true,
+            allowContextMenuWithControlKey: true,
           }}
           columnDefs={columnDefs}
           rowData={details}
-          storageKey='DayDealDetailsGrid'
+          storageKey='DayDealDetailsGrid_v2'
           controlBarProps={{
-            title: `Day Deals (${details.length})`,
+            title: 'Day Deals',
             hideActiveFilters: true,
             actionButtons: (
-              <>
+              <Horizontal alignItems='center' style={{ gap: '8px' }}>
                 {selectedIds.length > 0 && (
                   <GraviButton
                     buttonText={`Apply to Selected (${selectedIds.length})`}
@@ -234,7 +247,7 @@ export function DayDealGridSection({
                 <GraviButton buttonText='Import' icon={<UploadOutlined />} onClick={onImport} />
                 <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
                 <GraviButton buttonText='Add Day Deal' theme1 icon={<PlusOutlined />} onClick={onAddDetail} />
-              </>
+              </Horizontal>
             ),
           }}
         />
