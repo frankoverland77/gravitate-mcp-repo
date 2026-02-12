@@ -383,16 +383,14 @@ export function DetailsGridSection({
                   <GraviButton
                     buttonText={`Apply to Selected (${selectedIds.length})`}
                     onClick={onBulkEdit}
-                    size='small'
                   />
                 )}
-                <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} size='small' />
+                <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
                 <GraviButton
                   buttonText='Add Detail'
                   theme1
                   icon={<PlusOutlined />}
                   onClick={onAddDetail}
-                  size='small'
                 />
               </>
             ),

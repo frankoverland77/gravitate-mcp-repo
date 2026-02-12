@@ -1,5 +1,5 @@
 # Contract Management Demo - Project Context
-*Last Updated: 2026-02-10*
+*Last Updated: 2026-02-12*
 
 ## Purpose
 Demo/prototype of the Gravitate Contract Management module using Excalibrr components.
@@ -158,6 +158,7 @@ All contract creation components come from:
 - [x] Implement Details View mode — `CreateContractPage` supports create/edit/view via `derivePageMode()`
 - [ ] Add Save/Activate modal flow
 - [ ] Connect to mock API endpoints (mock data in `data/contract.data.ts` sufficient for demo)
+- [x] Day Deal flat grid-first redesign — supplier per-row, no header/calendar, fill handle enabled
 
 ---
 
@@ -286,3 +287,34 @@ Centralized mock data and helper functions:
 - Template chooser inline in drawer — reduces modal nesting
 - Mock data sufficient for demo — no API needed
 - PE_LIGHT theme for all contract routes — matches Pricing Engine aesthetic
+
+### Session 4 (2026-02-12) - Day Deal Screen Redesign — Flat Grid-First Entry
+
+**Completed:**
+- **Flat grid-first layout** — Removed header bar (`ContractHeaderSection`), inline calendar (`DayDealCalendar`), empty state screen, and edit header modal. Users land directly on an editable grid with 1 empty row ready to fill.
+- **Supplier column** — Replaced Detail ID badge column with editable Supplier dropdown (`EXTERNAL_PARTY_OPTIONS` via `agSelectCellEditor`). Each row is now a fully independent deal.
+- **Renamed Quantity → Volume** — Column header and bulk edit modal both say "Volume" now. Volume is **optional** (many day deals are "optional pickup").
+- **Updated validation** — Required fields: supplier, product, location, price. Volume removed from required checks.
+- **Fill handle + range selection** — Enabled `enableFillHandle` and `enableRangeSelection` in agPropOverrides for spreadsheet-like drag-down population.
+- **Control bar updates** — Title: "Day Deals (N)" (was "Day Deal Details (N Results)"). New "Import" button with `UploadOutlined` icon. "Add Detail" renamed to "Add Day Deal". Removed `size='small'` from all buttons.
+- **Bulk edit modal** — Added Supplier as first editable field with Select dropdown. Default selected field is now Supplier.
+- **New rows default** — `startDate = today`, `endDate = today`, `supplier = ''`
+- **Type update** — Added `supplier?: string` to `ContractDetail` interface (optional, no impact on Quick Entry or Full Entry)
+
+**Files Modified:**
+- `types/contract.types.ts` — Added `supplier?: string` to `ContractDetail`
+- `day-deal/DayDealFlow.tsx` — Major rewrite (removed header/calendar/empty state, grid-first)
+- `day-deal/DayDealFlow.module.css` — Simplified to just `.page-wrapper`
+- `day-deal/sections/DayDealGridSection.tsx` — Supplier column, Volume rename, fill handle, Import button
+- `day-deal/components/DayDealBulkEditModal.tsx` — Added Supplier field, Volume rename
+
+**Files Deleted:**
+- `day-deal/components/DayDealCalendar.tsx`
+- `day-deal/components/DayDealCalendar.module.css`
+
+**Key Decisions:**
+- Flat grid over header-then-details — eliminates repeated header flow when entering deals from multiple suppliers on a fast-moving market day
+- Supplier per-row instead of per-contract — each row is independent, grouped by supplier only at submission time
+- Volume optional — real-world day deals often have no quantity commitment
+- Dates default to today (not header dates) — day deals are same-day by nature
+- No empty state screen — grid starts with 1 row, "Add Day Deal" / "Bulk Add" / "Import" all in the control bar

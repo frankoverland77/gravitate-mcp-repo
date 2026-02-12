@@ -1,34 +1,30 @@
 /**
  * Day Deal Grid Section
  *
- * Simplified grid for day deal contract details.
- * 8 columns: checkbox, detail ID, product, location, start date, end date, price, quantity, delete.
- * No formula, destination, calendar, effectiveTime, or status columns.
+ * Flat spreadsheet-like grid for day deal entry.
+ * Each row is a fully independent deal: supplier, product, location, dates, price, volume.
+ * Supports fill handle for drag-down, range selection, undo/redo, and context menu.
  */
 
-import { useMemo, useCallback, useRef } from 'react';
-import { Vertical, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr';
-import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined } from '@ant-design/icons';
-import type {
-  ColDef,
-  ICellRendererParams,
-  GetContextMenuItemsParams,
-  GridApi,
-} from 'ag-grid-community';
+import { useMemo, useCallback, useRef } from 'react'
+import { Vertical, GraviGrid, GraviButton } from '@gravitate-js/excalibrr'
+import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons'
+import type { ColDef, ICellRendererParams, GetContextMenuItemsParams, GridApi } from 'ag-grid-community'
 
-import type { ContractDetail } from '../../types/contract.types';
-import { PRODUCT_OPTIONS, LOCATION_OPTIONS } from '../../data/contract.data';
-import styles from './DayDealGridSection.module.css';
+import type { ContractDetail } from '../../types/contract.types'
+import { PRODUCT_OPTIONS, LOCATION_OPTIONS, EXTERNAL_PARTY_OPTIONS } from '../../data/contract.data'
+import styles from './DayDealGridSection.module.css'
 
 interface DayDealGridSectionProps {
-  details: ContractDetail[];
-  selectedIds: string[];
-  onDetailUpdate: (detail: ContractDetail) => void;
-  onDetailDelete: (detailId: string) => void;
-  onSelectionChange: (selectedIds: string[]) => void;
-  onAddDetail: () => void;
-  onBulkEdit: () => void;
-  onBulkCreate: () => void;
+  details: ContractDetail[]
+  selectedIds: string[]
+  onDetailUpdate: (detail: ContractDetail) => void
+  onDetailDelete: (detailId: string) => void
+  onSelectionChange: (selectedIds: string[]) => void
+  onAddDetail: () => void
+  onBulkEdit: () => void
+  onBulkCreate: () => void
+  onImport: () => void
 }
 
 /**
@@ -39,18 +35,7 @@ function formatDate(date: Date): string {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  }).format(date);
-}
-
-/**
- * Detail ID badge renderer
- */
-function DetailIdRenderer({ value }: { value: string }) {
-  return (
-    <BBDTag>
-      <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{value}</span>
-    </BBDTag>
-  );
+  }).format(date)
 }
 
 export function DayDealGridSection({
@@ -62,8 +47,9 @@ export function DayDealGridSection({
   onAddDetail,
   onBulkEdit,
   onBulkCreate,
+  onImport,
 }: DayDealGridSectionProps) {
-  const gridApiRef = useRef<GridApi | null>(null);
+  const gridApiRef = useRef<GridApi | null>(null)
 
   const columnDefs = useMemo<ColDef<ContractDetail>[]>(
     () => [
@@ -76,12 +62,14 @@ export function DayDealGridSection({
         suppressMenu: true,
       },
       {
-        field: 'id',
-        headerName: 'Detail ID',
-        minWidth: 130,
-        cellRenderer: (params: ICellRendererParams<ContractDetail>) => (
-          <DetailIdRenderer value={params.value} />
-        ),
+        field: 'supplier',
+        headerName: 'Supplier',
+        minWidth: 160,
+        editable: true,
+        cellEditor: 'agSelectCellEditor',
+        cellEditorParams: {
+          values: EXTERNAL_PARTY_OPTIONS,
+        },
       },
       {
         field: 'product',
@@ -127,29 +115,29 @@ export function DayDealGridSection({
         editable: true,
         valueFormatter: ({ value }) => (value != null ? `$${Number(value).toFixed(4)}` : ''),
         valueSetter: (params) => {
-          const raw = String(params.newValue).replace(/[$,]/g, '');
-          const newValue = parseFloat(raw);
+          const raw = String(params.newValue).replace(/[$,]/g, '')
+          const newValue = parseFloat(raw)
           if (!isNaN(newValue)) {
-            params.data.fixedValue = newValue;
-            return true;
+            params.data.fixedValue = newValue
+            return true
           }
-          return false;
+          return false
         },
       },
       {
         field: 'quantity',
-        headerName: 'Quantity',
+        headerName: 'Volume',
         minWidth: 120,
         type: 'numericColumn',
         editable: true,
         valueFormatter: ({ value }) => (value ? new Intl.NumberFormat('en-US').format(value) : ''),
         valueSetter: (params) => {
-          const newValue = parseFloat(params.newValue);
+          const newValue = parseFloat(params.newValue)
           if (!isNaN(newValue)) {
-            params.data.quantity = newValue;
-            return true;
+            params.data.quantity = newValue
+            return true
           }
-          return false;
+          return false
         },
       },
       {
@@ -166,23 +154,23 @@ export function DayDealGridSection({
         ),
       },
     ],
-    [onDetailDelete]
-  );
+    [onDetailDelete],
+  )
 
   const handleCellValueChanged = useCallback(
     (event: { data: ContractDetail }) => {
-      onDetailUpdate({ ...event.data });
+      onDetailUpdate({ ...event.data })
     },
-    [onDetailUpdate]
-  );
+    [onDetailUpdate],
+  )
 
   const handleSelectionChanged = useCallback(() => {
     if (gridApiRef.current) {
-      const selectedRows = gridApiRef.current.getSelectedRows();
-      const ids = selectedRows.map((row: ContractDetail) => row.id);
-      onSelectionChange(ids);
+      const selectedRows = gridApiRef.current.getSelectedRows()
+      const ids = selectedRows.map((row: ContractDetail) => row.id)
+      onSelectionChange(ids)
     }
-  }, [onSelectionChange]);
+  }, [onSelectionChange])
 
   const getContextMenuItems = useCallback(
     (params: GetContextMenuItemsParams<ContractDetail>) => [
@@ -193,8 +181,8 @@ export function DayDealGridSection({
             const duplicated: ContractDetail = {
               ...params.node.data,
               id: `detail-${Date.now()}`,
-            };
-            onDetailUpdate(duplicated);
+            }
+            onDetailUpdate(duplicated)
           }
         },
       },
@@ -202,22 +190,22 @@ export function DayDealGridSection({
         name: 'Delete Row',
         action: () => {
           if (params.node?.data) {
-            onDetailDelete(params.node.data.id);
+            onDetailDelete(params.node.data.id)
           }
         },
       },
     ],
-    [onDetailUpdate, onDetailDelete]
-  );
+    [onDetailUpdate, onDetailDelete],
+  )
 
   return (
     <Vertical className={styles.container}>
-      <Vertical flex="1" className={styles['grid-wrapper']}>
+      <Vertical flex='1' className={styles['grid-wrapper']}>
         <GraviGrid
           agPropOverrides={{
             getRowId: (params) => params.data.id,
             onGridReady: (params) => {
-              gridApiRef.current = params.api;
+              gridApiRef.current = params.api
             },
             onCellValueChanged: handleCellValueChanged,
             onSelectionChanged: handleSelectionChanged,
@@ -226,12 +214,14 @@ export function DayDealGridSection({
             undoRedoCellEditing: true,
             undoRedoCellEditingLimit: 20,
             rowSelection: 'multiple' as const,
+            enableFillHandle: true,
+            enableRangeSelection: true,
           }}
           columnDefs={columnDefs}
           rowData={details}
-          storageKey="DayDealDetailsGrid"
+          storageKey='DayDealDetailsGrid'
           controlBarProps={{
-            title: `Day Deal Details (${details.length} Results)`,
+            title: `Day Deals (${details.length})`,
             hideActiveFilters: true,
             actionButtons: (
               <>
@@ -239,27 +229,16 @@ export function DayDealGridSection({
                   <GraviButton
                     buttonText={`Apply to Selected (${selectedIds.length})`}
                     onClick={onBulkEdit}
-                    size="small"
                   />
                 )}
-                <GraviButton
-                  buttonText="Bulk Add"
-                  icon={<AppstoreAddOutlined />}
-                  onClick={onBulkCreate}
-                  size="small"
-                />
-                <GraviButton
-                  buttonText="Add Detail"
-                  theme1
-                  icon={<PlusOutlined />}
-                  onClick={onAddDetail}
-                  size="small"
-                />
+                <GraviButton buttonText='Import' icon={<UploadOutlined />} onClick={onImport} />
+                <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
+                <GraviButton buttonText='Add Day Deal' theme1 icon={<PlusOutlined />} onClick={onAddDetail} />
               </>
             ),
           }}
         />
       </Vertical>
     </Vertical>
-  );
+  )
 }

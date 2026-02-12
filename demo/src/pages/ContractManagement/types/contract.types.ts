@@ -32,6 +32,7 @@ export type EffectiveTime = '12:00 AM' | '4:00 PM' | '5:00 PM' | '6:00 PM';
  */
 export interface ContractDetail {
   id: string;
+  supplier?: string;
   product: string;
   location: string;
   destination?: string;
