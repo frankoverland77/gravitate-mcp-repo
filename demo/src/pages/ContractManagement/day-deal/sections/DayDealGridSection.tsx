@@ -6,12 +6,14 @@
  * Supports fill handle for drag-down, range selection, undo/redo, and context menu.
  */
 
-import { useMemo, useCallback, useRef } from 'react'
+import { useMemo, useCallback, useRef, type MutableRefObject, type Dispatch, type SetStateAction } from 'react'
 import { Vertical, Horizontal, GraviGrid, GraviButton } from '@gravitate-js/excalibrr'
 import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons'
 import type { ColDef, ICellRendererParams, GetContextMenuItemsParams, GridApi } from 'ag-grid-community'
 
 import type { ContractDetail } from '../../types/contract.types'
+import { BulkSelectEditor, BulkNumberEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
+import { BulkDateEditor } from '@components/shared/Grid/bulkChange/BulkDateEditor'
 import { PRODUCT_OPTIONS, LOCATION_OPTIONS, EXTERNAL_PARTY_OPTIONS } from '../../data/contract.data'
 import styles from './DayDealGridSection.module.css'
 
@@ -22,9 +24,11 @@ interface DayDealGridSectionProps {
   onDetailDelete: (detailId: string) => void
   onSelectionChange: (selectedIds: string[]) => void
   onAddDetail: () => void
-  onBulkEdit: () => void
   onBulkCreate: () => void
   onImport: () => void
+  isBulkChangeVisible: boolean
+  setIsBulkChangeVisible: Dispatch<SetStateAction<boolean>>
+  onBulkUpdate: (rows: ContractDetail | ContractDetail[]) => Promise<void>
 }
 
 /**
@@ -40,16 +44,17 @@ function formatDate(date: Date): string {
 
 export function DayDealGridSection({
   details,
-  selectedIds,
   onDetailUpdate,
   onDetailDelete,
   onSelectionChange,
   onAddDetail,
-  onBulkEdit,
   onBulkCreate,
   onImport,
+  isBulkChangeVisible,
+  setIsBulkChangeVisible,
+  onBulkUpdate,
 }: DayDealGridSectionProps) {
-  const gridApiRef = useRef<GridApi | null>(null)
+  const gridApiRef = useRef() as MutableRefObject<GridApi>
 
   const columnDefs = useMemo<ColDef<ContractDetail>[]>(
     () => [
@@ -74,6 +79,12 @@ export function DayDealGridSection({
         cellEditorParams: {
           values: EXTERNAL_PARTY_OPTIONS,
         },
+        isBulkEditable: true,
+        bulkCellEditor: BulkSelectEditor,
+        bulkCellEditorParams: {
+          propKey: 'supplier',
+          options: EXTERNAL_PARTY_OPTIONS.map((s) => ({ Value: s, Text: s })),
+        },
       },
       {
         field: 'product',
@@ -83,6 +94,12 @@ export function DayDealGridSection({
         cellEditor: 'agSelectCellEditor',
         cellEditorParams: {
           values: PRODUCT_OPTIONS.map((p) => p.name),
+        },
+        isBulkEditable: true,
+        bulkCellEditor: BulkSelectEditor,
+        bulkCellEditorParams: {
+          propKey: 'product',
+          options: PRODUCT_OPTIONS.map((p) => ({ Value: p.name, Text: p.name })),
         },
       },
       {
@@ -94,6 +111,12 @@ export function DayDealGridSection({
         cellEditorParams: {
           values: LOCATION_OPTIONS.map((l) => l.name),
         },
+        isBulkEditable: true,
+        bulkCellEditor: BulkSelectEditor,
+        bulkCellEditorParams: {
+          propKey: 'location',
+          options: LOCATION_OPTIONS.map((l) => ({ Value: l.name, Text: l.name })),
+        },
       },
       {
         field: 'startDate',
@@ -102,6 +125,11 @@ export function DayDealGridSection({
         valueFormatter: ({ value }) => (value ? formatDate(value) : ''),
         editable: true,
         cellEditor: 'agDateCellEditor',
+        isBulkEditable: true,
+        bulkCellEditor: BulkDateEditor,
+        bulkCellEditorParams: {
+          propKey: 'startDate',
+        },
       },
       {
         field: 'endDate',
@@ -110,6 +138,11 @@ export function DayDealGridSection({
         valueFormatter: ({ value }) => (value ? formatDate(value) : ''),
         editable: true,
         cellEditor: 'agDateCellEditor',
+        isBulkEditable: true,
+        bulkCellEditor: BulkDateEditor,
+        bulkCellEditorParams: {
+          propKey: 'endDate',
+        },
       },
       {
         field: 'fixedValue',
@@ -127,6 +160,13 @@ export function DayDealGridSection({
           }
           return false
         },
+        isBulkEditable: true,
+        bulkCellEditor: BulkNumberEditor,
+        bulkCellEditorParams: {
+          propKey: 'fixedValue',
+          min: 0,
+          precision: 4,
+        },
       },
       {
         field: 'quantity',
@@ -142,6 +182,12 @@ export function DayDealGridSection({
             return true
           }
           return false
+        },
+        isBulkEditable: true,
+        bulkCellEditor: BulkNumberEditor,
+        bulkCellEditorParams: {
+          propKey: 'quantity',
+          min: 0,
         },
       },
       {
@@ -173,13 +219,14 @@ export function DayDealGridSection({
     [onDetailUpdate],
   )
 
-  const handleSelectionChanged = useCallback(() => {
-    if (gridApiRef.current) {
-      const selectedRows = gridApiRef.current.getSelectedRows()
-      const ids = selectedRows.map((row: ContractDetail) => row.id)
+  const handleSelectionChanged = useCallback(
+    (e: { api: GridApi }) => {
+      const selectedRows = e.api.getSelectedRows() as ContractDetail[]
+      const ids = selectedRows.map((row) => row.id)
       onSelectionChange(ids)
-    }
-  }, [onSelectionChange])
+    },
+    [onSelectionChange],
+  )
 
   const getContextMenuItems = useCallback(
     (params: GetContextMenuItemsParams<ContractDetail>) => [
@@ -214,13 +261,10 @@ export function DayDealGridSection({
     <Vertical className={styles.container}>
       <Vertical flex='1' className={styles['grid-wrapper']}>
         <GraviGrid
+          externalRef={gridApiRef}
           agPropOverrides={{
             getRowId: (params) => params.data.id,
-            onGridReady: (params) => {
-              gridApiRef.current = params.api
-            },
             onCellValueChanged: handleCellValueChanged,
-            onSelectionChanged: handleSelectionChanged,
             getContextMenuItems,
             stopEditingWhenCellsLoseFocus: true,
             undoRedoCellEditing: true,
@@ -233,17 +277,17 @@ export function DayDealGridSection({
           columnDefs={columnDefs}
           rowData={details}
           storageKey='DayDealDetailsGrid_v2'
+          onSelectionChanged={handleSelectionChanged}
+          isBulkChangeVisible={isBulkChangeVisible}
+          setIsBulkChangeVisible={setIsBulkChangeVisible}
+          isBulkChangeCompactMode
+          bulkDrawerTitle='DAY DEALS'
+          updateEP={onBulkUpdate}
           controlBarProps={{
             title: 'Day Deals',
             hideActiveFilters: true,
             actionButtons: (
               <Horizontal alignItems='center' style={{ gap: '8px' }}>
-                {selectedIds.length > 0 && (
-                  <GraviButton
-                    buttonText={`Apply to Selected (${selectedIds.length})`}
-                    onClick={onBulkEdit}
-                  />
-                )}
                 <GraviButton buttonText='Import' icon={<UploadOutlined />} onClick={onImport} />
                 <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
                 <GraviButton buttonText='Add Day Deal' theme1 icon={<PlusOutlined />} onClick={onAddDetail} />

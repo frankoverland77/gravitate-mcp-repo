@@ -17,17 +17,20 @@ import { NotificationMessage } from '@gravitate-js/excalibrr'
 
 import { FooterBar } from './components/FooterBar'
 import { EditHeaderModal } from './components/EditHeaderModal'
+import { FloatingBulkBar } from './components/FloatingBulkBar'
 import { EmptyStateSection } from './sections/EmptyStateSection'
 import { ContractHeaderSection } from './sections/ContractHeaderSection'
 import { ContractHeaderSidebar } from './sections/ContractHeaderSidebar'
 import { DetailsGridSection } from './sections/DetailsGridSection'
+import { VolumeGroupPanel } from './sections/VolumeGroupPanel'
 import { FormulaEditorDrawer } from './components/FormulaEditorDrawer'
 import { BulkCreateDrawer } from './components/BulkCreateDrawer'
-import { BulkEditModal } from './components/BulkEditModal'
 import { ImportFileModal } from './components/ImportFileModal'
 import { CopyDealModal } from './components/CopyDealModal'
 import { ExtendContractModal } from './components/ExtendContractModal'
-import type { QuickEntryScreen, ContractDetail, ContractHeader, PageMode, ContractStatus } from '../types/contract.types'
+import type { QuickEntryScreen, ContractDetail, ContractHeader, PageMode, ContractStatus, VolumeGroup } from '../types/contract.types'
+import { MOCK_VOLUME_GROUPS } from '../data/contract.data'
+import { addGroupToDetail, clearGroupsFromDetail, syncGroupDetailIds } from './volumeGroup.utils'
 import styles from './QuickEntryFlow.module.css'
 
 interface QuickEntryFlowProps {
@@ -69,8 +72,6 @@ export function QuickEntryFlow({
   contractStatus,
   createdAt,
 }: QuickEntryFlowProps) {
-  const isViewMode = mode === 'view'
-
   // Derive screen from details
   const screen: QuickEntryScreen = details.length > 0 ? 'grid' : 'empty'
 
@@ -83,10 +84,14 @@ export function QuickEntryFlow({
   const [formulaDrawerOpen, setFormulaDrawerOpen] = useState(false)
   const [activeDetail, setActiveDetail] = useState<ContractDetail | null>(null)
   const [bulkCreateDrawerOpen, setBulkCreateDrawerOpen] = useState(false)
-  const [bulkEditModalOpen, setBulkEditModalOpen] = useState(false)
+  const [isBulkChangeVisible, setIsBulkChangeVisible] = useState(false)
   const [importFileModalOpen, setImportFileModalOpen] = useState(false)
   const [copyDealModalOpen, setCopyDealModalOpen] = useState(false)
   const [extendModalOpen, setExtendModalOpen] = useState(false)
+
+  // Volume group state
+  const [volumeGroups, setVolumeGroups] = useState<VolumeGroup[]>(MOCK_VOLUME_GROUPS)
+  const [groupPanelOpen, setGroupPanelOpen] = useState(false)
 
   // Top header action handlers
   const handleCancel = useCallback(() => {
@@ -120,6 +125,7 @@ export function QuickEntryFlow({
       provisionType: 'Formula',
       quantity: 0,
       status: 'empty',
+      volumeGroupIds: [],
       ...(contractStatus === 'active' ? { isNew: true } : {}),
     }
     onDetailAdd(newDetail)
@@ -146,6 +152,7 @@ export function QuickEntryFlow({
       provisionType: 'Formula',
       quantity: 0,
       status: 'empty',
+      volumeGroupIds: [],
       ...(contractStatus === 'active' ? { isNew: true } : {}),
     }
     onDetailAdd(newDetail)
@@ -156,10 +163,6 @@ export function QuickEntryFlow({
     setFormulaDrawerOpen(true)
   }, [])
 
-  const handleDetailUpdate = useCallback((updatedDetail: ContractDetail) => {
-    onDetailUpdate(updatedDetail)
-  }, [onDetailUpdate])
-
   const handleDetailDelete = useCallback((detailId: string) => {
     onDetailDelete(detailId)
   }, [onDetailDelete])
@@ -167,12 +170,6 @@ export function QuickEntryFlow({
   const handleSelectionChange = useCallback((selectedIds: string[]) => {
     setSelectedDetailIds(selectedIds)
   }, [])
-
-  const handleBulkEdit = useCallback(() => {
-    if (selectedDetailIds.length > 0) {
-      setBulkEditModalOpen(true)
-    }
-  }, [selectedDetailIds])
 
   // Bulk create handler
   const handleBulkCreate = useCallback(
@@ -193,6 +190,7 @@ export function QuickEntryFlow({
             provisionType: 'Formula',
             quantity: 0,
             status: 'empty',
+            volumeGroupIds: [],
             ...(contractStatus === 'active' ? { isNew: true } : {}),
           })
         }
@@ -241,18 +239,150 @@ export function QuickEntryFlow({
     [onDetailUpdate]
   )
 
-  // Bulk edit apply handler
-  const handleBulkEditApply = useCallback(
-    (field: keyof ContractDetail, value: unknown) => {
-      details
-        .filter((d) => selectedDetailIds.includes(d.id))
-        .forEach((d) => {
-          onDetailUpdate({ ...d, [field]: value })
-        })
-      setBulkEditModalOpen(false)
+  // Bulk change bar update handler (receives merged rows from GraviGrid)
+  const handleBulkUpdate = useCallback(
+    async (rows: ContractDetail | ContractDetail[]) => {
+      const updatedRows = Array.isArray(rows) ? rows : [rows]
+      updatedRows.forEach((row) => onDetailUpdate(row))
+      // Sync volume groups from updated details
+      const updatedDetails = details.map((d) => {
+        const updated = updatedRows.find((u) => u.id === d.id)
+        return updated || d
+      })
+      setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
     },
-    [details, selectedDetailIds, onDetailUpdate]
+    [details, onDetailUpdate],
   )
+
+  // ==========================================
+  // Volume Group Handlers
+  // ==========================================
+
+  // Handle detail's volumeGroupIds change (from inline cell editor)
+  const handleDetailGroupChange = useCallback(
+    (updatedDetail: ContractDetail) => {
+      onDetailUpdate(updatedDetail)
+      // Sync group.detailIds from the updated details list
+      const updatedDetails = details.map((d) => (d.id === updatedDetail.id ? updatedDetail : d))
+      setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
+    },
+    [details, onDetailUpdate],
+  )
+
+  // Update a group (from panel edit view)
+  const handleGroupUpdate = useCallback((updated: VolumeGroup) => {
+    setVolumeGroups((prev) => prev.map((g) => (g.id === updated.id ? updated : g)))
+  }, [])
+
+  // Create a new group (from panel create view)
+  const handleGroupCreate = useCallback(
+    (group: Omit<VolumeGroup, 'id' | 'detailIds' | 'compliance' | 'liftedPercent'>) => {
+      const newGroup: VolumeGroup = {
+        ...group,
+        id: `VG-${String(Date.now()).slice(-4)}`,
+        detailIds: [],
+        compliance: 'ok',
+        liftedPercent: 0,
+      }
+      setVolumeGroups((prev) => [...prev, newGroup])
+    },
+    [],
+  )
+
+  // Remove a detail from a group (from panel edit view remove chip)
+  const handleRemoveDetailFromGroup = useCallback(
+    (detailId: string) => {
+      // Find the group being edited — we need the group context
+      // The panel handles this by calling onGroupDelete with the detailId
+      // We find which group contains this detail and remove it
+      const detail = details.find((d) => d.id === detailId)
+      if (!detail) return
+      // For simplicity, remove from ALL groups (panel edit view provides context)
+      const updatedDetail = clearGroupsFromDetail(detail)
+      onDetailUpdate(updatedDetail)
+      const updatedDetails = details.map((d) => (d.id === detailId ? updatedDetail : d))
+      setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
+    },
+    [details, onDetailUpdate],
+  )
+
+  // Panel Apply: add selected rows to a group (additive)
+  const handlePanelApply = useCallback(
+    (groupId: string) => {
+      const updatedDetails = details.map((d) => {
+        if (selectedDetailIds.includes(d.id)) {
+          return addGroupToDetail(d, groupId)
+        }
+        return d
+      })
+      updatedDetails
+        .filter((d) => selectedDetailIds.includes(d.id))
+        .forEach((d) => onDetailUpdate(d))
+      setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
+      setSelectedDetailIds([])
+    },
+    [details, selectedDetailIds, onDetailUpdate],
+  )
+
+  // Drag-and-drop: assign a detail to a group (additive)
+  const handleDragDropAssign = useCallback(
+    (detailId: string, groupId: string) => {
+      const detail = details.find((d) => d.id === detailId)
+      if (!detail) return
+      const updated = addGroupToDetail(detail, groupId)
+      onDetailUpdate(updated)
+      const updatedDetails = details.map((d) => (d.id === detailId ? updated : d))
+      setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
+    },
+    [details, onDetailUpdate],
+  )
+
+  // Floating bulk bar Apply
+  const handleBulkBarApply = useCallback(
+    (column: string, value: string) => {
+      if (column === 'volumeGroup') {
+        if (value === '__none__') {
+          // Clear all groups from selected details
+          const updatedDetails = details.map((d) => {
+            if (selectedDetailIds.includes(d.id)) {
+              return clearGroupsFromDetail(d)
+            }
+            return d
+          })
+          updatedDetails
+            .filter((d) => selectedDetailIds.includes(d.id))
+            .forEach((d) => onDetailUpdate(d))
+          setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
+        } else {
+          // Additive: add group to selected details
+          const updatedDetails = details.map((d) => {
+            if (selectedDetailIds.includes(d.id)) {
+              return addGroupToDetail(d, value)
+            }
+            return d
+          })
+          updatedDetails
+            .filter((d) => selectedDetailIds.includes(d.id))
+            .forEach((d) => onDetailUpdate(d))
+          setVolumeGroups((prev) => syncGroupDetailIds(updatedDetails, prev))
+        }
+      } else if (column === 'calendar') {
+        // Overwrite calendar on selected details
+        details
+          .filter((d) => selectedDetailIds.includes(d.id))
+          .forEach((d) => {
+            onDetailUpdate({ ...d, calendar: value as ContractDetail['calendar'] })
+          })
+      }
+      setSelectedDetailIds([])
+    },
+    [details, selectedDetailIds, onDetailUpdate],
+  )
+
+  // Open create group from inline cell editor
+  const handleOpenCreateGroup = useCallback(() => {
+    setGroupPanelOpen(true)
+  }, [])
 
   // Validate all required fields before allowing contract creation
   const isDetailComplete = (d: ContractDetail) =>
@@ -287,18 +417,42 @@ export function QuickEntryFlow({
                     details={details}
                     selectedIds={selectedDetailIds}
                     onFormulaClick={handleFormulaClick}
-                    onDetailUpdate={handleDetailUpdate}
+                    onDetailUpdate={handleDetailGroupChange}
                     onDetailDelete={handleDetailDelete}
                     onSelectionChange={handleSelectionChange}
                     onAddDetail={handleAddDetail}
-                    onBulkEdit={handleBulkEdit}
                     onBulkCreate={() => setBulkCreateDrawerOpen(true)}
                     contractStatus={contractStatus}
+                    isBulkChangeVisible={isBulkChangeVisible}
+                    setIsBulkChangeVisible={setIsBulkChangeVisible}
+                    onBulkUpdate={handleBulkUpdate}
+                    volumeGroups={volumeGroups}
+                    onManageGroups={() => setGroupPanelOpen((prev) => !prev)}
+                    onOpenCreateGroup={handleOpenCreateGroup}
                   />
                 )}
               </div>
+              <FloatingBulkBar
+                visible={selectedDetailIds.length > 0}
+                selectedCount={selectedDetailIds.length}
+                volumeGroups={volumeGroups}
+                onClear={() => setSelectedDetailIds([])}
+                onApply={handleBulkBarApply}
+              />
             </div>
           </Vertical>
+          <VolumeGroupPanel
+            visible={groupPanelOpen}
+            volumeGroups={volumeGroups}
+            details={details}
+            selectedDetailIds={selectedDetailIds}
+            onGroupUpdate={handleGroupUpdate}
+            onGroupCreate={handleGroupCreate}
+            onGroupDelete={handleRemoveDetailFromGroup}
+            onPanelApply={handlePanelApply}
+            onDragDropAssign={handleDragDropAssign}
+            onClose={() => setGroupPanelOpen(false)}
+          />
         </Horizontal>
       ) : (
         <>
@@ -318,16 +472,28 @@ export function QuickEntryFlow({
                     details={details}
                     selectedIds={selectedDetailIds}
                     onFormulaClick={handleFormulaClick}
-                    onDetailUpdate={handleDetailUpdate}
+                    onDetailUpdate={handleDetailGroupChange}
                     onDetailDelete={handleDetailDelete}
                     onSelectionChange={handleSelectionChange}
                     onAddDetail={handleAddDetail}
-                    onBulkEdit={handleBulkEdit}
                     onBulkCreate={() => setBulkCreateDrawerOpen(true)}
                     contractStatus={contractStatus}
+                    isBulkChangeVisible={isBulkChangeVisible}
+                    setIsBulkChangeVisible={setIsBulkChangeVisible}
+                    onBulkUpdate={handleBulkUpdate}
+                    volumeGroups={volumeGroups}
+                    onManageGroups={() => setGroupPanelOpen((prev) => !prev)}
+                    onOpenCreateGroup={handleOpenCreateGroup}
                   />
                 )}
               </div>
+              <FloatingBulkBar
+                visible={selectedDetailIds.length > 0}
+                selectedCount={selectedDetailIds.length}
+                volumeGroups={volumeGroups}
+                onClear={() => setSelectedDetailIds([])}
+                onApply={handleBulkBarApply}
+              />
             </div>
           </Vertical>
         </>
@@ -373,14 +539,6 @@ export function QuickEntryFlow({
         visible={bulkCreateDrawerOpen}
         onClose={() => setBulkCreateDrawerOpen(false)}
         onCreate={handleBulkCreate}
-      />
-
-      {/* Bulk Edit Modal */}
-      <BulkEditModal
-        visible={bulkEditModalOpen}
-        selectedCount={selectedDetailIds.length}
-        onClose={() => setBulkEditModalOpen(false)}
-        onApply={handleBulkEditApply}
       />
 
       {/* Import File Modal */}

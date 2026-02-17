@@ -1,0 +1,34 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e3a5f;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 8px 8px 0 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: translateY(0);
+  opacity: 1;
+  flex-shrink: 0;
+}
+
+.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.clear-link {
+  color: #93c5fd;
+  cursor: pointer;
+  margin-left: 12px;
+  font-size: 13px;
+}
+
+.clear-link:hover {
+  text-decoration: underline;
+}

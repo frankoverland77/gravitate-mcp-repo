@@ -25,7 +25,6 @@ import { BulkCreateDrawer } from '../quick-entry/components/BulkCreateDrawer'
 import { ImportFileModal } from '../quick-entry/components/ImportFileModal'
 import { CopyDealModal } from '../quick-entry/components/CopyDealModal'
 import { DayDealGridSection } from './sections/DayDealGridSection'
-import { DayDealBulkEditModal } from './components/DayDealBulkEditModal'
 import type { ContractDetail, ContractHeader, PageMode } from '../types/contract.types'
 import styles from './DayDealFlow.module.css'
 
@@ -82,7 +81,7 @@ export function DayDealFlow({
 
   // Modal/drawer states
   const [bulkCreateDrawerOpen, setBulkCreateDrawerOpen] = useState(false)
-  const [bulkEditModalOpen, setBulkEditModalOpen] = useState(false)
+  const [isBulkChangeVisible, setIsBulkChangeVisible] = useState(false)
   const [importFileModalOpen, setImportFileModalOpen] = useState(false)
   const [copyDealModalOpen, setCopyDealModalOpen] = useState(false)
 
@@ -142,12 +141,6 @@ export function DayDealFlow({
     setSelectedDetailIds(selectedIds)
   }, [])
 
-  const handleBulkEdit = useCallback(() => {
-    if (selectedDetailIds.length > 0) {
-      setBulkEditModalOpen(true)
-    }
-  }, [selectedDetailIds])
-
   // Bulk create handler
   const handleBulkCreate = useCallback(
     (products: string[], locations: string[]) => {
@@ -197,17 +190,13 @@ export function DayDealFlow({
     [onBulkAddDetails],
   )
 
-  // Bulk edit apply handler
-  const handleBulkEditApply = useCallback(
-    (field: keyof ContractDetail, value: unknown) => {
-      details
-        .filter((d) => selectedDetailIds.includes(d.id))
-        .forEach((d) => {
-          onDetailUpdate({ ...d, [field]: value })
-        })
-      setBulkEditModalOpen(false)
+  // Bulk change bar update handler (receives merged rows from GraviGrid)
+  const handleBulkUpdate = useCallback(
+    async (rows: ContractDetail | ContractDetail[]) => {
+      const updatedRows = Array.isArray(rows) ? rows : [rows]
+      updatedRows.forEach((row) => onDetailUpdate(row))
     },
-    [details, selectedDetailIds, onDetailUpdate],
+    [onDetailUpdate],
   )
 
   // Day deal completeness: supplier, product, location, fixedValue required; quantity optional
@@ -236,9 +225,11 @@ export function DayDealFlow({
             onDetailDelete={handleDetailDelete}
             onSelectionChange={handleSelectionChange}
             onAddDetail={handleAddDetail}
-            onBulkEdit={handleBulkEdit}
             onBulkCreate={() => setBulkCreateDrawerOpen(true)}
             onImport={() => setImportFileModalOpen(true)}
+            isBulkChangeVisible={isBulkChangeVisible}
+            setIsBulkChangeVisible={setIsBulkChangeVisible}
+            onBulkUpdate={handleBulkUpdate}
           />
         )}
       </Vertical>
@@ -263,14 +254,6 @@ export function DayDealFlow({
         visible={bulkCreateDrawerOpen}
         onClose={() => setBulkCreateDrawerOpen(false)}
         onCreate={handleBulkCreate}
-      />
-
-      {/* Day Deal Bulk Edit Modal */}
-      <DayDealBulkEditModal
-        visible={bulkEditModalOpen}
-        selectedCount={selectedDetailIds.length}
-        onClose={() => setBulkEditModalOpen(false)}
-        onApply={handleBulkEditApply}
       />
 
       {/* Import File Modal */}

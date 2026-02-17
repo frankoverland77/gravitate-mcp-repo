@@ -52,7 +52,6 @@ export function FullEntryFlow({
   const [showDetails, setShowDetails] = useState(false)
   const [formulaDrawerOpen, setFormulaDrawerOpen] = useState(false)
   const [activeDetail, setActiveDetail] = useState<ContractDetail | null>(null)
-  const [selectedDetailIds, setSelectedDetailIds] = useState<string[]>([])
 
   const handleHeaderChange = useCallback((updates: Partial<FullEntryHeader>) => {
     setHeader((prev) => ({ ...prev, ...updates }))
@@ -134,13 +133,11 @@ export function FullEntryFlow({
             </Texto>
             <DetailsGridSection
               details={details}
-              selectedIds={selectedDetailIds}
               onFormulaClick={handleFormulaClick}
               onDetailUpdate={onDetailUpdate}
               onDetailDelete={onDetailDelete}
-              onSelectionChange={setSelectedDetailIds}
+              onSelectionChange={() => {}}
               onAddDetail={() => onDetailAdd(createEmptyDetail())}
-              onBulkEdit={() => {}}
               onBulkCreate={() => onBulkAddDetails([createEmptyDetail()])}
               contractStatus={contractStatus}
             />

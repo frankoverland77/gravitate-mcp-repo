@@ -1,5 +1,5 @@
 # Contract Management Demo - Project Context
-*Last Updated: 2026-02-12*
+*Last Updated: 2026-02-16*
 
 ## Purpose
 Demo/prototype of the Gravitate Contract Management module using Excalibrr components.
@@ -159,6 +159,7 @@ All contract creation components come from:
 - [ ] Add Save/Activate modal flow
 - [ ] Connect to mock API endpoints (mock data in `data/contract.data.ts` sufficient for demo)
 - [x] Day Deal flat grid-first redesign — supplier per-row, no header/calendar, fill handle enabled
+- [x] Volume Grouping in Quick Entry — panel, grid column, bulk bar, 4 assignment methods
 
 ---
 
@@ -318,3 +319,53 @@ Centralized mock data and helper functions:
 - Volume optional — real-world day deals often have no quantity commitment
 - Dates default to today (not header dates) — day deals are same-day by nature
 - No empty state screen — grid starts with 1 row, "Add Day Deal" / "Bulk Add" / "Import" all in the control bar
+
+### Session 5 (2026-02-16) - Volume Grouping in Quick Entry
+
+**Completed:**
+- **Full volume grouping system** — 17 new files, 5 modified files implementing the complete volume group feature for Quick Entry flow
+- **Grid column** — `VolumeGroupCellRenderer` shows colored pills for assigned groups or "None" empty state; `VolumeGroupCellEditor` provides inline multi-select dropdown with checkmarks and "Create New Group" option
+- **Right-side panel** — `VolumeGroupPanel` (380px flex sibling, NOT a drawer) with 3 navigable views: list, edit, create
+- **Panel list view** — `GroupPanelListView` shows group tiles with allocation bars, detail counts, and compliance badges
+- **Panel edit view** — `GroupPanelEditView` shows group details with assigned detail chips (removable), toggle between edit and apply modes
+- **Panel create view** — `GroupPanelCreateView` form for new groups with name, allocation, unit, frequency, min/max percent fields
+- **Floating bulk bar** — `FloatingBulkBar` slides up when rows selected, column picker (Volume Group / Calendar) + value dropdown + Apply button
+- **Utility functions** — `volumeGroup.utils.ts` with add/remove/toggle/clear/sync functions
+- **4 assignment methods** — (1) Inline cell editor multi-select, (2) Panel edit/apply toggle, (3) Floating bulk bar, (4) Drag-and-drop to panel tiles
+
+**Architecture Decisions:**
+- `detail.volumeGroupIds: string[]` is the **single source of truth** — `group.detailIds` is always derived via `syncGroupDetailIds()` after every mutation
+- Panel is a **flex sibling** (380px), not a Drawer — compresses the grid rather than overlaying it
+- AG Grid `cellEditorPopup` for inline multi-select dropdown — avoids cell overflow issues
+- `AllocationProgressBar` reusable component with compliance-aware coloring (green=ok, amber=warning)
+- `GroupDetailChip` shows product/location summary with removable × button
+
+**Types Added:**
+- `VolumeGroup` — id, name, allocation, allocationUnit, minPercent, maxPercent, frequency, detailIds, compliance, liftedPercent
+- `AllocationUnit` — 'gal/yr' | 'gal/mo' | 'gal/qtr' | 'bbl/yr' | 'bbl/mo'
+- `GroupFrequency` — 'Monthly' | 'Quarterly' | 'Annually'
+- `GroupCompliance` — 'ok' | 'warning'
+- `VolumeGroupPanelView` — 'list' | 'edit' | 'create'
+- `ExternalAllocation` — for future external system import
+- `volumeGroupIds?: string[]` added to `ContractDetail`
+
+**New Files (17):**
+- `quick-entry/volumeGroup.utils.ts` — Utility functions
+- `quick-entry/components/volume-group/index.ts` — Barrel exports
+- `quick-entry/components/volume-group/VolumeGroupCellRenderer.tsx` + `.module.css`
+- `quick-entry/components/volume-group/VolumeGroupCellEditor.tsx` + `.module.css`
+- `quick-entry/components/volume-group/AllocationProgressBar.tsx` + `.module.css`
+- `quick-entry/components/volume-group/GroupDetailChip.tsx`
+- `quick-entry/components/volume-group/GroupPanelListView.tsx` + `.module.css`
+- `quick-entry/components/volume-group/GroupPanelEditView.tsx` + `.module.css`
+- `quick-entry/components/volume-group/GroupPanelCreateView.tsx` + `.module.css`
+- `quick-entry/sections/VolumeGroupPanel.tsx` + `.module.css`
+- `quick-entry/components/FloatingBulkBar.tsx` + `.module.css`
+
+**Modified Files (5):**
+- `types/contract.types.ts` — Added VolumeGroup, AllocationUnit, GroupFrequency, GroupCompliance, VolumeGroupPanelView, ExternalAllocation types; added `volumeGroupIds?: string[]` to ContractDetail
+- `data/contract.data.ts` — Added MOCK_VOLUME_GROUPS (3 groups) and MOCK_EXTERNAL_ALLOCATIONS (2 entries); added volumeGroupIds to existing mock details
+- `quick-entry/QuickEntryFlow.tsx` — Added volume group state, 8 handler functions, VolumeGroupPanel + FloatingBulkBar integration
+- `quick-entry/sections/DetailsGridSection.tsx` — Added Volume Group column with custom cell renderer/editor, "Manage Groups" button in control bar
+- `quick-entry/components/index.ts` — Added FloatingBulkBar export
+- `quick-entry/sections/index.ts` — Added VolumeGroupPanel export

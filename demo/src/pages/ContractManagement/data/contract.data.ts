@@ -10,6 +10,8 @@ import type {
   ContractDetail,
   EffectiveTime,
   PageMode,
+  VolumeGroup,
+  ExternalAllocation,
 } from '../types/contract.types'
 
 /**
@@ -134,6 +136,7 @@ export const MOCK_CONTRACTS: ContractListItem[] = [
         },
         quantity: 800000,
         status: 'ready',
+        volumeGroupIds: ['VG-001'],
       },
       {
         id: 'detail-1-2',
@@ -165,6 +168,7 @@ export const MOCK_CONTRACTS: ContractListItem[] = [
         },
         quantity: 600000,
         status: 'ready',
+        volumeGroupIds: ['VG-001', 'VG-002'],
       },
       {
         id: 'detail-1-3',
@@ -691,6 +695,7 @@ export const MOCK_CONTRACT_DETAILS: ContractDetail[] = [
     },
     quantity: 300000,
     status: 'ready',
+    volumeGroupIds: ['VG-001', 'VG-002'],
   },
   {
     id: 'detail-2',
@@ -722,6 +727,7 @@ export const MOCK_CONTRACT_DETAILS: ContractDetail[] = [
     },
     quantity: 250000,
     status: 'ready',
+    volumeGroupIds: ['VG-001'],
   },
   {
     id: 'detail-3',
@@ -735,6 +741,7 @@ export const MOCK_CONTRACT_DETAILS: ContractDetail[] = [
     fixedValue: 2.8500,
     quantity: 150000,
     status: 'ready',
+    volumeGroupIds: ['VG-002'],
   },
   {
     id: 'detail-4',
@@ -765,6 +772,7 @@ export const MOCK_CONTRACT_DETAILS: ContractDetail[] = [
     },
     quantity: 200000,
     status: 'in-progress',
+    volumeGroupIds: [],
   },
   {
     id: 'detail-5',
@@ -777,8 +785,65 @@ export const MOCK_CONTRACT_DETAILS: ContractDetail[] = [
     provisionType: 'Formula',
     quantity: 100000,
     status: 'empty',
+    volumeGroupIds: [],
   },
 ]
+
+/**
+ * Mock volume groups (matching wireframe data)
+ */
+export const MOCK_VOLUME_GROUPS: VolumeGroup[] = [
+  {
+    id: 'VG-001',
+    name: 'Gulf Coast Gasoline',
+    allocation: 1400000,
+    allocationUnit: 'gal/yr',
+    minPercent: 80,
+    maxPercent: 110,
+    frequency: 'Monthly',
+    detailIds: ['detail-1', 'detail-2'],
+    compliance: 'ok',
+    liftedPercent: 92,
+  },
+  {
+    id: 'VG-002',
+    name: 'Northeast Diesel',
+    allocation: 500000,
+    allocationUnit: 'gal/yr',
+    minPercent: 85,
+    maxPercent: 105,
+    frequency: 'Quarterly',
+    detailIds: ['detail-1', 'detail-3'],
+    compliance: 'warning',
+    liftedPercent: 78,
+  },
+]
+
+/**
+ * External allocations for Create Group flow
+ */
+export const EXTERNAL_ALLOCATIONS: ExternalAllocation[] = [
+  { id: 'EXT-001', source: 'dtn', sourceName: 'DTN Tabs', name: 'Gulf Coast Gasoline Allocation', allocation: 1200000, unit: 'gal/mo', frequency: 'Monthly' },
+  { id: 'EXT-002', source: 'dtn', sourceName: 'DTN Tabs', name: 'Southeast Diesel Pool', allocation: 750000, unit: 'gal/qtr', frequency: 'Quarterly' },
+  { id: 'EXT-003', source: 'sd', sourceName: 'Supply & Dispatch', name: 'Midwest RBOB Supply Agreement', allocation: 2000000, unit: 'gal/yr', frequency: 'Monthly' },
+  { id: 'EXT-004', source: 'sd', sourceName: 'Supply & Dispatch', name: 'Northeast Heating Oil', allocation: 500000, unit: 'gal/qtr', frequency: 'Quarterly' },
+  { id: 'EXT-005', source: 'dtn', sourceName: 'DTN Tabs', name: 'West Coast Jet Fuel', allocation: 3500000, unit: 'gal/yr', frequency: 'Monthly' },
+  { id: 'EXT-006', source: 'sd', sourceName: 'Supply & Dispatch', name: 'Texas Ethanol Blend', allocation: 900000, unit: 'gal/mo', frequency: 'Monthly' },
+]
+
+/**
+ * Look up a volume group by ID
+ */
+export function getVolumeGroupById(groups: VolumeGroup[], id: string): VolumeGroup | undefined {
+  return groups.find((g) => g.id === id)
+}
+
+/**
+ * Format a number with commas
+ */
+export function formatVolume(n: number): string {
+  return new Intl.NumberFormat('en-US').format(n)
+}
 
 export const DEMO_INITIAL_HEADER: ContractHeader = {
   internalParty: 'Gravitate Energy LLC',

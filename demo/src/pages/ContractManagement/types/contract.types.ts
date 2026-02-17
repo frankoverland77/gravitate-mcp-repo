@@ -46,6 +46,7 @@ export interface ContractDetail {
   quantity: number;
   status: ContractDetailStatus;
   isNew?: boolean;
+  volumeGroupIds?: string[];
 }
 
 /**
@@ -143,4 +144,53 @@ export interface BulkCreateSelection {
   products: string[];
   locations: string[];
   formulaTemplateId?: string;
+}
+
+/**
+ * Volume group allocation unit
+ */
+export type AllocationUnit = 'gal/yr' | 'gal/mo' | 'gal/qtr' | 'bbl/yr' | 'bbl/mo'
+
+/**
+ * Volume group frequency
+ */
+export type GroupFrequency = 'Monthly' | 'Quarterly' | 'Annually'
+
+/**
+ * Volume group compliance status
+ */
+export type GroupCompliance = 'ok' | 'warning'
+
+/**
+ * Volume group panel view state
+ */
+export type VolumeGroupPanelView = 'list' | 'edit' | 'create'
+
+/**
+ * Volume group - defines an allocation bucket that contract details can belong to
+ */
+export interface VolumeGroup {
+  id: string
+  name: string
+  allocation: number
+  allocationUnit: AllocationUnit
+  minPercent: number
+  maxPercent: number
+  frequency: GroupFrequency
+  detailIds: string[]
+  compliance: GroupCompliance
+  liftedPercent: number
+}
+
+/**
+ * External allocation - imported from external systems for group creation
+ */
+export interface ExternalAllocation {
+  id: string
+  source: string
+  sourceName: string
+  name: string
+  allocation: number
+  unit: AllocationUnit
+  frequency: GroupFrequency
 }

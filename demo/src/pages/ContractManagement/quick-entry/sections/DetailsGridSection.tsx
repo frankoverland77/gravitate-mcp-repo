@@ -6,26 +6,34 @@
  * Action buttons rendered via GraviGrid controlBarProps.
  */
 
-import { useMemo, useCallback, useRef } from 'react'
+import { useMemo, useCallback, useRef, type MutableRefObject, type Dispatch, type SetStateAction } from 'react'
 import { Vertical, Horizontal, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
-import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, AppstoreAddOutlined, DeleteOutlined, GroupOutlined } from '@ant-design/icons'
 import type { ColDef, ICellRendererParams, GetContextMenuItemsParams, GridApi } from 'ag-grid-community'
 
-import type { ContractDetail, ContractDetailStatus, ContractStatus } from '../../types/contract.types'
+import type { ContractDetail, ContractDetailStatus, ContractStatus, VolumeGroup } from '../../types/contract.types'
+import { VolumeGroupCellRenderer, VolumeGroupCellEditor } from '../components/volume-group'
+import { BulkSelectEditor, BulkNumberEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
+import { BulkDateEditor } from '@components/shared/Grid/bulkChange/BulkDateEditor'
 import { PRODUCT_OPTIONS, LOCATION_OPTIONS, CALENDAR_OPTIONS, EFFECTIVE_TIME_OPTIONS } from '../../data/contract.data'
 import styles from './DetailsGridSection.module.css'
 
 interface DetailsGridSectionProps {
   details: ContractDetail[]
-  selectedIds: string[]
+  selectedIds?: string[]
   onFormulaClick: (detail: ContractDetail) => void
   onDetailUpdate: (detail: ContractDetail) => void
   onDetailDelete: (detailId: string) => void
   onSelectionChange: (selectedIds: string[]) => void
   onAddDetail: () => void
-  onBulkEdit: () => void
   onBulkCreate: () => void
   contractStatus?: ContractStatus
+  isBulkChangeVisible?: boolean
+  setIsBulkChangeVisible?: Dispatch<SetStateAction<boolean>>
+  onBulkUpdate?: (rows: ContractDetail | ContractDetail[]) => Promise<void>
+  volumeGroups?: VolumeGroup[]
+  onManageGroups?: () => void
+  onOpenCreateGroup?: () => void
 }
 
 /**
@@ -98,17 +106,21 @@ function formatDate(date: Date): string {
 
 export function DetailsGridSection({
   details,
-  selectedIds,
   onFormulaClick,
   onDetailUpdate,
   onDetailDelete,
   onSelectionChange,
   onAddDetail,
-  onBulkEdit,
   onBulkCreate,
   contractStatus,
+  isBulkChangeVisible,
+  setIsBulkChangeVisible,
+  onBulkUpdate,
+  volumeGroups = [],
+  onManageGroups,
+  onOpenCreateGroup,
 }: DetailsGridSectionProps) {
-  const gridApiRef = useRef<GridApi | null>(null)
+  const gridApiRef = useRef() as MutableRefObject<GridApi>
 
   const isExpired = contractStatus === 'expired'
   const isActive = contractStatus === 'active'
@@ -156,6 +168,14 @@ export function DetailsGridSection({
         cellEditorParams: {
           values: PRODUCT_OPTIONS.map((p) => p.name),
         },
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkSelectEditor,
+          bulkCellEditorParams: {
+            propKey: 'product',
+            options: PRODUCT_OPTIONS.map((p) => ({ Value: p.name, Text: p.name })),
+          },
+        }),
       },
       {
         field: 'location',
@@ -169,6 +189,14 @@ export function DetailsGridSection({
         cellEditorParams: {
           values: LOCATION_OPTIONS.map((l) => l.name),
         },
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkSelectEditor,
+          bulkCellEditorParams: {
+            propKey: 'location',
+            options: LOCATION_OPTIONS.map((l) => ({ Value: l.name, Text: l.name })),
+          },
+        }),
       },
       {
         field: 'destination',
@@ -184,6 +212,22 @@ export function DetailsGridSection({
         },
       },
       {
+        field: 'volumeGroupIds',
+        headerName: 'Volume Group',
+        minWidth: 180,
+        editable: !isReadOnly,
+        cellRenderer: VolumeGroupCellRenderer,
+        cellRendererParams: {
+          volumeGroups,
+        },
+        cellEditor: VolumeGroupCellEditor,
+        cellEditorParams: {
+          volumeGroups,
+          onOpenCreateGroup,
+        },
+        cellEditorPopup: true,
+      },
+      {
         field: 'calendar',
         headerName: 'Calendar',
         minWidth: 140,
@@ -192,6 +236,14 @@ export function DetailsGridSection({
         cellEditorParams: {
           values: [...CALENDAR_OPTIONS],
         },
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkSelectEditor,
+          bulkCellEditorParams: {
+            propKey: 'calendar',
+            options: CALENDAR_OPTIONS.map((c) => ({ Value: c, Text: c })),
+          },
+        }),
       },
       {
         field: 'startDate',
@@ -200,6 +252,13 @@ export function DetailsGridSection({
         valueFormatter: ({ value }) => (value ? formatDate(value) : ''),
         editable: !isReadOnly,
         cellEditor: 'agDateCellEditor',
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkDateEditor,
+          bulkCellEditorParams: {
+            propKey: 'startDate',
+          },
+        }),
       },
       {
         field: 'endDate',
@@ -208,6 +267,13 @@ export function DetailsGridSection({
         valueFormatter: ({ value }) => (value ? formatDate(value) : ''),
         editable: !isReadOnly,
         cellEditor: 'agDateCellEditor',
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkDateEditor,
+          bulkCellEditorParams: {
+            propKey: 'endDate',
+          },
+        }),
       },
       {
         field: 'effectiveTime',
@@ -218,6 +284,14 @@ export function DetailsGridSection({
         cellEditorParams: {
           values: [...EFFECTIVE_TIME_OPTIONS],
         },
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkSelectEditor,
+          bulkCellEditorParams: {
+            propKey: 'effectiveTime',
+            options: EFFECTIVE_TIME_OPTIONS.map((t) => ({ Value: t, Text: t })),
+          },
+        }),
       },
       {
         field: 'formula',
@@ -261,6 +335,14 @@ export function DetailsGridSection({
           }
           return false
         },
+        ...(!isExpired && {
+          isBulkEditable: true,
+          bulkCellEditor: BulkNumberEditor,
+          bulkCellEditorParams: {
+            propKey: 'quantity',
+            min: 0,
+          },
+        }),
       },
       {
         field: 'status',
@@ -294,7 +376,7 @@ export function DetailsGridSection({
         : []),
     ]
     return cols
-  }, [onFormulaClick, onDetailDelete, contractStatus])
+  }, [onFormulaClick, onDetailDelete, contractStatus, volumeGroups, onOpenCreateGroup])
 
   // Handle cell value changes
   const handleCellValueChanged = useCallback(
@@ -304,14 +386,15 @@ export function DetailsGridSection({
     [onDetailUpdate]
   )
 
-  // Handle selection changes
-  const handleSelectionChanged = useCallback(() => {
-    if (gridApiRef.current) {
-      const selectedRows = gridApiRef.current.getSelectedRows()
-      const ids = selectedRows.map((row: ContractDetail) => row.id)
+  // Handle selection changes (GraviGrid passes { api } in the event)
+  const handleSelectionChanged = useCallback(
+    (e: { api: GridApi }) => {
+      const selectedRows = e.api.getSelectedRows() as ContractDetail[]
+      const ids = selectedRows.map((row) => row.id)
       onSelectionChange(ids)
-    }
-  }, [onSelectionChange])
+    },
+    [onSelectionChange],
+  )
 
   // Context menu items
   const getContextMenuItems = useCallback(
@@ -371,13 +454,10 @@ export function DetailsGridSection({
       {/* Grid - takes full height */}
       <Vertical flex='1' className={styles.gridWrapper}>
         <GraviGrid
+          externalRef={gridApiRef}
           agPropOverrides={{
             getRowId: (params) => params.data.id,
-            onGridReady: (params) => {
-              gridApiRef.current = params.api
-            },
             onCellValueChanged: handleCellValueChanged,
-            onSelectionChanged: handleSelectionChanged,
             getContextMenuItems,
             stopEditingWhenCellsLoseFocus: true,
             undoRedoCellEditing: true,
@@ -390,17 +470,18 @@ export function DetailsGridSection({
           columnDefs={columnDefs}
           rowData={details}
           storageKey='QuickEntryDetailsGrid_v2'
+          onSelectionChanged={handleSelectionChanged}
+          isBulkChangeVisible={isBulkChangeVisible}
+          setIsBulkChangeVisible={setIsBulkChangeVisible}
+          isBulkChangeCompactMode
+          bulkDrawerTitle='CONTRACT DETAILS'
+          updateEP={onBulkUpdate}
           controlBarProps={{
             title: 'Contract Details',
             hideActiveFilters: true,
             actionButtons: isExpired ? undefined : (
               <Horizontal alignItems='center' style={{ gap: '8px' }}>
-                {selectedIds.length > 0 && (
-                  <GraviButton
-                    buttonText={`Apply to Selected (${selectedIds.length})`}
-                    onClick={onBulkEdit}
-                  />
-                )}
+                <GraviButton buttonText='Manage Groups' icon={<GroupOutlined />} onClick={onManageGroups} />
                 <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
                 <GraviButton
                   buttonText='Add Detail'
