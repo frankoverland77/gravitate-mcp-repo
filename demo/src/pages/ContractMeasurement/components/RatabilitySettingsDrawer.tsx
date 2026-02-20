@@ -52,7 +52,7 @@ export function RatabilitySettingsDrawer({
 
   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({
     padding: '16px',
-    border: isSelected ? '2px solid #51b073' : '1px solid #d9d9d9',
+    border: isSelected ? '2px solid #52c41a' : '1px solid #d9d9d9',
     borderRadius: '8px',
     backgroundColor: isSelected ? 'rgba(81, 176, 115, 0.05)' : '#fafafa',
     cursor: 'pointer',
@@ -127,7 +127,7 @@ export function RatabilitySettingsDrawer({
           />
           <GraviButton
             buttonText={getSaveButtonText()}
-            appearance="success"
+            success
             onClick={handleSave}
             loading={saveStatus === 'saving'}
           />
@@ -264,7 +264,7 @@ export function RatabilitySettingsDrawer({
                         style={{
                           marginLeft: '8px',
                           padding: '2px 8px',
-                          backgroundColor: '#51b073',
+                          backgroundColor: '#52c41a',
                           color: 'white',
                           borderRadius: '4px',
                           fontSize: '10px',
@@ -348,7 +348,7 @@ export function RatabilitySettingsDrawer({
                         style={{
                           marginLeft: '8px',
                           padding: '2px 8px',
-                          backgroundColor: '#51b073',
+                          backgroundColor: '#52c41a',
                           color: 'white',
                           borderRadius: '4px',
                           fontSize: '10px',

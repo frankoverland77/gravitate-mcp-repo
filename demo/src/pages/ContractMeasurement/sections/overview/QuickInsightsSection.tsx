@@ -1,5 +1,4 @@
-import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
-import { Tag } from 'antd';
+import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import { CalendarOutlined, BarChartOutlined, ArrowUpOutlined } from '@ant-design/icons';
 
 // Static data for quick insights
@@ -77,12 +76,13 @@ export function QuickInsightsSection() {
 
             {/* Status Badge */}
             <div>
-              <Tag
-                color={INTERVAL_DATA.status === 'onTrack' ? 'success' : 'error'}
-                style={{ fontSize: '14px', padding: '4px 12px' }}
+              <BBDTag
+                success={INTERVAL_DATA.status === 'onTrack'}
+                error={INTERVAL_DATA.status !== 'onTrack'}
+                style={{ fontSize: '12px', padding: '2px 8px' }}
               >
                 {statusText}
-              </Tag>
+              </BBDTag>
             </div>
           </Vertical>
         </div>
@@ -109,15 +109,16 @@ export function QuickInsightsSection() {
 
             {/* Performance Badge */}
             <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-              <Tag
-                color={BENCHMARK_DATA.isOutperforming ? 'success' : 'error'}
-                style={{ fontSize: '14px', padding: '4px 12px' }}
+              <BBDTag
+                success={BENCHMARK_DATA.isOutperforming}
+                error={!BENCHMARK_DATA.isOutperforming}
+                style={{ fontSize: '12px', padding: '2px 8px' }}
               >
                 <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
                   <ArrowUpOutlined style={{ fontSize: '12px' }} />
                   {BENCHMARK_DATA.isOutperforming ? 'Outperforming' : 'Underperforming'}
                 </Horizontal>
-              </Tag>
+              </BBDTag>
             </Horizontal>
 
             {/* Simple Sparkline (static bars) */}

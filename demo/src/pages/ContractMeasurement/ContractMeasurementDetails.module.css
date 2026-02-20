@@ -34,5 +34,6 @@
 
 .detailsTabs :global(.ant-tabs-tabpane) {
   height: 100%;
-  overflow-y: auto; /* Tab content scrolls here, header stays fixed */
+  overflow-y: auto;
+  padding-top: 24px;
 }

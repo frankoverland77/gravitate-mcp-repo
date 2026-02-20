@@ -1,5 +1,4 @@
-import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
-import { Tag } from 'antd';
+import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import {
   LineChartOutlined,
   ClockCircleOutlined,
@@ -122,7 +121,7 @@ export function PerformanceOverviewSection() {
               <Texto category="h3" weight="600">
                 {METRICS.riskScore}
               </Texto>
-              <Tag color="error">{METRICS.riskLevel}</Tag>
+              <BBDTag error style={{ fontSize: '12px', padding: '2px 8px' }}>{METRICS.riskLevel}</BBDTag>
             </Horizontal>
             <Texto category="p2" appearance="medium">
               High risk level

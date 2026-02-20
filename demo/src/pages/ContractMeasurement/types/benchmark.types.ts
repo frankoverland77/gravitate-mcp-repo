@@ -1,7 +1,7 @@
 export interface Benchmark {
   id: string;
   name: string;
-  isPrimary: boolean;
+  isReference: boolean;
   publisher?: string;
   benchmarkType?: string;
   productHierarchy?: string;
@@ -26,7 +26,7 @@ export const DEFAULT_BENCHMARKS: Benchmark[] = [
   {
     id: 'rack-average',
     name: 'Rack Average',
-    isPrimary: true,
+    isReference: true,
     publisher: 'OPIS',
     benchmarkType: 'Rack Average',
     productHierarchy: 'Target Index',
@@ -35,7 +35,7 @@ export const DEFAULT_BENCHMARKS: Benchmark[] = [
   {
     id: 'rack-low',
     name: 'Rack Low',
-    isPrimary: false,
+    isReference: false,
     publisher: 'OPIS',
     benchmarkType: 'Rack Low',
     productHierarchy: 'Target Index',

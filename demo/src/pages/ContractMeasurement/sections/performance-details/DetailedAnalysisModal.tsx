@@ -1,5 +1,5 @@
-import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
-import { Tag, Progress, Modal } from 'antd'
+import { Vertical, Horizontal, Texto, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
+import { Progress, Modal } from 'antd'
 import {
   DashboardOutlined,
   ThunderboltOutlined,
@@ -29,14 +29,6 @@ const chartCardStyle = {
   borderRadius: '8px',
   padding: '20px',
   height: '280px',
-}
-
-// Risk level colors
-const riskColors: Record<string, string> = {
-  low: 'success',
-  medium: 'warning',
-  high: 'orange',
-  critical: 'error',
 }
 
 export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalysisModalProps) {
@@ -129,9 +121,12 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                 <Texto category='h3' weight='600'>
                   {product.riskScore}
                 </Texto>
-                <Tag color={riskColors[product.riskLevel]} style={{ textTransform: 'uppercase' }}>
-                  {product.riskLevel}
-                </Tag>
+                <BBDTag
+                  success={product.riskLevel === 'low'}
+                  warning={product.riskLevel === 'medium'}
+                  error={product.riskLevel === 'high'}
+                  style={{ textTransform: 'uppercase', fontSize: '12px', padding: '2px 8px' }}
+                >{product.riskLevel}</BBDTag>
               </Horizontal>
               <Texto category='p2' appearance='medium'>
                 Risk score (0-100)

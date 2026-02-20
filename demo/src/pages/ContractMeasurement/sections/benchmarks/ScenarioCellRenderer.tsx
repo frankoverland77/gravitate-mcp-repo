@@ -1,15 +1,16 @@
 import { Texto, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { Checkbox, Tooltip } from 'antd';
-import { StarFilled } from '@ant-design/icons';
+import { StarFilled, ExclamationCircleOutlined } from '@ant-design/icons';
 import type { ScenarioCellData } from '../../types/scenario.types';
 import styles from './ScenarioComparisonSection.module.css';
+import { useFeatureMode } from '../../../../contexts/FeatureModeContext';
 
 interface ScenarioCellRendererProps {
   cellData: ScenarioCellData;
-  isPrimaryForRow: boolean;
+  isReferenceForRow: boolean;
   showRowStar: boolean;
-  isPrimaryMode: boolean;
-  onSetPrimary: () => void;
+  isReferenceMode: boolean;
+  onSetReference: () => void;
 }
 
 function getDeltaColorClass(delta: number | undefined): string {
@@ -21,18 +22,19 @@ function getDeltaColorClass(delta: number | undefined): string {
 
 export function ScenarioCellRenderer({
   cellData,
-  isPrimaryForRow,
+  isReferenceForRow,
   showRowStar,
-  isPrimaryMode,
-  onSetPrimary,
+  isReferenceMode,
+  onSetReference,
 }: ScenarioCellRendererProps) {
-  const cellClassName = `${styles.scenarioCell} ${isPrimaryForRow ? styles.scenarioCellPrimary : ''}`;
+  const { isFutureMode } = useFeatureMode();
+  const cellClassName = `${styles.scenarioCell} ${isReferenceForRow ? styles.scenarioCellReference : ''}`;
 
   return (
     <div className={cellClassName}>
-      {isPrimaryMode && (
+      {isReferenceMode && (
         <div className={styles.cellCheckbox}>
-          <Checkbox checked={isPrimaryForRow} onChange={onSetPrimary} />
+          <Checkbox checked={isReferenceForRow} onChange={onSetReference} />
         </div>
       )}
 
@@ -40,7 +42,7 @@ export function ScenarioCellRenderer({
         <Horizontal alignItems="center" gap="8px" justifyContent="flex-start">
           <Texto weight="600">${cellData.price.toFixed(2)}/gal</Texto>
           {showRowStar && (
-            <Tooltip title="Primary">
+            <Tooltip title="Reference">
               <StarFilled className={styles.starIcon} />
             </Tooltip>
           )}
@@ -56,11 +58,22 @@ export function ScenarioCellRenderer({
           {cellData.formulaRef}
         </Texto>
 
-        <Texto category="p2" appearance="medium" className={styles.volumeText}>
-          {(cellData.allocation / 1000).toFixed(0)}K gal
-        </Texto>
+        {cellData.missingPriceInfo && (
+          <Tooltip title={`${cellData.missingPriceInfo.available} of ${cellData.missingPriceInfo.total} prices available — average calculated from available data`}>
+            <div className={styles.missingPriceIndicator}>
+              <ExclamationCircleOutlined />
+              <span>Partial data ({cellData.missingPriceInfo.available}/{cellData.missingPriceInfo.total})</span>
+            </div>
+          </Tooltip>
+        )}
 
-        {cellData.impact !== undefined && (
+        {isFutureMode && (
+          <Texto category="p2" appearance="medium" className={styles.volumeText}>
+            {(cellData.allocation / 1000).toFixed(0)}K gal
+          </Texto>
+        )}
+
+        {isFutureMode && cellData.impact !== undefined && (
           <Texto category="p2" weight="600" className={getDeltaColorClass(cellData.impact)}>
             {`Impact: ${cellData.impact >= 0 ? '+' : ''}$${(cellData.impact / 1000).toFixed(1)}K`}
           </Texto>

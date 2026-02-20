@@ -1,5 +1,4 @@
-import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
-import { Tag } from 'antd';
+import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import { FileTextOutlined, DashboardOutlined } from '@ant-design/icons';
 
 // Static data for contract details
@@ -117,9 +116,7 @@ export function ContractDetailsSection() {
                 >
                   Risk Level
                 </Texto>
-                <Tag color="error" style={{ fontSize: '14px', padding: '4px 12px' }}>
-                  {CONTRACT_DATA.riskLevel}
-                </Tag>
+                <BBDTag error style={{ fontSize: '12px', padding: '2px 8px' }}>{CONTRACT_DATA.riskLevel}</BBDTag>
               </div>
               <div>
                 <Texto
@@ -129,9 +126,7 @@ export function ContractDetailsSection() {
                 >
                   Status
                 </Texto>
-                <Tag color="success" style={{ fontSize: '14px', padding: '4px 12px' }}>
-                  {CONTRACT_DATA.status}
-                </Tag>
+                <BBDTag success style={{ fontSize: '12px', padding: '2px 8px' }}>{CONTRACT_DATA.status}</BBDTag>
               </div>
             </div>
           </Vertical>

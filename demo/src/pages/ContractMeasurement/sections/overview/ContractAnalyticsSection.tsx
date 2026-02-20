@@ -1,5 +1,4 @@
-import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
-import { Tag } from 'antd';
+import { Vertical, Horizontal, Texto, BBDTag } from '@gravitate-js/excalibrr';
 import {
   BarChartOutlined,
   LineChartOutlined,
@@ -272,7 +271,7 @@ export function ContractAnalyticsSection() {
                 <Texto category="h3" weight="600">7.2</Texto>
               </div>
               <Vertical style={{ gap: '4px' }}>
-                <Tag color="error" style={{ fontSize: '14px', padding: '4px 12px' }}>HIGH RISK</Tag>
+                <BBDTag error style={{ fontSize: '12px', padding: '2px 8px' }}>HIGH RISK</BBDTag>
                 <Texto category="p2" appearance="medium">Overall Risk Score</Texto>
               </Vertical>
             </Horizontal>

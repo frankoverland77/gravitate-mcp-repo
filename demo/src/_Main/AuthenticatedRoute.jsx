@@ -16,6 +16,7 @@ export function AuthenticatedRoute() {
   // If you add a new section like "Bakery" or "Forms" in pageConfig, add it here too!
   const scopes = {
     Welcome: true,
+    DesignSystem: true,
     Bakery: true,
     Forms: true,
     Dashboards: true,

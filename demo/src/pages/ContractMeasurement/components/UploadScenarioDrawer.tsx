@@ -125,7 +125,7 @@ export function UploadScenarioDrawer({
       products: editingScenario?.products || 'all',
       status: 'complete',
       entryMethod: 'upload',
-      isPrimary: editingScenario?.isPrimary || false,
+      isReference: editingScenario?.isReference || false,
       createdAt: editingScenario?.createdAt || now,
       updatedAt: now,
       priceConfig: editingScenario?.priceConfig || {},

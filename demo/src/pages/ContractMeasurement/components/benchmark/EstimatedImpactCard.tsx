@@ -62,8 +62,8 @@ function ImpactColumn({
 export function EstimatedImpactCard({ impactEstimate }: EstimatedImpactCardProps) {
   return (
     <div className={styles.card}>
-      <Texto category="p2" appearance="medium" weight="600" className={styles.cardTitle}>
-        ESTIMATED IMPACT
+      <Texto category="h5" weight="600">
+        Estimated Impact
       </Texto>
 
       <Horizontal gap="24px">

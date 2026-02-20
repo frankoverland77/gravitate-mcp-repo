@@ -3,6 +3,7 @@ import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { Table, Popover, Menu } from 'antd';
 import { MoreOutlined, PlusOutlined, StarOutlined, InfoCircleOutlined, DeleteOutlined, ClearOutlined } from '@ant-design/icons';
 import { AddBenchmarkDrawer } from '../../components/AddBenchmarkDrawer';
+import { useFeatureMode } from '../../../../contexts/FeatureModeContext';
 import {
   Benchmark,
   BenchmarkData,
@@ -16,7 +17,7 @@ import { generateComparisonData } from '../../../../shared/data';
 const renderDeltaCell = (value: number | null) => {
   if (value === null) return <div style={{ textAlign: 'center', color: '#8c8c8c' }}>—</div>;
   const isPositive = value >= 0;
-  const color = isPositive ? '#51b073' : '#ff4d4f';
+  const color = isPositive ? '#52c41a' : '#ff4d4f';
   const arrow = isPositive ? '↗' : '↘';
   const displayValue = isPositive ? `+$${Math.abs(value).toFixed(4)}` : `-$${Math.abs(value).toFixed(4)}`;
 
@@ -35,7 +36,7 @@ const renderDeltaCell = (value: number | null) => {
 const renderImpactCell = (value: number | null) => {
   if (value === null) return <div style={{ textAlign: 'right', color: '#8c8c8c' }}>—</div>;
   const isPositive = value >= 0;
-  const color = isPositive ? '#51b073' : '#ff4d4f';
+  const color = isPositive ? '#52c41a' : '#ff4d4f';
   const prefix = isPositive ? '+' : '-';
   const displayValue = `${prefix}$${Math.abs(value).toLocaleString()}`;
 
@@ -56,6 +57,7 @@ const generatePlaceholderData = (): BenchmarkData => ({
 });
 
 export function DetailedComparisonSection() {
+  const { isFutureMode } = useFeatureMode();
   const [benchmarks, setBenchmarks] = useState<Benchmark[]>(DEFAULT_BENCHMARKS);
   const [comparisonData, setComparisonData] = useState<ComparisonRowData[]>(initialComparisonData);
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
@@ -66,10 +68,10 @@ export function DetailedComparisonSection() {
   const handleAddBenchmark = (newBenchmark: Benchmark) => {
     if (benchmarks.length >= MAX_BENCHMARKS) return;
 
-    // If this is the first benchmark, make it primary
+    // If this is the first benchmark, make it reference
     const benchmarkToAdd = {
       ...newBenchmark,
-      isPrimary: benchmarks.length === 0 ? true : newBenchmark.isPrimary,
+      isReference: benchmarks.length === 0 ? true : newBenchmark.isReference,
     };
 
     setBenchmarks((prev) => [...prev, benchmarkToAdd]);
@@ -86,12 +88,12 @@ export function DetailedComparisonSection() {
     );
   };
 
-  // Handle setting a benchmark as primary
-  const handleSetPrimary = (benchmarkId: string) => {
+  // Handle setting a benchmark as reference
+  const handleSetReference = (benchmarkId: string) => {
     setBenchmarks((prev) =>
       prev.map((b) => ({
         ...b,
-        isPrimary: b.id === benchmarkId,
+        isReference: b.id === benchmarkId,
       }))
     );
   };
@@ -99,13 +101,13 @@ export function DetailedComparisonSection() {
   // Handle removing a benchmark
   const handleRemove = (benchmarkId: string) => {
     const benchmarkToRemove = benchmarks.find((b) => b.id === benchmarkId);
-    const wasPrimary = benchmarkToRemove?.isPrimary;
+    const wasReference = benchmarkToRemove?.isReference;
 
     setBenchmarks((prev) => {
       const remaining = prev.filter((b) => b.id !== benchmarkId);
-      // If we removed the primary, promote the first remaining benchmark
-      if (wasPrimary && remaining.length > 0) {
-        remaining[0].isPrimary = true;
+      // If we removed the reference, promote the first remaining benchmark
+      if (wasReference && remaining.length > 0) {
+        remaining[0].isReference = true;
       }
       return remaining;
     });
@@ -119,24 +121,24 @@ export function DetailedComparisonSection() {
     );
   };
 
-  // Handle clearing all benchmarks except primary
+  // Handle clearing all benchmarks except reference
   const handleClearAll = () => {
-    const primaryBenchmark = benchmarks.find((b) => b.isPrimary);
+    const referenceBenchmark = benchmarks.find((b) => b.isReference);
 
-    if (primaryBenchmark) {
-      // Keep only the primary benchmark
-      setBenchmarks([primaryBenchmark]);
-      // Keep only the primary benchmark's data
+    if (referenceBenchmark) {
+      // Keep only the reference benchmark
+      setBenchmarks([referenceBenchmark]);
+      // Keep only the reference benchmark's data
       setComparisonData((prev) =>
         prev.map((row) => ({
           ...row,
           benchmarkData: {
-            [primaryBenchmark.id]: row.benchmarkData[primaryBenchmark.id],
+            [referenceBenchmark.id]: row.benchmarkData[referenceBenchmark.id],
           },
         }))
       );
     } else {
-      // No primary, clear all
+      // No reference, clear all
       setBenchmarks([]);
       setComparisonData((prev) =>
         prev.map((row) => ({
@@ -148,8 +150,8 @@ export function DetailedComparisonSection() {
     setClearConfirmOpen(false);
   };
 
-  // Calculate non-primary benchmarks count for Clear All button visibility
-  const nonPrimaryCount = benchmarks.filter((b) => !b.isPrimary).length;
+  // Calculate non-reference benchmarks count for Clear All button visibility
+  const nonReferenceCount = benchmarks.filter((b) => !b.isReference).length;
 
   // More Details popover content
   const renderDetailsContent = (benchmark: Benchmark) => (
@@ -179,14 +181,14 @@ export function DetailedComparisonSection() {
     </div>
   );
 
-  // Benchmark header with PRIMARY badge and menu
+  // Benchmark header with REFERENCE badge and menu
   const renderBenchmarkHeader = (benchmark: Benchmark) => {
     const menuContent = (
       <Menu style={{ border: 'none', boxShadow: 'none' }}>
-        {!benchmark.isPrimary && (
-          <Menu.Item key="primary" onClick={() => handleSetPrimary(benchmark.id)}>
+        {!benchmark.isReference && (
+          <Menu.Item key="reference" onClick={() => handleSetReference(benchmark.id)}>
             <StarOutlined style={{ marginRight: '8px' }} />
-            Set as Primary
+            Set as Reference
           </Menu.Item>
         )}
         <Menu.Item key="details">
@@ -213,19 +215,19 @@ export function DetailedComparisonSection() {
 
     return (
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '32px' }}>
-        {benchmark.isPrimary && (
+        {benchmark.isReference && (
           <div style={{
             position: 'absolute',
             top: -16,
             left: -9,
-            backgroundColor: '#51b073',
+            backgroundColor: '#52c41a',
             color: '#ffffff',
             fontSize: '10px',
             fontWeight: 600,
             padding: '2px 8px',
             borderRadius: '0 0 4px 0',
           }}>
-            PRIMARY
+            REFERENCE
           </div>
         )}
         <span style={{ textTransform: 'uppercase', fontWeight: 600 }}>{benchmark.name}</span>
@@ -244,7 +246,7 @@ export function DetailedComparisonSection() {
 
   // Generate dynamic columns based on benchmarks
   const comparisonColumns = useMemo(() => {
-    const fixedColumns = [
+    const fixedColumns: any[] = [
       {
         title: 'PRODUCT',
         dataIndex: 'product',
@@ -257,35 +259,31 @@ export function DetailedComparisonSection() {
         key: 'location',
         width: 140,
       },
-      {
-        title: 'VOLUME',
-        dataIndex: 'volume',
-        key: 'volume',
-        width: 80,
-        align: 'right' as const,
-        render: (value: number) => value.toLocaleString(),
-      },
-      {
-        title: '% TOTAL',
-        dataIndex: 'percentTotal',
-        key: 'percentTotal',
-        width: 80,
-        align: 'right' as const,
-        render: (value: number) => `${value.toFixed(1)}%`,
-      },
     ];
 
-    const benchmarkColumns = benchmarks.map((benchmark, index) => ({
-      title: renderBenchmarkHeader(benchmark),
-      className: 'benchmark-group-start',
-      onHeaderCell: () => ({
-        style: benchmark.isPrimary
-          ? { backgroundColor: '#d4ece0' }
-          : index > 0
-          ? { borderLeft: '1px solid #e8e8e8' }
-          : {},
-      }),
-      children: [
+    if (isFutureMode) {
+      fixedColumns.push(
+        {
+          title: 'VOLUME',
+          dataIndex: 'volume',
+          key: 'volume',
+          width: 80,
+          align: 'right' as const,
+          render: (value: number) => value.toLocaleString(),
+        },
+        {
+          title: '% TOTAL',
+          dataIndex: 'percentTotal',
+          key: 'percentTotal',
+          width: 80,
+          align: 'right' as const,
+          render: (value: number) => `${value.toFixed(1)}%`,
+        },
+      );
+    }
+
+    const benchmarkColumns = benchmarks.map((benchmark, index) => {
+      const children: any[] = [
         {
           title: 'Delta ($/gal)',
           dataIndex: ['benchmarkData', benchmark.id, 'delta'],
@@ -295,21 +293,24 @@ export function DetailedComparisonSection() {
           render: (_: any, record: ComparisonRowData) =>
             renderDeltaCell(record.benchmarkData[benchmark.id]?.delta ?? null),
           onCell: () => ({
-            style: benchmark.isPrimary
+            style: benchmark.isReference
               ? { backgroundColor: '#e8f5ed' }
               : index > 0
               ? { borderLeft: '1px solid #e8e8e8' }
               : {},
           }),
           onHeaderCell: () => ({
-            style: benchmark.isPrimary
+            style: benchmark.isReference
               ? { backgroundColor: '#d4ece0' }
               : index > 0
               ? { borderLeft: '1px solid #e8e8e8' }
               : {},
           }),
         },
-        {
+      ];
+
+      if (isFutureMode) {
+        children.push({
           title: 'Financial impact',
           dataIndex: ['benchmarkData', benchmark.id, 'impact'],
           key: `${benchmark.id}-impact`,
@@ -318,20 +319,36 @@ export function DetailedComparisonSection() {
           render: (_: any, record: ComparisonRowData) =>
             renderImpactCell(record.benchmarkData[benchmark.id]?.impact ?? null),
           onCell: () => ({
-            style: benchmark.isPrimary ? { backgroundColor: '#e8f5ed' } : {},
+            style: benchmark.isReference ? { backgroundColor: '#e8f5ed' } : {},
           }),
           onHeaderCell: () => ({
-            style: benchmark.isPrimary ? { backgroundColor: '#d4ece0' } : {},
+            style: benchmark.isReference ? { backgroundColor: '#d4ece0' } : {},
           }),
-        },
-      ],
-    }));
+        });
+      }
+
+      return {
+        title: renderBenchmarkHeader(benchmark),
+        className: 'benchmark-group-start',
+        onHeaderCell: () => ({
+          style: benchmark.isReference
+            ? { backgroundColor: '#d4ece0' }
+            : index > 0
+            ? { borderLeft: '1px solid #e8e8e8' }
+            : {},
+        }),
+        children,
+      };
+    });
 
     return [...fixedColumns, ...benchmarkColumns];
-  }, [benchmarks, detailsPopoverOpen]);
+  }, [benchmarks, detailsPopoverOpen, isFutureMode]);
 
   // Calculate total width based on number of benchmarks
-  const tableWidth = 400 + benchmarks.length * 250;
+  // MVP: fewer fixed columns (no VOLUME/% TOTAL) and narrower benchmark groups (no impact column)
+  const fixedColumnsWidth = isFutureMode ? 400 : 240;
+  const benchmarkColumnWidth = isFutureMode ? 250 : 125;
+  const tableWidth = fixedColumnsWidth + benchmarks.length * benchmarkColumnWidth;
 
   // Calculate summary totals
   const summaryTotals = useMemo(() => {
@@ -357,15 +374,15 @@ export function DetailedComparisonSection() {
           <Texto category="p2" appearance="medium">Compare contract pricing against multiple industry benchmarks</Texto>
         </div>
         <Horizontal style={{ gap: '8px' }}>
-          {nonPrimaryCount > 0 && (
+          {nonReferenceCount > 0 && (
             <Popover
               content={
                 <div style={{ width: '260px' }}>
                   <Texto category="p2" weight="600" style={{ marginBottom: '8px', display: 'block' }}>
-                    Clear non-primary benchmarks?
+                    Clear non-reference benchmarks?
                   </Texto>
                   <Texto category="p2" appearance="medium" style={{ marginBottom: '16px', display: 'block' }}>
-                    This will remove {nonPrimaryCount} benchmark{nonPrimaryCount !== 1 ? 's' : ''} from the comparison table. The primary benchmark will be kept.
+                    This will remove {nonReferenceCount} benchmark{nonReferenceCount !== 1 ? 's' : ''} from the comparison table. The reference benchmark will be kept.
                   </Texto>
                   <Horizontal style={{ justifyContent: 'flex-end', gap: '8px' }}>
                     <GraviButton
@@ -425,14 +442,14 @@ export function DetailedComparisonSection() {
       {/* Table */}
       <div style={{ overflowX: 'auto' }}>
         <style>{`
-          /* PRIMARY group styling - dynamically applied via onCell/onHeaderCell */
-          .primary-benchmark-table .ant-table-thead > tr > th {
+          /* REFERENCE group styling - dynamically applied via onCell/onHeaderCell */
+          .reference-benchmark-table .ant-table-thead > tr > th {
             background-color: #fafafa;
           }
         `}</style>
         <div style={{ width: tableWidth + 2 }}>
           <Table
-            className="primary-benchmark-table"
+            className="reference-benchmark-table"
             columns={comparisonColumns}
             dataSource={comparisonData}
             pagination={false}
@@ -441,45 +458,55 @@ export function DetailedComparisonSection() {
             tableLayout="fixed"
             style={{ width: tableWidth }}
             onRow={() => ({ style: { backgroundColor: '#ffffff' } })}
-            summary={() => (
-              <Table.Summary>
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}>
-                    <span style={{ fontWeight: 600 }}>Total</span>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={2} align="right">
-                    <span style={{ fontWeight: 600 }}>{summaryTotals.totalVolume.toLocaleString()}</span>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={3} align="right">
-                    <span style={{ fontWeight: 600 }}>100.0%</span>
-                  </Table.Summary.Cell>
-                  {benchmarks.map((benchmark, index) => (
-                    <React.Fragment key={benchmark.id}>
-                      <Table.Summary.Cell
-                        index={4 + index * 2}
-                        colSpan={1}
-                      >
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell
-                        index={5 + index * 2}
-                        align="right"
-                      >
-                        <span
-                          style={{
-                            color: summaryTotals.benchmarkTotals[benchmark.id] >= 0 ? '#51b073' : '#ff4d4f',
-                            fontWeight: 500,
-                          }}
+            summary={() => {
+              const fixedCellCount = isFutureMode ? 4 : 2;
+              const cellsPerBenchmark = isFutureMode ? 2 : 1;
+              return (
+                <Table.Summary>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>
+                      <span style={{ fontWeight: 600 }}>Total</span>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                    {isFutureMode && (
+                      <>
+                        <Table.Summary.Cell index={2} align="right">
+                          <span style={{ fontWeight: 600 }}>{summaryTotals.totalVolume.toLocaleString()}</span>
+                        </Table.Summary.Cell>
+                        <Table.Summary.Cell index={3} align="right">
+                          <span style={{ fontWeight: 600 }}>100.0%</span>
+                        </Table.Summary.Cell>
+                      </>
+                    )}
+                    {benchmarks.map((benchmark, index) => (
+                      <React.Fragment key={benchmark.id}>
+                        <Table.Summary.Cell
+                          index={fixedCellCount + index * cellsPerBenchmark}
+                          colSpan={1}
                         >
-                          {summaryTotals.benchmarkTotals[benchmark.id] >= 0 ? '+' : '-'}$
-                          {Math.abs(summaryTotals.benchmarkTotals[benchmark.id]).toLocaleString()}
-                        </span>
-                      </Table.Summary.Cell>
-                    </React.Fragment>
-                  ))}
-                </Table.Summary.Row>
-              </Table.Summary>
-            )}
+                        </Table.Summary.Cell>
+                        {isFutureMode && (
+                          <Table.Summary.Cell
+                            index={fixedCellCount + 1 + index * cellsPerBenchmark}
+                            align="right"
+                          >
+                            <span
+                              style={{
+                                color: summaryTotals.benchmarkTotals[benchmark.id] >= 0 ? '#52c41a' : '#ff4d4f',
+                                fontWeight: 500,
+                              }}
+                            >
+                              {summaryTotals.benchmarkTotals[benchmark.id] >= 0 ? '+' : '-'}$
+                              {Math.abs(summaryTotals.benchmarkTotals[benchmark.id]).toLocaleString()}
+                            </span>
+                          </Table.Summary.Cell>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </Table.Summary.Row>
+                </Table.Summary>
+              );
+            }}
           />
         </div>
       </div>

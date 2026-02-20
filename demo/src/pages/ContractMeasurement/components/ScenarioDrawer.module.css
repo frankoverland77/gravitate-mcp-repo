@@ -50,7 +50,7 @@
 }
 
 .entryMethodTileSelected {
-  border: 2px solid #51b073;
+  border: 2px solid #52c41a;
   background-color: rgba(81, 176, 115, 0.05);
 }
 
@@ -60,7 +60,7 @@
 }
 
 .entryMethodIconSelected {
-  color: #51b073;
+  color: #52c41a;
 }
 
 /* Config Cards */

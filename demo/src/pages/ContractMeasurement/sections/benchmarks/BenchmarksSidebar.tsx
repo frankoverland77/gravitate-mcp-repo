@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr'
+import { Texto, GraviButton, Horizontal, Vertical, BBDTag } from '@gravitate-js/excalibrr'
 import { DownOutlined, RightOutlined, EditOutlined, CopyOutlined, DeleteOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons'
-import { Tag, Select, Popconfirm } from 'antd'
+import { Select, Popconfirm } from 'antd'
 import type { Scenario, AnalysisParameters } from '../../types/scenario.types'
 import { DEFAULT_PARAMETERS } from '../../types/scenario.types'
 
@@ -58,11 +58,15 @@ export function BenchmarksSidebar({
 
   // Format parameters for display
   const formatPriceParams = () => {
-    return `${parameters.price.lookback}, ${parameters.price.aggregation.charAt(0).toUpperCase() + parameters.price.aggregation.slice(1)}, ${parameters.price.method === 'weighted' ? 'Weighted Avg' : parameters.price.method === 'simple' ? 'Simple Avg' : 'Median'}`
-  }
-
-  const formatVolumeParams = () => {
-    return `${parameters.volume.lookback}, ${parameters.volume.granularity.charAt(0).toUpperCase() + parameters.volume.granularity.slice(1)}, ${parameters.volume.calculation === 'sum' ? 'Sum' : 'Average'}`
+    const lookbackLabels: Record<string, string> = {
+      '30d': '30 Days', '3mo': '3 Months', '6mo': '6 Months',
+      '12mo': '12 Months', 'full': 'Full Contract',
+    }
+    const methodLabels: Record<string, string> = {
+      'simple': 'Simple Avg', 'weekly-median': 'Wkly Median Avg',
+      'monthly-median': 'Mo Median Avg',
+    }
+    return `${lookbackLabels[parameters.price.lookback]}, ${methodLabels[parameters.price.method]}`
   }
 
   const getProductsLabel = (products: Scenario['products']) => {
@@ -124,12 +128,6 @@ export function BenchmarksSidebar({
                       </Texto>
                       <Texto category='p2'>{formatPriceParams()}</Texto>
                     </Horizontal>
-                    <Horizontal style={{ gap: '8px' }}>
-                      <Texto category='p2' appearance='medium' style={{ minWidth: '50px' }}>
-                        Volume:
-                      </Texto>
-                      <Texto category='p2'>{formatVolumeParams()}</Texto>
-                    </Horizontal>
                   </Vertical>
                 </Horizontal>
                 <GraviButton buttonText='Edit' icon={<EditOutlined />} appearance='outlined' onClick={() => setParametersEditMode(true)} />
@@ -139,91 +137,35 @@ export function BenchmarksSidebar({
               <Vertical style={{ gap: '16px' }}>
                 {/* Price History */}
                 <Vertical style={{ gap: '8px' }}>
-                  <Texto category='p2' weight='600'>
-                    Price History
-                  </Texto>
                   <Horizontal style={{ gap: '8px', flexWrap: 'wrap' }}>
                     <Select
                       size='small'
                       value={parameters.price.lookback}
                       onChange={(val) => onUpdateParameters({ ...parameters, price: { ...parameters.price, lookback: val } })}
                       options={[
+                        { value: '30d', label: '30d' },
+                        { value: '3mo', label: '3mo' },
                         { value: '6mo', label: '6mo' },
                         { value: '12mo', label: '12mo' },
-                        { value: '18mo', label: '18mo' },
-                        { value: '24mo', label: '24mo' },
+                        { value: 'full', label: 'Full' },
                       ]}
                       style={{ width: '70px' }}
-                    />
-                    <Select
-                      size='small'
-                      value={parameters.price.aggregation}
-                      onChange={(val) => onUpdateParameters({ ...parameters, price: { ...parameters.price, aggregation: val } })}
-                      options={[
-                        { value: 'daily', label: 'Daily' },
-                        { value: 'weekly', label: 'Weekly' },
-                        { value: 'monthly', label: 'Monthly' },
-                        { value: 'quarterly', label: 'Quarterly' },
-                      ]}
-                      style={{ width: '90px' }}
                     />
                     <Select
                       size='small'
                       value={parameters.price.method}
                       onChange={(val) => onUpdateParameters({ ...parameters, price: { ...parameters.price, method: val } })}
                       options={[
-                        { value: 'weighted', label: 'Weighted' },
                         { value: 'simple', label: 'Simple' },
-                        { value: 'median', label: 'Median' },
+                        { value: 'weekly-median', label: 'Wkly Median' },
+                        { value: 'monthly-median', label: 'Mo Median' },
                       ]}
-                      style={{ width: '90px' }}
+                      style={{ width: '110px' }}
                     />
                   </Horizontal>
                 </Vertical>
 
-                {/* Volume History */}
-                <Vertical style={{ gap: '8px' }}>
-                  <Texto category='p2' weight='600'>
-                    Volume History
-                  </Texto>
-                  <Horizontal style={{ gap: '8px', flexWrap: 'wrap' }}>
-                    <Select
-                      size='small'
-                      value={parameters.volume.lookback}
-                      onChange={(val) => onUpdateParameters({ ...parameters, volume: { ...parameters.volume, lookback: val } })}
-                      options={[
-                        { value: '6mo', label: '6mo' },
-                        { value: '12mo', label: '12mo' },
-                        { value: '18mo', label: '18mo' },
-                        { value: '24mo', label: '24mo' },
-                      ]}
-                      style={{ width: '70px' }}
-                    />
-                    <Select
-                      size='small'
-                      value={parameters.volume.granularity}
-                      onChange={(val) => onUpdateParameters({ ...parameters, volume: { ...parameters.volume, granularity: val } })}
-                      options={[
-                        { value: 'weekly', label: 'Weekly' },
-                        { value: 'monthly', label: 'Monthly' },
-                        { value: 'quarterly', label: 'Quarterly' },
-                      ]}
-                      style={{ width: '90px' }}
-                    />
-                    <Select
-                      size='small'
-                      value={parameters.volume.calculation}
-                      onChange={(val) => onUpdateParameters({ ...parameters, volume: { ...parameters.volume, calculation: val } })}
-                      options={[
-                        { value: 'sum', label: 'Sum' },
-                        { value: 'average', label: 'Average' },
-                      ]}
-                      style={{ width: '80px' }}
-                    />
-                  </Horizontal>
-                </Vertical>
-
-                <GraviButton buttonText='Done' success onClick={() => setParametersEditMode(false)} />
+                <GraviButton buttonText='Done' theme1 onClick={() => setParametersEditMode(false)} />
               </Vertical>
             )}
           </Vertical>
@@ -239,9 +181,7 @@ export function BenchmarksSidebar({
               <Texto weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '12px' }}>
                 Scenarios
               </Texto>
-              <Tag color='default' style={{ marginLeft: '4px' }}>
-                {scenarios.length}
-              </Tag>
+              <BBDTag style={{ marginLeft: '4px' }}>{scenarios.length}</BBDTag>
             </Horizontal>
           </Horizontal>
         </div>
@@ -255,10 +195,10 @@ export function BenchmarksSidebar({
                 <div
                   key={scenario.id}
                   style={{
-                    border: scenario.isPrimary ? '2px solid #51b073' : '1px solid #e8e8e8',
+                    border: scenario.isReference ? '2px solid #52c41a' : '1px solid #e8e8e8',
                     borderRadius: '8px',
                     padding: '12px',
-                    backgroundColor: scenario.isPrimary ? 'rgba(81, 176, 115, 0.05)' : '#fafafa',
+                    backgroundColor: scenario.isReference ? 'rgba(81, 176, 115, 0.05)' : '#fafafa',
                   }}
                 >
                   <div style={{ cursor: 'pointer' }} onClick={() => toggleScenarioExpansion(scenario.id)}>
@@ -268,10 +208,8 @@ export function BenchmarksSidebar({
                         <Texto weight='600' style={{ fontSize: '13px' }}>
                           {scenario.name}
                         </Texto>
-                        {scenario.isPrimary && (
-                          <Tag color='green' style={{ marginLeft: '4px', fontSize: '10px' }}>
-                            PRIMARY
-                          </Tag>
+                        {scenario.isReference && (
+                          <BBDTag success style={{ marginLeft: '4px', fontSize: '12px', padding: '2px 8px' }}>REFERENCE</BBDTag>
                         )}
                       </Horizontal>
                       <span
@@ -279,7 +217,7 @@ export function BenchmarksSidebar({
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          backgroundColor: scenario.status === 'complete' ? '#51b073' : '#8c8c8c',
+                          backgroundColor: scenario.status === 'complete' ? '#52c41a' : '#8c8c8c',
                         }}
                       />
                     </Horizontal>
@@ -320,7 +258,7 @@ export function BenchmarksSidebar({
             })}
 
             {/* Add Scenario Button */}
-            <GraviButton buttonText='Add Scenario' icon={<PlusOutlined />} success onClick={onAddScenario} />
+            <GraviButton buttonText='Add Scenario' icon={<PlusOutlined />} theme1 onClick={onAddScenario} />
           </Vertical>
         )}
       </div>

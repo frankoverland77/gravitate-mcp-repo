@@ -61,7 +61,7 @@ export function AddBenchmarkDrawer({
     const newBenchmark: Benchmark = {
       id: `benchmark-${Date.now()}`,
       name: getBenchmarkDisplayName(benchmarkType),
-      isPrimary: currentCount === 0,
+      isReference: currentCount === 0,
       publisher: publisher,
       benchmarkType: benchmarkType,
       productHierarchy: productHierarchy,
@@ -97,7 +97,7 @@ export function AddBenchmarkDrawer({
       footer={
         <Horizontal style={{ justifyContent: 'flex-end', gap: '12px', padding: '12px 0' }}>
           <GraviButton buttonText="Cancel" appearance="outlined" onClick={handleClose} />
-          <GraviButton buttonText="Add Benchmark" appearance="success" onClick={handleAdd} />
+          <GraviButton buttonText="Add Benchmark" success onClick={handleAdd} />
         </Horizontal>
       }
     >
@@ -177,22 +177,6 @@ export function AddBenchmarkDrawer({
             />
           </div>
 
-          {/* Location Hierarchy */}
-          <div>
-            <Texto
-              category="p2"
-              appearance="medium"
-              style={{ marginBottom: '8px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}
-            >
-              Location Hierarchy
-            </Texto>
-            <Select
-              value={locationHierarchy}
-              onChange={(value) => setLocationHierarchy(value)}
-              style={{ width: '100%' }}
-              options={locationHierarchyOptions}
-            />
-          </div>
         </div>
 
         {/* Divider */}
@@ -219,9 +203,6 @@ export function AddBenchmarkDrawer({
             </Texto>
             <Texto category="p2" appearance="medium">
               Product: <strong>{productHierarchyOptions.find((o) => o.value === productHierarchy)?.label}</strong>
-            </Texto>
-            <Texto category="p2" appearance="medium">
-              Location: <strong>{locationHierarchyOptions.find((o) => o.value === locationHierarchy)?.label}</strong>
             </Texto>
           </Vertical>
         </div>

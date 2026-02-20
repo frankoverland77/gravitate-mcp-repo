@@ -11,6 +11,7 @@ import {
   FileTextOutlined,
   SwapOutlined,
   DollarOutlined,
+  BgColorsOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
@@ -37,6 +38,20 @@ import { SubscriptionManagement } from './pages/SubscriptionManagement/Subscript
 import { RFPManagement } from './pages/RFP';
 import { NegotiationModePage } from './pages/NegotiationMode/NegotiationModePage';
 import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
+import {
+  TypographyShowcase,
+  ButtonsShowcase,
+  TagsShowcase,
+  DataDisplayShowcase,
+  HeadersShowcase,
+  LayoutShowcase,
+  DateTimeShowcase,
+  FormControlsShowcase,
+  FeedbackShowcase,
+  NavigationShowcase,
+  CellRenderersShowcase,
+  GridShowcase,
+} from './pages/DesignSystem';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -396,6 +411,99 @@ export const createPageConfig = (): PageConfig => {
       title: 'Sandbox',
       element: <WelcomePage />,
     },
+  };
+
+  config.DesignSystem = {
+    hasPermission: () => true,
+    key: 'DesignSystem',
+    icon: <BgColorsOutlined />,
+    title: 'Design System',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'Typography',
+        title: 'Typography',
+        element: <TypographyShowcase />,
+        path: '/DesignSystem/Typography',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Buttons',
+        title: 'Buttons',
+        element: <ButtonsShowcase />,
+        path: '/DesignSystem/Buttons',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Tags',
+        title: 'Tags',
+        element: <TagsShowcase />,
+        path: '/DesignSystem/Tags',
+      },
+      {
+        hasPermission: () => true,
+        key: 'DataDisplay',
+        title: 'Data Display',
+        element: <DataDisplayShowcase />,
+        path: '/DesignSystem/DataDisplay',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Headers',
+        title: 'Headers',
+        element: <HeadersShowcase />,
+        path: '/DesignSystem/Headers',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Layout',
+        title: 'Layout',
+        element: <LayoutShowcase />,
+        path: '/DesignSystem/Layout',
+      },
+      {
+        hasPermission: () => true,
+        key: 'DateTime',
+        title: 'Date & Time',
+        element: <DateTimeShowcase />,
+        path: '/DesignSystem/DateTime',
+      },
+      {
+        hasPermission: () => true,
+        key: 'FormControls',
+        title: 'Form Controls',
+        element: <FormControlsShowcase />,
+        path: '/DesignSystem/FormControls',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Feedback',
+        title: 'Feedback',
+        element: <FeedbackShowcase />,
+        path: '/DesignSystem/Feedback',
+      },
+      {
+        hasPermission: () => true,
+        key: 'DSNavigation',
+        title: 'Navigation',
+        element: <NavigationShowcase />,
+        path: '/DesignSystem/DSNavigation',
+      },
+      {
+        hasPermission: () => true,
+        key: 'CellRenderers',
+        title: 'Cell Renderers',
+        element: <CellRenderersShowcase />,
+        path: '/DesignSystem/CellRenderers',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Grid',
+        title: 'Grid',
+        element: <GridShowcase />,
+        path: '/DesignSystem/Grid',
+      },
+    ],
   };
 
   if (gridsRoutes.length > 0) {

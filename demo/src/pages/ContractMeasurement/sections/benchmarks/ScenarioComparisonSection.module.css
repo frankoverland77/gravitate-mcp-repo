@@ -38,7 +38,7 @@
   text-align: left;
 }
 
-.scenarioCellPrimary {
+.scenarioCellReference {
   background-color: rgba(81, 176, 115, 0.08);
 }
 
@@ -70,12 +70,12 @@
 
 .starIcon {
   font-size: 12px;
-  color: #51b073;
+  color: #52c41a;
 }
 
 .starIconHeader {
   font-size: 14px;
-  color: #51b073;
+  color: #52c41a;
 }
 
 .formulaRef {
@@ -87,7 +87,7 @@
 }
 
 .deltaPositive {
-  color: #51b073;
+  color: #52c41a;
 }
 
 .deltaNegative {
@@ -100,6 +100,27 @@
 
 .summaryRow {
   background-color: #fafafa;
+}
+
+/* Secondary header row for CPG delta summary */
+.summaryHeaderRow {
+  background-color: #fafafa;
+}
+
+.summaryHeaderRow td {
+  border-bottom: 1px solid #e8e8e8;
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+
+.summaryHeaderLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summaryHeaderCell {
+  vertical-align: middle;
 }
 
 /* Column header with edit icon */
@@ -151,4 +172,195 @@
 
 .cellEditIcon:hover {
   color: #1890ff;
+}
+
+/* Summary card above table */
+.summaryCard {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  width: fit-content;
+}
+
+/* Drag handle icon */
+.dragHandle {
+  cursor: grab;
+  color: #bfbfbf;
+  font-size: 12px;
+  transition: color 0.2s ease;
+  padding: 2px;
+}
+
+.dragHandle:hover {
+  color: #595959;
+}
+
+/* Drag states on column headers */
+.scenarioHeaderDragging {
+  opacity: 0.5;
+  background: #e6f4ff !important;
+}
+
+.scenarioHeaderDragOver {
+  border-left: 3px solid #1890ff !important;
+}
+
+/* Ad-hoc benchmark indicator */
+.adhocIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #8c8c8c;
+  background-color: #f5f5f5;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+  padding: 0 5px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.adhocDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #bfbfbf;
+  flex-shrink: 0;
+}
+
+/* Sort icon in column header */
+.headerSortIcon {
+  font-size: 14px;
+  color: #8c8c8c;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.columnHeader:hover .headerSortIcon {
+  opacity: 1;
+}
+
+.headerSortActive {
+  opacity: 1 !important;
+  color: #1890ff;
+}
+
+/* Filter bar */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Exclusion bar */
+.exclusionBar {
+  padding: 12px 16px;
+  background-color: #fff7e6;
+  border: 1px solid #ffd591;
+  border-radius: 8px;
+}
+
+/* Empty filter result */
+.emptyFilterResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 12px;
+}
+
+/* Group header row */
+.groupHeaderRow {
+  background: #f7f7f7;
+  border-top: 2px solid #e8e8e8;
+}
+
+.groupHeaderRow td {
+  font-weight: 600;
+}
+
+.groupHeaderRow:hover td {
+  background: #f0f0f0;
+}
+
+/* Group child row indentation */
+.groupChildRow td:first-child {
+  padding-left: 32px;
+}
+
+/* Group header cell (detail column) */
+.groupHeaderCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Group aggregated cell (scenario columns) */
+.groupAggCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* No-match failure cell */
+.noMatchCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 100px;
+  padding: 8px;
+  margin: -8px;
+  background-color: #fff2f0;
+  border-left: 3px solid #ff4d4f;
+}
+
+.noMatchIcon {
+  font-size: 20px;
+  color: #ff4d4f;
+}
+
+/* Unassigned row in blended mode - amber left border + tinted bg */
+.unassignedRow {
+  background-color: #fffbe6;
+  border-left: 3px solid #faad14;
+}
+
+.unassignedRow:hover td {
+  background-color: #fff7cc !important;
+}
+
+/* Unassigned select styling */
+.unassignedSelect :global(.ant-select-selector) {
+  border-color: #faad14 !important;
+  background-color: #fffbe6 !important;
+}
+
+/* Blended info bar */
+.blendedInfoBar {
+  padding: 12px 16px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+}
+
+/* Missing price indicator (partial data) */
+.missingPriceIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #faad14;
+  margin-top: 2px;
 }

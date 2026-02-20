@@ -21,6 +21,7 @@ demo/src/pages/ContractMeasurement/
 ├── ContractMeasurementDetails.tsx   # Detail page (with tabs)
 ├── project-context.md               # This file
 ├── components/                      # Reusable components
+│   ├── CMViewSettingsDrawer.tsx    # MVP/Future State toggle drawer (uses FeatureModeContext)
 │   ├── RatabilitySettingsDrawer.tsx # Global ratability settings drawer
 │   ├── ScenarioDrawer.tsx           # Add/Edit scenario drawer (with template chooser)
 │   └── benchmark/                   # Benchmark selection components
@@ -1364,7 +1365,7 @@ The ScenarioDrawer's "Benchmark" entry method had a TBD placeholder instead of f
    ```tsx
    const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({
      padding: '16px',
-     border: isSelected ? '2px solid #51b073' : '1px solid #d9d9d9',
+     border: isSelected ? '2px solid #52c41a' : '1px solid #d9d9d9',
      borderRadius: '8px',
      backgroundColor: isSelected ? 'rgba(81, 176, 115, 0.05)' : '#fafafa',
      cursor: 'pointer',
@@ -2856,6 +2857,266 @@ The Excel Upload feature follows the same design pattern established by Benchmar
 - [x] Import button enabled on step 3
 - [x] Scenario saved with entryMethod: 'upload'
 
+### Session 15 (2026-02-17) - MVP/Future State Toggle
+
+**Completed:**
+- Added floating "View Settings" button + drawer to both Grid and Details pages
+- New `CMViewSettingsDrawer` component with MVP/Future State radio card selection
+- Replicates proven pattern from OSP/Buy Now `ViewSettingsDrawer`
+
+**Files Created/Modified:**
+- `components/CMViewSettingsDrawer.tsx` — New drawer with radio cards, uses global `FeatureModeContext`
+- `ContractMeasurementGrid.tsx` — Added floating eye button + drawer integration
+- `ContractMeasurementDetails.tsx` — Same floating button + drawer pattern
+
+**Key Decisions:**
+- Used global `FeatureModeContext` (persists to localStorage) rather than local state — toggle applies across all pages
+- Floating button position: `right: 24px`, `bottom: 96px`, `zIndex: 9999` — consistent with OSP pattern
+- Drawer uses `visible` prop (not `open`), `width={400}`, `zIndex={2000}`
+- Simplified drawer compared to OSP version — only Feature Prioritization section (no column toggles needed yet)
+
+**Key Learnings:**
+- The `FeatureModeContext` already wraps the app, so no provider setup needed
+- The drawer reads from context internally — parent components only manage open/close state
+
+**Next:** Use `isMVPMode`/`isFutureMode` from `useFeatureMode()` to conditionally show/hide features across Contract Measurement pages.
+
+### Session 14 (2026-02-17) - MVP Branch: Strip Volume Elements
+
+**Completed:**
+- Implemented MVP/Future State conditional rendering across 6 files — all volume-dependent elements are now hidden in MVP mode
+- Grid page: Total Volume KPI tile hidden, tile grid adjusts from 4→3 columns, Volume Progress and Ratability columns conditionally included in columnDefs
+- Historical Comparison chart: Volume bars, right Y-axis, tooltip "Lifting" line all hidden in MVP; chart right margin reduced; button text changes from "Prices & Volume" → "Prices"
+- Parameters section: Volume History column hidden; subtitle adjusts to remove "and volume" reference
+- Detailed Comparison table: VOLUME and % TOTAL fixed columns hidden; Financial Impact sub-columns under each benchmark hidden; summary row adjusted (no volume total, no impact totals); table width calculation reduced for fewer columns
+- Scenario Comparison table: VOLUME base column hidden; summary row hides volume totals and impact totals per scenario
+- Scenario cell renderer: Allocation volume text ("XK gal") and Impact text ("Impact: +$X.XK") hidden in MVP mode
+
+**Key Decisions:**
+- Used `isFutureMode` guard consistently (show in Future State, hide in MVP) — same pattern everywhere
+- Added `isFutureMode` to all relevant `useMemo` dependency arrays to ensure columns rebuild on toggle
+- For DetailedComparisonSection, MVP benchmark groups show only Delta column (no Financial Impact) — keeps the table focused on price comparison
+- Summary rows simplified: in MVP, Detailed Comparison shows only "Total" label + empty delta cells; Scenario Comparison shows no volume/impact totals
+- Table width calculation dynamically adjusts based on mode to prevent excess whitespace
+
+**Key Learnings:**
+- Recharts `<YAxis>` and `<Bar>` can be conditionally rendered with `{isFutureMode && <Component />}` without breaking the chart
+- Ant Design `<Table>` summary cells need correct index values when columns are conditionally removed — used dynamic `fixedCellCount` and `cellsPerBenchmark` variables
+- Spread operator pattern `...(isFutureMode ? [column] : [])` works cleanly for conditional column inclusion in typed arrays
+
+**Not in scope (separate TODOs):**
+- ~~Average CPG difference row (replacement for totals row)~~ ✓ COMPLETED
+- Ratability settings drawer changes
+- VolumeTabContent in ScenarioDrawer
+
+---
+
+### Session 15 (2026-02-17) - CPG Delta Features for Scenario Comparison
+
+**Completed:**
+- Added `contractPrice` field to `GeneratedContractDetail` in `generators.data.ts`, using `generateSeededPrice()` for deterministic per-product/location pricing
+- Added `contractPrice` to `ComparisonRowData` type and `isMissingPrice` placeholder to `ScenarioCellData` type
+- **Feature 1: Average CPG Difference Row** — Replaced hollow summary row with "AVG CPG DELTA vs Contract Price" row. Always visible (not gated by primary selection). Each scenario cell shows colored `±$X.XXXX/gal` delta (scenario price minus contract price).
+- **Feature 2: Fixed Delta Column** — Conditional column showing `contractPrice - primaryScenarioPrice` per detail row. Only visible when all rows share the same primary scenario. Disappears in mixed-primary mode.
+- **Feature 3: Summary Card** — Styled card above the table showing the average fixed delta with primary scenario name and row count. Same visibility conditions as Fixed Delta Column.
+- Added `columnPrimaryScenarioId` and `fixedDeltas` useMemos for efficient computation
+- Added `.summaryCard` CSS class
+
+**Key Decisions:**
+- Sign convention: `getDeltaColorClass` treats negative = green (favorable), positive = red (unfavorable). For avgCpgDelta (scenario - contract), positive = scenario more expensive = red. For fixedDeltas (contract - scenario), positive = contract more expensive = red.
+- `isMissingPrice` added as type-only placeholder — no rendering yet, pending product decision
+- Summary card is potentially deferrable per Reece's feedback but implemented for now
+- Simple average used (not volume-weighted) for MVP; `isFutureMode` variant can be added later
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `generators.data.ts` | Added `contractPrice` to interface + generator using `generateSeededPrice` |
+| `scenario.types.ts` | Added `contractPrice` to `ComparisonRowData`, `isMissingPrice` to `ScenarioCellData` |
+| `ScenarioComparisonSection.tsx` | 3 new features: avg CPG row, fixed delta column, summary card; new useMemos |
+| `ScenarioComparisonSection.module.css` | Added `.summaryCard` class |
+
+---
+
+### Session 16 (2026-02-17) - X-Axis Granularity Selector for Historical Comparison Chart
+
+**Completed:**
+- Replaced 26 hardcoded daily chart data points with procedural generator producing ~365 daily points (12 months, deterministic sin-based noise, seasonal variation, weekend zero-volume)
+- Added `aggregateChartData()` function supporting daily/weekly/monthly/quarterly bucketing with simple, volume-weighted, and median averaging methods
+- Added `Segmented` granularity selector (`D | W | M | Q`) in chart controls row between view toggle and product filter
+- Chart rendering uses `displayData` from `useMemo(aggregation, method)` — both price and difference views respect current granularity
+- Dynamic XAxis interval (targets ~14 labels max) and conditional dot visibility (hidden when >52 data points)
+- Tooltip date formatting adapts per granularity: daily "Nov. 9, 2024", weekly "Week of Nov. 4, 2024", monthly "November 2024", quarterly "Q4 2024"
+- Wired `aggregation`, `method`, and `onAggregationChange` from BenchmarksTab → HistoricalComparisonSection so chart Segmented and ParametersModal stay in sync bidirectionally
+
+**Key Decisions:**
+- Used Ant Design `Segmented` (small size) with single-letter labels — matches the existing Scenario/Historical toggle pattern in BenchmarksTab
+- Granularity selector visible in both MVP and Future modes (it controls price data, shown in both)
+- Volume within aggregated buckets is always summed; differences recomputed from aggregated prices
+- Default remains `monthly` (from `DEFAULT_PARAMETERS`) — opens with ~12 readable points
+- Deterministic noise generator (sin-based hash) instead of Math.random() for consistent data across renders
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `HistoricalComparisonSection.tsx` | Major rewrite: ~365-point data generator, aggregation engine, Segmented control, dynamic chart config, updated tooltip |
+| `BenchmarksTab.tsx` | Pass `aggregation`, `method`, `onAggregationChange` props to HistoricalComparisonSection |
+
+### Session 17 (2026-02-17) - Scenario Comparison Table: Filter, Sort, Column Reorder
+
+**Completed:**
+- Added product and location multi-select filter dropdowns to the Scenario Comparison toolbar
+- Implemented sort-by-delta on any scenario column with 3-state cycle: unsorted → ascending → descending → unsorted
+- Implemented HTML5 drag-and-drop column reorder on scenario column headers (adapted from SupplierMatrixSection pattern)
+- Data pipeline now flows: `comparisonData` → `filteredData` → `sortedData` → Table dataSource
+- Changed `fixedDeltas` from array-indexed to `Map<detailId, number>` so sorting doesn't break delta-to-row mapping
+- Totals and summary card now computed from `filteredData` (reflect active filters)
+- Summary card shows "Across N of M detail rows (filtered)" when filters active
+- Empty filter state shows "No details match" message with Clear Filters button
+- Sort icon: SwapOutlined (unsorted, hover-reveal), SortAscendingOutlined/SortDescendingOutlined (active, always visible, blue)
+- Drag handles hidden during primary selection mode to avoid conflicting interactions
+- `useEffect` resets sort when sorted scenario is removed; tie-break on `detailId` for sort stability
+
+**Key Decisions:**
+- Filter options derived from `SAMPLE_DETAILS` (not `comparisonData`) so they stay stable regardless of current filter state
+- Sort always operates on delta values — no metric selector needed since delta is the key comparison metric
+- Column reorder mutates the `scenarios` array in BenchmarksTab (array order IS column order) — no separate `columnOrder` state
+- Only scenario columns are draggable; DETAIL, VOLUME, FIXED DELTA, and DRAFT columns are fixed
+- Used Ant Design `Select mode="multiple"` with `maxTagCount={2}` for compact filter chips
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `ScenarioComparisonSection.tsx` | Filter/sort/drag state, data pipeline (filteredData/sortedData), filter bar UI, sort icons in column headers, drag-and-drop handlers, Map-based fixedDeltas, empty filter state |
+| `ScenarioComparisonSection.module.css` | dragHandle, scenarioHeaderDragging, scenarioHeaderDragOver, headerSortIcon, headerSortActive, filterBar, emptyFilterResult styles |
+| `BenchmarksTab.tsx` | Added `handleReorderScenarios` callback, passed `onReorderScenarios` prop |
+
+### Session 18 (2026-02-17) - Fix ScenarioComparison Toolbar Clipping
+
+**Completed:**
+- Fixed toolbar content being visually cut off at ~69px (title/description visible but filters, summary card, and table hidden)
+- Root cause: Excalibrr `Vertical`/`Horizontal` components apply `overflow: hidden` by default, plus `Vertical` defaults to `height: 100%` and `flex: 1 1 auto` — cascading constraints clipped all inner content
+- Replaced 4 structural Excalibrr layout wrappers (root container, toolbar row, left-side title+filters, right-side buttons) with plain `<div>` elements using inline flex styles — matches the pattern used by `HistoricalComparisonSection`
+- Reverted `ContractMeasurementDetails.module.css` tabpane/content-holder CSS to original scroll pattern (tabpane as scroll container, content-holder `overflow: hidden`)
+- Interior Excalibrr components (inside summary card, empty state, etc.) left untouched — they work fine within sized containers
+
+**Key Decisions:**
+- Used plain `<div>` with inline flex styles for structural wrappers rather than trying to override Excalibrr defaults — simpler and matches sibling section pattern
+- Restored tabpane-as-scroll-container CSS pattern (used by SubscriptionManagement and other pages) rather than content-holder scrolling
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `ScenarioComparisonSection.tsx` | Replaced root `<Vertical>`, toolbar `<Horizontal>`, left-side `<Vertical>`, and right-side `<Horizontal>` with plain `<div>` elements |
+| `ContractMeasurementDetails.module.css` | content-holder: `overflow: hidden` (was `overflow-y: auto`); tabpane: `height: 100%; overflow-y: auto` (was empty) |
+
+---
+
+### Session 19 (2026-02-18) - Historical Chart View Dropdown + Scenario Lines
+
+**Completed:**
+- Rewrote `HistoricalComparisonSection.tsx` to support "Entire Deal vs Specific Detail" view dropdown
+- Per-detail daily data generation: each `SAMPLE_DETAILS` entry gets its own 365-day series with deterministic noise seeded by `detailIndex * 1000 + 7919`
+- `aggregateEntireDeal()` — volume-weighted average across all detail series at each day index
+- View dropdown populated from `SAMPLE_DETAILS` with "Entire Deal" default + all `{product} - {location}` entries
+- Scenario lines rendered on both Prices and Difference chart views using `SCENARIO_COLORS` palette (`#722ed1`, `#eb2f96`, `#fa8c16`, `#13c2c2`, `#2f54eb`, `#a0d911`)
+- `deriveScenarioPrice()` maps scenario `benchmarkId` to base series (rack-average → rackAverage, contract-low → contractPrice - 0.04, spot → spotPrice, rack-low → rackAverage - 0.02) and applies `diff.sign`/`diff.amount`
+- Legend entries with eye-icon toggle for per-scenario visibility
+- Y-axis domains updated to include scenario prices in min/max calculations
+- Contract Price label context-aware: "Current Contract" in Entire Deal, "Contract Price" for specific detail
+- `scenarios` prop now destructured from props (was previously ignored)
+
+**Key Decisions:**
+- Used module-level `perDetailData` constant (computed once from `SAMPLE_DETAILS`) rather than re-generating on each render
+- Two-step memo chain: `baseDailyData` (detail selection + entire-deal aggregation) → `displayData` (time aggregation + scenario merge)
+- Scenario color assignment uses array index into `nonPrimaryScenarios`, with alternating dash patterns for odd-indexed scenarios
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `HistoricalComparisonSection.tsx` | Full rewrite of data generation, new imports (`SAMPLE_DETAILS`, `ContractDetail`), view dropdown, scenario lines, legend, domain calculations |
+
+---
+
+### Session 20 (2026-02-19) - Detail Row Exclusion from Measurement Analysis
+
+**Completed:**
+- Implemented remove & restore detail rows from measurement analysis across 3 files
+- `BenchmarksTab.tsx`: Added `excludedDetailIds` state (Set), `includedDetails` derived memo, handler callbacks (`handleExcludeDetails`, `handleRestoreDetails`, `handleRestoreAll`). All `SAMPLE_DETAILS` refs replaced with `includedDetails`. Passes new props to both ScenarioComparisonSection and HistoricalComparisonSection.
+- `ScenarioComparisonSection.tsx`: Added `rowSelection` to antd Table (checkbox column), "Remove N Selected" toolbar button with guard (can't remove all), amber `.exclusionBar` banner with `Popover` for "View & Restore" listing excluded rows. All `SAMPLE_DETAILS` refs replaced with `includedDetails` prop. Popover reads from `SAMPLE_DETAILS` intentionally to show excluded rows.
+- `ScenarioComparisonSection.module.css`: Added `.exclusionBar` style (amber `#fff7e6`/`#ffd591`).
+- `HistoricalComparisonSection.tsx`: Added `includedDetails` optional prop, `includedPerDetailData` memo filtering module-level data, `useEffect` auto-reset view to "Entire Deal" if selected detail excluded, `viewOptions` filtered to included details only.
+
+**Bug Fix:** Summary row text wrapping vertically
+- **Cause:** `rowSelection` inserts checkbox column at index 0; `Table.Summary.Cell` indices were off by 1.
+- **Fix:** Added empty cell at index 0, shifted all other indices +1, updated `scenarioStartIndex` from `2:1` → `3:2`.
+
+**Key Decisions:**
+- Exclusion state lives in `BenchmarksTab` (parent) so both ScenarioComparison and HistoricalComparison stay in sync
+- Excluded rows are stored as a `Set<string>` of detail IDs for O(1) lookup
+- Popover reads from original `SAMPLE_DETAILS` (not `includedDetails`) so excluded rows can be shown for restoration
+- Guard prevents removing all rows — at least one must remain
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `BenchmarksTab.tsx` | Exclusion state, derived memo, handler callbacks, prop passing |
+| `ScenarioComparisonSection.tsx` | Checkbox selection, Remove button, exclusion banner with Popover |
+| `ScenarioComparisonSection.module.css` | `.exclusionBar` amber styling |
+| `HistoricalComparisonSection.tsx` | `includedDetails` prop, filtered data memo, auto-reset view, filtered viewOptions |
+
+**Build status:** Vite build passes. No new TS errors.
+
+---
+
+### Session 21 (2026-02-20) - Rename "Primary" to "Reference" Scenario
+
+**Completed:**
+- Full rename of "Primary Scenario" terminology to "Reference Scenario" across 13 code files (types, orchestrator, UI components, CSS)
+- Both internal variable/prop/type names AND user-facing labels updated
+
+**Terminology Map:**
+| Old | New |
+|-----|-----|
+| `isPrimary` | `isReference` |
+| `primarySelections` | `referenceSelections` |
+| `onSetPrimary` / `onSetColumnPrimary` | `onSetReference` / `onSetColumnReference` |
+| `isPrimaryMode` | `isReferenceMode` |
+| `columnPrimaryScenarioId` | `columnReferenceScenarioId` |
+| `allRowsHaveSamePrimary` | `allRowsHaveSameReference` |
+| `isColumnPrimary` / `hasRowPrimary` | `isColumnReference` / `hasRowReference` |
+| `isPrimaryForRow` | `isReferenceForRow` |
+| `nonPrimaryScenarios` | `nonReferenceScenarios` |
+| `.scenarioCellPrimary` (CSS) | `.scenarioCellReference` |
+| Button: "Set Primary" | "Set Reference" |
+| Banner: "Primary Selection Mode" | "Reference Selection Mode" |
+| Tooltips/Badges: "PRIMARY" | "REFERENCE" |
+| Menu: "Set as Primary" | "Set as Reference" |
+| Summary: "Primary: {name}" | "Reference: {name}" |
+
+**Excluded (intentionally):**
+- `RatabilitySettingsDrawer.tsx` — "Primary Period" is a different concept (measurement cadence)
+- Ant Design `type="primary"` button props — UI theme, not scenario concept
+
+**Files Changed:**
+| File | Changes |
+|------|---------|
+| `types/scenario.types.ts` | `Scenario.isPrimary` → `isReference`, `ScenarioCellData.isPrimary` → `isReference` |
+| `types/benchmark.types.ts` | `Benchmark.isPrimary` → `isReference`, default data |
+| `tabs/BenchmarksTab.tsx` | All state/memo/callback/prop renames, label "Reference:" |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | Props, state, memos, button/banner/tooltip labels |
+| `sections/benchmarks/ScenarioCellRenderer.tsx` | Props, CSS class, star tooltip |
+| `sections/benchmarks/ScenarioComparisonSection.module.css` | `.scenarioCellReference` class |
+| `sections/benchmarks/DetailedComparisonSection.tsx` | Menu, dialog, badge, internal vars |
+| `sections/benchmarks/BenchmarksSidebar.tsx` | Styling condition, badge text |
+| `sections/benchmarks/HistoricalComparisonSection.tsx` | `nonReferenceScenarios`, chart legend badge |
+| `components/AddBenchmarkDrawer.tsx` | `isReference: currentCount === 0` |
+| `components/BenchmarkScenarioDrawer.tsx` | `isReference: false` |
+| `components/FormulaScenarioDrawer.tsx` | `isReference: false` |
+| `components/UploadScenarioDrawer.tsx` | `isReference` field |
+
+**Build status:** Vite build passes. No new TS errors.
+
 ---
 
 ## Next Steps
@@ -2876,3 +3137,80 @@ The Excel Upload feature follows the same design pattern established by Benchmar
 14. **Update type definitions** - Add UnifiedScenario interface (deferred)
 15. **Migrate historical chart** - Move from BenchmarksTab if needed (deferred)
 16. **Connect scenarios to comparison table** - Make data dynamic based on scenario configs (deferred)
+
+---
+
+### Session 24 (2026-02-20) - Blended Reference Scenario Mode
+
+**Problem Statement:**
+When a contract has multiple product-location details, different rows may be best compared against different benchmark scenarios (e.g., gasoline vs OPIS, diesel vs Argus). The existing uniform reference mode only supports one reference for all rows. The `referenceSelections: Record<detailId, scenarioId>` state already supported per-row mapping, but there was no dedicated UX for per-row assignment.
+
+**Completed:**
+
+1. **New Types (`scenario.types.ts`)**
+   - `BlendedReferenceSummary` — weighted avg delta, assigned/total counts, coverage %, group breakdowns
+   - `BlendedGroupBreakdown` — per-group: avg delta, assigned/total counts, reference label (name / "Mixed" / "-- (unassigned)")
+
+2. **New CSS (`ScenarioComparisonSection.module.css`)**
+   - `.unassignedRow` — amber left border + tinted background for rows without a reference
+   - `.unassignedSelect` — amber-bordered Select dropdown
+   - `.blendedInfoBar` — green info bar explaining blended mode
+
+3. **BenchmarksTab State & Summary**
+   - `isBlendedMode` state with `handleToggleBlendedMode` handler
+   - Toggle OFF collapses to most common reference (auto-selects uniform mode)
+   - `blendedSummary` useMemo: volume-weighted avg delta, coverage tracking, per-group breakdowns
+   - Dual-mode summary card: uniform card hidden in blended mode, blended card shows weighted delta + coverage + warning icon + group breakdowns
+   - New props passed down: `isBlendedMode`, `onToggleBlendedMode`
+
+4. **ScenarioComparisonSection UI**
+   - **Props**: Added `isBlendedMode: boolean`, `onToggleBlendedMode: (b: boolean) => void`
+   - **Reference column**: 180px fixed-left, per-row `<Select>` with scenario options, `WarningFilled` suffix icon for unassigned, group headers show single ref name / "Mixed" / "-- (none)", header has coverage count badge
+   - **Blended fixed deltas**: `blendedFixedDeltas` useMemo — per-row delta from each row's own reference, `--` for unassigned
+   - **Fixed delta column**: Condition updated to `(allRowsHaveSameReference && columnReferenceScenarioId) || isBlendedMode`, render branches for blended vs uniform
+   - **Toolbar**: `<Switch>` toggle (Blended/Uniform), "Set Reference" button hidden in blended mode
+   - **Info bar**: Green bar explaining per-row assignment
+   - **HeaderWrapper**: Extra `<td>` for Reference column, blended average in Fixed Delta cell
+   - **Row className**: Unassigned rows get `.unassignedRow` styling (amber highlight)
+   - **Auto-disable**: `useEffect` turns off reference selection mode when entering blended
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `types/scenario.types.ts` | Added `BlendedReferenceSummary`, `BlendedGroupBreakdown` interfaces |
+| `sections/benchmarks/ScenarioComparisonSection.module.css` | Added `.unassignedRow`, `.unassignedSelect`, `.blendedInfoBar` |
+| `tabs/BenchmarksTab.tsx` | `isBlendedMode` state, toggle handler, `blendedSummary` memo, dual-mode summary card, new props |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | Reference column, blended deltas, Switch toggle, info bar, HeaderWrapper update, row styling |
+
+**Key Implementation Details:**
+
+1. **Toggle OFF Behavior:**
+   ```tsx
+   // When switching from blended to uniform, apply most common reference to all rows
+   const counts: Record<string, number> = {}
+   Object.values(referenceSelections).forEach((sid) => {
+     counts[sid] = (counts[sid] || 0) + 1
+   })
+   const mostCommon = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]
+   handleSetColumnReference(mostCommon)
+   ```
+
+2. **Blended Fixed Deltas (per-row):**
+   ```tsx
+   // Each row reads its own reference scenario's price
+   const refCell = row.scenarios[refId]
+   const delta = row.contractPrice - refCell.price
+   // Returns null for unassigned rows → renders as "--"
+   ```
+
+3. **Reference Column in Group Headers:**
+   - Collects all reference IDs for child rows
+   - 0 refs → "-- (none)", 1 ref → scenario name, 2+ refs → "Mixed"
+
+**Build status:** Vite build passes. No new TS errors.
+
+**Not Included (Future):**
+- Group-header bulk assignment (dropdown on group row to assign all children)
+- Persist blended mode to localStorage
+- "Copy reference down" context menu action

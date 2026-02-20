@@ -82,7 +82,7 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
           const pct = params.data.fulfillmentPercentage
           const status = params.data.performanceStatus
           const barColor =
-            status === 'critical' ? '#cf1322' : status === 'behind' ? '#faad14' : status === 'ahead' ? '#51b073' : '#1890ff'
+            status === 'critical' ? '#cf1322' : status === 'behind' ? '#faad14' : status === 'ahead' ? '#52c41a' : '#1890ff'
 
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 0' }}>

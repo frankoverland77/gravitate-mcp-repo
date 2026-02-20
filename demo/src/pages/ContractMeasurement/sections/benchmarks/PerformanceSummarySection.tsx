@@ -27,13 +27,13 @@ export function PerformanceSummarySection() {
                 Total Contract Value vs Benchmark
               </Texto>
             </Horizontal>
-            <Texto category="h3" weight="600" style={{ color: '#51b073' }}>
+            <Texto category="h3" weight="600" style={{ color: '#52c41a' }}>
               +$17,272
             </Texto>
             <Texto category="p2" appearance="medium">
               Additional revenue captured
             </Texto>
-            <Texto category="p2" style={{ color: '#51b073' }}>
+            <Texto category="p2" style={{ color: '#52c41a' }}>
               ↗ 0.0%
             </Texto>
           </Vertical>
@@ -48,13 +48,13 @@ export function PerformanceSummarySection() {
                 Average $/gallon difference
               </Texto>
             </Horizontal>
-            <Texto category="h3" weight="600" style={{ color: '#51b073' }}>
+            <Texto category="h3" weight="600" style={{ color: '#52c41a' }}>
               +$0.0371
             </Texto>
             <Texto category="p2" appearance="medium">
               Historical average over 26 days
             </Texto>
-            <Texto category="p2" style={{ color: '#51b073' }}>
+            <Texto category="p2" style={{ color: '#52c41a' }}>
               ↗ 0.0%
             </Texto>
           </Vertical>

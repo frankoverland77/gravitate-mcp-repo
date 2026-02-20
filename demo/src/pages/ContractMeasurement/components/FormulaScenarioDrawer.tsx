@@ -80,8 +80,8 @@ function StatusCellRenderer(props: { value: string }) {
   if (status === 'confirmed') {
     return (
       <Horizontal alignItems="center" style={{ gap: '6px' }}>
-        <CheckCircleOutlined style={{ color: '#51b073', fontSize: '14px' }} />
-        <Texto category="p2" style={{ color: '#51b073' }}>
+        <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
+        <Texto category="p2" style={{ color: '#52c41a' }}>
           Confirmed
         </Texto>
       </Horizontal>
@@ -317,7 +317,7 @@ export function FormulaScenarioDrawer({
         products: 'all',
         status: 'complete',
         entryMethod: 'formula',
-        isPrimary: false,
+        isReference: false,
         createdAt: now,
         updatedAt: now,
         priceConfig: { formulaId: `formula-${Date.now()}` },

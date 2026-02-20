@@ -1,19 +1,10 @@
-import { useMemo } from 'react';
-import { Texto, Vertical } from '@gravitate-js/excalibrr';
-import type { SelectedBenchmark } from '../../types/scenario.types';
-import {
-  getBenchmarkDisplayName,
-  calculateMatchingInfo,
-  calculateImpactEstimate,
-  getProductMatchDetails,
-} from './benchmark.utils';
-import { MatchingSummaryCard } from './MatchingSummaryCard';
-import { EstimatedImpactCard } from './EstimatedImpactCard';
-import { ProductBreakdownPanel } from './ProductBreakdownPanel';
-import styles from './BenchmarkPreview.module.css';
+import { Texto } from '@gravitate-js/excalibrr'
+import type { SelectedBenchmark } from '../../types/scenario.types'
+import { getBenchmarkDisplayName } from './benchmark.utils'
+import styles from './BenchmarkPreview.module.css'
 
 interface BenchmarkPreviewProps {
-  selectedBenchmark: SelectedBenchmark | undefined;
+  selectedBenchmark: SelectedBenchmark | undefined
 }
 
 function EmptyState() {
@@ -26,46 +17,19 @@ function EmptyState() {
         Choose from quick selections or configure a custom benchmark
       </Texto>
     </div>
-  );
+  )
 }
 
 export function BenchmarkPreview({ selectedBenchmark }: BenchmarkPreviewProps) {
-  const displayName = useMemo(
-    () => getBenchmarkDisplayName(selectedBenchmark),
-    [selectedBenchmark]
-  );
-  const matchingInfo = useMemo(() => calculateMatchingInfo(selectedBenchmark), [selectedBenchmark]);
-  const impactEstimate = useMemo(
-    () => calculateImpactEstimate(selectedBenchmark),
-    [selectedBenchmark]
-  );
-  const productDetails = useMemo(
-    () => getProductMatchDetails(selectedBenchmark),
-    [selectedBenchmark]
-  );
-
   if (!selectedBenchmark) {
-    return <EmptyState />;
+    return <EmptyState />
   }
 
   return (
-    <Vertical style={{ gap: '16px' }}>
-      <div className={styles.selectedBenchmark}>
-        <Texto weight="600" className={styles.selectedBenchmarkText}>
-          {displayName}
-        </Texto>
-      </div>
-
-      <MatchingSummaryCard
-        matchedCount={matchingInfo.matchedCount}
-        rollupCount={matchingInfo.rollupCount}
-        totalProducts={matchingInfo.totalProducts}
-        matchPercentage={matchingInfo.matchPercentage}
-      />
-
-      <EstimatedImpactCard impactEstimate={impactEstimate} />
-
-      <ProductBreakdownPanel productDetails={productDetails} />
-    </Vertical>
-  );
+    <div className={styles.selectedBenchmark}>
+      <Texto weight="600" className={styles.selectedBenchmarkText}>
+        {getBenchmarkDisplayName(selectedBenchmark)}
+      </Texto>
+    </div>
+  )
 }

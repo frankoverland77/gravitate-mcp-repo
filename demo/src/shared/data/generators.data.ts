@@ -335,6 +335,9 @@ export interface GeneratedContractDetail {
   location: string
   volume: number
   percentTotal: number
+  contractPrice: number
+  productGroup: string
+  locationRegion: string
 }
 
 /**
@@ -378,6 +381,9 @@ export function generateContractDetails(count = 10): GeneratedContractDetail[] {
       location: item.terminal.Name,
       volume: item.volume,
       percentTotal: Number(((item.volume / totalVolume) * 100).toFixed(1)),
+      contractPrice: generateSeededPrice(item.product.ProductId, item.terminal.LocationId, item.product.ProductGroup),
+      productGroup: item.product.ProductGroup,
+      locationRegion: item.terminal.Region,
     })
   }
 

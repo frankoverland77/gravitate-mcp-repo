@@ -37,9 +37,20 @@ export interface SelectedBenchmark {
   locationHierarchy?: LocationHierarchy;
 }
 
+export interface ManagedBenchmark {
+  id: string;
+  name: string;
+  publisher: BenchmarkPublisher;
+  benchmarkType: BenchmarkTypeOption;
+  productHierarchy: ProductHierarchy;
+  locationHierarchy: LocationHierarchy;
+  description: string;
+}
+
 export interface BenchmarkMatchingInfo {
   matchedCount: number;
   rollupCount: number;
+  noMatchCount: number;
   totalProducts: number;
   matchPercentage: number;
 }
@@ -58,6 +69,9 @@ export interface ProductMatchDetail {
   matchType: 'direct' | 'rollup' | 'none';
   price: number;
   delta: number;
+  hasMissingPrices?: boolean;
+  availablePriceCount?: number;
+  totalPriceCount?: number;
 }
 
 // Formula component type for the formula builder grid
@@ -99,12 +113,14 @@ export interface Scenario {
   customProductIds?: string[]; // Used when products === 'custom'
   status: ScenarioStatus;
   entryMethod: EntryMethod;
-  isPrimary?: boolean;
+  isReference?: boolean;
   createdAt: string;
   updatedAt: string;
 
   // Price Configuration
   priceConfig?: {
+    source: 'managed' | 'adhoc';
+    managedBenchmarkId?: string;
     benchmarkId?: string;
     formulaId?: string;
     publisher?: BenchmarkPublisher;
@@ -141,9 +157,8 @@ export interface ScenarioFormData {
 // Parameters for historical analysis
 export interface AnalysisParameters {
   price: {
-    lookback: '6mo' | '12mo' | '18mo' | '24mo';
-    aggregation: 'daily' | 'weekly' | 'monthly' | 'quarterly';
-    method: 'weighted' | 'simple' | 'median';
+    lookback: '30d' | '3mo' | '6mo' | '12mo' | 'full';
+    method: 'simple' | 'weekly-median' | 'monthly-median';
   };
   volume: {
     lookback: '6mo' | '12mo' | '18mo' | '24mo';
@@ -156,15 +171,17 @@ export interface AnalysisParameters {
 export interface ScenarioCellData {
   scenarioId: string;
   price: number;
-  delta?: number; // Difference from primary
+  delta?: number; // Difference from reference
   deltaPercent?: number;
   formulaRef: string; // e.g., "OPIS Houston Rack + $0.03"
   allocation: number;
   rateability: number;
   rateabilityStatus: 'on-track' | 'at-risk' | 'below-min';
-  impact?: number; // Financial impact vs primary
-  isPrimary: boolean;
+  impact?: number; // Financial impact vs reference
+  isReference: boolean;
   isLowest?: boolean;
+  isMissingPrice?: boolean;
+  missingPriceInfo?: { available: number; total: number };
 }
 
 // Row data for comparison table
@@ -174,15 +191,65 @@ export interface ComparisonRowData {
   location: string;
   volume: number;
   percentTotal: number;
+  contractPrice: number;
+  productGroup: string;
+  locationRegion: string;
   scenarios: Record<string, ScenarioCellData>;
+}
+
+// Grouping types
+export type GroupingDimension = 'none' | 'product-family' | 'region';
+
+export const GROUPING_OPTIONS: Array<{ value: GroupingDimension; label: string }> = [
+  { value: 'none', label: 'None' },
+  { value: 'product-family', label: 'Product Family' },
+  { value: 'region', label: 'Region' },
+];
+
+export interface GroupHeaderRow {
+  isGroupHeader: true;
+  groupKey: string;
+  groupLabel: string;
+  rowCount: number;
+  totalVolume: number;
+  totalPercentage: number;
+  contractPrice: number;
+  aggregatedScenarios: Record<
+    string,
+    {
+      avgPrice: number;
+      avgDelta: number | undefined;
+      totalVolume: number;
+      totalImpact: number;
+    }
+  >;
+}
+
+export type TableRow = (ComparisonRowData & { isGroupHeader?: false; groupKey?: string }) | GroupHeaderRow;
+
+// Blended reference summary (when rows have different reference scenarios)
+export interface BlendedReferenceSummary {
+  weightedAvgDelta: number
+  assignedCount: number
+  totalCount: number
+  coveragePercent: number
+  groupBreakdowns: BlendedGroupBreakdown[]
+}
+
+export interface BlendedGroupBreakdown {
+  groupKey: string
+  groupLabel: string
+  avgDelta: number
+  assignedCount: number
+  totalCount: number
+  referenceLabel: string // scenario name, "Mixed", or "-- (unassigned)"
 }
 
 // Default parameters
 export const DEFAULT_PARAMETERS: AnalysisParameters = {
   price: {
     lookback: '12mo',
-    aggregation: 'monthly',
-    method: 'weighted',
+    method: 'simple',
   },
   volume: {
     lookback: '12mo',
@@ -249,7 +316,7 @@ export function createNewScenario(name: string): Scenario {
     products: 'all',
     status: 'incomplete',
     entryMethod: 'benchmark',
-    isPrimary: false,
+    isReference: false,
     createdAt: now,
     updatedAt: now,
   };

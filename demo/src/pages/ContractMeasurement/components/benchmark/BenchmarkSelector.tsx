@@ -15,7 +15,6 @@ import {
   PRODUCT_HIERARCHY_OPTIONS,
   LOCATION_HIERARCHY_OPTIONS,
 } from '../../types/scenario.types'
-import { BenchmarkPreview } from './BenchmarkPreview'
 import { BenchmarkSelectionCards } from './QuickSelectionCards'
 import styles from './BenchmarkSelector.module.css'
 
@@ -119,16 +118,16 @@ export function BenchmarkSelector({
     (!isCustom || benchmarkTypeOption)
 
   return (
-    <Horizontal alignItems="flex-start" style={{ gap: '24px' }}>
-      {/* Left Panel - Benchmark Cards */}
+    <div className={styles.container}>
+      {/* Column 1 - Benchmark Cards */}
       <div className={styles.leftPanel}>
         <BenchmarkSelectionCards selectedType={selectedType} onSelect={handleCardSelect} />
       </div>
 
-      {/* Right Panel - Configuration Form + Preview */}
-      <div className={styles.rightPanel}>
-        {selectedType ? (
-          <Vertical style={{ gap: '20px' }}>
+      {selectedType ? (
+        <>
+          {/* Column 2 - Configuration + Summary/Impact */}
+          <div className={styles.centerPanel}>
             {/* Configuration Form */}
             <div className={styles.configForm}>
               <Texto
@@ -250,20 +249,18 @@ export function BenchmarkSelector({
               </Vertical>
             </div>
 
-            {/* Benchmark Preview - Only show after applying */}
-            {selectedBenchmark && <BenchmarkPreview selectedBenchmark={selectedBenchmark} />}
-          </Vertical>
-        ) : (
-          <div className={styles.emptyRightPanel}>
-            <Texto appearance="medium" style={{ textAlign: 'center' }}>
-              Select a benchmark type to configure
-            </Texto>
-            <Texto category="p2" appearance="medium" style={{ textAlign: 'center', marginTop: '8px' }}>
-              Choose from the options on the left to get started
-            </Texto>
           </div>
-        )}
-      </div>
-    </Horizontal>
+        </>
+      ) : (
+        <div className={styles.emptyState}>
+          <Texto appearance="medium" style={{ textAlign: 'center' }}>
+            Select a benchmark type to configure
+          </Texto>
+          <Texto category="p2" appearance="medium" style={{ textAlign: 'center', marginTop: '8px' }}>
+            Choose from the options on the left to get started
+          </Texto>
+        </div>
+      )}
+    </div>
   )
 }

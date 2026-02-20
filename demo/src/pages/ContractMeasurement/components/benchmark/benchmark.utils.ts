@@ -60,6 +60,7 @@ export function calculateMatchingInfo(
     return {
       matchedCount: 0,
       rollupCount: 0,
+      noMatchCount: 0,
       totalProducts: products.length,
       matchPercentage: 0,
     };
@@ -67,38 +68,49 @@ export function calculateMatchingInfo(
 
   const totalProducts = products.length;
   let matchRate: number;
+  let noMatchCount = 0;
 
-  // Quick selections have predefined match rates
+  // Quick selections (managed benchmarks) have predefined match rates and no failures
   if (benchmark.type === 'quick') {
-    matchRate = 0.85; // Quick selections use target-index by default
+    matchRate = 0.85;
+    noMatchCount = 0;
   } else {
-    // Custom benchmark match rate depends on hierarchy
+    // Custom benchmark match rate + no-match count depends on hierarchy
     switch (benchmark.productHierarchy) {
       case 'target-index':
         matchRate = 0.85;
+        noMatchCount = 1;
         break;
       case 'product-grade':
         matchRate = 0.75;
+        noMatchCount = 1;
         break;
       case 'product-family':
         matchRate = 0.6;
+        noMatchCount = 2;
         break;
       case 'any':
         matchRate = 1.0;
+        noMatchCount = 0;
         break;
       default:
         matchRate = 0.85;
+        noMatchCount = 0;
     }
   }
 
-  const matchedCount = Math.floor(totalProducts * matchRate);
-  const rollupCount = totalProducts - matchedCount;
+  // Ensure noMatchCount doesn't exceed total
+  noMatchCount = Math.min(noMatchCount, totalProducts);
+  const matchedCount = Math.floor((totalProducts - noMatchCount) * matchRate);
+  const rollupCount = totalProducts - matchedCount - noMatchCount;
+  const coveragePercentage = Math.round(((matchedCount + rollupCount) / totalProducts) * 100);
 
   return {
     matchedCount,
     rollupCount,
+    noMatchCount,
     totalProducts,
-    matchPercentage: Math.round(matchRate * 100),
+    matchPercentage: coveragePercentage,
   };
 }
 
@@ -192,8 +204,27 @@ export function getProductMatchDetails(
 
   return products.map((product, index) => {
     // Determine match type based on position (simulated)
+    // Last N products are "no match", preceding ones are rollup, first ones are direct
+    const noMatchStart = products.length - matchingInfo.noMatchCount;
+    const isNoMatch = index >= noMatchStart;
     const isDirectMatch = index < matchingInfo.matchedCount;
-    const matchType: 'direct' | 'rollup' | 'none' = isDirectMatch ? 'direct' : 'rollup';
+    const matchType: 'direct' | 'rollup' | 'none' = isNoMatch
+      ? 'none'
+      : isDirectMatch
+        ? 'direct'
+        : 'rollup';
+
+    // No-match products have no price data
+    if (matchType === 'none') {
+      return {
+        productId: product.id,
+        productName: product.name,
+        location: product.location,
+        matchType,
+        price: 0,
+        delta: 0,
+      };
+    }
 
     // Calculate price delta (simulated)
     let priceDelta = 0;
@@ -207,6 +238,10 @@ export function getProductMatchDetails(
       }
     }
 
+    // Simulate missing prices on the first rollup product
+    const isFirstRollup = matchType === 'rollup' && index === matchingInfo.matchedCount;
+    const hasMissingPrices = isFirstRollup && matchingInfo.rollupCount > 0;
+
     return {
       productId: product.id,
       productName: product.name,
@@ -214,6 +249,11 @@ export function getProductMatchDetails(
       matchType,
       price: product.currentPrice + priceDelta,
       delta: Math.round(priceDelta * 100) / 100,
+      ...(hasMissingPrices && {
+        hasMissingPrices: true,
+        availablePriceCount: 18,
+        totalPriceCount: 22,
+      }),
     };
   });
 }

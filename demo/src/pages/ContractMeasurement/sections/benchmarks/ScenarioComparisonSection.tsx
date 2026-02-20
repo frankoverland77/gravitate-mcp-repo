@@ -1,33 +1,107 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Texto, GraviButton, Horizontal, Vertical, NotificationMessage } from '@gravitate-js/excalibrr';
-import { CheckSquareOutlined, BorderOutlined, StarOutlined, StarFilled, PlusOutlined, EditOutlined } from '@ant-design/icons';
-import { Table, Checkbox, Tooltip } from 'antd';
+import {
+  CheckSquareOutlined,
+  BorderOutlined,
+  StarOutlined,
+  StarFilled,
+  PlusOutlined,
+  EditOutlined,
+  HolderOutlined,
+  SwapOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+  DeleteOutlined,
+  RightOutlined,
+  WarningFilled,
+} from '@ant-design/icons';
+import { Table, Checkbox, Tooltip, Select, Popover, Popconfirm, Switch } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import type { Scenario, ComparisonRowData, ScenarioCellData } from '../../types/scenario.types';
+import type { Scenario, ComparisonRowData, ScenarioCellData, GroupingDimension, GroupHeaderRow, TableRow } from '../../types/scenario.types';
+import { GROUPING_OPTIONS } from '../../types/scenario.types';
+import { useFeatureMode } from '../../../../contexts/FeatureModeContext';
 import { ScenarioCellRenderer, getDeltaColorClass } from './ScenarioCellRenderer';
 import { BenchmarkScenarioDrawer } from '../../components/BenchmarkScenarioDrawer';
 import { FormulaScenarioDrawer } from '../../components/FormulaScenarioDrawer';
 import { UploadScenarioDrawer } from '../../components/UploadScenarioDrawer';
-import { SAMPLE_DETAILS } from '../../ContractMeasurement.data';
+import { SAMPLE_DETAILS, type ContractDetail } from '../../ContractMeasurement.data';
 import styles from './ScenarioComparisonSection.module.css';
 
 interface ScenarioComparisonSectionProps {
   scenarios: Scenario[];
-  primarySelections: Record<string, string>;
-  onSetPrimary: (detailId: string, scenarioId: string) => void;
-  onSetColumnPrimary: (scenarioId: string) => void;
+  includedDetails: ContractDetail[];
+  excludedDetailIds: Set<string>;
+  onExcludeDetails: (ids: string[]) => void;
+  onRestoreDetails: (ids: string[]) => void;
+  onRestoreAll: () => void;
+  referenceSelections: Record<string, string>;
+  onSetReference: (detailId: string, scenarioId: string) => void;
+  onSetColumnReference: (scenarioId: string) => void;
   onAddScenario?: (scenario: Scenario) => void;
   onUpdateScenario?: (scenario: Scenario) => void;
+  onReorderScenarios?: (newOrder: string[]) => void;
+  groupingDimension: GroupingDimension;
+  onGroupingChange: (dimension: GroupingDimension) => void;
+  isBlendedMode: boolean;
+  onToggleBlendedMode: (blended: boolean) => void;
 }
 
 function generateScenarioCellData(
   scenarioId: string,
-  isPrimary: boolean,
-  detailIndex: number
+  isReference: boolean,
+  detailIndex: number,
+  scenario?: Scenario
 ): ScenarioCellData {
+  const totalDetails = SAMPLE_DETAILS.length;
+
+  // For benchmark scenarios, simulate no-match on last 2 details and partial data on detail at index totalDetails-3
+  if (scenario?.entryMethod === 'benchmark' && scenario.status === 'complete') {
+    const noMatchThreshold = totalDetails - 2;
+    const partialDataIndex = totalDetails - 3;
+
+    // No match — lookup failure
+    if (detailIndex >= noMatchThreshold) {
+      const allocation = SAMPLE_DETAILS[detailIndex].volume;
+      return {
+        scenarioId,
+        price: 0,
+        formulaRef: 'No instrument found',
+        allocation,
+        rateability: 0,
+        rateabilityStatus: 'below-min',
+        isReference,
+        isMissingPrice: true,
+      };
+    }
+
+    // Partial data — instrument found but incomplete prices
+    if (detailIndex === partialDataIndex) {
+      const basePrice = 2.45 + Math.random() * 0.3 - 0.15;
+      const primaryPrice = 2.45;
+      const delta = isReference ? undefined : basePrice - primaryPrice;
+      const allocation = SAMPLE_DETAILS[detailIndex].volume;
+      const rateability = 85 + Math.random() * 25;
+      return {
+        scenarioId,
+        price: basePrice,
+        delta,
+        deltaPercent: delta ? (delta / primaryPrice) * 100 : undefined,
+        formulaRef: isReference
+          ? 'OPIS Houston Rack + $0.03'
+          : `OPIS Contract ${scenarioId.includes('A') ? 'Low' : 'High'}`,
+        allocation,
+        rateability,
+        rateabilityStatus: rateability >= 90 ? 'on-track' : rateability >= 80 ? 'at-risk' : 'below-min',
+        impact: delta ? Math.round(delta * allocation) : undefined,
+        isReference,
+        missingPriceInfo: { available: 18, total: 22 },
+      };
+    }
+  }
+
   const basePrice = 2.45 + Math.random() * 0.3 - 0.15;
   const primaryPrice = 2.45;
-  const delta = isPrimary ? undefined : basePrice - primaryPrice;
+  const delta = isReference ? undefined : basePrice - primaryPrice;
   const allocation = SAMPLE_DETAILS[detailIndex].volume;
   const rateability = 85 + Math.random() * 25;
 
@@ -36,26 +110,37 @@ function generateScenarioCellData(
     price: basePrice,
     delta,
     deltaPercent: delta ? (delta / primaryPrice) * 100 : undefined,
-    formulaRef: isPrimary
+    formulaRef: isReference
       ? 'OPIS Houston Rack + $0.03'
       : `OPIS Contract ${scenarioId.includes('A') ? 'Low' : 'High'}`,
     allocation,
     rateability,
     rateabilityStatus: rateability >= 90 ? 'on-track' : rateability >= 80 ? 'at-risk' : 'below-min',
     impact: delta ? Math.round(delta * allocation) : undefined,
-    isPrimary,
+    isReference,
   };
 }
 
 export function ScenarioComparisonSection({
   scenarios,
-  primarySelections,
-  onSetPrimary,
-  onSetColumnPrimary,
+  includedDetails,
+  excludedDetailIds,
+  onExcludeDetails,
+  onRestoreDetails,
+  onRestoreAll,
+  referenceSelections,
+  onSetReference,
+  onSetColumnReference,
   onAddScenario,
   onUpdateScenario,
+  onReorderScenarios,
+  groupingDimension,
+  onGroupingChange,
+  isBlendedMode,
+  onToggleBlendedMode,
 }: ScenarioComparisonSectionProps) {
-  const [isPrimaryMode, setIsPrimaryMode] = useState(false);
+  const { isFutureMode } = useFeatureMode();
+  const [isReferenceMode, setIsReferenceMode] = useState(false);
   const [showDraftColumn, setShowDraftColumn] = useState(false);
   const [benchmarkDrawerVisible, setBenchmarkDrawerVisible] = useState(false);
   const [formulaDrawerVisible, setFormulaDrawerVisible] = useState(false);
@@ -64,6 +149,29 @@ export function ScenarioComparisonSection({
   // Edit mode state
   const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
   const [editingDetailId, setEditingDetailId] = useState<string | null>(null); // For single-detail edit
+
+  // Row selection state for exclusion
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+
+  // Filter state
+  const [productFilter, setProductFilter] = useState<string[]>([]);
+  const [locationFilter, setLocationFilter] = useState<string[]>([]);
+
+  // Sort state (always sorts by delta column)
+  const [sortScenarioId, setSortScenarioId] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+
+  // Drag-and-drop state
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  // Reset sort if sorted scenario is removed
+  useEffect(() => {
+    if (sortScenarioId && !scenarios.some((s) => s.id === sortScenarioId)) {
+      setSortScenarioId(null);
+      setSortDirection(null);
+    }
+  }, [scenarios, sortScenarioId]);
 
   // Handle editing a scenario (header click - edit all details)
   const handleEditScenario = useCallback((scenario: Scenario) => {
@@ -167,60 +275,321 @@ export function ScenarioComparisonSection({
     [editingScenario, onAddScenario, onUpdateScenario, handleCloseUploadDrawer]
   );
 
-  const allRowsHaveSamePrimary = useMemo(() => {
-    const selections = Object.values(primarySelections);
-    if (selections.length === 0 || selections.length !== SAMPLE_DETAILS.length) return true;
+  const allRowsHaveSameReference = useMemo(() => {
+    const selections = Object.values(referenceSelections);
+    if (selections.length === 0 || selections.length !== includedDetails.length) return true;
     return selections.every((id) => id === selections[0]);
-  }, [primarySelections]);
+  }, [referenceSelections, includedDetails.length]);
 
-  const isColumnPrimary = useCallback(
+  const columnReferenceScenarioId = useMemo(() => {
+    if (!allRowsHaveSameReference) return null;
+    const selections = Object.values(referenceSelections);
+    if (selections.length === 0) return scenarios.find((s) => s.isReference)?.id || null;
+    return selections[0] || null;
+  }, [allRowsHaveSameReference, referenceSelections, scenarios]);
+
+  const isColumnReference = useCallback(
     (scenarioId: string) => {
-      if (!allRowsHaveSamePrimary) return false;
-      const selections = Object.values(primarySelections);
+      if (!allRowsHaveSameReference) return false;
+      const selections = Object.values(referenceSelections);
       if (selections.length === 0)
-        return scenarios.find((s) => s.id === scenarioId)?.isPrimary || false;
+        return scenarios.find((s) => s.id === scenarioId)?.isReference || false;
       return selections[0] === scenarioId;
     },
-    [allRowsHaveSamePrimary, primarySelections, scenarios]
+    [allRowsHaveSameReference, referenceSelections, scenarios]
   );
 
-  const hasRowPrimary = useCallback(
+  const hasRowReference = useCallback(
     (detailId: string, scenarioId: string) => {
-      if (allRowsHaveSamePrimary) return false;
-      return primarySelections[detailId] === scenarioId;
+      if (allRowsHaveSameReference) return false;
+      return referenceSelections[detailId] === scenarioId;
     },
-    [allRowsHaveSamePrimary, primarySelections]
+    [allRowsHaveSameReference, referenceSelections]
   );
+
+  // Derived filter options from data
+  const uniqueProducts = useMemo(
+    () => [...new Set(includedDetails.map((d) => d.product))].map((p) => ({ value: p, label: p })),
+    [includedDetails]
+  );
+  const uniqueLocations = useMemo(
+    () => [...new Set(includedDetails.map((d) => d.location))].map((l) => ({ value: l, label: l })),
+    [includedDetails]
+  );
+
+  const hasActiveFilters = productFilter.length > 0 || locationFilter.length > 0;
 
   const comparisonData = useMemo(() => {
-    return SAMPLE_DETAILS.map((detail, index) => {
+    return includedDetails.map((detail, index) => {
       const scenarioData: Record<string, ScenarioCellData> = {};
       scenarios.forEach((scenario) => {
-        const isPrimaryForRow =
-          primarySelections[detail.detailId] === scenario.id ||
-          (!primarySelections[detail.detailId] && (scenario.isPrimary ?? false));
-        scenarioData[scenario.id] = generateScenarioCellData(scenario.id, isPrimaryForRow, index);
+        const isReferenceForRow =
+          referenceSelections[detail.detailId] === scenario.id ||
+          (!referenceSelections[detail.detailId] && (scenario.isReference ?? false));
+        scenarioData[scenario.id] = generateScenarioCellData(scenario.id, isReferenceForRow, index, scenario);
       });
       return { ...detail, scenarios: scenarioData } as ComparisonRowData;
     });
-  }, [scenarios, primarySelections]);
+  }, [scenarios, referenceSelections, includedDetails]);
+
+  // Apply filters
+  const filteredData = useMemo(() => {
+    return comparisonData.filter((row) => {
+      if (productFilter.length > 0 && !productFilter.includes(row.product)) return false;
+      if (locationFilter.length > 0 && !locationFilter.includes(row.location)) return false;
+      return true;
+    });
+  }, [comparisonData, productFilter, locationFilter]);
+
+  // Apply sort (by delta of a specific scenario column)
+  const sortedData = useMemo(() => {
+    if (!sortScenarioId || !sortDirection) return filteredData;
+    return [...filteredData].sort((a, b) => {
+      const deltaA = a.scenarios[sortScenarioId]?.delta ?? 0;
+      const deltaB = b.scenarios[sortScenarioId]?.delta ?? 0;
+      const cmp = deltaA - deltaB;
+      if (cmp !== 0) return sortDirection === 'asc' ? cmp : -cmp;
+      // Tie-break on detailId for stability
+      return a.detailId.localeCompare(b.detailId);
+    });
+  }, [filteredData, sortScenarioId, sortDirection]);
+
+  // Grouping expand/collapse state
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
+  // Auto-expand all groups when grouping dimension changes
+  useEffect(() => {
+    if (groupingDimension === 'none') {
+      setExpandedGroups(new Set());
+      return;
+    }
+    // Compute all group keys and expand them
+    const keys = new Set<string>();
+    sortedData.forEach((row) => {
+      const key = groupingDimension === 'product-family' ? row.productGroup : row.locationRegion;
+      keys.add(key);
+    });
+    setExpandedGroups(keys);
+  }, [groupingDimension]); // intentionally only depends on dimension change
+
+  const handleToggleGroup = useCallback((groupKey: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupKey)) next.delete(groupKey);
+      else next.add(groupKey);
+      return next;
+    });
+  }, []);
+
+  // Grouped display data pipeline
+  const displayData = useMemo<TableRow[]>(() => {
+    if (groupingDimension === 'none') return sortedData;
+
+    const groups = new Map<string, ComparisonRowData[]>();
+    const groupOrder: string[] = [];
+
+    for (const row of sortedData) {
+      const key = groupingDimension === 'product-family' ? row.productGroup : row.locationRegion;
+      if (!groups.has(key)) {
+        groups.set(key, []);
+        groupOrder.push(key);
+      }
+      groups.get(key)!.push(row);
+    }
+
+    const result: TableRow[] = [];
+    for (const groupKey of groupOrder) {
+      const rows = groups.get(groupKey)!;
+      const totalVolume = rows.reduce((s, r) => s + r.volume, 0);
+      const totalPercentage = rows.reduce((s, r) => s + r.percentTotal, 0);
+      const weightedContractPrice =
+        totalVolume > 0 ? rows.reduce((s, r) => s + r.contractPrice * r.volume, 0) / totalVolume : 0;
+
+      // Compute volume-weighted aggregates per scenario
+      const aggregatedScenarios: GroupHeaderRow['aggregatedScenarios'] = {};
+      scenarios.forEach((scenario) => {
+        let sumPrice = 0;
+        let sumDelta = 0;
+        let deltaCount = 0;
+        let sumImpact = 0;
+        let scenarioVolume = 0;
+
+        rows.forEach((row) => {
+          const cell = row.scenarios[scenario.id];
+          if (cell) {
+            sumPrice += cell.price * row.volume;
+            scenarioVolume += row.volume;
+            if (cell.delta !== undefined) {
+              sumDelta += cell.delta * row.volume;
+              deltaCount++;
+            }
+            sumImpact += cell.impact || 0;
+          }
+        });
+
+        aggregatedScenarios[scenario.id] = {
+          avgPrice: scenarioVolume > 0 ? sumPrice / scenarioVolume : 0,
+          avgDelta: deltaCount > 0 && scenarioVolume > 0 ? sumDelta / scenarioVolume : undefined,
+          totalVolume: scenarioVolume,
+          totalImpact: sumImpact,
+        };
+      });
+
+      result.push({
+        isGroupHeader: true,
+        groupKey,
+        groupLabel: groupKey.charAt(0).toUpperCase() + groupKey.slice(1),
+        rowCount: rows.length,
+        totalVolume,
+        totalPercentage,
+        contractPrice: weightedContractPrice,
+        aggregatedScenarios,
+      });
+
+      if (expandedGroups.has(groupKey)) {
+        rows.forEach((row) => result.push({ ...row, isGroupHeader: false as const, groupKey }));
+      }
+    }
+    return result;
+  }, [sortedData, groupingDimension, expandedGroups, scenarios]);
 
   const totals = useMemo(() => {
-    const result: Record<string, { volume: number; impact: number }> = {};
+    const result: Record<string, { volume: number; impact: number; avgCpgDelta: number }> = {};
     scenarios.forEach((scenario) => {
       let totalVolume = 0,
-        totalImpact = 0;
-      comparisonData.forEach((row) => {
+        totalImpact = 0,
+        sumCpgDelta = 0,
+        countCpg = 0;
+      filteredData.forEach((row) => {
         const cellData = row.scenarios[scenario.id];
         if (cellData) {
           totalVolume += cellData.allocation;
           totalImpact += cellData.impact || 0;
+          sumCpgDelta += cellData.price - row.contractPrice;
+          countCpg++;
         }
       });
-      result[scenario.id] = { volume: totalVolume, impact: totalImpact };
+      result[scenario.id] = {
+        volume: totalVolume,
+        impact: totalImpact,
+        avgCpgDelta: countCpg > 0 ? sumCpgDelta / countCpg : 0,
+      };
     });
     return result;
-  }, [scenarios, comparisonData]);
+  }, [scenarios, filteredData]);
+
+  // Use Map keyed by detailId so sorting doesn't break delta-to-row association
+  const fixedDeltas = useMemo(() => {
+    if (!columnReferenceScenarioId) return null;
+    const perRow = new Map<string, number>();
+    let sum = 0;
+    filteredData.forEach((row) => {
+      const primaryCell = row.scenarios[columnReferenceScenarioId];
+      const delta = primaryCell ? row.contractPrice - primaryCell.price : 0;
+      perRow.set(row.detailId, delta);
+      sum += delta;
+    });
+    const avg = perRow.size > 0 ? sum / perRow.size : 0;
+    return { perRow, average: avg };
+  }, [filteredData, columnReferenceScenarioId]);
+
+  // Blended fixed deltas — per-row delta using each row's own reference scenario
+  const blendedFixedDeltas = useMemo(() => {
+    if (!isBlendedMode) return null
+    const perRow = new Map<string, number | null>()
+    let sum = 0
+    let assignedCount = 0
+    filteredData.forEach((row) => {
+      const refId = referenceSelections[row.detailId]
+      if (!refId) {
+        perRow.set(row.detailId, null)
+        return
+      }
+      const refCell = row.scenarios[refId]
+      if (!refCell || refCell.isMissingPrice) {
+        perRow.set(row.detailId, null)
+        return
+      }
+      const delta = row.contractPrice - refCell.price
+      perRow.set(row.detailId, delta)
+      sum += delta
+      assignedCount++
+    })
+    const average = assignedCount > 0 ? sum / assignedCount : 0
+    return { perRow, average, assignedCount }
+  }, [isBlendedMode, filteredData, referenceSelections])
+
+  // Sort toggle: unsorted → asc → desc → unsorted
+  const handleToggleSort = useCallback(
+    (scenarioId: string) => {
+      if (sortScenarioId !== scenarioId) {
+        setSortScenarioId(scenarioId);
+        setSortDirection('asc');
+      } else if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortScenarioId(null);
+        setSortDirection(null);
+      }
+    },
+    [sortScenarioId, sortDirection]
+  );
+
+  // Drag handlers for column reordering
+  const handleDragStart = useCallback((e: React.DragEvent, scenarioId: string) => {
+    setDraggingId(scenarioId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', scenarioId);
+  }, []);
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent, scenarioId: string) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (scenarioId !== draggingId) {
+        setDragOverId(scenarioId);
+      }
+    },
+    [draggingId]
+  );
+
+  const handleDragLeave = useCallback(() => {
+    setDragOverId(null);
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent, targetId: string) => {
+      e.preventDefault();
+      const sourceId = e.dataTransfer.getData('text/plain');
+
+      if (sourceId && sourceId !== targetId && onReorderScenarios) {
+        const currentOrder = scenarios.map((s) => s.id);
+        const sourceIndex = currentOrder.indexOf(sourceId);
+        const targetIndex = currentOrder.indexOf(targetId);
+
+        if (sourceIndex !== -1 && targetIndex !== -1) {
+          const newOrder = [...currentOrder];
+          newOrder.splice(sourceIndex, 1);
+          newOrder.splice(targetIndex, 0, sourceId);
+          onReorderScenarios(newOrder);
+        }
+      }
+
+      setDraggingId(null);
+      setDragOverId(null);
+    },
+    [scenarios, onReorderScenarios]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    setDraggingId(null);
+    setDragOverId(null);
+  }, []);
+
+  // Auto-disable reference mode when entering blended
+  useEffect(() => {
+    if (isBlendedMode) setIsReferenceMode(false)
+  }, [isBlendedMode])
 
   const renderScenarioCell = useCallback(
     (record: ComparisonRowData, scenario: Scenario) => {
@@ -260,10 +629,26 @@ export function ScenarioComparisonSection({
 
       const cellData = record.scenarios[scenario.id];
       if (!cellData) return null;
-      const isPrimaryForRow =
-        primarySelections[record.detailId] === scenario.id ||
-        (!primarySelections[record.detailId] && (scenario.isPrimary ?? false));
-      const showRowStar = hasRowPrimary(record.detailId, scenario.id);
+
+      // No match — lookup failure (benchmark scenario, isMissingPrice=true, no missingPriceInfo)
+      if (scenario.entryMethod === 'benchmark' && cellData.isMissingPrice && !cellData.missingPriceInfo) {
+        return (
+          <Tooltip title={`No price instrument found for ${record.product} — ${record.location}. Select one manually.`}>
+            <div className={styles.noMatchCell}>
+              <WarningFilled className={styles.noMatchIcon} />
+              <Texto category="p2" weight="600" appearance="error">No Match</Texto>
+              <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
+                No instrument found
+              </Texto>
+            </div>
+          </Tooltip>
+        );
+      }
+
+      const isReferenceForRow =
+        referenceSelections[record.detailId] === scenario.id ||
+        (!referenceSelections[record.detailId] && (scenario.isReference ?? false));
+      const showRowStar = hasRowReference(record.detailId, scenario.id);
 
       // For formula scenarios, wrap with edit icon
       if (scenario.entryMethod === 'formula') {
@@ -271,10 +656,10 @@ export function ScenarioComparisonSection({
           <div className={styles.cellWithEdit}>
             <ScenarioCellRenderer
               cellData={cellData}
-              isPrimaryForRow={isPrimaryForRow}
+              isReferenceForRow={isReferenceForRow}
               showRowStar={showRowStar}
-              isPrimaryMode={isPrimaryMode}
-              onSetPrimary={() => onSetPrimary(record.detailId, scenario.id)}
+              isReferenceMode={isReferenceMode}
+              onSetReference={() => onSetReference(record.detailId, scenario.id)}
             />
             <Tooltip title="Edit detail">
               <EditOutlined
@@ -292,18 +677,21 @@ export function ScenarioComparisonSection({
       return (
         <ScenarioCellRenderer
           cellData={cellData}
-          isPrimaryForRow={isPrimaryForRow}
+          isReferenceForRow={isReferenceForRow}
           showRowStar={showRowStar}
-          isPrimaryMode={isPrimaryMode}
-          onSetPrimary={() => onSetPrimary(record.detailId, scenario.id)}
+          isReferenceMode={isReferenceMode}
+          onSetReference={() => onSetReference(record.detailId, scenario.id)}
         />
       );
     },
-    [primarySelections, hasRowPrimary, isPrimaryMode, onSetPrimary, handleEditDetail]
+    [referenceSelections, hasRowReference, isReferenceMode, onSetReference, handleEditDetail]
   );
 
-  const columns: ColumnsType<ComparisonRowData> = useMemo(() => {
-    const baseColumns: ColumnsType<ComparisonRowData> = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: ColumnsType<any> = useMemo(() => {
+    const isGrouped = groupingDimension !== 'none';
+
+    const baseColumns: ColumnsType<TableRow> = [
       {
         title: 'DETAIL',
         dataIndex: 'product',
@@ -311,75 +699,196 @@ export function ScenarioComparisonSection({
         width: 180,
         maxWidth: 250,
         fixed: 'left',
-        render: (_: unknown, record: ComparisonRowData) => (
-          <Vertical style={{ gap: '2px' }}>
-            <Texto weight="600">{record.product}</Texto>
-            <Texto category="p2" appearance="medium">
-              {record.location}
-            </Texto>
-          </Vertical>
-        ),
+        render: (_: unknown, record: TableRow) => {
+          if (record.isGroupHeader) {
+            const isExpanded = expandedGroups.has(record.groupKey);
+            return (
+              <div
+                className={styles.groupHeaderCell}
+                onClick={() => handleToggleGroup(record.groupKey)}
+              >
+                <RightOutlined
+                  style={{
+                    fontSize: 12,
+                    transition: 'transform 0.2s',
+                    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                  }}
+                />
+                <Texto weight="600">{record.groupLabel}</Texto>
+                <Texto category="p2" appearance="medium">
+                  ({record.rowCount} details)
+                </Texto>
+              </div>
+            );
+          }
+          return (
+            <Vertical style={{ gap: '2px' }} justifyContent="flex-start">
+              <Texto weight="600">{record.product}</Texto>
+              <Texto category="p2" appearance="medium">
+                {record.location}
+              </Texto>
+            </Vertical>
+          );
+        },
       },
-      {
-        title: 'VOLUME',
-        dataIndex: 'volume',
-        key: 'volume',
-        width: 100,
-        maxWidth: 250,
-        render: (_: unknown, record: ComparisonRowData) => (
-          <Vertical style={{ gap: '2px' }}>
-            <Texto>{(record.volume / 1000).toFixed(0)}K gal</Texto>
-            <Texto category="p2" appearance="medium">
-              {record.percentTotal.toFixed(1)}%
-            </Texto>
-          </Vertical>
-        ),
-      },
+      ...(isFutureMode
+        ? [
+            {
+              title: 'VOLUME',
+              dataIndex: 'volume',
+              key: 'volume',
+              width: 100,
+              maxWidth: 250,
+              render: (_: unknown, record: TableRow) => {
+                if (record.isGroupHeader) {
+                  return (
+                    <Vertical style={{ gap: '2px' }}>
+                      <Texto weight="600">{(record.totalVolume / 1000).toFixed(0)}K gal</Texto>
+                      <Texto category="p2" appearance="medium">
+                        {record.totalPercentage.toFixed(1)}%
+                      </Texto>
+                    </Vertical>
+                  );
+                }
+                return (
+                  <Vertical style={{ gap: '2px' }}>
+                    <Texto>{(record.volume / 1000).toFixed(0)}K gal</Texto>
+                    <Texto category="p2" appearance="medium">
+                      {record.percentTotal.toFixed(1)}%
+                    </Texto>
+                  </Vertical>
+                );
+              },
+            },
+          ]
+        : []),
     ];
 
-    const scenarioColumns: ColumnsType<ComparisonRowData> = scenarios.map((scenario) => ({
-      title: (
-        <div className={styles.columnHeader}>
-          <Horizontal alignItems="center" style={{ gap: '8px' }}>
-            {isPrimaryMode && (
-              <Checkbox
-                checked={
-                  Object.values(primarySelections).every((id) => id === scenario.id) &&
-                  Object.keys(primarySelections).length === SAMPLE_DETAILS.length
-                }
-                indeterminate={
-                  Object.values(primarySelections).some((id) => id === scenario.id) &&
-                  !Object.values(primarySelections).every((id) => id === scenario.id)
-                }
-                onChange={() => onSetColumnPrimary(scenario.id)}
-              />
-            )}
-            <span>{scenario.name}</span>
-            {isColumnPrimary(scenario.id) && (
-              <Tooltip title="Primary">
-                <StarFilled className={styles.starIconHeader} />
+    const scenarioColumns: ColumnsType<TableRow> = scenarios.map((scenario) => {
+      const isSorted = sortScenarioId === scenario.id;
+      const isDragging = draggingId === scenario.id;
+      const isDragOver = dragOverId === scenario.id;
+      const canDrag = !!onReorderScenarios && !isReferenceMode;
+
+      const headerClassNames = [
+        styles.columnHeader,
+        isDragging ? styles.scenarioHeaderDragging : '',
+        isDragOver ? styles.scenarioHeaderDragOver : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+
+      return {
+        title: (
+          <div
+            className={headerClassNames}
+            draggable={canDrag}
+            onDragStart={canDrag ? (e) => handleDragStart(e, scenario.id) : undefined}
+            onDragOver={canDrag ? (e) => handleDragOver(e, scenario.id) : undefined}
+            onDragLeave={canDrag ? handleDragLeave : undefined}
+            onDrop={canDrag ? (e) => handleDrop(e, scenario.id) : undefined}
+            onDragEnd={canDrag ? handleDragEnd : undefined}
+          >
+            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              {canDrag && (
+                <Tooltip title="Drag to reorder">
+                  <HolderOutlined className={styles.dragHandle} />
+                </Tooltip>
+              )}
+              {isReferenceMode && (
+                <Checkbox
+                  checked={
+                    Object.values(referenceSelections).every((id) => id === scenario.id) &&
+                    Object.keys(referenceSelections).length === includedDetails.length
+                  }
+                  indeterminate={
+                    Object.values(referenceSelections).some((id) => id === scenario.id) &&
+                    !Object.values(referenceSelections).every((id) => id === scenario.id)
+                  }
+                  onChange={() => onSetColumnReference(scenario.id)}
+                />
+              )}
+              <span>{scenario.name}</span>
+              {scenario.priceConfig?.source === 'adhoc' && (
+                <Tooltip title="Ad-hoc benchmark — local to this contract measurement">
+                  <span className={styles.adhocIndicator}>
+                    <span className={styles.adhocDot} />
+                    Local
+                  </span>
+                </Tooltip>
+              )}
+              {isColumnReference(scenario.id) && (
+                <Tooltip title="Reference">
+                  <StarFilled className={styles.starIconHeader} />
+                </Tooltip>
+              )}
+            </Horizontal>
+            <Horizontal alignItems="center" style={{ gap: '4px' }}>
+              <Tooltip title={isSorted ? (sortDirection === 'asc' ? 'Sort descending' : 'Clear sort') : 'Sort by delta'}>
+                {isSorted && sortDirection === 'asc' ? (
+                  <SortAscendingOutlined
+                    className={`${styles.headerSortIcon} ${styles.headerSortActive}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSort(scenario.id);
+                    }}
+                  />
+                ) : isSorted && sortDirection === 'desc' ? (
+                  <SortDescendingOutlined
+                    className={`${styles.headerSortIcon} ${styles.headerSortActive}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSort(scenario.id);
+                    }}
+                  />
+                ) : (
+                  <SwapOutlined
+                    className={styles.headerSortIcon}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSort(scenario.id);
+                    }}
+                  />
+                )}
               </Tooltip>
-            )}
-          </Horizontal>
-          <Tooltip title="Edit scenario">
-            <EditOutlined
-              className={styles.headerEditIcon}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEditScenario(scenario);
-              }}
-            />
-          </Tooltip>
-        </div>
-      ),
-      dataIndex: scenario.id,
-      key: scenario.id,
-      minWidth: 250,
-      render: (_: unknown, record: ComparisonRowData) => renderScenarioCell(record, scenario),
-    }));
+              <Tooltip title="Edit scenario">
+                <EditOutlined
+                  className={styles.headerEditIcon}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditScenario(scenario);
+                  }}
+                />
+              </Tooltip>
+            </Horizontal>
+          </div>
+        ),
+        dataIndex: scenario.id,
+        key: scenario.id,
+        minWidth: 250,
+        render: (_: unknown, record: TableRow) => {
+          if (record.isGroupHeader) {
+            const agg = record.aggregatedScenarios[scenario.id];
+            if (!agg) return null;
+            return (
+              <div className={styles.groupAggCell}>
+                <Texto weight="600">${agg.avgPrice.toFixed(4)}/gal</Texto>
+                {agg.avgDelta !== undefined && (
+                  <Texto category="p2" className={getDeltaColorClass(agg.avgDelta)}>
+                    {agg.avgDelta >= 0 ? '+' : ''}
+                    {agg.avgDelta.toFixed(4)}
+                  </Texto>
+                )}
+              </div>
+            );
+          }
+          return renderScenarioCell(record as ComparisonRowData, scenario);
+        },
+      };
+    });
 
     // Add draft column if showDraftColumn is true
-    const draftColumn: ColumnsType<ComparisonRowData> = showDraftColumn
+    const draftColumn: ColumnsType<TableRow> = showDraftColumn
       ? [
           {
             title: 'NEW SCENARIO',
@@ -387,10 +896,10 @@ export function ScenarioComparisonSection({
             key: 'draft',
             minWidth: 250,
             onCell: (_, index) => ({
-              rowSpan: index === 0 ? SAMPLE_DETAILS.length : 0,
+              rowSpan: index === 0 ? displayData.filter((r) => !r.isGroupHeader).length || includedDetails.length : 0,
             }),
-            render: (_: unknown, __: ComparisonRowData, index: number) => {
-              if (index !== 0) return null;
+            render: (_: unknown, record: TableRow, index: number) => {
+              if (record.isGroupHeader || index !== 0) return null;
               return (
                 <Vertical
                   alignItems="center"
@@ -418,13 +927,20 @@ export function ScenarioComparisonSection({
                       onClick={() => handleSelectScenarioType('formula')}
                       style={{ width: '100%' }}
                     />
-                    <GraviButton
-                      buttonText="Upload"
-                      appearance="outlined"
-                      onClick={() => handleSelectScenarioType('upload')}
-                      style={{ width: '100%' }}
-                    />
+                    {isFutureMode && (
+                      <GraviButton
+                        buttonText="Upload"
+                        appearance="outlined"
+                        onClick={() => handleSelectScenarioType('upload')}
+                        style={{ width: '100%' }}
+                      />
+                    )}
                   </Vertical>
+                  <GraviButton
+                    buttonText="Cancel"
+                    appearance="text"
+                    onClick={() => setShowDraftColumn(false)}
+                  />
                 </Vertical>
               );
             },
@@ -432,46 +948,309 @@ export function ScenarioComparisonSection({
         ]
       : [];
 
-    return [...baseColumns, ...scenarioColumns, ...draftColumn];
+    // Reference column — only visible in blended mode
+    const referenceColumn: ColumnsType<TableRow> = isBlendedMode
+      ? [
+          {
+            title: (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Texto category="p2" weight="600">REFERENCE</Texto>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    backgroundColor: blendedFixedDeltas && blendedFixedDeltas.assignedCount === filteredData.length ? '#f6ffed' : '#fffbe6',
+                    border: `1px solid ${blendedFixedDeltas && blendedFixedDeltas.assignedCount === filteredData.length ? '#b7eb8f' : '#ffd591'}`,
+                    borderRadius: '10px',
+                    padding: '0 8px',
+                    lineHeight: '20px',
+                  }}
+                >
+                  {blendedFixedDeltas?.assignedCount ?? 0}/{filteredData.length}
+                </span>
+              </div>
+            ),
+            key: 'referenceSelect',
+            width: 180,
+            fixed: 'left' as const,
+            render: (_: unknown, record: TableRow) => {
+              if (record.isGroupHeader) {
+                // Show group reference summary
+                const groupRows = sortedData.filter((r) => {
+                  const key = groupingDimension === 'product-family' ? r.productGroup : r.locationRegion
+                  return key === record.groupKey
+                })
+                const refIds = new Set(groupRows.map((r) => referenceSelections[r.detailId]).filter(Boolean))
+                if (refIds.size === 0) return <Texto category="p2" appearance="medium">-- (none)</Texto>
+                if (refIds.size === 1) {
+                  const refName = scenarios.find((s) => s.id === [...refIds][0])?.name
+                  return <Texto category="p2" weight="600">{refName}</Texto>
+                }
+                return <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>Mixed</Texto>
+              }
+              const currentRef = referenceSelections[record.detailId]
+              const isUnassigned = !currentRef
+              return (
+                <Select
+                  size="small"
+                  value={currentRef || undefined}
+                  placeholder="Select..."
+                  onChange={(value: string) => onSetReference(record.detailId, value)}
+                  options={scenarios.filter((s) => s.status === 'complete').map((s) => ({
+                    value: s.id,
+                    label: s.name,
+                  }))}
+                  style={{ width: '100%' }}
+                  className={isUnassigned ? styles.unassignedSelect : undefined}
+                  suffixIcon={isUnassigned ? <WarningFilled style={{ color: '#faad14' }} /> : undefined}
+                />
+              )
+            },
+          },
+        ]
+      : []
+
+    const fixedDeltaColumn: ColumnsType<TableRow> =
+      (allRowsHaveSameReference && columnReferenceScenarioId) || isBlendedMode
+        ? [
+            {
+              title: (
+                <Vertical style={{ gap: '2px' }}>
+                  <Texto category="p2" weight="600">
+                    FIXED DELTA
+                  </Texto>
+                  <Texto category="p2" appearance="medium">
+                    vs Contract
+                  </Texto>
+                </Vertical>
+              ),
+              key: 'fixedDelta',
+              width: 130,
+              render: (_: unknown, record: TableRow) => {
+                if (record.isGroupHeader) {
+                  if (isBlendedMode && blendedFixedDeltas) {
+                    // Blended group average
+                    const groupRows = sortedData.filter((r) => {
+                      const key = groupingDimension === 'product-family' ? r.productGroup : r.locationRegion
+                      return key === record.groupKey
+                    })
+                    let sum = 0
+                    let count = 0
+                    groupRows.forEach((r) => {
+                      const d = blendedFixedDeltas.perRow.get(r.detailId)
+                      if (d !== null && d !== undefined) {
+                        sum += d
+                        count++
+                      }
+                    })
+                    if (count === 0) return <Texto weight="600" appearance="medium">--</Texto>
+                    const avg = sum / count
+                    return (
+                      <Texto weight="600" className={getDeltaColorClass(avg)}>
+                        {avg >= 0 ? '+$' : '-$'}
+                        {Math.abs(avg).toFixed(4)}/gal
+                      </Texto>
+                    )
+                  }
+                  // Uniform mode group average
+                  if (!fixedDeltas) return null;
+                  const groupRows = sortedData.filter((r) => {
+                    const key = groupingDimension === 'product-family' ? r.productGroup : r.locationRegion;
+                    return key === record.groupKey;
+                  });
+                  if (groupRows.length === 0) return null;
+                  let sum = 0;
+                  let count = 0;
+                  groupRows.forEach((r) => {
+                    const d = fixedDeltas.perRow.get(r.detailId);
+                    if (d !== undefined) {
+                      sum += d;
+                      count++;
+                    }
+                  });
+                  const avg = count > 0 ? sum / count : 0;
+                  return (
+                    <Texto weight="600" className={getDeltaColorClass(avg)}>
+                      {avg >= 0 ? '+$' : '-$'}
+                      {Math.abs(avg).toFixed(4)}/gal
+                    </Texto>
+                  );
+                }
+                // Blended per-row delta
+                if (isBlendedMode && blendedFixedDeltas) {
+                  const delta = blendedFixedDeltas.perRow.get(record.detailId)
+                  if (delta === null || delta === undefined) {
+                    return <Texto weight="600" appearance="medium">--</Texto>
+                  }
+                  return (
+                    <Texto weight="600" className={getDeltaColorClass(delta)}>
+                      {delta >= 0 ? '+$' : '-$'}
+                      {Math.abs(delta).toFixed(4)}/gal
+                    </Texto>
+                  )
+                }
+                // Uniform per-row delta
+                if (!fixedDeltas) return null;
+                const delta = fixedDeltas.perRow.get(record.detailId) ?? 0;
+                return (
+                  <Texto weight="600" className={getDeltaColorClass(delta)}>
+                    {delta >= 0 ? '+$' : '-$'}
+                    {Math.abs(delta).toFixed(4)}/gal
+                  </Texto>
+                );
+              },
+            },
+          ]
+        : [];
+
+    const actionColumn: ColumnsType<TableRow> = [
+      {
+        title: '',
+        key: 'rowActions',
+        width: 52,
+        fixed: 'right',
+        render: (_: unknown, record: TableRow) => {
+          if (record.isGroupHeader) return null
+          return (
+            <Popconfirm
+              title='Remove Product'
+              description='Are you sure you want to remove this product?'
+              onConfirm={() => {
+                if (includedDetails.length <= 1) {
+                  NotificationMessage('Cannot Remove All', 'At least one detail must remain in the analysis', true)
+                  return
+                }
+                onExcludeDetails([record.detailId])
+                NotificationMessage('Detail Excluded', '1 detail removed from analysis', false)
+              }}
+              okText='Remove'
+              cancelText='Cancel'
+              okButtonProps={{ danger: true }}
+            >
+              <GraviButton
+                icon={<DeleteOutlined />}
+                appearance='outlined'
+                size='small'
+                style={{ minWidth: 'auto', padding: '4px 8px' }}
+              />
+            </Popconfirm>
+          )
+        },
+      },
+    ];
+
+    return [...baseColumns, ...referenceColumn, ...scenarioColumns, ...fixedDeltaColumn, ...draftColumn, ...actionColumn];
   }, [
     scenarios,
-    primarySelections,
-    isPrimaryMode,
-    isColumnPrimary,
-    onSetColumnPrimary,
+    referenceSelections,
+    isReferenceMode,
+    isColumnReference,
+    onSetColumnReference,
+    onSetReference,
     renderScenarioCell,
     showDraftColumn,
     handleSelectScenarioType,
     handleEditScenario,
+    isFutureMode,
+    allRowsHaveSameReference,
+    columnReferenceScenarioId,
+    fixedDeltas,
+    blendedFixedDeltas,
+    isBlendedMode,
+    sortScenarioId,
+    sortDirection,
+    draggingId,
+    dragOverId,
+    onReorderScenarios,
+    handleDragStart,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleDragEnd,
+    handleToggleSort,
+    groupingDimension,
+    expandedGroups,
+    handleToggleGroup,
+    displayData,
+    sortedData,
+    filteredData,
+    includedDetails,
+    onExcludeDetails,
   ]);
 
-  const summaryRow = () => (
-    <Table.Summary fixed>
-      <Table.Summary.Row className={styles.summaryRow}>
-        <Table.Summary.Cell index={0}>
-          <Texto weight="600">TOTAL</Texto>
-        </Table.Summary.Cell>
-        <Table.Summary.Cell index={1}>
-          <Texto weight="600">
-            {(SAMPLE_DETAILS.reduce((sum, d) => sum + d.volume, 0) / 1000).toFixed(0)}K gal
-          </Texto>
-        </Table.Summary.Cell>
-        {scenarios.map((scenario, index) => (
-          <Table.Summary.Cell key={scenario.id} index={index + 2}>
-            <Vertical style={{ gap: '4px' }}>
-              <Texto weight="600">{(totals[scenario.id]?.volume / 1000).toFixed(0)}K gal</Texto>
-              {totals[scenario.id]?.impact !== 0 && (
-                <Texto weight="600" className={getDeltaColorClass(totals[scenario.id]?.impact)}>
-                  {totals[scenario.id]?.impact >= 0 ? '+' : ''}$
-                  {(totals[scenario.id]?.impact / 1000).toFixed(1)}K
+  const hasFixedDelta = (allRowsHaveSameReference && !!columnReferenceScenarioId) || isBlendedMode;
+
+  // Custom header wrapper that appends a CPG delta summary row inside <thead>
+  const HeaderWrapper = useCallback(
+    (props: React.HTMLAttributes<HTMLTableSectionElement>) => {
+      if (sortedData.length === 0) return <thead {...props} />
+
+      return (
+        <thead {...props}>
+          {props.children}
+          <tr className={styles.summaryHeaderRow}>
+            {/* Checkbox column (from rowSelection) */}
+            <td className={styles.summaryHeaderCell} />
+            {/* DETAIL column */}
+            <td className={styles.summaryHeaderCell}>
+              <div className={styles.summaryHeaderLabel}>
+                <Texto weight="600">AVG CPG DELTA</Texto>
+                <Texto category="p2" appearance="medium">vs Contract Price</Texto>
+              </div>
+            </td>
+            {/* VOLUME column (conditional) */}
+            {isFutureMode && (
+              <td className={styles.summaryHeaderCell}>
+                <Texto weight="600">
+                  {(filteredData.reduce((sum, d) => sum + d.volume, 0) / 1000).toFixed(0)}K gal
                 </Texto>
-              )}
-            </Vertical>
-          </Table.Summary.Cell>
-        ))}
-      </Table.Summary.Row>
-    </Table.Summary>
-  );
+              </td>
+            )}
+            {/* Reference column (blended mode) */}
+            {isBlendedMode && (
+              <td className={styles.summaryHeaderCell}>
+                <Texto category="p2" appearance="medium">
+                  {blendedFixedDeltas?.assignedCount ?? 0}/{filteredData.length} assigned
+                </Texto>
+              </td>
+            )}
+            {/* One cell per scenario */}
+            {scenarios.map((scenario) => (
+              <td key={scenario.id} className={styles.summaryHeaderCell}>
+                {isFutureMode && (
+                  <Texto weight="600">{(totals[scenario.id]?.volume / 1000).toFixed(0)}K gal</Texto>
+                )}
+                <Texto weight="600" className={getDeltaColorClass(totals[scenario.id]?.avgCpgDelta)}>
+                  {totals[scenario.id]?.avgCpgDelta >= 0 ? '+$' : '-$'}
+                  {Math.abs(totals[scenario.id]?.avgCpgDelta).toFixed(4)}/gal
+                </Texto>
+              </td>
+            ))}
+            {/* Fixed delta column (conditional) */}
+            {hasFixedDelta && (isBlendedMode ? blendedFixedDeltas : fixedDeltas) && (
+              <td className={styles.summaryHeaderCell}>
+                {(() => {
+                  const avg = isBlendedMode ? blendedFixedDeltas?.average ?? 0 : fixedDeltas?.average ?? 0
+                  const hasAssigned = isBlendedMode ? (blendedFixedDeltas?.assignedCount ?? 0) > 0 : true
+                  if (!hasAssigned) return <Texto weight="600" appearance="medium">--</Texto>
+                  return (
+                    <Texto weight="600" className={getDeltaColorClass(avg)}>
+                      {avg >= 0 ? '+$' : '-$'}
+                      {Math.abs(avg).toFixed(4)}/gal
+                    </Texto>
+                  )
+                })()}
+              </td>
+            )}
+            {/* Draft column (conditional, empty) */}
+            {showDraftColumn && <td className={styles.summaryHeaderCell} />}
+            {/* Action column (empty) */}
+            <td className={styles.summaryHeaderCell} />
+          </tr>
+        </thead>
+      )
+    },
+    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, blendedFixedDeltas, isBlendedMode, showDraftColumn]
+  )
 
   if (scenarios.length === 0) {
     return (
@@ -483,7 +1262,7 @@ export function ScenarioComparisonSection({
           <GraviButton
             buttonText="Add Scenario"
             icon={<PlusOutlined />}
-            success
+            theme1
             onClick={handleAddScenarioClick}
           />
         </Vertical>
@@ -492,8 +1271,8 @@ export function ScenarioComparisonSection({
   }
 
   return (
-    <Vertical style={{ gap: '16px' }}>
-      <Horizontal justifyContent="space-between" alignItems="center">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <Texto category="h4" weight="600">
             Scenario Comparison
@@ -502,44 +1281,208 @@ export function ScenarioComparisonSection({
             Compare pricing scenarios across all product details
           </Texto>
         </div>
-        <Horizontal style={{ gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+          <Texto category="p2" appearance="medium" weight="600">
+            Group by
+          </Texto>
+          <Select
+            value={groupingDimension}
+            onChange={onGroupingChange}
+            options={GROUPING_OPTIONS}
+            style={{ minWidth: 150 }}
+          />
+          <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
+          <Texto category="p2" appearance="medium" weight="600">
+            Filter by
+          </Texto>
+          <Select
+            mode="multiple"
+            placeholder="All Products"
+            value={productFilter}
+            onChange={setProductFilter}
+            options={uniqueProducts}
+            style={{ minWidth: 200 }}
+            maxTagCount={2}
+            allowClear
+          />
+          <Select
+            mode="multiple"
+            placeholder="All Locations"
+            value={locationFilter}
+            onChange={setLocationFilter}
+            options={uniqueLocations}
+            style={{ minWidth: 200 }}
+            maxTagCount={2}
+            allowClear
+          />
+          {hasActiveFilters && (
+            <GraviButton
+              buttonText="Clear"
+              appearance="text"
+              onClick={() => {
+                setProductFilter([]);
+                setLocationFilter([]);
+              }}
+            />
+          )}
+          {hasActiveFilters && (
+            <Texto category="p2" appearance="medium">
+              Showing {filteredData.length} of {comparisonData.length} details
+            </Texto>
+          )}
+          <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
           {!showDraftColumn && (
             <GraviButton
               buttonText="Add Scenario"
               icon={<PlusOutlined />}
-              success
+              theme1
               onClick={handleAddScenarioClick}
             />
           )}
-          <GraviButton
-            buttonText={isPrimaryMode ? 'Done' : 'Set Primary'}
-            icon={isPrimaryMode ? <CheckSquareOutlined /> : <BorderOutlined />}
-            appearance={isPrimaryMode ? 'success' : 'outlined'}
-            onClick={() => setIsPrimaryMode(!isPrimaryMode)}
+          {!isBlendedMode && (
+            <GraviButton
+              buttonText={isReferenceMode ? 'Done' : 'Set Reference'}
+              icon={isReferenceMode ? <CheckSquareOutlined /> : <BorderOutlined />}
+              theme1
+              appearance={isReferenceMode ? 'filled' : 'outlined'}
+              onClick={() => setIsReferenceMode(!isReferenceMode)}
+            />
+          )}
+          <Switch
+            checked={isBlendedMode}
+            onChange={onToggleBlendedMode}
+            checkedChildren="Blended"
+            unCheckedChildren="Uniform"
           />
           <GraviButton buttonText="Export Results" appearance="outlined" />
-        </Horizontal>
-      </Horizontal>
+          {selectedRowKeys.length > 0 && (
+            <>
+              <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
+              <GraviButton
+                buttonText={`Remove ${selectedRowKeys.length} Selected`}
+                icon={<DeleteOutlined />}
+                appearance="outlined"
+                style={{ color: '#ff4d4f', borderColor: '#ff4d4f' }}
+                onClick={() => {
+                  if (selectedRowKeys.length >= includedDetails.length) {
+                    NotificationMessage('Cannot Remove All', 'At least one detail must remain in the analysis', true);
+                    return;
+                  }
+                  onExcludeDetails(selectedRowKeys);
+                  setSelectedRowKeys([]);
+                  NotificationMessage(
+                    'Details Excluded',
+                    `${selectedRowKeys.length} detail(s) removed from analysis`,
+                    false,
+                  );
+                }}
+              />
+            </>
+          )}
+        </div>
+      </div>
 
-      {isPrimaryMode && (
+      {isReferenceMode && (
         <div className={styles.infoBar}>
           <Texto category="p2">
-            <strong>Primary Selection Mode:</strong> Click cells or column headers to set which
-            scenario is the primary reference for each row.
+            <strong>Reference Selection Mode:</strong> Click cells or column headers to set which
+            scenario is the reference for each row.
           </Texto>
         </div>
       )}
 
+      {isBlendedMode && (
+        <div className={styles.blendedInfoBar}>
+          <Texto category="p2">
+            <strong>Blended Reference Mode:</strong> Assign a different reference scenario per row using the Reference column dropdowns. Unassigned rows are highlighted in amber.
+          </Texto>
+        </div>
+      )}
+
+      {excludedDetailIds.size > 0 && (
+        <div className={styles.exclusionBar}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Texto category="p2">
+              <strong>{excludedDetailIds.size} detail(s) excluded</strong> from analysis
+            </Texto>
+            <Popover
+              trigger="click"
+              placement="bottomRight"
+              content={
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 280 }}>
+                  {SAMPLE_DETAILS.filter((d) => excludedDetailIds.has(d.detailId)).map((d) => (
+                    <div
+                      key={d.detailId}
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <Texto weight="600">{d.product}</Texto>
+                        <Texto category="p2" appearance="medium">
+                          {d.location}
+                        </Texto>
+                      </div>
+                      <GraviButton buttonText="Restore" appearance="text" onClick={() => onRestoreDetails([d.detailId])} />
+                    </div>
+                  ))}
+                  <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: '8px', marginTop: '4px' }}>
+                    <GraviButton buttonText="Restore All" appearance="text" onClick={onRestoreAll} />
+                  </div>
+                </div>
+              }
+            >
+              <GraviButton buttonText="View & Restore" appearance="text" />
+            </Popover>
+          </div>
+        </div>
+      )}
+
       <div className={styles.tableContainer}>
-        <Table
-          columns={columns}
-          dataSource={comparisonData}
-          rowKey="detailId"
-          pagination={false}
-          scroll={{ x: 'max-content', y: 800 }}
-          summary={allRowsHaveSamePrimary ? summaryRow : undefined}
-          size="small"
-        />
+        {hasActiveFilters && filteredData.length === 0 ? (
+          <div className={styles.emptyFilterResult}>
+            <Texto category="p1" appearance="medium">
+              No details match the current filters
+            </Texto>
+            <GraviButton
+              buttonText="Clear Filters"
+              appearance="outlined"
+              onClick={() => {
+                setProductFilter([]);
+                setLocationFilter([]);
+              }}
+            />
+          </div>
+        ) : (
+          <>
+            <Table
+              components={{
+                header: { wrapper: HeaderWrapper },
+              }}
+              rowSelection={{
+                selectedRowKeys,
+                onChange: (keys) => setSelectedRowKeys(keys as string[]),
+                getCheckboxProps: (record: TableRow) => ({
+                  style: record.isGroupHeader ? { display: 'none' } : undefined,
+                  disabled: record.isGroupHeader,
+                }),
+              }}
+              columns={columns}
+              dataSource={displayData}
+              rowKey={(record: TableRow) =>
+                record.isGroupHeader ? `group-${record.groupKey}` : record.detailId
+              }
+              rowClassName={(record: TableRow) => {
+                if (record.isGroupHeader) return styles.groupHeaderRow
+                if (isBlendedMode && !record.isGroupHeader && !referenceSelections[record.detailId])
+                  return `${styles.unassignedRow}${groupingDimension !== 'none' ? ` ${styles.groupChildRow}` : ''}`
+                if (groupingDimension !== 'none' && !record.isGroupHeader) return styles.groupChildRow
+                return ''
+              }}
+              pagination={false}
+              scroll={{ x: 'max-content' }}
+              size="small"
+            />
+          </>
+        )}
       </div>
 
       {/* Scenario Drawers */}
@@ -562,6 +1505,6 @@ export function ScenarioComparisonSection({
         onSave={handleSaveUploadScenario}
         editingScenario={editingScenario?.entryMethod === 'upload' ? editingScenario : undefined}
       />
-    </Vertical>
+    </div>
   );
 }

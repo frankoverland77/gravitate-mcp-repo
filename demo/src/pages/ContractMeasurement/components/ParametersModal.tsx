@@ -28,143 +28,49 @@ export function ParametersModal({ visible, parameters, onClose, onApply }: Param
     <Modal title="Parameters" visible={visible} onCancel={onClose} footer={null} width={400}>
       <Vertical style={{ gap: '24px' }}>
         {/* Price History Section */}
-        <Vertical style={{ gap: '12px' }}>
-          <Texto category="p2" weight="600">
-            Price History
-          </Texto>
-          <Vertical style={{ gap: '8px' }}>
-            <Horizontal justifyContent="space-between" alignItems="center">
-              <Texto category="p2" appearance="medium">
-                Lookback:
-              </Texto>
-              <Select
-                value={localParams.price.lookback}
-                onChange={(val) =>
-                  setLocalParams({
-                    ...localParams,
-                    price: { ...localParams.price, lookback: val },
-                  })
-                }
-                options={[
-                  { value: '6mo', label: '6 months' },
-                  { value: '12mo', label: '12 months' },
-                  { value: '18mo', label: '18 months' },
-                  { value: '24mo', label: '24 months' },
-                ]}
-                style={{ width: '140px' }}
-              />
-            </Horizontal>
-            <Horizontal justifyContent="space-between" alignItems="center">
-              <Texto category="p2" appearance="medium">
-                Aggregation:
-              </Texto>
-              <Select
-                value={localParams.price.aggregation}
-                onChange={(val) =>
-                  setLocalParams({
-                    ...localParams,
-                    price: { ...localParams.price, aggregation: val },
-                  })
-                }
-                options={[
-                  { value: 'daily', label: 'Daily' },
-                  { value: 'weekly', label: 'Weekly' },
-                  { value: 'monthly', label: 'Monthly' },
-                  { value: 'quarterly', label: 'Quarterly' },
-                ]}
-                style={{ width: '140px' }}
-              />
-            </Horizontal>
-            <Horizontal justifyContent="space-between" alignItems="center">
-              <Texto category="p2" appearance="medium">
-                Method:
-              </Texto>
-              <Select
-                value={localParams.price.method}
-                onChange={(val) =>
-                  setLocalParams({
-                    ...localParams,
-                    price: { ...localParams.price, method: val },
-                  })
-                }
-                options={[
-                  { value: 'weighted', label: 'Weighted Average' },
-                  { value: 'simple', label: 'Simple Average' },
-                  { value: 'median', label: 'Median' },
-                ]}
-                style={{ width: '140px' }}
-              />
-            </Horizontal>
-          </Vertical>
-        </Vertical>
-
-        {/* Volume History Section */}
-        <Vertical style={{ gap: '12px' }}>
-          <Texto category="p2" weight="600">
-            Volume History
-          </Texto>
-          <Vertical style={{ gap: '8px' }}>
-            <Horizontal justifyContent="space-between" alignItems="center">
-              <Texto category="p2" appearance="medium">
-                Lookback:
-              </Texto>
-              <Select
-                value={localParams.volume.lookback}
-                onChange={(val) =>
-                  setLocalParams({
-                    ...localParams,
-                    volume: { ...localParams.volume, lookback: val },
-                  })
-                }
-                options={[
-                  { value: '6mo', label: '6 months' },
-                  { value: '12mo', label: '12 months' },
-                  { value: '18mo', label: '18 months' },
-                  { value: '24mo', label: '24 months' },
-                ]}
-                style={{ width: '140px' }}
-              />
-            </Horizontal>
-            <Horizontal justifyContent="space-between" alignItems="center">
-              <Texto category="p2" appearance="medium">
-                Granularity:
-              </Texto>
-              <Select
-                value={localParams.volume.granularity}
-                onChange={(val) =>
-                  setLocalParams({
-                    ...localParams,
-                    volume: { ...localParams.volume, granularity: val },
-                  })
-                }
-                options={[
-                  { value: 'weekly', label: 'Weekly' },
-                  { value: 'monthly', label: 'Monthly' },
-                  { value: 'quarterly', label: 'Quarterly' },
-                ]}
-                style={{ width: '140px' }}
-              />
-            </Horizontal>
-            <Horizontal justifyContent="space-between" alignItems="center">
-              <Texto category="p2" appearance="medium">
-                Calculation:
-              </Texto>
-              <Select
-                value={localParams.volume.calculation}
-                onChange={(val) =>
-                  setLocalParams({
-                    ...localParams,
-                    volume: { ...localParams.volume, calculation: val },
-                  })
-                }
-                options={[
-                  { value: 'sum', label: 'Sum' },
-                  { value: 'average', label: 'Average' },
-                ]}
-                style={{ width: '140px' }}
-              />
-            </Horizontal>
-          </Vertical>
+        <Vertical style={{ gap: '8px' }}>
+          <Horizontal justifyContent="space-between" alignItems="center">
+            <Texto category="p2" appearance="medium">
+              Lookback Period:
+            </Texto>
+            <Select
+              value={localParams.price.lookback}
+              onChange={(val) =>
+                setLocalParams({
+                  ...localParams,
+                  price: { ...localParams.price, lookback: val },
+                })
+              }
+              options={[
+                { value: '30d', label: 'Last 30 Days' },
+                { value: '3mo', label: 'Last 3 Months' },
+                { value: '6mo', label: 'Last 6 Months' },
+                { value: '12mo', label: 'Last 12 Months' },
+                { value: 'full', label: 'Entire Contract Duration' },
+              ]}
+              style={{ width: '220px' }}
+            />
+          </Horizontal>
+          <Horizontal justifyContent="space-between" alignItems="center">
+            <Texto category="p2" appearance="medium">
+              Averaging Method:
+            </Texto>
+            <Select
+              value={localParams.price.method}
+              onChange={(val) =>
+                setLocalParams({
+                  ...localParams,
+                  price: { ...localParams.price, method: val },
+                })
+              }
+              options={[
+                { value: 'simple', label: 'Simple Average' },
+                { value: 'weekly-median', label: 'Avg of Weekly Medians' },
+                { value: 'monthly-median', label: 'Avg of Monthly Medians' },
+              ]}
+              style={{ width: '220px' }}
+            />
+          </Horizontal>
         </Vertical>
 
         {/* Footer buttons */}

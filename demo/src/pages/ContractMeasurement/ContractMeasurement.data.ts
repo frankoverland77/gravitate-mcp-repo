@@ -18,6 +18,7 @@ export interface ContractMeasurementRecord {
   financialImpact: number;
   ratability: number;
   status: 'Active' | 'Inactive' | 'Pending';
+  isArchived: boolean;
 }
 
 // Get customer names from shared data for contract records
@@ -39,6 +40,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     financialImpact: 5432,
     ratability: 0,
     status: 'Active',
+    isArchived: false,
   },
   {
     id: 2,
@@ -55,6 +57,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     financialImpact: -4521,
     ratability: 14,
     status: 'Active',
+    isArchived: false,
   },
   {
     id: 3,
@@ -71,6 +74,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     financialImpact: 2150,
     ratability: 5,
     status: 'Active',
+    isArchived: false,
   },
   {
     id: 4,
@@ -87,6 +91,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     financialImpact: 890,
     ratability: 0,
     status: 'Active',
+    isArchived: false,
   },
   {
     id: 5,
@@ -103,6 +108,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     financialImpact: -1250,
     ratability: 8,
     status: 'Active',
+    isArchived: false,
   },
   {
     id: 6,
@@ -119,6 +125,41 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     financialImpact: -8200,
     ratability: 22,
     status: 'Active',
+    isArchived: false,
+  },
+  {
+    id: 7,
+    contractId: 'CTR-007',
+    customer: customers[6]?.Name || 'Marathon Petroleum',
+    type: 'Sale',
+    startDate: '2024-06-01',
+    endDate: '2024-12-31',
+    daysLeft: 0,
+    volumeCompleted: 60000,
+    volumeTotal: 60000,
+    riskLevel: 'Low',
+    riskScore: 4.1,
+    financialImpact: 3200,
+    ratability: 0,
+    status: 'Inactive',
+    isArchived: true,
+  },
+  {
+    id: 8,
+    contractId: 'CTR-008',
+    customer: customers[7]?.Name || 'Valero Energy',
+    type: 'Purchase',
+    startDate: '2024-04-15',
+    endDate: '2024-10-15',
+    daysLeft: 0,
+    volumeCompleted: 110000,
+    volumeTotal: 110000,
+    riskLevel: 'Medium',
+    riskScore: 15.8,
+    financialImpact: -2100,
+    ratability: 3,
+    status: 'Inactive',
+    isArchived: true,
   },
 ];
 
