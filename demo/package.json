@@ -1,6 +1,6 @@
 {
   "name": "excalibrr-demo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Excalibrr Component Demo Project",
   "type": "module",
   "scripts": {
