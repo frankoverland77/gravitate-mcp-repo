@@ -22,9 +22,9 @@ import type { Location } from '../types/location.types'
  * Base prices by product group (USD per gallon)
  */
 const BASE_PRICES: Record<string, number> = {
-  gasoline: 2.35,
-  diesel: 2.55,
-  biodiesel: 2.65,
+  gasoline: 2.30,
+  diesel: 2.45,
+  biodiesel: 2.40,
 }
 
 /**
@@ -44,9 +44,10 @@ export function generatePrice(group: string, variation = 0.15): number {
  */
 export function generateSeededPrice(productId: number, locationId: number, group: string): number {
   const seed = (productId * 1000 + locationId) % 100
-  const base = BASE_PRICES[group] || 2.5
-  const delta = ((seed - 50) / 50) * 0.15 // -0.15 to +0.15 based on seed
-  return Number((base + delta).toFixed(2))
+  const base = BASE_PRICES[group] || 2.38
+  const delta = ((seed - 50) / 50) * 0.25 // -0.25 to +0.25 based on seed
+  // Clamp to 2.01 – 2.75 range
+  return Number(Math.min(2.75, Math.max(2.01, base + delta)).toFixed(4))
 }
 
 // ============================================================================
@@ -1023,6 +1024,214 @@ export function generateAnalyticsData(count = 7): GeneratedAnalyticsRow[] {
       differenceToSelected: isSelected ? '$0.00' : `${diffValue >= 0 ? '+' : ''}$${diffValue.toFixed(2)}`,
       isSelected,
     })
+  }
+
+  return data
+}
+
+// ============================================================================
+// DELIVERED PRICING GENERATORS (Quote Book EOD Mode)
+// ============================================================================
+
+export type DeliveredPricingStrategy =
+  | 'Lowest Price'
+  | 'Lowest Rack'
+  | 'Lowest Contract'
+  | 'Average Rack'
+  | 'Allocation Maintenance'
+
+export const DELIVERED_PRICING_STRATEGIES: DeliveredPricingStrategy[] = [
+  'Lowest Price',
+  'Lowest Rack',
+  'Lowest Contract',
+  'Average Rack',
+  'Allocation Maintenance',
+]
+
+export interface DeliveredPricingQuoteRow {
+  id: number
+  QuoteConfigurationMappingId: number
+  QuoteConfigurationName: string
+  LocationName: string
+  DestinationLocationName: string
+  CounterpartyName: string
+  ProductName: string
+  ProductGroup: string
+  Strategy: DeliveredPricingStrategy
+  // Current period
+  PriorQuotePeriod: {
+    Liftings: number
+    LastPrice: number
+  }
+  // Exception alerting
+  Exception: string | null
+  // Whether the user has manually overridden the strategy default
+  IsStrategyOverridden: boolean
+  // Proposed period
+  Cost: number | null
+  Diff: number
+  Freight: number
+  Tax: number
+  /** Carrier assigned to this freight lane */
+  CarrierName: string
+  /** Freight type (e.g. Common Carrier, Dedicated, Pipeline) */
+  FreightType: string
+  /** Original freight for the row's origin — used as reference when supply option origin changes */
+  BaseFreight: number
+  /** Original tax for the row's origin — used as reference when supply option origin changes */
+  BaseTax: number
+  ProposedPrice: number
+  PriceDelta: number
+  Margin: number
+}
+
+/**
+ * Generate delivered pricing data modeled after the Pricing Engine Quote Book EOD mode.
+ * Produces rows with quote configuration, origin/destination, product,
+ * current period (sold volume, price), and proposed columns
+ * (cost, diff, freight, tax, price, price delta, margin).
+ * Price = Cost + Freight + Tax + Diff.
+ *
+ * @param count - Number of rows to generate (default 40)
+ */
+export function generateDeliveredPricingData(count = 40): DeliveredPricingQuoteRow[] {
+  const origins = LOCATIONS.filter((l) => l.IsTerminal && l.IsActive)
+  const destinations = LOCATIONS.filter((l) => !l.IsTerminal && l.IsActive).slice(0, 30)
+  const products = [
+    { ProductId: 901, Name: '87 E10', ProductGroup: 'gasoline' },
+    { ProductId: 902, Name: '93 E10', ProductGroup: 'gasoline' },
+    { ProductId: 903, Name: 'ULSD2', ProductGroup: 'diesel' },
+  ]
+
+  const quoteConfigs = [
+    'Delivered',
+  ]
+
+  const counterparties = [
+    'Scharf Fuels',
+    'Johnson Oil',
+    'Hunt Petroleum',
+    'Davies Energy',
+  ]
+
+  const carriers = [
+    'TransAm Logistics',
+    'Gulf Coast Carriers',
+    'Patriot Transport',
+    'Eagle Fleet Services',
+    'Lone Star Freight',
+    'Pinnacle Hauling',
+  ]
+
+  const freightTypes = [
+    'Point-to-Point',
+    'Mileage',
+  ]
+
+  // Retail store destinations (address-style names)
+  const retailDestinations = [
+    '123 Main St',
+    '456 Elm Ave',
+    '789 Oak Blvd',
+    '1020 Cedar Ln',
+    '3350 Maple Dr',
+    '510 Walnut St',
+    '1475 Pine Rd',
+    '2200 Birch Way',
+    '680 Spruce Ct',
+    '4100 Ash Pkwy',
+    '915 Willow Trl',
+    '1340 Hickory Pl',
+    '2780 Poplar Ave',
+    '365 Magnolia Blvd',
+    '5020 Cypress Ln',
+    '1190 Juniper Dr',
+    '830 Redwood St',
+    '2460 Sycamore Rd',
+    '4725 Chestnut Way',
+    '190 Pecan Ct',
+    '3610 Dogwood Pkwy',
+    '1055 Hawthorn Trl',
+    '2890 Locust Pl',
+    '540 Mulberry Ave',
+    '4215 Sequoia Blvd',
+    '1780 Alder Ln',
+    '3140 Aspen Dr',
+    '660 Cottonwood St',
+    '2025 Laurel Rd',
+    '4480 Mesquite Way',
+  ]
+
+  const data: DeliveredPricingQuoteRow[] = []
+  let id = 1
+
+  for (const origin of origins) {
+    for (let destIdx = 0; destIdx < destinations.length; destIdx++) {
+      const destination = destinations[destIdx]
+      for (const product of products) {
+        if (data.length >= count) break
+
+        const seed = product.ProductId * 1000 + origin.LocationId * 100 + destination.LocationId
+        const configIndex = seed % quoteConfigs.length
+        const baseCost = generateSeededPrice(product.ProductId, origin.LocationId, product.ProductGroup)
+
+        // Freight based on distance proxy (difference in IDs)
+        const freight = Number((0.03 + (Math.abs(origin.LocationId - destination.LocationId) % 15) * 0.008).toFixed(4))
+
+        // Diff (strategy differential)
+        const diff = Number(((seed % 12 - 6) / 100).toFixed(4))
+
+        // Tax as small percentage
+        const tax = Number((baseCost * (0.02 + (seed % 5) / 100)).toFixed(4))
+
+        // Price = Cost + Freight + Tax + Diff
+        const proposedPrice = Number((baseCost + freight + tax + diff).toFixed(4))
+
+        // Prior period price with slight variation
+        const priorPrice = Number((proposedPrice + ((seed % 10) - 5) / 100).toFixed(4))
+        const priceDelta = Number((proposedPrice - priorPrice).toFixed(4))
+        const margin = Number((proposedPrice - baseCost).toFixed(4))
+
+        // Sold volume
+        const liftings = 1000 + (seed % 50) * 200
+
+        const strategy = DELIVERED_PRICING_STRATEGIES[seed % DELIVERED_PRICING_STRATEGIES.length]
+        const counterparty = counterparties[seed % counterparties.length]
+        const carrier = carriers[(seed * 3 + 7) % carriers.length]
+        const freightType = freightTypes[(seed * 5 + 11) % freightTypes.length]
+
+        data.push({
+          id: id++,
+          QuoteConfigurationMappingId: id,
+          QuoteConfigurationName: quoteConfigs[configIndex],
+          LocationName: origin.Name,
+          DestinationLocationName: retailDestinations[seed % retailDestinations.length],
+          CounterpartyName: counterparty,
+          ProductName: product.Name,
+          ProductGroup: product.ProductGroup,
+          Strategy: strategy,
+          Exception: null, // computed at runtime based on supply options
+          IsStrategyOverridden: false,
+          PriorQuotePeriod: {
+            Liftings: liftings,
+            LastPrice: priorPrice,
+          },
+          Cost: baseCost,
+          Diff: diff,
+          Freight: freight,
+          Tax: tax,
+          CarrierName: carrier,
+          FreightType: freightType,
+          BaseFreight: freight,
+          BaseTax: tax,
+          ProposedPrice: proposedPrice,
+          PriceDelta: priceDelta,
+          Margin: margin,
+        })
+      }
+      if (data.length >= count) break
+    }
+    if (data.length >= count) break
   }
 
   return data

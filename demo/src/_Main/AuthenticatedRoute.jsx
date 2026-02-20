@@ -34,6 +34,8 @@ export function AuthenticatedRoute() {
     InventoryGrid: true,
     BulkChangeTest: true,
     Contracts: true,
+    NegotiationMode: true,
+    DeliveredPricing: true,
   };
   return (
     <FeatureModeProvider>

@@ -105,4 +105,8 @@ export {
   type GeneratedComparisonRow,
   type GeneratedPricingRow,
   type GeneratedAnalyticsRow,
+  generateDeliveredPricingData,
+  type DeliveredPricingQuoteRow,
+  type DeliveredPricingStrategy,
+  DELIVERED_PRICING_STRATEGIES,
 } from './generators.data'

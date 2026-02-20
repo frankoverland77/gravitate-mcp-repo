@@ -1,0 +1,446 @@
+/* Negotiation Panel Component Styles */
+.negotiation-component {
+  border: 1px solid var(--gray-300, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Header States */
+.negotiation-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-300, #e5e7eb);
+}
+
+.negotiation-header.state-proposing {
+  background: #fefce8;
+  border-bottom-color: #fef08a;
+}
+
+.negotiation-header.state-awaiting {
+  background: #fef3c7;
+  border-bottom-color: #fcd34d;
+}
+
+.negotiation-header.state-action-required {
+  background: #dbeafe;
+  border-bottom-color: #93c5fd;
+}
+
+.negotiation-header.state-confirmed {
+  background: #d1fae5;
+  border-bottom-color: #6ee7b7;
+}
+
+.negotiation-header-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.negotiation-header-icon {
+  font-size: 18px;
+}
+
+.negotiation-clear-btn {
+  margin-left: auto;
+  font-size: 12px;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.negotiation-clear-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #374151;
+}
+
+/* Body */
+.negotiation-body {
+  padding: 16px;
+}
+
+.negotiation-status {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.negotiation-status strong {
+  color: #374151;
+}
+
+/* Deadline Bar */
+.deadline-bar {
+  margin-bottom: 16px;
+}
+
+.deadline-text {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.deadline-time-remaining {
+  font-weight: 500;
+  color: #f59e0b;
+}
+
+.deadline-progress-bar {
+  height: 6px;
+  background: var(--gray-300, #e5e7eb);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.deadline-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.deadline-progress-fill.fill-normal {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.deadline-progress-fill.fill-warning {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+/* Comparison Table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.comparison-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--gray-300, #e5e7eb);
+}
+
+.comparison-table td {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.comparison-table .field-name {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.comparison-table .original-value {
+  color: #6b7280;
+}
+
+.comparison-table .proposed-value {
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.comparison-table .proposed-value .arrow {
+  color: #3b82f6;
+  margin-right: 4px;
+}
+
+.comparison-table .confirmed-value {
+  color: #059669;
+}
+
+.comparison-table .confirmed-value .checkmark {
+  margin-right: 4px;
+}
+
+.delta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 6px;
+}
+
+.delta.positive {
+  color: #059669;
+}
+
+.delta.negative {
+  color: #dc2626;
+}
+
+/* Note Section */
+.note-section {
+  margin-bottom: 16px;
+}
+
+.note-section label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.note-display {
+  background: #f9fafb;
+  border: 1px solid var(--gray-300, #e5e7eb);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  color: #374151;
+  font-style: italic;
+}
+
+.note-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  color: #374151;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.note-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Expiration Picker */
+.expiration-select {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #374151;
+  background: #fff;
+}
+
+.expiration-computed {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 8px;
+}
+
+/* History Section */
+.history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.history-toggle:hover {
+  color: #374151;
+}
+
+.history-expanded {
+  margin-top: 12px;
+  border-top: 1px solid var(--gray-300, #e5e7eb);
+  padding-top: 12px;
+}
+
+.history-entry {
+  background: #f9fafb;
+  border: 1px solid var(--gray-300, #e5e7eb);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.history-entry:last-child {
+  margin-bottom: 0;
+}
+
+.history-entry.current {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.history-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.history-entry-marker {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d1d5db;
+  flex-shrink: 0;
+}
+
+.history-entry.current .history-entry-marker {
+  background: #3b82f6;
+}
+
+.history-entry-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+}
+
+.history-entry.current .history-entry-title {
+  color: #1e40af;
+}
+
+.history-entry-label {
+  font-size: 10px;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: auto;
+}
+
+.history-entry-meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.history-entry-values {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.history-entry-values .label {
+  color: #6b7280;
+}
+
+.history-entry-expiration {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.history-entry-expiration .status-countered {
+  font-weight: 500;
+  color: #2563eb;
+}
+
+.history-entry-expiration .status-expired {
+  font-weight: 500;
+  color: #dc2626;
+}
+
+.history-entry-note {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+  background: #fff;
+  border: 1px solid var(--gray-300, #e5e7eb);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+/* ─── Dashboard Layout ──────────────────────────────────────────────── */
+
+.negotiation-dashboard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.negotiation-dashboard-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  background: #fafafa;
+}
+
+.negotiation-dashboard-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ─── Modal overrides ───────────────────────────────────────────────── */
+
+.negotiation-component {
+  border: 1px solid var(--gray-300, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ─── Order Details Modal (mirrors ViewOnlineOrderDetails) ─────────── */
+
+/* Formula Components (mirrors viewOrderStyles.css) */
+.formula-components-list {
+  border: 1px solid var(--gray-300, #e5e7eb);
+  border-radius: 5px;
+}
+
+.formula-components-list .ant-list-header {
+  background-color: var(--bg-3, #f5f5f5);
+  padding: 8px;
+  border-radius: 5px 5px 0 0;
+}
+
+.formula-components-list .ant-list-items .ant-list-item {
+  background-color: var(--bg-1, #fff);
+  padding: 5px 8px;
+}
+
+.formula-components-list .ant-list-footer {
+  background-color: var(--bg-3, #f5f5f5);
+  padding: 6px 8px;
+  border-radius: 0 0 5px 5px;
+}
+
+.formula-components-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.formula-col-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.formula-col-source {
+  width: 120px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.formula-col-value {
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}

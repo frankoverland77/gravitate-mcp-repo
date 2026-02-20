@@ -9,6 +9,8 @@ import {
   CreditCardOutlined,
   BellOutlined,
   FileTextOutlined,
+  SwapOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
@@ -23,6 +25,7 @@ import { FormulaTemplateDetails } from './pages/demos/grids/FormulaTemplateDetai
 import { ContractDetails } from './pages/demos/grids/ContractDetails';
 import { OnlineSellingPlatformHome } from './pages/OnlineSellingPlatform/OnlineSellingPlatformHome';
 import { IndexOfferManagement } from './pages/OnlineSellingPlatform/IndexOfferManagement';
+import { IndexOfferBuyNow } from './pages/OnlineSellingPlatform/IndexOfferBuyNow';
 import { SupplierAnalysis } from './pages/OnlineSellingPlatform/SupplierAnalysis';
 import { SupplierDetails } from './pages/OnlineSellingPlatform/SupplierDetails';
 import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
@@ -32,6 +35,8 @@ import { ThemeRouteWrapper } from './components/shared/ThemeRouteWrapper';
 import { BulkChangeTest } from './pages/demos/BulkChangeTest/BulkChangeTest';
 import { SubscriptionManagement } from './pages/SubscriptionManagement/SubscriptionManagement';
 import { RFPManagement } from './pages/RFP';
+import { NegotiationModePage } from './pages/NegotiationMode/NegotiationModePage';
+import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -262,6 +267,20 @@ export const demoRegistry: DemoRoute[] = [
     created: new Date().toISOString(),
     category: 'contract-management',
   },
+  // Delivered Pricing
+  {
+    key: 'DeliveredPricing',
+    title: 'Delivered Pricing',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <DeliveredPricing />
+      </ThemeRouteWrapper>
+    ),
+    path: '/DeliveredPricing',
+    description: 'End of Day delivered pricing quote book with cost, freight, and margin analysis',
+    created: new Date().toISOString(),
+    category: 'grids',
+  },
   // MCP server will add more demos here automatically
 ];
 
@@ -448,6 +467,18 @@ export const createPageConfig = (): PageConfig => {
         path: '/MarketPlatform/IndexOfferManagement',
         description: 'Manage index pricing offers for buyers',
       },
+      {
+        hasPermission: () => true,
+        key: 'IndexOfferBuyNow',
+        title: 'Index Offer Buy Now',
+        element: (
+          <ThemeRouteWrapper theme="OSP">
+            <IndexOfferBuyNow />
+          </ThemeRouteWrapper>
+        ),
+        path: '/MarketPlatform/IndexOfferBuyNow',
+        description: 'Buyer experience for placing index pricing orders with pickup window dates',
+      },
     ],
   };
 
@@ -515,6 +546,32 @@ export const createPageConfig = (): PageConfig => {
         hidden: true,
       },
     ],
+  };
+
+  config.NegotiationMode = {
+    hasPermission: () => true,
+    key: 'NegotiationMode',
+    icon: <SwapOutlined />,
+    title: 'Negotiation Mode',
+    element: (
+      <ThemeRouteWrapper theme="OSP">
+        <NegotiationModePage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/NegotiationMode',
+  };
+
+  config.DeliveredPricing = {
+    hasPermission: () => true,
+    key: 'DeliveredPricing',
+    icon: <DollarOutlined />,
+    title: 'Delivered Pricing',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <DeliveredPricing />
+      </ThemeRouteWrapper>
+    ),
+    path: '/DeliveredPricing',
   };
 
   config.BulkChangeTest = {
