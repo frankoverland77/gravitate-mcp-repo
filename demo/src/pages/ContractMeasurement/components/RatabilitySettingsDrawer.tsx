@@ -118,6 +118,7 @@ export function RatabilitySettingsDrawer({
       visible={visible}
       zIndex={2000}
       maskClosable={true}
+      bodyStyle={{ overflowY: 'auto', height: 'calc(100vh - 110px)' }}
       footer={
         <Horizontal style={{ justifyContent: 'space-between', padding: '12px 0' }}>
           <GraviButton

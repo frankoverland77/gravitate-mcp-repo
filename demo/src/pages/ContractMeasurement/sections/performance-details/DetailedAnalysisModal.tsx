@@ -1,9 +1,8 @@
-import { Vertical, Horizontal, Texto, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
+import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Progress, Modal } from 'antd'
 import {
   DashboardOutlined,
   ThunderboltOutlined,
-  AlertOutlined,
   CalendarOutlined,
   BulbOutlined,
   CheckCircleOutlined,
@@ -41,9 +40,8 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
   const daysToTarget = data?.daysToTarget || 0
   const recommendations = data?.recommendations || []
 
-  // Calculate max values for chart scaling
-  const maxDailyVolume = dailyLiftingData.length > 0 ? Math.max(...dailyLiftingData.map((d) => Math.max(d.actual, d.target))) : 1
-  const maxDayOfWeek = dayOfWeekPattern.length > 0 ? Math.max(...dayOfWeekPattern.map((d) => d.avgVolume)) : 1
+  // Fixed y-axis max for both charts
+  const yMax = 15000
 
   return (
     <Modal
@@ -60,8 +58,8 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
     >
       {product ? (
       <Vertical style={{ gap: '24px' }}>
-        {/* Overview Metrics - 4 cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        {/* Overview Metrics - 3 cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {/* Performance Card */}
           <div style={cardStyle}>
             <Vertical style={{ gap: '12px' }}>
@@ -108,32 +106,6 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
             </Vertical>
           </div>
 
-          {/* Risk Level Card */}
-          <div style={cardStyle}>
-            <Vertical style={{ gap: '12px' }}>
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
-                <AlertOutlined style={{ fontSize: '16px', color: '#cf1322' }} />
-                <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Risk Level
-                </Texto>
-              </Horizontal>
-              <Horizontal alignItems='center' style={{ gap: '12px' }}>
-                <Texto category='h3' weight='600'>
-                  {product.riskScore}
-                </Texto>
-                <BBDTag
-                  success={product.riskLevel === 'low'}
-                  warning={product.riskLevel === 'medium'}
-                  error={product.riskLevel === 'high'}
-                  style={{ textTransform: 'uppercase', fontSize: '12px', padding: '2px 8px' }}
-                >{product.riskLevel}</BBDTag>
-              </Horizontal>
-              <Texto category='p2' appearance='medium'>
-                Risk score (0-100)
-              </Texto>
-            </Vertical>
-          </div>
-
           {/* Timeline Card */}
           <div style={cardStyle}>
             <Vertical style={{ gap: '12px' }}>
@@ -166,57 +138,67 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
               <Texto category='h5' weight='600'>
                 Daily Lifting (30 Days)
               </Texto>
-              <div style={{ flex: 1, position: 'relative' }}>
-                {/* Simple bar visualization */}
-                <Horizontal alignItems='flex-end' style={{ gap: '2px', height: '160px' }}>
-                  {dailyLiftingData.slice(-15).map((d, index) => {
-                    const actualHeight = (d.actual / maxDailyVolume) * 100
-                    const targetHeight = (d.target / maxDailyVolume) * 100
-                    return (
-                      <div key={index} style={{ flex: 1, position: 'relative', height: '100%' }}>
-                        {/* Target line */}
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: `${targetHeight}%`,
-                            left: 0,
-                            right: 0,
-                            height: '2px',
-                            backgroundColor: '#cf1322',
-                            opacity: 0.5,
-                          }}
-                        />
-                        {/* Actual bar */}
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: '10%',
-                            right: '10%',
-                            height: `${actualHeight}%`,
-                            backgroundColor: d.actual >= d.target ? '#52c41a' : '#1890ff',
-                            borderRadius: '2px 2px 0 0',
-                          }}
-                        />
-                      </div>
-                    )
-                  })}
-                </Horizontal>
-                {/* Legend */}
-                <Horizontal style={{ gap: '16px', marginTop: '12px' }}>
-                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
-                    <div style={{ width: '12px', height: '12px', backgroundColor: '#1890ff', borderRadius: '2px' }} />
-                    <Texto category='p2' appearance='medium'>
-                      Actual
-                    </Texto>
+              <div style={{ flex: 1, display: 'flex', position: 'relative' }}>
+                {/* Y-axis labels */}
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: '24px', marginRight: '8px', width: '40px', flexShrink: 0 }}>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>15,000</Texto>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>10,000</Texto>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>5,000</Texto>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>0</Texto>
+                </div>
+                {/* Chart area */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: '2px', borderLeft: '1px solid #d9d9d9', borderBottom: '1px solid #d9d9d9' }}>
+                    {dailyLiftingData.slice(-15).map((d, index) => {
+                      const chartHeight = 160
+                      const actualHeight = Math.max((d.actual / yMax) * chartHeight, 2)
+                      const targetBottom = (d.target / yMax) * chartHeight
+                      return (
+                        <div key={index} style={{ flex: 1, position: 'relative', height: `${chartHeight}px` }}>
+                          {/* Target line */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              bottom: `${targetBottom}px`,
+                              left: 0,
+                              right: 0,
+                              height: '2px',
+                              backgroundColor: '#cf1322',
+                              opacity: 0.5,
+                            }}
+                          />
+                          {/* Actual bar */}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: '10%',
+                              right: '10%',
+                              height: `${actualHeight}px`,
+                              backgroundColor: d.actual >= d.target ? '#52c41a' : '#1890ff',
+                              borderRadius: '2px 2px 0 0',
+                            }}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {/* Legend */}
+                  <Horizontal style={{ gap: '16px', marginTop: '8px' }}>
+                    <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                      <div style={{ width: '12px', height: '12px', backgroundColor: '#1890ff', borderRadius: '2px' }} />
+                      <Texto category='p2' appearance='medium'>
+                        Actual
+                      </Texto>
+                    </Horizontal>
+                    <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                      <div style={{ width: '12px', height: '2px', backgroundColor: '#cf1322' }} />
+                      <Texto category='p2' appearance='medium'>
+                        Target
+                      </Texto>
+                    </Horizontal>
                   </Horizontal>
-                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
-                    <div style={{ width: '12px', height: '2px', backgroundColor: '#cf1322' }} />
-                    <Texto category='p2' appearance='medium'>
-                      Target
-                    </Texto>
-                  </Horizontal>
-                </Horizontal>
+                </div>
               </div>
             </Vertical>
           </div>
@@ -227,16 +209,25 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
               <Texto category='h5' weight='600'>
                 Day of Week Pattern
               </Texto>
-              <div style={{ flex: 1 }}>
-                <Horizontal alignItems='flex-end' justifyContent='space-around' style={{ height: '160px' }}>
+              <div style={{ flex: 1, display: 'flex', position: 'relative' }}>
+                {/* Y-axis labels */}
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: '24px', marginRight: '8px', width: '40px', flexShrink: 0 }}>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>15,000</Texto>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>10,000</Texto>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>5,000</Texto>
+                  <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>0</Texto>
+                </div>
+                {/* Chart area */}
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end', gap: '8px', paddingBottom: '24px', borderLeft: '1px solid #d9d9d9', borderBottom: '1px solid #d9d9d9', marginBottom: '0px' }}>
                   {dayOfWeekPattern.map((d, index) => {
-                    const height = (d.avgVolume / maxDayOfWeek) * 100
+                    const chartHeight = 160
+                    const barHeight = Math.max((d.avgVolume / yMax) * chartHeight, 2)
                     return (
-                      <Vertical key={index} alignItems='center' style={{ gap: '4px' }}>
+                      <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                         <div
                           style={{
                             width: '32px',
-                            height: `${height}%`,
+                            height: `${barHeight}px`,
                             backgroundColor: '#722ed1',
                             borderRadius: '4px 4px 0 0',
                             opacity: 0.7 + (index % 2) * 0.15,
@@ -245,10 +236,10 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                         <Texto category='p2' appearance='medium' style={{ fontSize: '11px' }}>
                           {d.day}
                         </Texto>
-                      </Vertical>
+                      </div>
                     )
                   })}
-                </Horizontal>
+                </div>
               </div>
             </Vertical>
           </div>

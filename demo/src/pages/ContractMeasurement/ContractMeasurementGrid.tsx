@@ -67,6 +67,11 @@ export function ContractMeasurementGrid() {
         width: 100,
       },
       {
+        field: 'instrument',
+        headerName: 'INSTRUMENT',
+        width: 130,
+      },
+      {
         field: 'contractPeriod',
         headerName: 'CONTRACT PERIOD',
         width: 180,
@@ -87,21 +92,23 @@ export function ContractMeasurementGrid() {
           </span>
         ),
       },
-    ];
-
-    if (isFutureMode) {
-      cols.push({
+      {
         field: 'volumeProgress',
         headerName: 'VOLUME PROGRESS',
-        width: 160,
+        width: 180,
         valueGetter: (params: any) => params.data,
         cellRenderer: (params: any) => {
           const pct = Math.round((params.data.volumeCompleted / params.data.volumeTotal) * 100);
           return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '4px 0' }}>
-              <span style={{ fontSize: '12px' }}>
-                {pct}%{params.data.volumeCompleted.toLocaleString()} / {params.data.volumeTotal.toLocaleString()}
-              </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '4px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600 }}>
+                  {pct}%
+                </span>
+                <span style={{ fontSize: '11px', color: '#8c8c8c' }}>
+                  {params.data.volumeCompleted.toLocaleString()} / {params.data.volumeTotal.toLocaleString()}
+                </span>
+              </div>
               <div style={{
                 width: '100%',
                 height: '6px',
@@ -119,24 +126,29 @@ export function ContractMeasurementGrid() {
             </div>
           );
         },
-      });
-    }
-
-    cols.push(
+      },
+      {
+        field: 'ratability',
+        headerName: 'RATABILITY',
+        width: 110,
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return (
+            <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
+              <span>{value}%</span>
+              {value < 70 && <WarningOutlined style={{ color: '#faad14', fontSize: '14px' }} />}
+            </Horizontal>
+          );
+        },
+      },
       {
         field: 'riskLevel',
         headerName: 'RISK LEVEL',
         width: 100,
       },
       {
-        field: 'riskScore',
-        headerName: 'RISK SCORE',
-        width: 100,
-        type: 'numericColumn',
-      },
-      {
         field: 'financialImpact',
-        headerName: 'FINANCIAL IMPACT',
+        headerName: 'BENCHMARK IMPACT',
         width: 140,
         cellRenderer: (params: any) => {
           const value = params.value;
@@ -149,31 +161,41 @@ export function ContractMeasurementGrid() {
           );
         },
       },
-    );
-
-    if (isFutureMode) {
-      cols.push({
-        field: 'ratability',
-        headerName: 'RATABILITY',
-        width: 110,
+      {
+        field: 'margin',
+        headerName: 'MARGIN (CPG)',
+        width: 130,
+        type: 'numericColumn',
         cellRenderer: (params: any) => {
           const value = params.value;
+          const color = value >= 0 ? '#52c41a' : '#cf1322';
+          const prefix = value >= 0 ? '+' : '';
           return (
-            <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
-              <span>{value}%</span>
-              {value > 0 && <WarningOutlined style={{ color: '#faad14', fontSize: '14px' }} />}
-            </Horizontal>
+            <span style={{ color, fontWeight: 600 }}>
+              {prefix}${value.toFixed(4)}
+            </span>
           );
         },
-      });
-    }
+      },
+      {
+        field: 'profitability',
+        headerName: 'PROFITABILITY',
+        width: 140,
+        valueGetter: (params: any) => params.data.margin * params.data.volumeCompleted,
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          const color = value >= 0 ? '#52c41a' : '#cf1322';
+          const prefix = value >= 0 ? '+' : '';
+          return (
+            <span style={{ color, fontWeight: 600 }}>
+              {prefix}${Math.round(value).toLocaleString()}
+            </span>
+          );
+        },
+      },
+    ];
 
     cols.push(
-      {
-        field: 'status',
-        headerName: 'STATUS',
-        width: 100,
-      },
       {
         field: 'actions',
         headerName: '',
@@ -347,7 +369,7 @@ export function ContractMeasurementGrid() {
           </div>
         )}
 
-        {/* Tile 4: Financial Impact */}
+        {/* Tile 4: Benchmark Impact */}
         <div style={{
           backgroundColor: '#ffffff',
           border: '1px solid #e8e8e8',
@@ -359,7 +381,7 @@ export function ContractMeasurementGrid() {
             <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
               <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Financial Impact
+                Benchmark Impact
               </Texto>
             </Horizontal>
             <Horizontal style={{ alignItems: 'baseline', gap: '12px' }}>

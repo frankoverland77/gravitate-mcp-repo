@@ -35,6 +35,7 @@ const cardStyle = {
   padding: '24px',
   boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
   minHeight: '380px',
+  overflow: 'visible' as const,
 };
 
 export function ContractAnalyticsSection() {
@@ -49,7 +50,7 @@ export function ContractAnalyticsSection() {
       </div>
 
       {/* 2x2 Grid of Charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         {/* Chart 1: Volume Performance */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
           <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
@@ -261,11 +262,15 @@ export function ContractAnalyticsSection() {
                 style={{
                   width: '80px',
                   height: '80px',
+                  minWidth: '80px',
+                  minHeight: '80px',
+                  flexShrink: 0,
                   borderRadius: '50%',
                   border: '6px solid #cf1322',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  boxSizing: 'border-box',
                 }}
               >
                 <Texto category="h3" weight="600">7.2</Texto>

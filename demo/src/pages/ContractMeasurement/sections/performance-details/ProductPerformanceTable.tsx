@@ -148,15 +148,6 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
         sortable: true,
       },
       {
-        field: 'benchmarkPrice',
-        headerName: 'BENCHMARK $/GAL',
-        width: 130,
-        cellRenderer: (params: any) => (
-          <span style={{ fontWeight: 600 }}>${params.value.toFixed(2)}</span>
-        ),
-        sortable: true,
-      },
-      {
         field: 'varianceVsBenchmark',
         headerName: 'Δ VS BENCHMARK',
         width: 150,
@@ -173,8 +164,7 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Icon style={{ color, fontSize: '12px' }} />
                 <span style={{ fontWeight: 600, color }}>
-                  {value >= 0 ? '+' : ''}
-                  {value.toFixed(1)}&#162;
+                  {value >= 0 ? '+' : ''}${value.toFixed(4)}
                 </span>
               </div>
               <span style={{ fontSize: '11px', color: '#595959' }}>{label}</span>
@@ -184,24 +174,45 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
         sortable: true,
       },
       {
-        field: 'riskScore',
-        headerName: 'RISK',
-        width: 100,
-        cellRenderer: (params: any) => (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <BBDTag
-              success={params.data.riskLevel === 'low'}
-              warning={params.data.riskLevel === 'medium'}
-              error={params.data.riskLevel === 'high' || params.data.riskLevel === 'critical'}
-              style={{ width: 'fit-content' }}
-            >
-              {params.value}
-            </BBDTag>
-            <span style={{ fontSize: '11px', color: '#595959', textTransform: 'uppercase' }}>
-              {params.data.riskLevel}
+        field: 'varianceVsRack',
+        headerName: 'Δ VS RACK',
+        width: 150,
+        cellRenderer: (params: any) => {
+          const value = params.value
+          const isAbove = value > 0
+          const isAt = value === 0
+          const color = isAbove ? '#52c41a' : isAt ? '#8c8c8c' : '#cf1322'
+          const Icon = isAbove ? ArrowUpOutlined : isAt ? MinusOutlined : ArrowDownOutlined
+          const label = isAbove ? 'Above Rack' : isAt ? 'At Rack' : 'Below Rack'
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Icon style={{ color, fontSize: '12px' }} />
+                <span style={{ fontWeight: 600, color }}>
+                  {value >= 0 ? '+' : ''}${value.toFixed(4)}
+                </span>
+              </div>
+              <span style={{ fontSize: '11px', color: '#595959' }}>{label}</span>
+            </div>
+          )
+        },
+        sortable: true,
+      },
+      {
+        field: 'margin',
+        headerName: 'MARGIN (CPG)',
+        width: 130,
+        cellRenderer: (params: any) => {
+          const value = params.value
+          const color = value >= 0 ? '#52c41a' : '#cf1322'
+          const prefix = value >= 0 ? '+' : ''
+          return (
+            <span style={{ fontWeight: 600, color }}>
+              {prefix}${value.toFixed(4)}
             </span>
-          </div>
-        ),
+          )
+        },
         sortable: true,
       },
       {

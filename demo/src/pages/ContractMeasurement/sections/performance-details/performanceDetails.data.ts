@@ -24,7 +24,9 @@ export const PRODUCT_PERFORMANCE_DATA: ProductPerformanceRecord[] = generatedDat
   paceVariance: item.paceVariance,
   benchmarkPrice: item.benchmarkPrice,
   varianceVsBenchmark: item.varianceVsBenchmark,
+  varianceVsRack: item.varianceVsRack,
   benchmarkVariance: item.benchmarkVariance,
+  margin: item.margin,
   riskScore: item.riskScore,
   riskLevel: item.riskLevel,
   performanceStatus: item.performanceStatus,
@@ -36,47 +38,55 @@ export const PRODUCT_PERFORMANCE_DATA: ProductPerformanceRecord[] = generatedDat
 export function calculatePerformanceSummary(data: ProductPerformanceRecord[]): PerformanceSummary {
   const totalDetails = data.length
   const aboveBenchmark = data.filter((d) => d.benchmarkVariance === 'above').length
-  const atBenchmark = data.filter((d) => d.benchmarkVariance === 'at').length
   const belowBenchmark = data.filter((d) => d.benchmarkVariance === 'below').length
-  const avgPerformance = data.reduce((sum, d) => sum + d.fulfillmentPercentage, 0) / totalDetails
-  const underPerforming = data.filter((d) => d.performanceStatus === 'behind' || d.performanceStatus === 'critical').length
-  const atRisk = data.filter((d) => d.riskLevel === 'high' || d.riskLevel === 'critical').length
+  const volumeLifted = data.reduce((sum, d) => sum + d.actualVolume, 0)
+  const totalMargin = data.length > 0
+    ? data.reduce((sum, d) => sum + d.margin, 0) / data.length
+    : 0
+  const totalProfitability = data.reduce((sum, d) => sum + d.margin * d.actualVolume, 0)
 
   return {
     totalDetails,
     aboveBenchmark,
-    atBenchmark,
     belowBenchmark,
-    avgPerformance,
-    underPerforming,
-    atRisk,
+    volumeLifted,
+    totalMargin,
+    totalProfitability,
   }
 }
 
 // Generate detailed analysis data for a product
 export function getDetailedAnalysisData(product: ProductPerformanceRecord): DetailedAnalysisData {
-  // Generate mock 30-day lifting data
+  // Generate mock 30-day lifting data - values normalized to 0-15k range
+  const baseSeed = product.id * 137
   const dailyLiftingData = Array.from({ length: 30 }, (_, i) => {
     const date = new Date()
     date.setDate(date.getDate() - (29 - i))
-    const targetDaily = product.requiredDailyPace
-    const actualDaily = product.dailyAverageLifting + Math.floor((Math.random() - 0.5) * 2000)
+    // Use a hash-like function for more chaotic variance across days
+    let daySeed = baseSeed + i * 2654435761
+    daySeed = ((daySeed >>> 16) ^ daySeed) * 0x45d9f3b
+    daySeed = ((daySeed >>> 16) ^ daySeed) & 0x7fffffff
+    // Actual values range 5,000-15,000 with high day-to-day variance
+    const actualDaily = 5000 + (daySeed % 10001)
+    // Target is a steady line around 10,000
+    const targetDaily = 9500 + (baseSeed % 1500)
     return {
       date: date.toISOString().split('T')[0],
-      actual: Math.max(0, actualDaily),
+      actual: actualDaily,
       target: targetDaily,
     }
   })
 
-  // Day of week pattern
+  // Day of week pattern - fixed ranges: Mon-Wed ~8-11k, Thu-Fri >12k, Sat-Sun <5k
+  const seed = product.id * 137
   const dayOfWeekPattern = [
-    { day: 'Mon', avgVolume: Math.floor(product.dailyAverageLifting * 1.1) },
-    { day: 'Tue', avgVolume: Math.floor(product.dailyAverageLifting * 1.05) },
-    { day: 'Wed', avgVolume: Math.floor(product.dailyAverageLifting * 1.02) },
-    { day: 'Thu', avgVolume: Math.floor(product.dailyAverageLifting * 0.98) },
-    { day: 'Fri', avgVolume: Math.floor(product.dailyAverageLifting * 0.95) },
-    { day: 'Sat', avgVolume: Math.floor(product.dailyAverageLifting * 0.7) },
-    { day: 'Sun', avgVolume: Math.floor(product.dailyAverageLifting * 0.6) },
+    { day: 'Mon', avgVolume: 8500 + (seed % 2500) },
+    { day: 'Tue', avgVolume: 9000 + ((seed * 3) % 2000) },
+    { day: 'Wed', avgVolume: 8200 + ((seed * 7) % 2800) },
+    { day: 'Thu', avgVolume: 12200 + ((seed * 11) % 2500) },
+    { day: 'Fri', avgVolume: 12500 + ((seed * 13) % 2200) },
+    { day: 'Sat', avgVolume: 2500 + ((seed * 17) % 2400) },
+    { day: 'Sun', avgVolume: 1800 + ((seed * 19) % 2800) },
   ]
 
   // Calculate projections
@@ -94,7 +104,7 @@ export function getDetailedAnalysisData(product: ProductPerformanceRecord): Deta
     recommendations.push(`Increase daily lifting rate by ${Math.abs(product.paceVariance).toFixed(1)}% to meet target`)
   }
   if (product.benchmarkVariance === 'below') {
-    recommendations.push(`Review pricing strategy - currently ${Math.abs(product.varianceVsBenchmark).toFixed(1)}¢ below benchmark`)
+    recommendations.push(`Review pricing strategy - currently $${Math.abs(product.varianceVsBenchmark).toFixed(4)}/gal below benchmark`)
   }
   if (product.riskLevel === 'high' || product.riskLevel === 'critical') {
     recommendations.push('Schedule review meeting with customer to discuss fulfillment concerns')

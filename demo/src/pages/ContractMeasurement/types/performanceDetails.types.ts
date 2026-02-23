@@ -17,8 +17,10 @@ export interface ProductPerformanceRecord {
   requiredDailyPace: number
   paceVariance: number // percentage difference
   benchmarkPrice: number
-  varianceVsBenchmark: number // in cents
+  varianceVsBenchmark: number // avg $/gal to 4 decimal places, range -0.0500 to +0.0500
+  varianceVsRack: number // avg $/gal to 4 decimal places, range -0.0500 to +0.0500
   benchmarkVariance: BenchmarkVariance
+  margin: number // avg $/gal to 4 decimal places, range -0.0250 to +0.2500
   riskScore: number
   riskLevel: RiskLevel
   performanceStatus: PerformanceStatus
@@ -29,11 +31,10 @@ export interface ProductPerformanceRecord {
 export interface PerformanceSummary {
   totalDetails: number
   aboveBenchmark: number
-  atBenchmark: number
   belowBenchmark: number
-  avgPerformance: number
-  underPerforming: number
-  atRisk: number
+  volumeLifted: number
+  totalMargin: number
+  totalProfitability: number
 }
 
 export interface DetailedAnalysisData {

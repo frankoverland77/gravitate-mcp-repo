@@ -757,7 +757,9 @@ export interface GeneratedPerformanceRecord {
   paceVariance: number
   benchmarkPrice: number
   varianceVsBenchmark: number
+  varianceVsRack: number
   benchmarkVariance: 'above' | 'below' | 'at'
+  margin: number
   riskScore: number
   riskLevel: 'low' | 'medium' | 'high' | 'critical'
   performanceStatus: 'ahead' | 'on-track' | 'behind' | 'critical'
@@ -795,9 +797,13 @@ export function generatePerformanceDetails(count = 8): GeneratedPerformanceRecor
       const requiredDailyPace = Math.floor(targetVolume / 25)
       const paceVariance = Number((((dailyAverageLifting - requiredDailyPace) / requiredDailyPace) * 100).toFixed(1))
 
-      const varianceVsBenchmark = Number((((seed % 20) - 10) / 10).toFixed(1))
+      const varianceVsBenchmark = Number((((seed % 100) - 50) / 1000).toFixed(4))
+      const varianceVsRack = Number(((((seed * 7) % 100) - 50) / 1000).toFixed(4))
       const benchmarkVariance: 'above' | 'below' | 'at' =
-        varianceVsBenchmark > 0.5 ? 'above' : varianceVsBenchmark < -0.5 ? 'below' : 'at'
+        varianceVsBenchmark > 0.005 ? 'above' : varianceVsBenchmark < -0.005 ? 'below' : 'at'
+
+      // Margin: avg cents per gallon as dollar value, range -$0.0250 to +$0.2500
+      const margin = Number((-0.025 + ((seed % 1000) / 1000) * 0.275).toFixed(4))
 
       const riskScore = Math.max(0, Math.min(100, 100 - fulfillmentPercentage + Math.abs(paceVariance)))
       const riskLevel: 'low' | 'medium' | 'high' | 'critical' =
@@ -830,7 +836,9 @@ export function generatePerformanceDetails(count = 8): GeneratedPerformanceRecor
         paceVariance,
         benchmarkPrice: basePrice,
         varianceVsBenchmark,
+        varianceVsRack,
         benchmarkVariance,
+        margin,
         riskScore: Math.round(riskScore),
         riskLevel,
         performanceStatus,
