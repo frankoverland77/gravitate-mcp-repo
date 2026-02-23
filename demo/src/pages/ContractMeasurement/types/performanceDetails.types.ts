@@ -21,6 +21,7 @@ export interface ProductPerformanceRecord {
   varianceVsRack: number // avg $/gal to 4 decimal places, range -0.0500 to +0.0500
   benchmarkVariance: BenchmarkVariance
   margin: number // avg $/gal to 4 decimal places, range -0.0250 to +0.2500
+  lowerOfImpact: number // total $ revenue loss from rack being lower side of lower-of, always <= 0
   riskScore: number
   riskLevel: RiskLevel
   performanceStatus: PerformanceStatus

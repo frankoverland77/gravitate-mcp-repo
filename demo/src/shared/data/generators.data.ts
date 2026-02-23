@@ -760,6 +760,7 @@ export interface GeneratedPerformanceRecord {
   varianceVsRack: number
   benchmarkVariance: 'above' | 'below' | 'at'
   margin: number
+  lowerOfImpact: number
   riskScore: number
   riskLevel: 'low' | 'medium' | 'high' | 'critical'
   performanceStatus: 'ahead' | 'on-track' | 'behind' | 'critical'
@@ -805,6 +806,12 @@ export function generatePerformanceDetails(count = 8): GeneratedPerformanceRecor
       // Margin: avg cents per gallon as dollar value, range -$0.0250 to +$0.2500
       const margin = Number((-0.025 + ((seed % 1000) / 1000) * 0.275).toFixed(4))
 
+      // Lower-of Impact: total $ loss when rack price undercuts contract terms
+      // Only negative when varianceVsRack < 0 (rack won), otherwise 0
+      const lowerOfImpact = varianceVsRack < 0
+        ? Math.round(varianceVsRack * actualVolume)
+        : 0
+
       const riskScore = Math.max(0, Math.min(100, 100 - fulfillmentPercentage + Math.abs(paceVariance)))
       const riskLevel: 'low' | 'medium' | 'high' | 'critical' =
         riskScore < 25 ? 'low' : riskScore < 50 ? 'medium' : riskScore < 75 ? 'high' : 'critical'
@@ -839,6 +846,7 @@ export function generatePerformanceDetails(count = 8): GeneratedPerformanceRecor
         varianceVsRack,
         benchmarkVariance,
         margin,
+        lowerOfImpact,
         riskScore: Math.round(riskScore),
         riskLevel,
         performanceStatus,

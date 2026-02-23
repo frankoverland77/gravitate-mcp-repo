@@ -216,6 +216,27 @@ export function ProductPerformanceTable({ data, onRowClick }: ProductPerformance
         sortable: true,
       },
       {
+        field: 'lowerOfImpact',
+        headerName: 'LOWER OF RACK IMPACT',
+        width: 170,
+        cellRenderer: (params: any) => {
+          const value = params.value
+          if (value === 0) {
+            return (
+              <span style={{ fontWeight: 600, color: '#8c8c8c' }}>
+                $0
+              </span>
+            )
+          }
+          return (
+            <span style={{ fontWeight: 600, color: '#cf1322' }}>
+              -${Math.abs(value).toLocaleString()}
+            </span>
+          )
+        },
+        sortable: true,
+      },
+      {
         field: 'trend',
         headerName: 'TREND',
         width: 120,

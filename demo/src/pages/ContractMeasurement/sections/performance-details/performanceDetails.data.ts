@@ -27,6 +27,7 @@ export const PRODUCT_PERFORMANCE_DATA: ProductPerformanceRecord[] = generatedDat
   varianceVsRack: item.varianceVsRack,
   benchmarkVariance: item.benchmarkVariance,
   margin: item.margin,
+  lowerOfImpact: item.lowerOfImpact,
   riskScore: item.riskScore,
   riskLevel: item.riskLevel,
   performanceStatus: item.performanceStatus,

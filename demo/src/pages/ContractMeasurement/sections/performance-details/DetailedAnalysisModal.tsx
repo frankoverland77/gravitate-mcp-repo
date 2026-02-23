@@ -4,8 +4,7 @@ import {
   DashboardOutlined,
   ThunderboltOutlined,
   CalendarOutlined,
-  BulbOutlined,
-  CheckCircleOutlined,
+  FallOutlined,
 } from '@ant-design/icons'
 import type { DetailedAnalysisData } from '../../types/performanceDetails.types'
 
@@ -38,10 +37,32 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
   const projectedCompletion = data?.projectedCompletion || ''
   const projectedShortfall = data?.projectedShortfall || 0
   const daysToTarget = data?.daysToTarget || 0
-  const recommendations = data?.recommendations || []
 
   // Fixed y-axis max for both charts
   const yMax = 15000
+
+  // Generate Lower-of Impact waterfall data
+  const waterfallData = (() => {
+    if (!product) return []
+    const baseSeed = product.id * 137
+    const contractRevenue = Math.round(product.actualVolume * 2.45) // ~$2.45/gal contract terms
+    const steps: { label: string; value: number; type: 'start' | 'loss' | 'end' }[] = []
+    steps.push({ label: 'Contract\nTerms', value: contractRevenue, type: 'start' })
+
+    // Generate 10 weekly loss periods where rack undercut contract
+    let cumLoss = 0
+    for (let i = 0; i < 10; i++) {
+      let s = baseSeed + i * 2654435761
+      s = ((s >>> 16) ^ s) * 0x45d9f3b
+      s = ((s >>> 16) ^ s) & 0x7fffffff
+      const loss = Math.round((s % 35000) + 3000) // $3k - $38k loss per week
+      cumLoss += loss
+      steps.push({ label: `Wk ${i + 1}`, value: -loss, type: 'loss' })
+    }
+
+    steps.push({ label: 'Realized', value: contractRevenue - cumLoss, type: 'end' })
+    return steps
+  })()
 
   return (
     <Modal
@@ -90,14 +111,14 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
               <Horizontal alignItems='center' style={{ gap: '8px' }}>
                 <ThunderboltOutlined style={{ fontSize: '16px', color: '#faad14' }} />
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Daily Pace
+                  Weekly Pace
                 </Texto>
               </Horizontal>
               <Texto category='h3' weight='600'>
-                {product.dailyAverageLifting.toLocaleString()}
+                {(product.dailyAverageLifting * 7).toLocaleString()}
               </Texto>
               <Texto category='p2' appearance='medium'>
-                Required: {product.requiredDailyPace.toLocaleString()}
+                Required: {(product.requiredDailyPace * 7).toLocaleString()}
               </Texto>
               <Texto category='p2' style={{ color: product.paceVariance >= 0 ? '#52c41a' : '#cf1322' }}>
                 {product.paceVariance >= 0 ? '+' : ''}
@@ -245,6 +266,168 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
           </div>
         </div>
 
+        {/* Lower-of Impact Waterfall */}
+        {waterfallData.length > 0 && (() => {
+          const startValue = waterfallData[0].value
+          const maxValue = startValue
+          const chartHeight = 200
+          const losses = waterfallData.filter(d => d.type === 'loss')
+          const totalLoss = losses.reduce((sum, d) => sum + Math.abs(d.value), 0)
+          const endValue = waterfallData[waterfallData.length - 1].value
+          let runningTotal = startValue
+
+          return (
+            <div style={{ ...cardStyle, backgroundColor: '#fff' }}>
+              <Vertical style={{ gap: '16px' }}>
+                <Horizontal alignItems='center' justifyContent='space-between'>
+                  <Horizontal alignItems='center' style={{ gap: '8px' }}>
+                    <FallOutlined style={{ fontSize: '18px', color: '#cf1322' }} />
+                    <Texto category='h5' weight='600'>
+                      Lower-of Impact Analysis
+                    </Texto>
+                  </Horizontal>
+                  <Horizontal style={{ gap: '16px' }}>
+                    <Texto category='p2' appearance='medium'>
+                      Total Impact: <span style={{ color: '#cf1322', fontWeight: 600 }}>-${totalLoss.toLocaleString()}</span>
+                    </Texto>
+                    <Texto category='p2' appearance='medium'>
+                      Rack Won: <span style={{ fontWeight: 600 }}>{losses.length} of {waterfallData.length - 2} periods</span>
+                    </Texto>
+                  </Horizontal>
+                </Horizontal>
+
+                {/* Waterfall Chart */}
+                <div style={{ position: 'relative', height: `${chartHeight + 40}px` }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', height: `${chartHeight}px`, gap: '4px', paddingLeft: '60px' }}>
+                    {waterfallData.map((step, index) => {
+                      if (step.type === 'start') {
+                        const barHeight = (step.value / maxValue) * chartHeight
+                        return (
+                          <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Texto category='p2' weight='600' style={{ fontSize: '10px', marginBottom: '4px' }}>
+                              ${(step.value / 1000000).toFixed(2)}M
+                            </Texto>
+                            <div style={{
+                              width: '100%',
+                              height: `${barHeight}px`,
+                              backgroundColor: '#1890ff',
+                              borderRadius: '4px 4px 0 0',
+                              opacity: 0.85,
+                            }} />
+                          </div>
+                        )
+                      }
+                      if (step.type === 'loss') {
+                        const prevTotal = runningTotal
+                        runningTotal += step.value // step.value is negative
+                        const topOffset = ((maxValue - prevTotal) / maxValue) * chartHeight
+                        const lossHeight = (Math.abs(step.value) / maxValue) * chartHeight
+
+                        return (
+                          <div key={index} style={{ flex: 1, position: 'relative', height: `${chartHeight}px` }}>
+                            {/* Connector line from previous bar */}
+                            <div style={{
+                              position: 'absolute',
+                              top: `${topOffset}px`,
+                              left: '-2px',
+                              width: 'calc(50% + 2px)',
+                              height: '1px',
+                              borderTop: '1px dashed #bfbfbf',
+                            }} />
+                            {/* Loss bar */}
+                            <div style={{
+                              position: 'absolute',
+                              top: `${topOffset}px`,
+                              left: '10%',
+                              right: '10%',
+                              height: `${Math.max(lossHeight, 4)}px`,
+                              backgroundColor: '#cf1322',
+                              borderRadius: '4px',
+                              opacity: 0.85,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                              {lossHeight > 16 && (
+                                <Texto category='p2' style={{ fontSize: '9px', color: '#fff', fontWeight: 600 }}>
+                                  -${(Math.abs(step.value) / 1000).toFixed(0)}K
+                                </Texto>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      }
+                      // End bar
+                      const barHeight = (step.value / maxValue) * chartHeight
+                      return (
+                        <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: `${chartHeight}px`, position: 'relative' }}>
+                          {/* Connector line */}
+                          <div style={{
+                            position: 'absolute',
+                            top: `${((maxValue - endValue) / maxValue) * chartHeight}px`,
+                            left: '-2px',
+                            width: 'calc(50% + 2px)',
+                            height: '1px',
+                            borderTop: '1px dashed #bfbfbf',
+                          }} />
+                          <Texto category='p2' weight='600' style={{ fontSize: '10px', marginBottom: '4px' }}>
+                            ${(step.value / 1000000).toFixed(2)}M
+                          </Texto>
+                          <div style={{
+                            width: '100%',
+                            height: `${barHeight}px`,
+                            backgroundColor: '#52c41a',
+                            borderRadius: '4px 4px 0 0',
+                            opacity: 0.85,
+                          }} />
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {/* X-axis labels */}
+                  <div style={{ display: 'flex', gap: '4px', paddingLeft: '60px', marginTop: '8px' }}>
+                    {waterfallData.map((step, index) => (
+                      <div key={index} style={{ flex: 1, textAlign: 'center' }}>
+                        <Texto category='p2' appearance='medium' style={{ fontSize: '10px' }}>
+                          {step.label}
+                        </Texto>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Y-axis labels */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, height: `${chartHeight}px`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '55px' }}>
+                    <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>
+                      ${(maxValue / 1000000).toFixed(1)}M
+                    </Texto>
+                    <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>
+                      ${(maxValue / 2000000).toFixed(1)}M
+                    </Texto>
+                    <Texto category='p2' appearance='medium' style={{ fontSize: '10px', textAlign: 'right' }}>
+                      $0
+                    </Texto>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <Horizontal style={{ gap: '20px' }}>
+                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                    <div style={{ width: '12px', height: '12px', backgroundColor: '#1890ff', borderRadius: '2px', opacity: 0.85 }} />
+                    <Texto category='p2' appearance='medium'>Contract Terms Revenue</Texto>
+                  </Horizontal>
+                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                    <div style={{ width: '12px', height: '12px', backgroundColor: '#cf1322', borderRadius: '2px', opacity: 0.85 }} />
+                    <Texto category='p2' appearance='medium'>Rack Undercut (Margin Erosion)</Texto>
+                  </Horizontal>
+                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                    <div style={{ width: '12px', height: '12px', backgroundColor: '#52c41a', borderRadius: '2px', opacity: 0.85 }} />
+                    <Texto category='p2' appearance='medium'>Actual Realized Revenue</Texto>
+                  </Horizontal>
+                </Horizontal>
+              </Vertical>
+            </div>
+          )
+        })()}
+
         {/* Pace Analysis */}
         <div style={{ ...cardStyle, backgroundColor: '#fff' }}>
           <Vertical style={{ gap: '16px' }}>
@@ -257,7 +440,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                   Current Pace
                 </Texto>
                 <Texto category='h4' weight='600'>
-                  {product.dailyAverageLifting.toLocaleString()}/day
+                  {(product.dailyAverageLifting * 7).toLocaleString()}/week
                 </Texto>
               </Vertical>
               <Vertical style={{ gap: '4px' }}>
@@ -265,7 +448,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                   Required Pace
                 </Texto>
                 <Texto category='h4' weight='600'>
-                  {product.requiredDailyPace.toLocaleString()}/day
+                  {(product.requiredDailyPace * 7).toLocaleString()}/week
                 </Texto>
               </Vertical>
               <Vertical style={{ gap: '4px' }}>
@@ -289,25 +472,6 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
           </Vertical>
         </div>
 
-        {/* Recommendations */}
-        <div style={{ ...cardStyle, backgroundColor: '#f6ffed', borderColor: '#b7eb8f' }}>
-          <Vertical style={{ gap: '16px' }}>
-            <Horizontal alignItems='center' style={{ gap: '8px' }}>
-              <BulbOutlined style={{ fontSize: '18px', color: '#52c41a' }} />
-              <Texto category='h5' weight='600'>
-                Recommendations
-              </Texto>
-            </Horizontal>
-            <Vertical style={{ gap: '12px' }}>
-              {recommendations.map((rec, index) => (
-                <Horizontal key={index} alignItems='flex-start' style={{ gap: '8px' }}>
-                  <CheckCircleOutlined style={{ fontSize: '14px', color: '#52c41a', marginTop: '3px' }} />
-                  <Texto category='p1'>{rec}</Texto>
-                </Horizontal>
-              ))}
-            </Vertical>
-          </Vertical>
-        </div>
       </Vertical>
       ) : null}
     </Modal>
