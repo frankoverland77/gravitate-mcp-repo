@@ -451,6 +451,7 @@ interface HistoricalComparisonSectionProps {
   aggregation: Aggregation
   method: Method
   onAggregationChange: (value: Aggregation) => void
+  hasComparisonScenarios?: boolean
 }
 
 export function HistoricalComparisonSection({
@@ -459,6 +460,7 @@ export function HistoricalComparisonSection({
   aggregation,
   method,
   onAggregationChange,
+  hasComparisonScenarios = true,
 }: HistoricalComparisonSectionProps) {
   const { isFutureMode } = useFeatureMode()
   const [activeView, setActiveView] = useState<ViewMode>('prices')
@@ -1030,6 +1032,22 @@ export function HistoricalComparisonSection({
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Muted message when no comparison scenarios exist */}
+      {!hasComparisonScenarios && (
+        <div
+          style={{
+            padding: '16px 24px',
+            backgroundColor: '#fafafa',
+            border: '1px solid #e8e8e8',
+            borderRadius: '8px',
+          }}
+        >
+          <Texto category='p1' appearance='medium'>
+            Add a comparison scenario to see historical trend lines overlaid on this chart
+          </Texto>
+        </div>
+      )}
     </div>
   )
 }

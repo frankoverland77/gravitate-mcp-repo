@@ -31,24 +31,6 @@ const INITIAL_SCENARIOS: Scenario[] = [
       locationHierarchy: 'city',
     },
   },
-  {
-    id: 'scenario-a',
-    name: 'Scenario A - OPIS Contract Low',
-    counterparty: 'circle-k',
-    products: 'all',
-    status: 'complete',
-    entryMethod: 'benchmark',
-    isReference: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    priceConfig: {
-      source: 'adhoc',
-      benchmarkId: 'contract-low',
-      publisher: 'opis',
-      productHierarchy: 'product-grade',
-      locationHierarchy: 'state',
-    },
-  },
 ]
 
 type ViewTab = 'scenarios' | 'historical'
@@ -78,6 +60,12 @@ export function BenchmarksTab() {
   const includedDetails = useMemo(
     () => SAMPLE_DETAILS.filter((d) => !excludedDetailIds.has(d.detailId)),
     [excludedDetailIds],
+  )
+
+  // True when at least one non-reference comparison scenario exists
+  const hasComparisonScenarios = useMemo(
+    () => scenarios.some((s) => !s.isReference),
+    [scenarios],
   )
 
   // Drawer state
@@ -219,29 +207,63 @@ export function BenchmarksTab() {
     return selections[0] || null
   }, [allRowsHaveSameReference, referenceSelections, scenarios])
 
+  // Detect no-match row indices based on the mock data generation logic
+  // Benchmark complete scenarios have no-match for the last 2 detail rows
+  const noMatchStats = useMemo(() => {
+    const totalDetails = SAMPLE_DETAILS.length
+    const noMatchThreshold = totalDetails - 2
+    const benchmarkScenarios = scenarios.filter((s) => s.entryMethod === 'benchmark' && s.status === 'complete')
+    if (benchmarkScenarios.length === 0) return { excludedCount: 0, totalCount: includedDetails.length }
+
+    // Count how many included details fall into the no-match zone
+    let excludedCount = 0
+    includedDetails.forEach((detail) => {
+      const originalIndex = SAMPLE_DETAILS.findIndex((d) => d.detailId === detail.detailId)
+      if (originalIndex >= noMatchThreshold) excludedCount++
+    })
+    return { excludedCount, totalCount: includedDetails.length }
+  }, [scenarios, includedDetails])
+
   // Compute fixed delta average for summary card (deterministic seeded values)
+  // Excludes no-match rows (last 2 details for benchmark scenarios)
   const fixedDeltaAverage = useMemo(() => {
     if (!columnReferenceScenarioId) return null
+    const refScenario = scenarios.find((s) => s.id === columnReferenceScenarioId)
+    const isRefBenchmarkComplete = refScenario?.entryMethod === 'benchmark' && refScenario?.status === 'complete'
+    const totalDetails = SAMPLE_DETAILS.length
+    const noMatchThreshold = totalDetails - 2
     const hash = columnReferenceScenarioId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
     let sum = 0
-    includedDetails.forEach((detail, index) => {
-      const seed = index * 7919 + hash
+    let count = 0
+    includedDetails.forEach((detail) => {
+      const originalIndex = SAMPLE_DETAILS.findIndex((d) => d.detailId === detail.detailId)
+      // Skip no-match rows for benchmark scenarios
+      if (isRefBenchmarkComplete && originalIndex >= noMatchThreshold) return
+      const seed = originalIndex * 7919 + hash
       const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1
       const scenarioPrice = 2.45 + frac * 0.3 - 0.15
       sum += detail.contractPrice - scenarioPrice
+      count++
     })
-    return includedDetails.length > 0 ? sum / includedDetails.length : 0
-  }, [columnReferenceScenarioId, includedDetails])
+    return count > 0 ? sum / count : 0
+  }, [columnReferenceScenarioId, includedDetails, scenarios])
 
   // Compute per-group delta breakdown when grouping is active
   const perGroupDeltas = useMemo(() => {
     if (groupingDimension === 'none' || !columnReferenceScenarioId) return null
+    const refScenario = scenarios.find((s) => s.id === columnReferenceScenarioId)
+    const isRefBenchmarkComplete = refScenario?.entryMethod === 'benchmark' && refScenario?.status === 'complete'
+    const totalDetails = SAMPLE_DETAILS.length
+    const noMatchThreshold = totalDetails - 2
     const hash = columnReferenceScenarioId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
     const groups = new Map<string, { sum: number; count: number }>()
 
-    includedDetails.forEach((detail, index) => {
+    includedDetails.forEach((detail) => {
+      const originalIndex = SAMPLE_DETAILS.findIndex((d) => d.detailId === detail.detailId)
+      // Skip no-match rows
+      if (isRefBenchmarkComplete && originalIndex >= noMatchThreshold) return
       const key = groupingDimension === 'product-family' ? detail.productGroup : detail.locationRegion
-      const seed = index * 7919 + hash
+      const seed = originalIndex * 7919 + hash
       const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1
       const scenarioPrice = 2.45 + frac * 0.3 - 0.15
       const delta = detail.contractPrice - scenarioPrice
@@ -257,7 +279,7 @@ export function BenchmarksTab() {
       result.push({ label: k.charAt(0).toUpperCase() + k.slice(1), avg: v.count > 0 ? v.sum / v.count : 0 })
     })
     return result
-  }, [groupingDimension, columnReferenceScenarioId, includedDetails])
+  }, [groupingDimension, columnReferenceScenarioId, includedDetails, scenarios])
 
   // Toggle handler for blended mode — when switching OFF, apply most common reference to all rows
   const handleToggleBlendedMode = useCallback(
@@ -373,7 +395,7 @@ export function BenchmarksTab() {
     <>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', minHeight: 0 }}>
         {/* Summary Card — uniform mode */}
-        {!isBlendedMode && allRowsHaveSameReference && fixedDeltaAverage !== null && (
+        {hasComparisonScenarios && !isBlendedMode && allRowsHaveSameReference && fixedDeltaAverage !== null && (
           <div
             style={{
               backgroundColor: '#ffffff',
@@ -400,8 +422,16 @@ export function BenchmarksTab() {
               </Texto>
               <Texto category="p2" appearance="medium">
                 Reference: {scenarios.find((s) => s.id === columnReferenceScenarioId)?.name || 'None'} · Across{' '}
-                {includedDetails.length} detail rows
+                {includedDetails.length - noMatchStats.excludedCount} detail rows
               </Texto>
+              {noMatchStats.excludedCount > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                  <WarningFilled style={{ color: '#faad14', fontSize: '13px' }} />
+                  <Texto category="p2" style={{ color: '#d48806' }}>
+                    {noMatchStats.excludedCount} no-match row(s) excluded from averages
+                  </Texto>
+                </div>
+              )}
               {perGroupDeltas && perGroupDeltas.length > 0 && (
                 <div style={{ display: 'flex', gap: '16px', marginTop: '4px', flexWrap: 'wrap' }}>
                   {perGroupDeltas.map((g) => (
@@ -417,7 +447,7 @@ export function BenchmarksTab() {
         )}
 
         {/* Summary Card — blended mode */}
-        {isBlendedMode && blendedSummary && (
+        {hasComparisonScenarios && isBlendedMode && blendedSummary && (
           <div
             style={{
               backgroundColor: '#ffffff',
@@ -516,6 +546,7 @@ export function BenchmarksTab() {
             onGroupingChange={setGroupingDimension}
             isBlendedMode={isBlendedMode}
             onToggleBlendedMode={handleToggleBlendedMode}
+            hasComparisonScenarios={hasComparisonScenarios}
           />
         ) : (
           <HistoricalComparisonSection
@@ -529,6 +560,7 @@ export function BenchmarksTab() {
                 price: { ...prev.price, aggregation: value },
               }))
             }
+            hasComparisonScenarios={hasComparisonScenarios}
           />
         )}
       </div>

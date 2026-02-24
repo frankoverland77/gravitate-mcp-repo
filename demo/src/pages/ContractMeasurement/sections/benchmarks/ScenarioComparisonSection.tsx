@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Texto, GraviButton, Horizontal, Vertical, NotificationMessage } from '@gravitate-js/excalibrr';
+import { Texto, GraviButton, Horizontal, Vertical, BBDTag, NotificationMessage } from '@gravitate-js/excalibrr';
 import {
   CheckSquareOutlined,
   BorderOutlined,
@@ -25,7 +25,87 @@ import { BenchmarkScenarioDrawer } from '../../components/BenchmarkScenarioDrawe
 import { FormulaScenarioDrawer } from '../../components/FormulaScenarioDrawer';
 import { UploadScenarioDrawer } from '../../components/UploadScenarioDrawer';
 import { SAMPLE_DETAILS, type ContractDetail } from '../../ContractMeasurement.data';
+import { getInstrumentsByProductGroup } from '../../../../shared/data/pricePublishers.data';
 import styles from './ScenarioComparisonSection.module.css';
+
+// Instrument picker popover content for no-match cells
+function InstrumentPickerPopover({
+  product,
+  location,
+  productGroup,
+  onApply,
+}: {
+  product: string;
+  location: string;
+  productGroup: string;
+  onApply: (instrumentId: string, price: number) => void;
+}) {
+  const [selectedInstrument, setSelectedInstrument] = useState<string | undefined>(undefined);
+  const group = productGroup === 'diesel' ? 'diesel' : 'gasoline';
+  const instruments = getInstrumentsByProductGroup(group);
+
+  // Deterministic mock price based on instrument ID
+  const resolvedPrice = useMemo(() => {
+    if (!selectedInstrument) return null;
+    const seed = selectedInstrument.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const frac = (((Math.sin(seed * 7919) * 43758.5453) % 1) + 1) % 1;
+    return 2.2 + frac * 0.35;
+  }, [selectedInstrument]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: 280, padding: '4px 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <Texto weight="600">Select Instrument</Texto>
+        <Texto category="p2" appearance="medium">
+          {product} — {location}
+        </Texto>
+      </div>
+      <Select
+        showSearch
+        placeholder="Choose an instrument..."
+        value={selectedInstrument}
+        onChange={setSelectedInstrument}
+        optionFilterProp="label"
+        options={instruments.map((inst) => ({
+          value: inst.id,
+          label: `${inst.publisher} — ${inst.name} (${inst.region})`,
+        }))}
+        style={{ width: '100%' }}
+      />
+      {resolvedPrice !== null && (
+        <div
+          style={{
+            backgroundColor: '#f6ffed',
+            border: '1px solid #b7eb8f',
+            borderRadius: '6px',
+            padding: '10px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2px',
+          }}
+        >
+          <Texto category="p2" appearance="medium">Resolved Price</Texto>
+          <Texto weight="700" style={{ color: '#52c41a' }}>
+            ${resolvedPrice.toFixed(4)}/gal
+          </Texto>
+        </div>
+      )}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <GraviButton
+          buttonText="Apply"
+          theme1
+          size="small"
+          disabled={!selectedInstrument || resolvedPrice === null}
+          onClick={() => {
+            if (selectedInstrument && resolvedPrice !== null) {
+              onApply(selectedInstrument, resolvedPrice);
+            }
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
 interface ScenarioComparisonSectionProps {
   scenarios: Scenario[];
@@ -44,6 +124,7 @@ interface ScenarioComparisonSectionProps {
   onGroupingChange: (dimension: GroupingDimension) => void;
   isBlendedMode: boolean;
   onToggleBlendedMode: (blended: boolean) => void;
+  hasComparisonScenarios?: boolean;
 }
 
 function generateScenarioCellData(
@@ -54,10 +135,11 @@ function generateScenarioCellData(
 ): ScenarioCellData {
   const totalDetails = SAMPLE_DETAILS.length;
 
-  // For benchmark scenarios, simulate no-match on last 2 details and partial data on detail at index totalDetails-3
+  // For benchmark scenarios, simulate no-match on last 2 details and partial data on 2 other details
   if (scenario?.entryMethod === 'benchmark' && scenario.status === 'complete') {
     const noMatchThreshold = totalDetails - 2;
-    const partialDataIndex = totalDetails - 3;
+    const partialDataIndex1 = totalDetails - 3;
+    const partialDataIndex2 = totalDetails - 5;
 
     // No match — lookup failure
     if (detailIndex >= noMatchThreshold) {
@@ -74,13 +156,17 @@ function generateScenarioCellData(
       };
     }
 
-    // Partial data — instrument found but incomplete prices
-    if (detailIndex === partialDataIndex) {
-      const basePrice = 2.45 + Math.random() * 0.3 - 0.15;
+    // Partial data — instrument found but incomplete prices (2 rows with different ratios)
+    if (detailIndex === partialDataIndex1 || detailIndex === partialDataIndex2) {
+      const seed = detailIndex * 7919 + scenarioId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1;
+      const basePrice = 2.45 + frac * 0.3 - 0.15;
       const primaryPrice = 2.45;
       const delta = isReference ? undefined : basePrice - primaryPrice;
       const allocation = SAMPLE_DETAILS[detailIndex].volume;
-      const rateability = 85 + Math.random() * 25;
+      const rateability = 85 + frac * 25;
+      const partialInfo =
+        detailIndex === partialDataIndex1 ? { available: 18, total: 22 } : { available: 7, total: 10 };
       return {
         scenarioId,
         price: basePrice,
@@ -94,16 +180,18 @@ function generateScenarioCellData(
         rateabilityStatus: rateability >= 90 ? 'on-track' : rateability >= 80 ? 'at-risk' : 'below-min',
         impact: delta ? Math.round(delta * allocation) : undefined,
         isReference,
-        missingPriceInfo: { available: 18, total: 22 },
+        missingPriceInfo: partialInfo,
       };
     }
   }
 
-  const basePrice = 2.45 + Math.random() * 0.3 - 0.15;
+  const seed = detailIndex * 7919 + scenarioId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1;
+  const basePrice = 2.45 + frac * 0.3 - 0.15;
   const primaryPrice = 2.45;
   const delta = isReference ? undefined : basePrice - primaryPrice;
   const allocation = SAMPLE_DETAILS[detailIndex].volume;
-  const rateability = 85 + Math.random() * 25;
+  const rateability = 85 + frac * 25;
 
   return {
     scenarioId,
@@ -138,6 +226,7 @@ export function ScenarioComparisonSection({
   onGroupingChange,
   isBlendedMode,
   onToggleBlendedMode,
+  hasComparisonScenarios = true,
 }: ScenarioComparisonSectionProps) {
   const { isFutureMode } = useFeatureMode();
   const [isReferenceMode, setIsReferenceMode] = useState(false);
@@ -149,6 +238,19 @@ export function ScenarioComparisonSection({
   // Edit mode state
   const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
   const [editingDetailId, setEditingDetailId] = useState<string | null>(null); // For single-detail edit
+
+  // Instrument override state for resolved no-match cells
+  const [instrumentOverrides, setInstrumentOverrides] = useState<Map<string, { instrumentId: string; price: number }>>(new Map());
+
+  const handleInstrumentOverride = useCallback((detailId: string, scenarioId: string, instrumentId: string, price: number) => {
+    const key = `${detailId}:${scenarioId}`;
+    setInstrumentOverrides((prev) => {
+      const next = new Map(prev);
+      next.set(key, { instrumentId, price });
+      return next;
+    });
+    NotificationMessage('Instrument Applied', `Override price set to $${price.toFixed(4)}/gal`, false);
+  }, []);
 
   // Row selection state for exclusion
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
@@ -326,11 +428,29 @@ export function ScenarioComparisonSection({
         const isReferenceForRow =
           referenceSelections[detail.detailId] === scenario.id ||
           (!referenceSelections[detail.detailId] && (scenario.isReference ?? false));
-        scenarioData[scenario.id] = generateScenarioCellData(scenario.id, isReferenceForRow, index, scenario);
+        const cellData = generateScenarioCellData(scenario.id, isReferenceForRow, index, scenario);
+
+        // Apply instrument override if a no-match cell has been resolved
+        const overrideKey = `${detail.detailId}:${scenario.id}`;
+        const override = instrumentOverrides.get(overrideKey);
+        if (override && cellData.isMissingPrice && !cellData.missingPriceInfo) {
+          const primaryPrice = 2.45;
+          const delta = isReferenceForRow ? undefined : override.price - primaryPrice;
+          scenarioData[scenario.id] = {
+            ...cellData,
+            price: override.price,
+            delta,
+            deltaPercent: delta ? (delta / primaryPrice) * 100 : undefined,
+            formulaRef: `Override: ${override.instrumentId}`,
+            isMissingPrice: false,
+          };
+        } else {
+          scenarioData[scenario.id] = cellData;
+        }
       });
       return { ...detail, scenarios: scenarioData } as ComparisonRowData;
     });
-  }, [scenarios, referenceSelections, includedDetails]);
+  }, [scenarios, referenceSelections, includedDetails, instrumentOverrides]);
 
   // Apply filters
   const filteredData = useMemo(() => {
@@ -454,25 +574,32 @@ export function ScenarioComparisonSection({
   }, [sortedData, groupingDimension, expandedGroups, scenarios]);
 
   const totals = useMemo(() => {
-    const result: Record<string, { volume: number; impact: number; avgCpgDelta: number }> = {};
+    const result: Record<string, { volume: number; impact: number; avgCpgDelta: number; includedCount: number; excludedCount: number }> = {};
     scenarios.forEach((scenario) => {
       let totalVolume = 0,
         totalImpact = 0,
         sumCpgDelta = 0,
-        countCpg = 0;
+        includedCount = 0,
+        excludedCount = 0;
       filteredData.forEach((row) => {
         const cellData = row.scenarios[scenario.id];
-        if (cellData) {
-          totalVolume += cellData.allocation;
-          totalImpact += cellData.impact || 0;
-          sumCpgDelta += cellData.price - row.contractPrice;
-          countCpg++;
+        if (!cellData) return;
+        // Skip full no-match cells (price=0, no partial data) from averages
+        if (cellData.isMissingPrice && !cellData.missingPriceInfo) {
+          excludedCount++;
+          return;
         }
+        totalVolume += cellData.allocation;
+        totalImpact += cellData.impact || 0;
+        sumCpgDelta += cellData.price - row.contractPrice;
+        includedCount++;
       });
       result[scenario.id] = {
         volume: totalVolume,
         impact: totalImpact,
-        avgCpgDelta: countCpg > 0 ? sumCpgDelta / countCpg : 0,
+        avgCpgDelta: includedCount > 0 ? sumCpgDelta / includedCount : 0,
+        includedCount,
+        excludedCount,
       };
     });
     return result;
@@ -481,16 +608,25 @@ export function ScenarioComparisonSection({
   // Use Map keyed by detailId so sorting doesn't break delta-to-row association
   const fixedDeltas = useMemo(() => {
     if (!columnReferenceScenarioId) return null;
-    const perRow = new Map<string, number>();
+    const perRow = new Map<string, number | null>();
     let sum = 0;
+    let includedCount = 0;
+    let excludedCount = 0;
     filteredData.forEach((row) => {
       const primaryCell = row.scenarios[columnReferenceScenarioId];
+      // Skip full no-match cells
+      if (primaryCell && primaryCell.isMissingPrice && !primaryCell.missingPriceInfo) {
+        perRow.set(row.detailId, null);
+        excludedCount++;
+        return;
+      }
       const delta = primaryCell ? row.contractPrice - primaryCell.price : 0;
       perRow.set(row.detailId, delta);
       sum += delta;
+      includedCount++;
     });
-    const avg = perRow.size > 0 ? sum / perRow.size : 0;
-    return { perRow, average: avg };
+    const avg = includedCount > 0 ? sum / includedCount : 0;
+    return { perRow, average: avg, includedCount, excludedCount };
   }, [filteredData, columnReferenceScenarioId]);
 
   // Blended fixed deltas — per-row delta using each row's own reference scenario
@@ -633,15 +769,37 @@ export function ScenarioComparisonSection({
       // No match — lookup failure (benchmark scenario, isMissingPrice=true, no missingPriceInfo)
       if (scenario.entryMethod === 'benchmark' && cellData.isMissingPrice && !cellData.missingPriceInfo) {
         return (
-          <Tooltip title={`No price instrument found for ${record.product} — ${record.location}. Select one manually.`}>
+          <Popover
+            trigger="click"
+            placement="right"
+            content={
+              <InstrumentPickerPopover
+                product={record.product}
+                location={record.location}
+                productGroup={record.productGroup}
+                onApply={(instrumentId, price) =>
+                  handleInstrumentOverride(record.detailId, scenario.id, instrumentId, price)
+                }
+              />
+            }
+          >
             <div className={styles.noMatchCell}>
-              <WarningFilled className={styles.noMatchIcon} />
-              <Texto category="p2" weight="600" appearance="error">No Match</Texto>
+              <div className={styles.noMatchIconCircle}>
+                <WarningFilled className={styles.noMatchIcon} />
+              </div>
+              <BBDTag danger>No Match</BBDTag>
               <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
-                No instrument found
+                No instrument found for
               </Texto>
+              <Texto category="p2" weight="600" style={{ fontSize: '11px', textAlign: 'center' }}>
+                {record.product}
+              </Texto>
+              <span className={styles.noMatchFixLink}>
+                <EditOutlined style={{ fontSize: 12 }} />
+                Select instrument
+              </span>
             </div>
-          </Tooltip>
+          </Popover>
         );
       }
 
@@ -684,7 +842,7 @@ export function ScenarioComparisonSection({
         />
       );
     },
-    [referenceSelections, hasRowReference, isReferenceMode, onSetReference, handleEditDetail]
+    [referenceSelections, hasRowReference, isReferenceMode, onSetReference, handleEditDetail, handleInstrumentOverride]
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -948,6 +1106,50 @@ export function ScenarioComparisonSection({
         ]
       : [];
 
+    // Ghost placeholder column — visible when no comparison scenarios and no draft column
+    const ghostColumn: ColumnsType<TableRow> =
+      !hasComparisonScenarios && !showDraftColumn
+        ? [
+            {
+              title: (
+                <div className={styles.ghostColumnHeader}>
+                  <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>
+                    Add a scenario...
+                  </Texto>
+                </div>
+              ),
+              dataIndex: 'ghost',
+              key: 'ghost',
+              width: 300,
+              onCell: (_, index) => ({
+                rowSpan: index === 0 ? displayData.filter((r) => !r.isGroupHeader).length || includedDetails.length : 0,
+              }),
+              render: (_: unknown, record: TableRow, index: number) => {
+                if (record.isGroupHeader || index !== 0) return null;
+                return (
+                  <div className={styles.ghostColumnContent}>
+                    <div className={styles.ghostIconCircle}>
+                      <PlusOutlined className={styles.ghostIcon} />
+                    </div>
+                    <Texto category="h5" weight="600">
+                      Add a scenario to compare
+                    </Texto>
+                    <Texto category="p2" appearance="medium" style={{ textAlign: 'center' }}>
+                      Compare your contract against benchmarks, custom formulas, or uploaded pricing
+                    </Texto>
+                    <GraviButton
+                      buttonText="Add Scenario"
+                      icon={<PlusOutlined />}
+                      theme1
+                      onClick={handleAddScenarioClick}
+                    />
+                  </div>
+                );
+              },
+            },
+          ]
+        : [];
+
     // Reference column — only visible in blended mode
     const referenceColumn: ColumnsType<TableRow> = isBlendedMode
       ? [
@@ -1062,12 +1264,13 @@ export function ScenarioComparisonSection({
                   let count = 0;
                   groupRows.forEach((r) => {
                     const d = fixedDeltas.perRow.get(r.detailId);
-                    if (d !== undefined) {
+                    if (d !== undefined && d !== null) {
                       sum += d;
                       count++;
                     }
                   });
-                  const avg = count > 0 ? sum / count : 0;
+                  if (count === 0) return <Texto weight="600" appearance="medium">--</Texto>;
+                  const avg = sum / count;
                   return (
                     <Texto weight="600" className={getDeltaColorClass(avg)}>
                       {avg >= 0 ? '+$' : '-$'}
@@ -1090,7 +1293,10 @@ export function ScenarioComparisonSection({
                 }
                 // Uniform per-row delta
                 if (!fixedDeltas) return null;
-                const delta = fixedDeltas.perRow.get(record.detailId) ?? 0;
+                const delta = fixedDeltas.perRow.get(record.detailId);
+                if (delta === null || delta === undefined) {
+                  return <Texto weight="600" appearance="medium">--</Texto>;
+                }
                 return (
                   <Texto weight="600" className={getDeltaColorClass(delta)}>
                     {delta >= 0 ? '+$' : '-$'}
@@ -1138,9 +1344,10 @@ export function ScenarioComparisonSection({
       },
     ];
 
-    return [...baseColumns, ...referenceColumn, ...scenarioColumns, ...fixedDeltaColumn, ...draftColumn, ...actionColumn];
+    return [...baseColumns, ...referenceColumn, ...scenarioColumns, ...ghostColumn, ...fixedDeltaColumn, ...draftColumn, ...actionColumn];
   }, [
     scenarios,
+    hasComparisonScenarios,
     referenceSelections,
     isReferenceMode,
     isColumnReference,
@@ -1214,17 +1421,28 @@ export function ScenarioComparisonSection({
               </td>
             )}
             {/* One cell per scenario */}
-            {scenarios.map((scenario) => (
-              <td key={scenario.id} className={styles.summaryHeaderCell}>
-                {isFutureMode && (
-                  <Texto weight="600">{(totals[scenario.id]?.volume / 1000).toFixed(0)}K gal</Texto>
-                )}
-                <Texto weight="600" className={getDeltaColorClass(totals[scenario.id]?.avgCpgDelta)}>
-                  {totals[scenario.id]?.avgCpgDelta >= 0 ? '+$' : '-$'}
-                  {Math.abs(totals[scenario.id]?.avgCpgDelta).toFixed(4)}/gal
-                </Texto>
-              </td>
-            ))}
+            {scenarios.map((scenario) => {
+              const scenarioTotals = totals[scenario.id];
+              return (
+                <td key={scenario.id} className={styles.summaryHeaderCell}>
+                  {isFutureMode && (
+                    <Texto weight="600">{(scenarioTotals?.volume / 1000).toFixed(0)}K gal</Texto>
+                  )}
+                  <Texto weight="600" className={getDeltaColorClass(scenarioTotals?.avgCpgDelta)}>
+                    {scenarioTotals?.avgCpgDelta >= 0 ? '+$' : '-$'}
+                    {Math.abs(scenarioTotals?.avgCpgDelta).toFixed(4)}/gal
+                  </Texto>
+                  {scenarioTotals?.excludedCount > 0 && (
+                    <Tooltip title={`${scenarioTotals.excludedCount} no-match row(s) excluded from this average`}>
+                      <div className={styles.summaryExclusionIndicator}>
+                        <WarningFilled style={{ fontSize: 11 }} />
+                        <span>Avg of {scenarioTotals.includedCount}/{scenarioTotals.includedCount + scenarioTotals.excludedCount}</span>
+                      </div>
+                    </Tooltip>
+                  )}
+                </td>
+              );
+            })}
             {/* Fixed delta column (conditional) */}
             {hasFixedDelta && (isBlendedMode ? blendedFixedDeltas : fixedDeltas) && (
               <td className={styles.summaryHeaderCell}>
@@ -1232,15 +1450,28 @@ export function ScenarioComparisonSection({
                   const avg = isBlendedMode ? blendedFixedDeltas?.average ?? 0 : fixedDeltas?.average ?? 0
                   const hasAssigned = isBlendedMode ? (blendedFixedDeltas?.assignedCount ?? 0) > 0 : true
                   if (!hasAssigned) return <Texto weight="600" appearance="medium">--</Texto>
+                  const fdExcluded = !isBlendedMode && fixedDeltas ? fixedDeltas.excludedCount : 0
                   return (
-                    <Texto weight="600" className={getDeltaColorClass(avg)}>
-                      {avg >= 0 ? '+$' : '-$'}
-                      {Math.abs(avg).toFixed(4)}/gal
-                    </Texto>
+                    <>
+                      <Texto weight="600" className={getDeltaColorClass(avg)}>
+                        {avg >= 0 ? '+$' : '-$'}
+                        {Math.abs(avg).toFixed(4)}/gal
+                      </Texto>
+                      {fdExcluded > 0 && fixedDeltas && (
+                        <Tooltip title={`${fdExcluded} no-match row(s) excluded from this average`}>
+                          <div className={styles.summaryExclusionIndicator}>
+                            <WarningFilled style={{ fontSize: 11 }} />
+                            <span>Avg of {fixedDeltas.includedCount}/{fixedDeltas.includedCount + fdExcluded}</span>
+                          </div>
+                        </Tooltip>
+                      )}
+                    </>
                   )
                 })()}
               </td>
             )}
+            {/* Ghost column (conditional, empty) */}
+            {!hasComparisonScenarios && !showDraftColumn && <td className={styles.summaryHeaderCell} />}
             {/* Draft column (conditional, empty) */}
             {showDraftColumn && <td className={styles.summaryHeaderCell} />}
             {/* Action column (empty) */}
@@ -1249,7 +1480,7 @@ export function ScenarioComparisonSection({
         </thead>
       )
     },
-    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, blendedFixedDeltas, isBlendedMode, showDraftColumn]
+    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, blendedFixedDeltas, isBlendedMode, showDraftColumn, hasComparisonScenarios]
   )
 
   if (scenarios.length === 0) {
@@ -1257,14 +1488,8 @@ export function ScenarioComparisonSection({
       <div className={styles.emptyState}>
         <Vertical alignItems="center" style={{ gap: '16px' }}>
           <StarOutlined className={styles.emptyIcon} />
-          <Texto category="h4">No Scenarios</Texto>
-          <Texto appearance="medium">Add a scenario to start comparing pricing options.</Texto>
-          <GraviButton
-            buttonText="Add Scenario"
-            icon={<PlusOutlined />}
-            theme1
-            onClick={handleAddScenarioClick}
-          />
+          <Texto category="h4">No Scenarios Configured</Texto>
+          <Texto appearance="medium">Contact your administrator.</Texto>
         </Vertical>
       </div>
     );
@@ -1278,59 +1503,79 @@ export function ScenarioComparisonSection({
             Scenario Comparison
           </Texto>
           <Texto category="p2" appearance="medium">
-            Compare pricing scenarios across all product details
+            {hasComparisonScenarios
+              ? 'Compare pricing scenarios across all product details'
+              : 'Add a comparison scenario to get started'}
           </Texto>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-          <Texto category="p2" appearance="medium" weight="600">
-            Group by
-          </Texto>
-          <Select
-            value={groupingDimension}
-            onChange={onGroupingChange}
-            options={GROUPING_OPTIONS}
-            style={{ minWidth: 150 }}
-          />
-          <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
-          <Texto category="p2" appearance="medium" weight="600">
-            Filter by
-          </Texto>
-          <Select
-            mode="multiple"
-            placeholder="All Products"
-            value={productFilter}
-            onChange={setProductFilter}
-            options={uniqueProducts}
-            style={{ minWidth: 200 }}
-            maxTagCount={2}
-            allowClear
-          />
-          <Select
-            mode="multiple"
-            placeholder="All Locations"
-            value={locationFilter}
-            onChange={setLocationFilter}
-            options={uniqueLocations}
-            style={{ minWidth: 200 }}
-            maxTagCount={2}
-            allowClear
-          />
-          {hasActiveFilters && (
-            <GraviButton
-              buttonText="Clear"
-              appearance="text"
-              onClick={() => {
-                setProductFilter([]);
-                setLocationFilter([]);
-              }}
-            />
+          {hasComparisonScenarios && (
+            <>
+              <Switch
+                checked={isBlendedMode}
+                onChange={onToggleBlendedMode}
+                checkedChildren="Blended"
+                unCheckedChildren="Uniform"
+              />
+              <Texto category="p2" appearance="medium" weight="600">
+                Group by
+              </Texto>
+              <Select
+                value={groupingDimension}
+                onChange={onGroupingChange}
+                options={GROUPING_OPTIONS}
+                style={{ minWidth: 150 }}
+              />
+              <Texto category="p2" appearance="medium" weight="600">
+                Filter by
+              </Texto>
+              <Select
+                mode="multiple"
+                placeholder="All Products"
+                value={productFilter}
+                onChange={setProductFilter}
+                options={uniqueProducts}
+                style={{ minWidth: 200 }}
+                maxTagCount={2}
+                allowClear
+              />
+              <Select
+                mode="multiple"
+                placeholder="All Locations"
+                value={locationFilter}
+                onChange={setLocationFilter}
+                options={uniqueLocations}
+                style={{ minWidth: 200 }}
+                maxTagCount={2}
+                allowClear
+              />
+              {hasActiveFilters && (
+                <GraviButton
+                  buttonText="Clear"
+                  appearance="text"
+                  onClick={() => {
+                    setProductFilter([]);
+                    setLocationFilter([]);
+                  }}
+                />
+              )}
+              {hasActiveFilters && (
+                <Texto category="p2" appearance="medium">
+                  Showing {filteredData.length} of {comparisonData.length} details
+                </Texto>
+              )}
+              <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
+              {!isBlendedMode && (
+                <GraviButton
+                  buttonText={isReferenceMode ? 'Done' : 'Set Reference'}
+                  icon={isReferenceMode ? <CheckSquareOutlined /> : <BorderOutlined />}
+                  theme1
+                  appearance={isReferenceMode ? 'filled' : 'outlined'}
+                  onClick={() => setIsReferenceMode(!isReferenceMode)}
+                />
+              )}
+            </>
           )}
-          {hasActiveFilters && (
-            <Texto category="p2" appearance="medium">
-              Showing {filteredData.length} of {comparisonData.length} details
-            </Texto>
-          )}
-          <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
           {!showDraftColumn && (
             <GraviButton
               buttonText="Add Scenario"
@@ -1339,22 +1584,9 @@ export function ScenarioComparisonSection({
               onClick={handleAddScenarioClick}
             />
           )}
-          {!isBlendedMode && (
-            <GraviButton
-              buttonText={isReferenceMode ? 'Done' : 'Set Reference'}
-              icon={isReferenceMode ? <CheckSquareOutlined /> : <BorderOutlined />}
-              theme1
-              appearance={isReferenceMode ? 'filled' : 'outlined'}
-              onClick={() => setIsReferenceMode(!isReferenceMode)}
-            />
+          {hasComparisonScenarios && (
+            <GraviButton buttonText="Export Results" appearance="outlined" />
           )}
-          <Switch
-            checked={isBlendedMode}
-            onChange={onToggleBlendedMode}
-            checkedChildren="Blended"
-            unCheckedChildren="Uniform"
-          />
-          <GraviButton buttonText="Export Results" appearance="outlined" />
           {selectedRowKeys.length > 0 && (
             <>
               <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />

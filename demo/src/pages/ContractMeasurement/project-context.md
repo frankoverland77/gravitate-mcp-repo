@@ -3214,3 +3214,151 @@ When a contract has multiple product-location details, different rows may be bes
 - Group-header bulk assignment (dropdown on group row to assign all children)
 - Persist blended mode to localStorage
 - "Copy reference down" context menu action
+
+### Session 25 (2026-02-24) - No-Match Cell State Enhancement & Instrument Picker
+
+**Problem Statement:**
+The Scenario Comparison table had basic scaffolding for "no-match" and "partial data" cell states, but they lacked visual prominence and actionability. Full no-match cells (zero instrument found) needed a "fix it" affordance. Partial-match cells needed clearer visual treatment. The summary row was **buggy** — it included no-match cells (price=0) in the CPG delta average, dragging it down incorrectly.
+
+**Completed:**
+
+1. **Bug Fix: Totals Calculation**
+   - `totals` useMemo now skips no-match cells (`isMissingPrice && !missingPriceInfo`) from CPG delta averages
+   - Tracks `includedCount` and `excludedCount` per scenario
+   - `fixedDeltas` useMemo returns `null` for no-match rows; Fixed Delta column renders `--` for excluded rows
+   - Same fix applied in BenchmarksTab summary card (`fixedDeltaAverage`, `perGroupDeltas`)
+
+2. **Enhanced No-Match Cell**
+   - 36px circular icon container (`.noMatchIconCircle`) with red-tinted background
+   - `BBDTag danger` for "No Match" label
+   - Product name shown for context
+   - Hover-reveal "Select instrument" link (`.noMatchFixLink`, opacity 0→1 on hover)
+   - Entire cell wrapped in `<Popover trigger="click">` pointing to InstrumentPickerPopover
+
+3. **InstrumentPickerPopover Component**
+   - Searchable `<Select>` dropdown with instruments from `getInstrumentsByProductGroup()`
+   - Green preview box shows resolved price after selection (deterministic seeded mock price)
+   - "Apply" button commits override
+   - Uses `instrumentOverrides` Map state (`"detailId:scenarioId"` → `{ instrumentId, price }`)
+   - `comparisonData` useMemo checks overrides: converts no-match → normal cell with override price
+
+4. **Enhanced Partial-Match Cell (ScenarioCellRenderer)**
+   - Outer div uses `.partialMatchCell` class (amber 3px left border + subtle tint)
+   - Delta uses `.deltaPartial` class (amber italic + asterisk suffix)
+   - Badge uses `.partialDataBadge` pill-shaped style (amber bg + border, rounded)
+   - Enhanced tooltip: structured HTML with bold title + available/total breakdown + missing count
+
+5. **Summary Row & Card Warnings**
+   - Per-scenario summary cells show "Avg of X/Y" with warning icon when no-match rows excluded
+   - Fixed Delta summary cell also shows exclusion warning
+   - BenchmarksTab uniform summary card shows amber warning: "N no-match row(s) excluded from averages"
+   - Row count corrected to show actual included count
+
+6. **More Varied Mock Data**
+   - Second partial-data row added at `totalDetails - 5` with ratio 7/10 (in addition to existing 18/22)
+   - All `Math.random()` calls in `generateScenarioCellData` replaced with deterministic seeded values
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `sections/benchmarks/ScenarioComparisonSection.module.css` | 7 new classes: `.noMatchIconCircle`, `.noMatchFixLink`, `.partialMatchCell`, `.deltaPartial`, `.partialDataBadge`, `.summaryExclusionIndicator`; enhanced `.noMatchCell` with hover/cursor |
+| `sections/benchmarks/ScenarioCellRenderer.tsx` | Partial-match: amber border class, italic amber delta with asterisk, pill badge, structured tooltip |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | `InstrumentPickerPopover` component, `instrumentOverrides` state, totals bug fix (skip no-match), fixedDeltas null handling, enhanced no-match cell with Popover, summary row warnings, deterministic mock data, second partial row |
+| `tabs/BenchmarksTab.tsx` | `noMatchStats` memo, `fixedDeltaAverage` excludes no-match rows, `perGroupDeltas` excludes no-match, amber warning in uniform summary card |
+
+**Key Implementation Details:**
+
+1. **Instrument Override State:**
+   ```tsx
+   const [instrumentOverrides, setInstrumentOverrides] = useState<Map<string, { instrumentId: string; price: number }>>(new Map())
+   // Key format: "detailId:scenarioId"
+   // comparisonData useMemo applies overrides to convert no-match → normal cell
+   ```
+
+2. **No-Match Detection for Exclusion:**
+   ```tsx
+   // A cell is "full no-match" when: isMissingPrice === true && !missingPriceInfo
+   // A cell is "partial-match" when: missingPriceInfo is present (has real calculated values)
+   // Only full no-match is excluded from averages
+   ```
+
+3. **Deterministic Mock Prices:**
+   ```tsx
+   const seed = detailIndex * 7919 + scenarioId.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+   const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1
+   ```
+
+**Build status:** Vite build passes. No new TS errors.
+
+### Session 26 (2026-02-24) - Empty Scenario State (Ghost Column)
+
+**Problem Statement:**
+When a user creates a new measurement and selects a contract, they land on the Benchmarks tab with pre-loaded comparison scenarios. The design spec calls for a polished first-use experience: the grid renders with only the reference "Current Contract" column, and a ghost placeholder column invites the user to add their first comparison scenario. Summary tiles and advanced toolbar controls are hidden until meaningful comparison data exists.
+
+**Key Concept:** "Empty" means no comparison scenarios (`scenarios.filter(s => !s.isReference).length === 0`), not zero scenarios total. The reference scenario always exists.
+
+**Completed:**
+
+1. **Reduced Initial Scenarios** — Removed "Scenario A" from `INITIAL_SCENARIOS` in BenchmarksTab; app now starts with only the reference "Current Contract" scenario.
+
+2. **`hasComparisonScenarios` Derived Boolean** — Added to BenchmarksTab, computed via `scenarios.some(s => !s.isReference)`. Passed as prop to both ScenarioComparisonSection and HistoricalComparisonSection.
+
+3. **Ghost Placeholder Column** — 300px dashed-border column with icon circle (PlusOutlined), heading, description text, and "Add Scenario" CTA button. Uses `rowSpan` to span all data rows (same pattern as draft column). Visible only when `!hasComparisonScenarios && !showDraftColumn`. Disappears when user clicks Add Scenario (draft column takes over) or when a scenario is saved.
+
+4. **Summary Cards Guarded** — Both uniform and blended summary cards in BenchmarksTab prepend `hasComparisonScenarios &&` to their render conditions.
+
+5. **Simplified Toolbar** — Filter/grouping/sort/blended/export controls wrapped in `{hasComparisonScenarios && ...}`. Only title + subtitle + "Add Scenario" button visible in empty state. Subtitle changes to "Add a comparison scenario to get started".
+
+6. **HeaderWrapper Updated** — Ghost column gets matching `<td>` in summary row to prevent column misalignment.
+
+7. **Historical Tab Muted Message** — Info bar below chart: "Add a comparison scenario to see historical trend lines overlaid on this chart". Chart continues rendering baseline series normally.
+
+8. **Edge Case Guard Updated** — `scenarios.length === 0` fallback text changed to "No Scenarios Configured / Contact your administrator."
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `sections/benchmarks/ScenarioComparisonSection.module.css` | 4 new classes: `.ghostColumnHeader`, `.ghostColumnContent`, `.ghostIconCircle`, `.ghostIcon` |
+| `tabs/BenchmarksTab.tsx` | Removed Scenario A from INITIAL_SCENARIOS, added `hasComparisonScenarios` memo, guarded summary cards, passed prop to both sections |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | Added `hasComparisonScenarios` prop, ghost column definition + assembly, simplified toolbar, HeaderWrapper ghost td, updated edge case text |
+| `sections/benchmarks/HistoricalComparisonSection.tsx` | Added `hasComparisonScenarios` prop, muted info bar below chart |
+
+**Transition Flow:**
+1. User lands → grid shows Detail + Current Contract + ghost column with CTA
+2. User clicks "Add Scenario" → `showDraftColumn = true` → ghost disappears, draft column appears
+3. User picks scenario type → drawer opens → configures and saves
+4. Scenario added → `hasComparisonScenarios = true` → ghost gone permanently, toolbar controls appear, summary cards enabled
+
+**Build status:** Vite build passes. No new TS errors.
+
+### Session 27 (2026-02-24) - Drawer Layout Width Fixes & Toolbar Reorder
+
+**Problem Statement:**
+The "Add Benchmark Scenario" bottom drawer uses a `280px 1fr` grid. Since the drawer spans full screen width, the right-side `1fr` column stretched to 1000+ pixels, making the config panel, form fields, and buttons look oversized. The toolbar control order also needed reorganization for better UX flow.
+
+**Completed:**
+
+1. **Constrained Center Panel Width** — Added `max-width: 380px` to `.centerPanel` in both `ExistingBenchmarkSelector.module.css` and `BenchmarkSelector.module.css`. Config tiles now stay at a reasonable ~380px instead of stretching across the entire drawer.
+
+2. **Constrained Empty State Width** — Replaced `grid-column: 2 / -1` with `max-width: 380px` on `.emptyState` in both CSS files so the "Select a benchmark type to configure" placeholder matches the config tiles.
+
+3. **Button Hug Content** — Added `alignSelf: 'flex-start'` to the "Apply Selection" / "Update Selection" `GraviButton` in `BenchmarkSelector.tsx` so it hugs its text content instead of stretching full-width.
+
+4. **Toolbar Control Reorder** — Reorganized the ScenarioComparisonSection toolbar from left to right:
+   - **Before:** Group by | divider | Filter by + Products + Locations | divider | Add Scenario | Set Reference | Uniform/Blended | Export Results
+   - **After:** Blended/Uniform toggle | Group by | Filter by + Products + Locations | divider | Set Reference | Add Scenario | Export Results
+   - Removed redundant divider between Group by and Filter by (they now flow naturally as the "left group")
+   - Moved Switch to far left, Set Reference before Add Scenario, Export Results at far right
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `components/benchmark/ExistingBenchmarkSelector.module.css` | Added `max-width: 380px` to `.centerPanel`; replaced `grid-column: 2 / -1` with `max-width: 380px` on `.emptyState` |
+| `components/benchmark/BenchmarkSelector.module.css` | Same changes as above |
+| `components/benchmark/BenchmarkSelector.tsx` | Added `alignSelf: 'flex-start'` to Apply/Update button style |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | Reordered toolbar controls: Switch first, Set Reference before Add Scenario, Export at end |
+
+**Build status:** Vite build passes. No new TS errors.

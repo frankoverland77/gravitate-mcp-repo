@@ -28,7 +28,11 @@ export function ScenarioCellRenderer({
   onSetReference,
 }: ScenarioCellRendererProps) {
   const { isFutureMode } = useFeatureMode();
-  const cellClassName = `${styles.scenarioCell} ${isReferenceForRow ? styles.scenarioCellReference : ''}`;
+  const hasPartialData = !!cellData.missingPriceInfo;
+
+  const cellClassName = hasPartialData
+    ? `${styles.partialMatchCell} ${isReferenceForRow ? styles.scenarioCellReference : ''}`
+    : `${styles.scenarioCell} ${isReferenceForRow ? styles.scenarioCellReference : ''}`;
 
   return (
     <div className={cellClassName}>
@@ -49,9 +53,15 @@ export function ScenarioCellRenderer({
         </Horizontal>
 
         {cellData.delta !== undefined && (
-          <Texto category="p2" className={getDeltaColorClass(cellData.delta)}>
-            {`${cellData.delta >= 0 ? '+' : ''}${cellData.delta.toFixed(2)} (${cellData.deltaPercent?.toFixed(1)}%)`}
-          </Texto>
+          hasPartialData ? (
+            <Texto category="p2" className={styles.deltaPartial}>
+              {`${cellData.delta >= 0 ? '+' : ''}${cellData.delta.toFixed(2)} (${cellData.deltaPercent?.toFixed(1)}%)*`}
+            </Texto>
+          ) : (
+            <Texto category="p2" className={getDeltaColorClass(cellData.delta)}>
+              {`${cellData.delta >= 0 ? '+' : ''}${cellData.delta.toFixed(2)} (${cellData.deltaPercent?.toFixed(1)}%)`}
+            </Texto>
+          )
         )}
 
         <Texto category="p2" appearance="medium" className={styles.formulaRef}>
@@ -59,10 +69,24 @@ export function ScenarioCellRenderer({
         </Texto>
 
         {cellData.missingPriceInfo && (
-          <Tooltip title={`${cellData.missingPriceInfo.available} of ${cellData.missingPriceInfo.total} prices available — average calculated from available data`}>
-            <div className={styles.missingPriceIndicator}>
+          <Tooltip
+            title={
+              <div>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>Incomplete Price Data</div>
+                <div>
+                  {cellData.missingPriceInfo.available} of {cellData.missingPriceInfo.total} prices available
+                </div>
+                <div style={{ marginTop: '2px', opacity: 0.8 }}>
+                  {cellData.missingPriceInfo.total - cellData.missingPriceInfo.available} missing — average calculated from available data
+                </div>
+              </div>
+            }
+          >
+            <div className={styles.partialDataBadge}>
               <ExclamationCircleOutlined />
-              <span>Partial data ({cellData.missingPriceInfo.available}/{cellData.missingPriceInfo.total})</span>
+              <span>
+                {cellData.missingPriceInfo.available}/{cellData.missingPriceInfo.total} prices
+              </span>
             </div>
           </Tooltip>
         )}

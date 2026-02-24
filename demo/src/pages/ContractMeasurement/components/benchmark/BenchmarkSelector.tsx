@@ -244,7 +244,7 @@ export function BenchmarkSelector({
                   success
                   disabled={!canApply}
                   onClick={handleApply}
-                  style={{ marginTop: '8px' }}
+                  style={{ marginTop: '8px', alignSelf: 'flex-start' }}
                 />
               </Vertical>
             </div>
