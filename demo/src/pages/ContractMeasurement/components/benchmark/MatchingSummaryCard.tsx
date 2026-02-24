@@ -35,21 +35,21 @@ export function MatchingSummaryCard({
       />
 
       <Horizontal justifyContent="space-between">
-        <Vertical gap="4px">
-          <Horizontal alignItems="center" gap="6px">
+        <Vertical style={{ gap: '4px' }}>
+          <Horizontal alignItems="center" style={{ gap: '6px' }}>
             <CheckCircleOutlined className={`${styles.matchIcon} ${styles.matchIconSuccess}`} />
             <Texto category="p2">
               <strong>{matchedCount}</strong> direct matches
             </Texto>
           </Horizontal>
-          <Horizontal alignItems="center" gap="6px">
+          <Horizontal alignItems="center" style={{ gap: '6px' }}>
             <WarningOutlined className={`${styles.matchIcon} ${styles.matchIconWarning}`} />
             <Texto category="p2">
               <strong>{rollupCount}</strong> using rollup
             </Texto>
           </Horizontal>
           {noMatchCount > 0 && (
-            <Horizontal alignItems="center" gap="6px">
+            <Horizontal alignItems="center" style={{ gap: '6px' }}>
               <CloseCircleOutlined className={`${styles.matchIcon} ${styles.matchIconError}`} />
               <Texto category="p2">
                 <strong>{noMatchCount}</strong> no match

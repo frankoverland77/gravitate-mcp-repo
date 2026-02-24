@@ -30,11 +30,11 @@ function ImpactColumn({
   const colorClass = isPositive ? styles.deltaPositive : styles.deltaNegative;
 
   return (
-    <Vertical flex={1} gap="4px">
+    <Vertical flex={1} style={{ gap: '4px' }}>
       <Texto category="p2" appearance="medium">
         {label}
       </Texto>
-      <Horizontal alignItems="center" gap="4px">
+      <Horizontal alignItems="center" style={{ gap: '4px' }}>
         {delta !== 0 &&
           (isRevenue ? (
             delta < 0 ? (
@@ -66,7 +66,7 @@ export function EstimatedImpactCard({ impactEstimate }: EstimatedImpactCardProps
         Estimated Impact
       </Texto>
 
-      <Horizontal gap="24px">
+      <Horizontal style={{ gap: '24px' }}>
         <ImpactColumn
           label="Revenue"
           delta={impactEstimate.revenueDelta}
