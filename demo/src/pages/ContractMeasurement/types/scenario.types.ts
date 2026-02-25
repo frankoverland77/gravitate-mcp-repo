@@ -34,6 +34,16 @@ export interface SelectedBenchmark {
   locationHierarchy?: LocationHierarchy;
 }
 
+export interface ManagedBenchmark {
+  id: string
+  name: string
+  publisher: BenchmarkPublisher
+  benchmarkType: BenchmarkTypeOption
+  productHierarchy: ProductHierarchy
+  locationHierarchy: LocationHierarchy
+  description: string
+}
+
 export interface BenchmarkMatchingInfo {
   matchedCount: number;
   rollupCount: number;

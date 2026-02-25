@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Texto, Horizontal, Vertical, GraviButton } from '@gravitate-js/excalibrr'
-import { Drawer, Button, Input } from 'antd'
+import { Drawer, Button, Input, Segmented } from 'antd'
 import type { SelectedBenchmark, Scenario } from '../types/scenario.types'
 import { generateScenarioId } from '../types/scenario.types'
 import { useFeatureMode } from '../../../contexts/FeatureModeContext'
-import { BenchmarkSelector } from './benchmark'
+import { BenchmarkSelector, ExistingBenchmarkSelector } from './benchmark'
 import { ReferenceLegendCards } from './benchmark/QuickSelectionCards'
 import { MatchingSummaryCard } from './benchmark/MatchingSummaryCard'
 import { EstimatedImpactCard } from './benchmark/EstimatedImpactCard'
@@ -34,6 +34,8 @@ export function BenchmarkScenarioDrawer({
   const [selectedBenchmark, setSelectedBenchmark] = useState<SelectedBenchmark | undefined>(undefined)
   const [diffSign, setDiffSign] = useState<'+' | '-'>('+')
   const [diffAmount, setDiffAmount] = useState<number>(0)
+  const [benchmarkMode, setBenchmarkMode] = useState<'existing' | 'new'>('existing')
+  const [managedBenchmarkId, setManagedBenchmarkId] = useState<string | undefined>(undefined)
 
   const isEditMode = !!editingScenario
 
@@ -45,6 +47,8 @@ export function BenchmarkScenarioDrawer({
         setName(editingScenario.name)
         setDiffSign(editingScenario.priceConfig?.diff?.sign || '+')
         setDiffAmount(editingScenario.priceConfig?.diff?.amount ?? 0)
+        setBenchmarkMode(editingScenario.priceConfig?.source === 'adhoc' ? 'new' : 'existing')
+        setManagedBenchmarkId(editingScenario.priceConfig?.managedBenchmarkId)
         if (editingScenario.priceConfig?.publisher) {
           setSelectedBenchmark({
             publisher: editingScenario.priceConfig.publisher,
@@ -58,6 +62,8 @@ export function BenchmarkScenarioDrawer({
         setSelectedBenchmark(undefined)
         setDiffSign('+')
         setDiffAmount(0)
+        setBenchmarkMode('existing')
+        setManagedBenchmarkId(undefined)
       }
     }
   }, [visible, editingScenario])
@@ -97,7 +103,8 @@ export function BenchmarkScenarioDrawer({
 
     const now = new Date().toISOString()
     const priceConfig: Scenario['priceConfig'] = {
-      source: 'adhoc',
+      source: benchmarkMode === 'existing' ? 'managed' : 'adhoc',
+      managedBenchmarkId: benchmarkMode === 'existing' ? managedBenchmarkId : undefined,
       publisher: selectedBenchmark.publisher,
       productHierarchy: selectedBenchmark.productHierarchy,
       locationHierarchy: selectedBenchmark.locationHierarchy,
@@ -186,40 +193,66 @@ export function BenchmarkScenarioDrawer({
           padding: '24px',
         }}
       >
-        <div style={{ display: 'flex', gap: '24px' }}>
-          {/* Left column: Reference Legend */}
-          <div style={{ width: '220px', flexShrink: 0 }}>
-            <ReferenceLegendCards />
-          </div>
+        {/* Scenario Name */}
+        <div style={{ marginBottom: '24px', maxWidth: '400px' }}>
+          <Texto
+            style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              marginBottom: '8px',
+              display: 'block',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              color: '#595959',
+            }}
+          >
+            Scenario Name
+          </Texto>
+          <Input
+            placeholder='Enter scenario name...'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            size='large'
+            maxLength={100}
+          />
+        </div>
 
-          {/* Center column: Name + Form */}
-          <div style={{ flex: 3, minWidth: 0 }}>
-            {/* Scenario Name */}
-            <div style={{ marginBottom: '24px', maxWidth: '50%' }}>
-              <Texto
-                style={{
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  marginBottom: '8px',
-                  display: 'block',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  color: '#595959',
-                }}
-              >
-                Scenario Name
-              </Texto>
-              <Input
-                placeholder='Enter scenario name...'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                size='large'
-                maxLength={100}
-              />
+        {/* Mode Toggle */}
+        <div style={{ marginBottom: '24px' }}>
+          <Segmented
+            value={benchmarkMode}
+            onChange={(value) => {
+              setBenchmarkMode(value as 'existing' | 'new')
+              setSelectedBenchmark(undefined)
+              setManagedBenchmarkId(undefined)
+            }}
+            options={[
+              { value: 'existing', label: 'Select Existing' },
+              { value: 'new', label: 'Create New' },
+            ]}
+          />
+        </div>
+
+        {/* Conditional Content */}
+        {benchmarkMode === 'existing' ? (
+          <ExistingBenchmarkSelector
+            selectedBenchmark={selectedBenchmark}
+            onBenchmarkChange={setSelectedBenchmark}
+            diffSign={diffSign}
+            diffAmount={diffAmount}
+            onDiffSignChange={setDiffSign}
+            onDiffAmountChange={(val) => setDiffAmount(val ?? 0)}
+            onManagedIdChange={setManagedBenchmarkId}
+          />
+        ) : (
+          <div style={{ display: 'flex', gap: '24px' }}>
+            {/* Left column: Reference Legend */}
+            <div style={{ width: '220px', flexShrink: 0 }}>
+              <ReferenceLegendCards />
             </div>
 
-            {/* Benchmark Configuration */}
-            <div>
+            {/* Center column: Benchmark Configuration */}
+            <div style={{ flex: 3, minWidth: 0 }}>
               <Texto
                 style={{
                   fontSize: '12px',
@@ -242,29 +275,29 @@ export function BenchmarkScenarioDrawer({
                 onDiffAmountChange={(val) => setDiffAmount(val ?? 0)}
               />
             </div>
-          </div>
 
-          {/* Right column: Preview Panel (Future mode only) */}
-          {isFutureMode && (
-            <div style={{ flex: 2, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {matchingInfo && impactEstimate && productDetails ? (
-                <>
-                  <MatchingSummaryCard
-                    matchedCount={matchingInfo.matchedCount}
-                    rollupCount={matchingInfo.rollupCount}
-                    noMatchCount={matchingInfo.noMatchCount}
-                    totalProducts={matchingInfo.totalProducts}
-                    matchPercentage={matchingInfo.matchPercentage}
-                  />
-                  <EstimatedImpactCard impactEstimate={impactEstimate} />
-                  <ProductBreakdownPanel productDetails={productDetails} />
-                </>
-              ) : (
-                <BenchmarkPreview selectedBenchmark={undefined} />
-              )}
-            </div>
-          )}
-        </div>
+            {/* Right column: Preview Panel (Future mode only) */}
+            {isFutureMode && (
+              <div style={{ flex: 2, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {matchingInfo && impactEstimate && productDetails ? (
+                  <>
+                    <MatchingSummaryCard
+                      matchedCount={matchingInfo.matchedCount}
+                      rollupCount={matchingInfo.rollupCount}
+                      noMatchCount={matchingInfo.noMatchCount}
+                      totalProducts={matchingInfo.totalProducts}
+                      matchPercentage={matchingInfo.matchPercentage}
+                    />
+                    <EstimatedImpactCard impactEstimate={impactEstimate} />
+                    <ProductBreakdownPanel productDetails={productDetails} />
+                  </>
+                ) : (
+                  <BenchmarkPreview selectedBenchmark={undefined} />
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Fixed Footer */}
