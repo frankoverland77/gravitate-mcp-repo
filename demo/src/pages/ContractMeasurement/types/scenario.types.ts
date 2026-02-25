@@ -29,22 +29,9 @@ export type ProductHierarchy = 'target-index' | 'product-grade' | 'product-famil
 export type LocationHierarchy = 'city' | 'state' | 'padd' | 'national';
 
 export interface SelectedBenchmark {
-  type: 'quick' | 'custom';
-  quickType?: QuickBenchmarkType;
   publisher?: BenchmarkPublisher;
-  benchmarkType?: BenchmarkTypeOption;
   productHierarchy?: ProductHierarchy;
   locationHierarchy?: LocationHierarchy;
-}
-
-export interface ManagedBenchmark {
-  id: string;
-  name: string;
-  publisher: BenchmarkPublisher;
-  benchmarkType: BenchmarkTypeOption;
-  productHierarchy: ProductHierarchy;
-  locationHierarchy: LocationHierarchy;
-  description: string;
 }
 
 export interface BenchmarkMatchingInfo {
@@ -194,6 +181,8 @@ export interface ComparisonRowData {
   contractPrice: number;
   productGroup: string;
   locationRegion: string;
+  effectiveStartDate: string;
+  effectiveEndDate: string;
   scenarios: Record<string, ScenarioCellData>;
 }
 
@@ -226,24 +215,6 @@ export interface GroupHeaderRow {
 }
 
 export type TableRow = (ComparisonRowData & { isGroupHeader?: false; groupKey?: string }) | GroupHeaderRow;
-
-// Blended reference summary (when rows have different reference scenarios)
-export interface BlendedReferenceSummary {
-  weightedAvgDelta: number
-  assignedCount: number
-  totalCount: number
-  coveragePercent: number
-  groupBreakdowns: BlendedGroupBreakdown[]
-}
-
-export interface BlendedGroupBreakdown {
-  groupKey: string
-  groupLabel: string
-  avgDelta: number
-  assignedCount: number
-  totalCount: number
-  referenceLabel: string // scenario name, "Mixed", or "-- (unassigned)"
-}
 
 // Default parameters
 export const DEFAULT_PARAMETERS: AnalysisParameters = {

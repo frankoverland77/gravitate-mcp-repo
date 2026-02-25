@@ -15,7 +15,7 @@ import {
   RightOutlined,
   WarningFilled,
 } from '@ant-design/icons';
-import { Table, Checkbox, Tooltip, Select, Popover, Popconfirm, Switch } from 'antd';
+import { Table, Checkbox, Tooltip, Select, Popover, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { Scenario, ComparisonRowData, ScenarioCellData, GroupingDimension, GroupHeaderRow, TableRow } from '../../types/scenario.types';
 import { GROUPING_OPTIONS } from '../../types/scenario.types';
@@ -27,6 +27,11 @@ import { UploadScenarioDrawer } from '../../components/UploadScenarioDrawer';
 import { SAMPLE_DETAILS, type ContractDetail } from '../../ContractMeasurement.data';
 import { getInstrumentsByProductGroup } from '../../../../shared/data/pricePublishers.data';
 import styles from './ScenarioComparisonSection.module.css';
+
+const formatShortDate = (iso: string) => {
+  const d = new Date(iso + 'T00:00:00')
+  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
 
 // Instrument picker popover content for no-match cells
 function InstrumentPickerPopover({
@@ -122,8 +127,6 @@ interface ScenarioComparisonSectionProps {
   onReorderScenarios?: (newOrder: string[]) => void;
   groupingDimension: GroupingDimension;
   onGroupingChange: (dimension: GroupingDimension) => void;
-  isBlendedMode: boolean;
-  onToggleBlendedMode: (blended: boolean) => void;
   hasComparisonScenarios?: boolean;
 }
 
@@ -224,8 +227,6 @@ export function ScenarioComparisonSection({
   onReorderScenarios,
   groupingDimension,
   onGroupingChange,
-  isBlendedMode,
-  onToggleBlendedMode,
   hasComparisonScenarios = true,
 }: ScenarioComparisonSectionProps) {
   const { isFutureMode } = useFeatureMode();
@@ -629,32 +630,6 @@ export function ScenarioComparisonSection({
     return { perRow, average: avg, includedCount, excludedCount };
   }, [filteredData, columnReferenceScenarioId]);
 
-  // Blended fixed deltas — per-row delta using each row's own reference scenario
-  const blendedFixedDeltas = useMemo(() => {
-    if (!isBlendedMode) return null
-    const perRow = new Map<string, number | null>()
-    let sum = 0
-    let assignedCount = 0
-    filteredData.forEach((row) => {
-      const refId = referenceSelections[row.detailId]
-      if (!refId) {
-        perRow.set(row.detailId, null)
-        return
-      }
-      const refCell = row.scenarios[refId]
-      if (!refCell || refCell.isMissingPrice) {
-        perRow.set(row.detailId, null)
-        return
-      }
-      const delta = row.contractPrice - refCell.price
-      perRow.set(row.detailId, delta)
-      sum += delta
-      assignedCount++
-    })
-    const average = assignedCount > 0 ? sum / assignedCount : 0
-    return { perRow, average, assignedCount }
-  }, [isBlendedMode, filteredData, referenceSelections])
-
   // Sort toggle: unsorted → asc → desc → unsorted
   const handleToggleSort = useCallback(
     (scenarioId: string) => {
@@ -721,11 +696,6 @@ export function ScenarioComparisonSection({
     setDraggingId(null);
     setDragOverId(null);
   }, []);
-
-  // Auto-disable reference mode when entering blended
-  useEffect(() => {
-    if (isBlendedMode) setIsReferenceMode(false)
-  }, [isBlendedMode])
 
   const renderScenarioCell = useCallback(
     (record: ComparisonRowData, scenario: Scenario) => {
@@ -854,8 +824,8 @@ export function ScenarioComparisonSection({
         title: 'DETAIL',
         dataIndex: 'product',
         key: 'detail',
-        width: 180,
-        maxWidth: 250,
+        width: 200,
+        maxWidth: 270,
         fixed: 'left',
         render: (_: unknown, record: TableRow) => {
           if (record.isGroupHeader) {
@@ -880,12 +850,18 @@ export function ScenarioComparisonSection({
             );
           }
           return (
-            <Vertical style={{ gap: '2px' }} justifyContent="flex-start">
-              <Texto weight="600">{record.product}</Texto>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <Texto weight="600" category="p2">{record.product}</Texto>
+                <Texto category="p2" appearance="medium" style={{ fontSize: 11 }}>{record.detailId}</Texto>
+              </div>
               <Texto category="p2" appearance="medium">
                 {record.location}
               </Texto>
-            </Vertical>
+              <Texto category="p2" appearance="medium" style={{ fontSize: 10 }}>
+                {formatShortDate(record.effectiveStartDate)} – {formatShortDate(record.effectiveEndDate)}
+              </Texto>
+            </div>
           );
         },
       },
@@ -1150,75 +1126,14 @@ export function ScenarioComparisonSection({
           ]
         : [];
 
-    // Reference column — only visible in blended mode
-    const referenceColumn: ColumnsType<TableRow> = isBlendedMode
-      ? [
-          {
-            title: (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Texto category="p2" weight="600">REFERENCE</Texto>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    backgroundColor: blendedFixedDeltas && blendedFixedDeltas.assignedCount === filteredData.length ? '#f6ffed' : '#fffbe6',
-                    border: `1px solid ${blendedFixedDeltas && blendedFixedDeltas.assignedCount === filteredData.length ? '#b7eb8f' : '#ffd591'}`,
-                    borderRadius: '10px',
-                    padding: '0 8px',
-                    lineHeight: '20px',
-                  }}
-                >
-                  {blendedFixedDeltas?.assignedCount ?? 0}/{filteredData.length}
-                </span>
-              </div>
-            ),
-            key: 'referenceSelect',
-            width: 180,
-            fixed: 'left' as const,
-            render: (_: unknown, record: TableRow) => {
-              if (record.isGroupHeader) {
-                // Show group reference summary
-                const groupRows = sortedData.filter((r) => {
-                  const key = groupingDimension === 'product-family' ? r.productGroup : r.locationRegion
-                  return key === record.groupKey
-                })
-                const refIds = new Set(groupRows.map((r) => referenceSelections[r.detailId]).filter(Boolean))
-                if (refIds.size === 0) return <Texto category="p2" appearance="medium">-- (none)</Texto>
-                if (refIds.size === 1) {
-                  const refName = scenarios.find((s) => s.id === [...refIds][0])?.name
-                  return <Texto category="p2" weight="600">{refName}</Texto>
-                }
-                return <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>Mixed</Texto>
-              }
-              const currentRef = referenceSelections[record.detailId]
-              const isUnassigned = !currentRef
-              return (
-                <Select
-                  size="small"
-                  value={currentRef || undefined}
-                  placeholder="Select..."
-                  onChange={(value: string) => onSetReference(record.detailId, value)}
-                  options={scenarios.filter((s) => s.status === 'complete').map((s) => ({
-                    value: s.id,
-                    label: s.name,
-                  }))}
-                  style={{ width: '100%' }}
-                  className={isUnassigned ? styles.unassignedSelect : undefined}
-                  suffixIcon={isUnassigned ? <WarningFilled style={{ color: '#faad14' }} /> : undefined}
-                />
-              )
-            },
-          },
-        ]
-      : []
-
     const fixedDeltaColumn: ColumnsType<TableRow> =
-      (allRowsHaveSameReference && columnReferenceScenarioId) || isBlendedMode
+      allRowsHaveSameReference && columnReferenceScenarioId
         ? [
             {
               title: (
                 <Vertical style={{ gap: '2px' }}>
                   <Texto category="p2" weight="600">
-                    FIXED DELTA
+                    DELTA
                   </Texto>
                   <Texto category="p2" appearance="medium">
                     vs Contract
@@ -1229,31 +1144,6 @@ export function ScenarioComparisonSection({
               width: 130,
               render: (_: unknown, record: TableRow) => {
                 if (record.isGroupHeader) {
-                  if (isBlendedMode && blendedFixedDeltas) {
-                    // Blended group average
-                    const groupRows = sortedData.filter((r) => {
-                      const key = groupingDimension === 'product-family' ? r.productGroup : r.locationRegion
-                      return key === record.groupKey
-                    })
-                    let sum = 0
-                    let count = 0
-                    groupRows.forEach((r) => {
-                      const d = blendedFixedDeltas.perRow.get(r.detailId)
-                      if (d !== null && d !== undefined) {
-                        sum += d
-                        count++
-                      }
-                    })
-                    if (count === 0) return <Texto weight="600" appearance="medium">--</Texto>
-                    const avg = sum / count
-                    return (
-                      <Texto weight="600" className={getDeltaColorClass(avg)}>
-                        {avg >= 0 ? '+$' : '-$'}
-                        {Math.abs(avg).toFixed(4)}/gal
-                      </Texto>
-                    )
-                  }
-                  // Uniform mode group average
                   if (!fixedDeltas) return null;
                   const groupRows = sortedData.filter((r) => {
                     const key = groupingDimension === 'product-family' ? r.productGroup : r.locationRegion;
@@ -1278,20 +1168,7 @@ export function ScenarioComparisonSection({
                     </Texto>
                   );
                 }
-                // Blended per-row delta
-                if (isBlendedMode && blendedFixedDeltas) {
-                  const delta = blendedFixedDeltas.perRow.get(record.detailId)
-                  if (delta === null || delta === undefined) {
-                    return <Texto weight="600" appearance="medium">--</Texto>
-                  }
-                  return (
-                    <Texto weight="600" className={getDeltaColorClass(delta)}>
-                      {delta >= 0 ? '+$' : '-$'}
-                      {Math.abs(delta).toFixed(4)}/gal
-                    </Texto>
-                  )
-                }
-                // Uniform per-row delta
+                // Per-row delta
                 if (!fixedDeltas) return null;
                 const delta = fixedDeltas.perRow.get(record.detailId);
                 if (delta === null || delta === undefined) {
@@ -1344,7 +1221,7 @@ export function ScenarioComparisonSection({
       },
     ];
 
-    return [...baseColumns, ...referenceColumn, ...scenarioColumns, ...ghostColumn, ...fixedDeltaColumn, ...draftColumn, ...actionColumn];
+    return [...baseColumns, ...scenarioColumns, ...ghostColumn, ...fixedDeltaColumn, ...draftColumn, ...actionColumn];
   }, [
     scenarios,
     hasComparisonScenarios,
@@ -1361,8 +1238,6 @@ export function ScenarioComparisonSection({
     allRowsHaveSameReference,
     columnReferenceScenarioId,
     fixedDeltas,
-    blendedFixedDeltas,
-    isBlendedMode,
     sortScenarioId,
     sortDirection,
     draggingId,
@@ -1384,7 +1259,7 @@ export function ScenarioComparisonSection({
     onExcludeDetails,
   ]);
 
-  const hasFixedDelta = (allRowsHaveSameReference && !!columnReferenceScenarioId) || isBlendedMode;
+  const hasFixedDelta = allRowsHaveSameReference && !!columnReferenceScenarioId;
 
   // Custom header wrapper that appends a CPG delta summary row inside <thead>
   const HeaderWrapper = useCallback(
@@ -1412,14 +1287,6 @@ export function ScenarioComparisonSection({
                 </Texto>
               </td>
             )}
-            {/* Reference column (blended mode) */}
-            {isBlendedMode && (
-              <td className={styles.summaryHeaderCell}>
-                <Texto category="p2" appearance="medium">
-                  {blendedFixedDeltas?.assignedCount ?? 0}/{filteredData.length} assigned
-                </Texto>
-              </td>
-            )}
             {/* One cell per scenario */}
             {scenarios.map((scenario) => {
               const scenarioTotals = totals[scenario.id];
@@ -1444,30 +1311,20 @@ export function ScenarioComparisonSection({
               );
             })}
             {/* Fixed delta column (conditional) */}
-            {hasFixedDelta && (isBlendedMode ? blendedFixedDeltas : fixedDeltas) && (
+            {hasFixedDelta && fixedDeltas && (
               <td className={styles.summaryHeaderCell}>
-                {(() => {
-                  const avg = isBlendedMode ? blendedFixedDeltas?.average ?? 0 : fixedDeltas?.average ?? 0
-                  const hasAssigned = isBlendedMode ? (blendedFixedDeltas?.assignedCount ?? 0) > 0 : true
-                  if (!hasAssigned) return <Texto weight="600" appearance="medium">--</Texto>
-                  const fdExcluded = !isBlendedMode && fixedDeltas ? fixedDeltas.excludedCount : 0
-                  return (
-                    <>
-                      <Texto weight="600" className={getDeltaColorClass(avg)}>
-                        {avg >= 0 ? '+$' : '-$'}
-                        {Math.abs(avg).toFixed(4)}/gal
-                      </Texto>
-                      {fdExcluded > 0 && fixedDeltas && (
-                        <Tooltip title={`${fdExcluded} no-match row(s) excluded from this average`}>
-                          <div className={styles.summaryExclusionIndicator}>
-                            <WarningFilled style={{ fontSize: 11 }} />
-                            <span>Avg of {fixedDeltas.includedCount}/{fixedDeltas.includedCount + fdExcluded}</span>
-                          </div>
-                        </Tooltip>
-                      )}
-                    </>
-                  )
-                })()}
+                <Texto weight="600" className={getDeltaColorClass(fixedDeltas.average)}>
+                  {fixedDeltas.average >= 0 ? '+$' : '-$'}
+                  {Math.abs(fixedDeltas.average).toFixed(4)}/gal
+                </Texto>
+                {fixedDeltas.excludedCount > 0 && (
+                  <Tooltip title={`${fixedDeltas.excludedCount} no-match row(s) excluded from this average`}>
+                    <div className={styles.summaryExclusionIndicator}>
+                      <WarningFilled style={{ fontSize: 11 }} />
+                      <span>Avg of {fixedDeltas.includedCount}/{fixedDeltas.includedCount + fixedDeltas.excludedCount}</span>
+                    </div>
+                  </Tooltip>
+                )}
               </td>
             )}
             {/* Ghost column (conditional, empty) */}
@@ -1480,7 +1337,7 @@ export function ScenarioComparisonSection({
         </thead>
       )
     },
-    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, blendedFixedDeltas, isBlendedMode, showDraftColumn, hasComparisonScenarios]
+    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, showDraftColumn, hasComparisonScenarios]
   )
 
   if (scenarios.length === 0) {
@@ -1511,12 +1368,6 @@ export function ScenarioComparisonSection({
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
           {hasComparisonScenarios && (
             <>
-              <Switch
-                checked={isBlendedMode}
-                onChange={onToggleBlendedMode}
-                checkedChildren="Blended"
-                unCheckedChildren="Uniform"
-              />
               <Texto category="p2" appearance="medium" weight="600">
                 Group by
               </Texto>
@@ -1565,15 +1416,13 @@ export function ScenarioComparisonSection({
                 </Texto>
               )}
               <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
-              {!isBlendedMode && (
-                <GraviButton
-                  buttonText={isReferenceMode ? 'Done' : 'Set Reference'}
-                  icon={isReferenceMode ? <CheckSquareOutlined /> : <BorderOutlined />}
-                  theme1
-                  appearance={isReferenceMode ? 'filled' : 'outlined'}
-                  onClick={() => setIsReferenceMode(!isReferenceMode)}
-                />
-              )}
+              <GraviButton
+                buttonText={isReferenceMode ? 'Done' : 'Set Reference'}
+                icon={isReferenceMode ? <CheckSquareOutlined /> : <BorderOutlined />}
+                theme1
+                appearance={isReferenceMode ? 'filled' : 'outlined'}
+                onClick={() => setIsReferenceMode(!isReferenceMode)}
+              />
             </>
           )}
           {!showDraftColumn && (
@@ -1619,14 +1468,6 @@ export function ScenarioComparisonSection({
           <Texto category="p2">
             <strong>Reference Selection Mode:</strong> Click cells or column headers to set which
             scenario is the reference for each row.
-          </Texto>
-        </div>
-      )}
-
-      {isBlendedMode && (
-        <div className={styles.blendedInfoBar}>
-          <Texto category="p2">
-            <strong>Blended Reference Mode:</strong> Assign a different reference scenario per row using the Reference column dropdowns. Unassigned rows are highlighted in amber.
           </Texto>
         </div>
       )}
@@ -1704,8 +1545,6 @@ export function ScenarioComparisonSection({
               }
               rowClassName={(record: TableRow) => {
                 if (record.isGroupHeader) return styles.groupHeaderRow
-                if (isBlendedMode && !record.isGroupHeader && !referenceSelections[record.detailId])
-                  return `${styles.unassignedRow}${groupingDimension !== 'none' ? ` ${styles.groupChildRow}` : ''}`
                 if (groupingDimension !== 'none' && !record.isGroupHeader) return styles.groupChildRow
                 return ''
               }}

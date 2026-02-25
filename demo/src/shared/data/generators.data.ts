@@ -338,6 +338,8 @@ export interface GeneratedContractDetail {
   contractPrice: number
   productGroup: string
   locationRegion: string
+  effectiveStartDate: string
+  effectiveEndDate: string
 }
 
 /**
@@ -373,8 +375,22 @@ export function generateContractDetails(count = 10): GeneratedContractDetail[] {
     if (tempDetails.length >= count) break
   }
 
+  // Contract date range
+  const contractStart = '2024-01-01'
+  const contractEnd = '2025-12-31'
+
   // Second pass: calculate percentages and create final details
   for (const item of tempDetails) {
+    // ~30% of rows get a later start date (1-6 months offset), deterministic based on seed
+    const seed = item.product.ProductId * 100 + item.terminal.LocationId
+    const hasLaterStart = seed % 10 < 3 // 30% chance
+    let effectiveStart = contractStart
+    if (hasLaterStart) {
+      const monthOffset = 1 + (seed % 6) // 1-6 months
+      const startDate = new Date(2024, monthOffset, 1)
+      effectiveStart = startDate.toISOString().split('T')[0]
+    }
+
     details.push({
       detailId: `DTL-${String(detailNum++).padStart(3, '0')}`,
       product: item.product.Name,
@@ -384,6 +400,8 @@ export function generateContractDetails(count = 10): GeneratedContractDetail[] {
       contractPrice: generateSeededPrice(item.product.ProductId, item.terminal.LocationId, item.product.ProductGroup),
       productGroup: item.product.ProductGroup,
       locationRegion: item.terminal.Region,
+      effectiveStartDate: effectiveStart,
+      effectiveEndDate: contractEnd,
     })
   }
 

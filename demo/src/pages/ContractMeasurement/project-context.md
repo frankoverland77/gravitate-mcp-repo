@@ -3362,3 +3362,92 @@ The "Add Benchmark Scenario" bottom drawer uses a `280px 1fr` grid. Since the dr
 | `sections/benchmarks/ScenarioComparisonSection.tsx` | Reordered toolbar controls: Switch first, Set Reference before Add Scenario, Export at end |
 
 **Build status:** Vite build passes. No new TS errors.
+
+### Session 28 (2026-02-25) - Gate Preview Panel Behind isFutureMode
+
+**Problem Statement:**
+The preview validation panel (MatchingSummaryCard, EstimatedImpactCard, ProductBreakdownPanel) was wired into `BenchmarkScenarioDrawer.tsx` as a two-column layout. This needed to be gated behind the `isFutureMode` feature flag so MVP mode shows the original single-column drawer without the preview panel.
+
+**Completed:**
+
+1. **Feature flag integration** — Added `useFeatureMode()` hook to `BenchmarkScenarioDrawer`, destructuring `isFutureMode`.
+
+2. **Gated useMemo computations** — All three preview data calculations (`matchingInfo`, `impactEstimate`, `productDetails`) now short-circuit to `null` when `!isFutureMode`, skipping computation entirely in MVP mode.
+
+3. **Conditional layout rendering:**
+   - **MVP mode (`!isFutureMode`):** Single-column layout, no flex wrapper, name input `maxWidth: '30%'`, preview panel not rendered at all.
+   - **Future mode (`isFutureMode`):** Two-column `display: flex` layout with `gap: 24px`, config column `flex: 3`, preview column `flex: 2` with full preview panel or BenchmarkPreview placeholder.
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `components/BenchmarkScenarioDrawer.tsx` | Added `useFeatureMode` import/hook; gated `useMemo` computations with `isFutureMode`; conditional single-column (MVP) vs two-column (Future) layout; preview panel only renders in Future mode |
+
+**Key Decision:** The preview imports (MatchingSummaryCard, EstimatedImpactCard, etc.) remain in the file even in MVP mode — they're tree-shaken by the conditional render and the `useMemo` short-circuits prevent any computation cost.
+
+**Build status:** Vite build passes. No new TS errors.
+
+### Session 29 (2026-02-25) - Remove Blended/Uniform Toggle
+
+**Context:** Reece confirmed during sync that the Blended/Uniform toggle is redundant — the existing "Set Reference" checkbox mechanism already covers the row-by-row reference assignment use case. AG likely re-requested functionality that already existed.
+
+**Completed:**
+
+1. **Removed all blended mode state and logic from `BenchmarksTab.tsx`** — `isBlendedMode` state, `handleToggleBlendedMode` callback, `blendedSummary` useMemo (~90 lines), blended summary card JSX (~57 lines), and props passed to `ScenarioComparisonSection`.
+
+2. **Removed all blended mode code from `ScenarioComparisonSection.tsx`** — `isBlendedMode`/`onToggleBlendedMode` from props interface, `blendedFixedDeltas` useMemo, auto-disable reference mode useEffect, entire REFERENCE column definition (~60 lines), `<Switch>` toggle from toolbar, blended branches in fixed delta column renderer (group avg + per-row), blended branch in HeaderWrapper, `.blendedInfoBar` info message, and blended-mode row styling.
+
+3. **Removed types from `scenario.types.ts`** — `BlendedReferenceSummary` and `BlendedGroupBreakdown` interfaces.
+
+4. **Removed CSS from `ScenarioComparisonSection.module.css`** — `.unassignedRow`, `.unassignedSelect`, `.blendedInfoBar` classes.
+
+5. **Simplified guards** — Uniform summary card no longer gated behind `!isBlendedMode` (always renders when applicable). "Set Reference" button no longer gated behind `!isBlendedMode` (always visible). Fixed delta column visibility simplified to just `allRowsHaveSameReference && columnReferenceScenarioId`.
+
+**What stays:** `referenceSelections` state and all "Set Reference" checkbox/button logic — this is the single mechanism for per-row reference assignment. `isReferenceMode` toggle and related column-header/cell click handlers unchanged.
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `tabs/BenchmarksTab.tsx` | Removed blended state, toggle handler, summary useMemo, blended summary card JSX, props to child |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | Removed blended props, blendedFixedDeltas, reference column, Switch, blended branches in renderers/HeaderWrapper, info bar, row styling |
+| `types/scenario.types.ts` | Removed `BlendedReferenceSummary`, `BlendedGroupBreakdown` interfaces |
+| `sections/benchmarks/ScenarioComparisonSection.module.css` | Removed `.unassignedRow`, `.unassignedSelect`, `.blendedInfoBar` |
+
+**Build status:** Vite build passes. No TS errors, no unused imports.
+
+### Session 30 (2026-02-25) - Detail ID + Effective Dates in Far-Left Column
+
+**Context:** The scenario comparison grid rows map 1:1 to contract detail records. The far-left "DETAIL" column previously showed only product (bold) + location (gray). Two additional data points now surface here: Detail ID (cross-reference anchor) and Effective Dates (explains gaps in price history for later-added rows).
+
+**Completed:**
+
+1. **Added `effectiveStartDate` and `effectiveEndDate` to `ComparisonRowData`** in `scenario.types.ts` — both `string` (ISO date format).
+
+2. **Added same fields to `GeneratedContractDetail`** in `generators.data.ts` — and updated `generateContractDetails()` to produce deterministic effective dates. Contract range is `2024-01-01` to `2025-12-31`. ~30% of rows get a later start date (1-6 months offset) based on `seed % 10 < 3`. This creates realistic "gaps" where some details were added mid-contract.
+
+3. **Updated far-left column renderer** in `ScenarioComparisonSection.tsx`:
+   - Added `formatShortDate` helper (ISO → `Mon YYYY`)
+   - Replaced `<Vertical>` wrapper with plain `<div>` (per memory learnings about overflow)
+   - Layout now shows: product + detailId (same line, right-aligned), location, effective date range
+   - Column width bumped from 180→200px, maxWidth from 250→270px
+
+**Layout:**
+```
+┌──────────────────────────────────┐
+│ 87 Octane              DTL-001  │  ← product (bold) + detailId (muted, right-aligned)
+│ Houston Terminal                 │  ← location (muted)
+│ Jan 2024 – Dec 2025             │  ← effective dates (smaller, muted)
+└──────────────────────────────────┘
+```
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `types/scenario.types.ts` | Added `effectiveStartDate`, `effectiveEndDate` to `ComparisonRowData` |
+| `../../shared/data/generators.data.ts` | Added fields to `GeneratedContractDetail`; deterministic date generation in `generateContractDetails()` |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | `formatShortDate` helper; updated detail column renderer with 4-line layout; width 180→200 |
+
+**Build status:** Vite build passes. No new TS errors.

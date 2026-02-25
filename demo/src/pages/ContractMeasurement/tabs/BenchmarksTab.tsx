@@ -8,7 +8,7 @@ import { ScenarioDrawer } from '../components/ScenarioDrawer'
 import { ParametersModal } from '../components/ParametersModal'
 import { getDeltaColorClass } from '../sections/benchmarks/ScenarioCellRenderer'
 import { SAMPLE_DETAILS } from '../ContractMeasurement.data'
-import type { Scenario, AnalysisParameters, ScenarioFormData, GroupingDimension, BlendedReferenceSummary, BlendedGroupBreakdown } from '../types/scenario.types'
+import type { Scenario, AnalysisParameters, ScenarioFormData, GroupingDimension } from '../types/scenario.types'
 import { DEFAULT_PARAMETERS, generateScenarioId } from '../types/scenario.types'
 
 // Initial sample scenarios
@@ -53,9 +53,6 @@ export function BenchmarksTab() {
 
   // Grouping state
   const [groupingDimension, setGroupingDimension] = useState<GroupingDimension>('none')
-
-  // Blended reference mode state
-  const [isBlendedMode, setIsBlendedMode] = useState(false)
 
   const includedDetails = useMemo(
     () => SAMPLE_DETAILS.filter((d) => !excludedDetailIds.has(d.detailId)),
@@ -281,121 +278,11 @@ export function BenchmarksTab() {
     return result
   }, [groupingDimension, columnReferenceScenarioId, includedDetails, scenarios])
 
-  // Toggle handler for blended mode — when switching OFF, apply most common reference to all rows
-  const handleToggleBlendedMode = useCallback(
-    (newBlended: boolean) => {
-      if (!newBlended && isBlendedMode) {
-        const counts: Record<string, number> = {}
-        Object.values(referenceSelections).forEach((sid) => {
-          counts[sid] = (counts[sid] || 0) + 1
-        })
-        const entries = Object.entries(counts)
-        if (entries.length > 0) {
-          const mostCommon = entries.sort((a, b) => b[1] - a[1])[0][0]
-          handleSetColumnReference(mostCommon)
-        }
-      }
-      setIsBlendedMode(newBlended)
-    },
-    [isBlendedMode, referenceSelections, handleSetColumnReference],
-  )
-
-  // Blended summary: volume-weighted avg delta across assigned rows + per-group breakdown
-  const blendedSummary = useMemo<BlendedReferenceSummary | null>(() => {
-    if (!isBlendedMode) return null
-
-    const assignedDetails = includedDetails.filter((d) => referenceSelections[d.detailId])
-    const totalCount = includedDetails.length
-    const assignedCount = assignedDetails.length
-
-    if (assignedCount === 0) {
-      return {
-        weightedAvgDelta: 0,
-        assignedCount: 0,
-        totalCount,
-        coveragePercent: 0,
-        groupBreakdowns: [],
-      }
-    }
-
-    // Volume-weighted avg delta using same seeded price generation as fixedDeltaAverage
-    let weightedSum = 0
-    let totalVolume = 0
-    assignedDetails.forEach((detail) => {
-      const refId = referenceSelections[detail.detailId]
-      const hash = refId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-      const detailIndex = includedDetails.indexOf(detail)
-      const seed = detailIndex * 7919 + hash
-      const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1
-      const scenarioPrice = 2.45 + frac * 0.3 - 0.15
-      const delta = detail.contractPrice - scenarioPrice
-      weightedSum += delta * detail.volume
-      totalVolume += detail.volume
-    })
-
-    const weightedAvgDelta = totalVolume > 0 ? weightedSum / totalVolume : 0
-
-    // Per-group breakdown
-    const groupBreakdowns: BlendedGroupBreakdown[] = []
-    if (groupingDimension !== 'none') {
-      const groups = new Map<string, { details: typeof includedDetails; refIds: Set<string> }>()
-      includedDetails.forEach((detail) => {
-        const key = groupingDimension === 'product-family' ? detail.productGroup : detail.locationRegion
-        if (!groups.has(key)) groups.set(key, { details: [], refIds: new Set() })
-        const g = groups.get(key)!
-        g.details.push(detail)
-        const refId = referenceSelections[detail.detailId]
-        if (refId) g.refIds.add(refId)
-      })
-
-      groups.forEach((g, key) => {
-        const assigned = g.details.filter((d) => referenceSelections[d.detailId])
-        let sum = 0
-        let count = 0
-        assigned.forEach((detail) => {
-          const refId = referenceSelections[detail.detailId]
-          const hash = refId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-          const detailIndex = includedDetails.indexOf(detail)
-          const seed = detailIndex * 7919 + hash
-          const frac = (((Math.sin(seed) * 43758.5453) % 1) + 1) % 1
-          const scenarioPrice = 2.45 + frac * 0.3 - 0.15
-          sum += detail.contractPrice - scenarioPrice
-          count++
-        })
-
-        let referenceLabel = '-- (unassigned)'
-        if (g.refIds.size === 1) {
-          const refId = [...g.refIds][0]
-          referenceLabel = scenarios.find((s) => s.id === refId)?.name || refId
-        } else if (g.refIds.size > 1) {
-          referenceLabel = 'Mixed'
-        }
-
-        groupBreakdowns.push({
-          groupKey: key,
-          groupLabel: key.charAt(0).toUpperCase() + key.slice(1),
-          avgDelta: count > 0 ? sum / count : 0,
-          assignedCount: assigned.length,
-          totalCount: g.details.length,
-          referenceLabel,
-        })
-      })
-    }
-
-    return {
-      weightedAvgDelta,
-      assignedCount,
-      totalCount,
-      coveragePercent: Math.round((assignedCount / totalCount) * 100),
-      groupBreakdowns,
-    }
-  }, [isBlendedMode, includedDetails, referenceSelections, groupingDimension, scenarios])
-
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', minHeight: 0 }}>
-        {/* Summary Card — uniform mode */}
-        {hasComparisonScenarios && !isBlendedMode && allRowsHaveSameReference && fixedDeltaAverage !== null && (
+        {/* Summary Card */}
+        {hasComparisonScenarios && allRowsHaveSameReference && fixedDeltaAverage !== null && (
           <div
             style={{
               backgroundColor: '#ffffff',
@@ -414,7 +301,7 @@ export function BenchmarksTab() {
                 weight="600"
                 style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
               >
-                Average Fixed Delta vs Contract
+                Average Delta vs Contract
               </Texto>
               <Texto category="h3" weight="700" className={getDeltaColorClass(fixedDeltaAverage)}>
                 {fixedDeltaAverage >= 0 ? '+$' : '-$'}
@@ -439,65 +326,6 @@ export function BenchmarksTab() {
                       {g.label}: {g.avg >= 0 ? '+$' : '-$'}
                       {Math.abs(g.avg).toFixed(4)}/gal
                     </Texto>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Summary Card — blended mode */}
-        {hasComparisonScenarios && isBlendedMode && blendedSummary && (
-          <div
-            style={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #e8e8e8',
-              borderRadius: '8px',
-              padding: '20px 24px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-              width: 'fit-content',
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <Texto
-                category="p2"
-                appearance="medium"
-                weight="600"
-                style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
-              >
-                Blended Reference Summary
-              </Texto>
-              {blendedSummary.assignedCount > 0 ? (
-                <Texto category="h3" weight="700" className={getDeltaColorClass(blendedSummary.weightedAvgDelta)}>
-                  {blendedSummary.weightedAvgDelta >= 0 ? '+$' : '-$'}
-                  {Math.abs(blendedSummary.weightedAvgDelta).toFixed(4)}/gal
-                </Texto>
-              ) : (
-                <Texto category="h3" weight="700" appearance="medium">
-                  --
-                </Texto>
-              )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Texto category="p2" appearance="medium">
-                  Coverage: {blendedSummary.assignedCount}/{blendedSummary.totalCount} rows (
-                  {blendedSummary.coveragePercent}%)
-                </Texto>
-                {blendedSummary.coveragePercent < 100 && (
-                  <WarningFilled style={{ color: '#faad14', fontSize: '14px' }} />
-                )}
-              </div>
-              {blendedSummary.groupBreakdowns.length > 0 && (
-                <div style={{ display: 'flex', gap: '16px', marginTop: '4px', flexWrap: 'wrap' }}>
-                  {blendedSummary.groupBreakdowns.map((g) => (
-                    <div key={g.groupKey} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <Texto category="p2" className={getDeltaColorClass(g.avgDelta)}>
-                        {g.groupLabel}: {g.assignedCount > 0 ? `${g.avgDelta >= 0 ? '+$' : '-$'}${Math.abs(g.avgDelta).toFixed(4)}/gal` : '--'}
-                      </Texto>
-                      <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
-                        {g.referenceLabel} · {g.assignedCount}/{g.totalCount}
-                      </Texto>
-                    </div>
                   ))}
                 </div>
               )}
@@ -544,8 +372,6 @@ export function BenchmarksTab() {
             onReorderScenarios={handleReorderScenarios}
             groupingDimension={groupingDimension}
             onGroupingChange={setGroupingDimension}
-            isBlendedMode={isBlendedMode}
-            onToggleBlendedMode={handleToggleBlendedMode}
             hasComparisonScenarios={hasComparisonScenarios}
           />
         ) : (

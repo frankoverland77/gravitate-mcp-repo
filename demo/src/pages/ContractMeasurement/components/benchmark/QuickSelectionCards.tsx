@@ -1,11 +1,5 @@
 import { Texto, Horizontal, Vertical } from '@gravitate-js/excalibrr'
-import {
-  BarChartOutlined,
-  LineChartOutlined,
-  StockOutlined,
-  FileTextOutlined,
-  SettingOutlined,
-} from '@ant-design/icons'
+import { BarChartOutlined, LineChartOutlined, StockOutlined, FileTextOutlined } from '@ant-design/icons'
 import type { BenchmarkType } from '../../types/scenario.types'
 import styles from './BenchmarkSelector.module.css'
 
@@ -41,49 +35,34 @@ export const BENCHMARK_OPTIONS: BenchmarkOptionConfig[] = [
     description: 'Compare to OPIS contract pricing',
     icon: <FileTextOutlined className={styles.optionIcon} />,
   },
-  {
-    type: 'custom',
-    title: 'Custom',
-    description: 'Configure a custom benchmark with specific publisher and type',
-    icon: <SettingOutlined className={styles.optionIcon} />,
-  },
 ]
 
-interface BenchmarkSelectionCardsProps {
-  selectedType: BenchmarkType | undefined
-  onSelect: (type: BenchmarkType, title: string) => void
-}
-
-export function BenchmarkSelectionCards({ selectedType, onSelect }: BenchmarkSelectionCardsProps) {
-  const getCardClassName = (type: BenchmarkType) => {
-    const base = styles.optionCard
-    const isSelected = selectedType === type
-    if (isSelected) return `${base} ${styles.optionCardSelected}`
-    return base
-  }
-
+export function ReferenceLegendCards() {
   return (
-    <Vertical style={{ gap: '12px' }}>
-      {BENCHMARK_OPTIONS.map((option) => (
-        <div
-          key={option.type}
-          className={getCardClassName(option.type)}
-          onClick={() => onSelect(option.type, option.title)}
-          style={{ cursor: 'pointer' }}
-        >
-          <Horizontal alignItems="flex-start" style={{ gap: '12px' }}>
-            <div className={selectedType === option.type ? styles.optionIconSelected : ''}>
+    <div>
+      <Texto
+        category='p2'
+        appearance='medium'
+        weight='600'
+        style={{ textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px', display: 'block' }}
+      >
+        Common Benchmarks
+      </Texto>
+      <Vertical style={{ gap: '10px' }}>
+        {BENCHMARK_OPTIONS.map((option) => (
+          <div key={option.type} className={styles.optionCard}>
+            <Horizontal alignItems='flex-start' style={{ gap: '12px' }}>
               {option.icon}
-            </div>
-            <Vertical style={{ gap: '4px', flex: 1 }}>
-              <Texto weight="600">{option.title}</Texto>
-              <Texto category="p2" appearance="medium" className={styles.optionDescription}>
-                {option.description}
-              </Texto>
-            </Vertical>
-          </Horizontal>
-        </div>
-      ))}
-    </Vertical>
+              <Vertical style={{ gap: '4px', flex: 1 }}>
+                <Texto weight='600'>{option.title}</Texto>
+                <Texto category='p2' appearance='medium' className={styles.optionDescription}>
+                  {option.description}
+                </Texto>
+              </Vertical>
+            </Horizontal>
+          </div>
+        ))}
+      </Vertical>
+    </div>
   )
 }

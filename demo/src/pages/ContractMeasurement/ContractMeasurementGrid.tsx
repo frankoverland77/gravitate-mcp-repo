@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraviGrid, Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr';
-import { RightOutlined, WarningOutlined, MoreOutlined, FileTextOutlined, LineChartOutlined, DollarOutlined, SettingOutlined, EyeOutlined } from '@ant-design/icons';
+import { RightOutlined, WarningOutlined, MoreOutlined, FileTextOutlined, LineChartOutlined, DollarOutlined, SettingOutlined, EyeOutlined, LinkOutlined } from '@ant-design/icons';
 import { Popover, Menu, Button, Segmented } from 'antd';
 import { MEASUREMENT_DATA } from './ContractMeasurement.data';
 import { RatabilitySettingsDrawer } from './components/RatabilitySettingsDrawer';
@@ -210,6 +210,17 @@ export function ContractMeasurementGrid() {
                   Edit Contract
                 </Menu.Item>
               )}
+              <Menu.Item
+                key='open-contract'
+                icon={<LinkOutlined />}
+                onClick={() =>
+                  navigate(`/ContractFormulas/ContractDetails/${params.data.contractId}`, {
+                    state: { id: params.data.contractId, externalCompany: params.data.customer },
+                  })
+                }
+              >
+                Open Contract
+              </Menu.Item>
               <Menu.Item key="download" onClick={() => console.log('Download', params.data)}>
                 Download Report
               </Menu.Item>

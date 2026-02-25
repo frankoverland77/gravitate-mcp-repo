@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
-import { LeftOutlined, EyeOutlined } from '@ant-design/icons';
+import { LeftOutlined, EyeOutlined, LinkOutlined } from '@ant-design/icons';
 import { Tabs, Button } from 'antd';
 import { OverviewTab, ScenarioAnalysisTab, PerformanceDetailsTab, BenchmarksTab } from './tabs';
 import { CMViewSettingsDrawer } from './components/CMViewSettingsDrawer';
@@ -28,6 +28,12 @@ export function ContractMeasurementDetails() {
     navigate('/ContractMeasurement/ContractMeasurementGrid');
   };
 
+  const handleViewContract = () => {
+    navigate(`/ContractFormulas/ContractDetails/${data.contractId}`, {
+      state: { id: data.contractId, externalCompany: data.customer },
+    })
+  };
+
   return (
     <div className={styles.detailsPage}>
       {/* Page Header with Back Button - flexShrink: 0 prevents compression */}
@@ -41,6 +47,15 @@ export function ContractMeasurementDetails() {
         <Texto category="h3" weight="600">
           Measurement Details - ID: {data.id}
         </Texto>
+        {data.contractId && (
+          <GraviButton
+            type='text'
+            icon={<LinkOutlined />}
+            buttonText={data.contractId}
+            onClick={handleViewContract}
+            style={{ color: 'var(--theme-color-link, #1890ff)', fontWeight: 500 }}
+          />
+        )}
       </Horizontal>
 
       {/* Tabs - CSS handles flex + scroll behavior */}

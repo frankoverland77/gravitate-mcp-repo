@@ -22,31 +22,33 @@ export const SAMPLE_CONTRACT_PRODUCTS = generateContractProducts(6);
 export function getBenchmarkDisplayName(benchmark: SelectedBenchmark | undefined): string {
   if (!benchmark) return 'No Selection';
 
-  if (benchmark.type === 'quick') {
-    switch (benchmark.quickType) {
-      case 'rack-average':
-        return 'Rack Average';
-      case 'rack-low':
-        return 'Rack Low';
-      case 'spot-price':
-        return 'Spot Price';
-      default:
-        return 'Unknown';
-    }
+  const publisher = benchmark.publisher?.toUpperCase() || 'Unknown';
+  const hierarchyParts: string[] = [];
+
+  if (benchmark.productHierarchy) {
+    const productMap: Record<string, string> = {
+      'target-index': 'Target Index',
+      'product-grade': 'Product Grade',
+      'product-family': 'Product Family',
+      any: 'Any Match',
+    };
+    hierarchyParts.push(productMap[benchmark.productHierarchy] || benchmark.productHierarchy);
   }
 
-  // Custom benchmark
-  const publisher = benchmark.publisher?.toUpperCase() || 'Unknown';
-  const typeMap: Record<string, string> = {
-    'rack-low': 'Rack Low',
-    'rack-average': 'Rack Average',
-    'contract-low': 'Contract Low',
-    spot: 'Spot',
-  };
-  const benchmarkType = benchmark.benchmarkType
-    ? typeMap[benchmark.benchmarkType] || benchmark.benchmarkType
-    : 'Unknown';
-  return `${publisher} ${benchmarkType}`;
+  if (benchmark.locationHierarchy) {
+    const locationMap: Record<string, string> = {
+      city: 'City',
+      state: 'State',
+      padd: 'PADD',
+      national: 'National',
+    };
+    hierarchyParts.push(locationMap[benchmark.locationHierarchy] || benchmark.locationHierarchy);
+  }
+
+  if (hierarchyParts.length > 0) {
+    return `${publisher} (${hierarchyParts.join(' / ')})`;
+  }
+  return publisher;
 }
 
 /**
@@ -70,33 +72,27 @@ export function calculateMatchingInfo(
   let matchRate: number;
   let noMatchCount = 0;
 
-  // Quick selections (managed benchmarks) have predefined match rates and no failures
-  if (benchmark.type === 'quick') {
-    matchRate = 0.85;
-    noMatchCount = 0;
-  } else {
-    // Custom benchmark match rate + no-match count depends on hierarchy
-    switch (benchmark.productHierarchy) {
-      case 'target-index':
-        matchRate = 0.85;
-        noMatchCount = 1;
-        break;
-      case 'product-grade':
-        matchRate = 0.75;
-        noMatchCount = 1;
-        break;
-      case 'product-family':
-        matchRate = 0.6;
-        noMatchCount = 2;
-        break;
-      case 'any':
-        matchRate = 1.0;
-        noMatchCount = 0;
-        break;
-      default:
-        matchRate = 0.85;
-        noMatchCount = 0;
-    }
+  // Match rate depends on product hierarchy
+  switch (benchmark.productHierarchy) {
+    case 'target-index':
+      matchRate = 0.85;
+      noMatchCount = 1;
+      break;
+    case 'product-grade':
+      matchRate = 0.75;
+      noMatchCount = 1;
+      break;
+    case 'product-family':
+      matchRate = 0.6;
+      noMatchCount = 2;
+      break;
+    case 'any':
+      matchRate = 1.0;
+      noMatchCount = 0;
+      break;
+    default:
+      matchRate = 0.85;
+      noMatchCount = 0;
   }
 
   // Ensure noMatchCount doesn't exceed total
@@ -130,53 +126,23 @@ export function calculateImpactEstimate(
     };
   }
 
-  // Get adjustment factors based on benchmark type
+  // Get adjustment factors based on publisher
   let priceAdjustment: number;
   let marginMultiplier: number;
 
-  if (benchmark.type === 'quick') {
-    switch (benchmark.quickType) {
-      case 'rack-average':
-        priceAdjustment = -0.021; // 2.1% lower (favorable)
-        marginMultiplier = 0.96;
-        break;
-      case 'rack-low':
-        priceAdjustment = -0.045; // 4.5% lower (more favorable)
-        marginMultiplier = 0.94;
-        break;
-      case 'spot-price':
-        priceAdjustment = 0.028; // 2.8% higher (unfavorable)
-        marginMultiplier = 1.02;
-        break;
-      default:
-        priceAdjustment = 0;
-        marginMultiplier = 1;
-    }
-  } else {
-    // Custom benchmark - adjust based on publisher
-    switch (benchmark.publisher) {
-      case 'platts':
-        priceAdjustment = 0.018;
-        marginMultiplier = 1.02;
-        break;
-      case 'argus':
-        priceAdjustment = 0.012;
-        marginMultiplier = 1.01;
-        break;
-      case 'opis':
-      default:
-        priceAdjustment = -0.015;
-        marginMultiplier = 0.99;
-    }
-
-    // Adjust for benchmark type
-    if (benchmark.benchmarkType === 'rack-low') {
-      priceAdjustment -= 0.03;
-      marginMultiplier *= 0.97;
-    } else if (benchmark.benchmarkType === 'spot') {
-      priceAdjustment += 0.02;
-      marginMultiplier *= 1.01;
-    }
+  switch (benchmark.publisher) {
+    case 'platts':
+      priceAdjustment = 0.018;
+      marginMultiplier = 1.02;
+      break;
+    case 'argus':
+      priceAdjustment = 0.012;
+      marginMultiplier = 1.01;
+      break;
+    case 'opis':
+    default:
+      priceAdjustment = -0.015;
+      marginMultiplier = 0.99;
   }
 
   // Calculate totals
@@ -226,13 +192,13 @@ export function getProductMatchDetails(
       };
     }
 
-    // Calculate price delta (simulated)
+    // Calculate price delta based on publisher
     let priceDelta = 0;
     if (benchmark) {
-      if (benchmark.type === 'quick' && benchmark.quickType === 'rack-low') {
-        priceDelta = -(0.03 + Math.random() * 0.04); // -3 to -7 cents
-      } else if (benchmark.type === 'quick' && benchmark.quickType === 'spot-price') {
+      if (benchmark.publisher === 'platts') {
         priceDelta = 0.02 + Math.random() * 0.03; // +2 to +5 cents
+      } else if (benchmark.publisher === 'argus') {
+        priceDelta = 0.01 + Math.random() * 0.02; // +1 to +3 cents
       } else {
         priceDelta = -0.02 + Math.random() * 0.04; // -2 to +2 cents
       }

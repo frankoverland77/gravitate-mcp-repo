@@ -450,30 +450,6 @@
   margin-top: 2px;
 }
 
-/* Unassigned row in blended mode - amber left border + tinted bg */
-.unassignedRow {
-  background-color: #fffbe6;
-  border-left: 3px solid #faad14;
-}
-
-.unassignedRow:hover td {
-  background-color: #fff7cc !important;
-}
-
-/* Unassigned select styling */
-.unassignedSelect :global(.ant-select-selector) {
-  border-color: #faad14 !important;
-  background-color: #fffbe6 !important;
-}
-
-/* Blended info bar */
-.blendedInfoBar {
-  padding: 12px 16px;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  border-radius: 8px;
-}
-
 /* Missing price indicator (partial data) */
 .missingPriceIndicator {
   display: inline-flex;

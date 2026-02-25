@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Texto, Horizontal, Vertical, GraviButton } from '@gravitate-js/excalibrr'
-import { Drawer, Button, Input, Segmented } from 'antd'
-import type { SelectedBenchmark, Scenario, BenchmarkTypeOption, BenchmarkType } from '../types/scenario.types'
+import { Drawer, Button, Input } from 'antd'
+import type { SelectedBenchmark, Scenario } from '../types/scenario.types'
 import { generateScenarioId } from '../types/scenario.types'
-import { BenchmarkSelector, ExistingBenchmarkSelector } from './benchmark'
+import { useFeatureMode } from '../../../contexts/FeatureModeContext'
+import { BenchmarkSelector } from './benchmark'
+import { ReferenceLegendCards } from './benchmark/QuickSelectionCards'
 import { MatchingSummaryCard } from './benchmark/MatchingSummaryCard'
 import { EstimatedImpactCard } from './benchmark/EstimatedImpactCard'
 import { ProductBreakdownPanel } from './benchmark/ProductBreakdownPanel'
@@ -27,8 +29,8 @@ export function BenchmarkScenarioDrawer({
   onSave,
   editingScenario,
 }: BenchmarkScenarioDrawerProps) {
+  const { isFutureMode } = useFeatureMode()
   const [name, setName] = useState('')
-  const [benchmarkMode, setBenchmarkMode] = useState<'existing' | 'new'>('existing')
   const [selectedBenchmark, setSelectedBenchmark] = useState<SelectedBenchmark | undefined>(undefined)
   const [diffSign, setDiffSign] = useState<'+' | '-'>('+')
   const [diffAmount, setDiffAmount] = useState<number>(0)
@@ -39,19 +41,13 @@ export function BenchmarkScenarioDrawer({
   useEffect(() => {
     if (visible) {
       if (editingScenario) {
-        // Edit mode - populate with existing data
+        // Edit mode - populate from priceConfig
         setName(editingScenario.name)
         setDiffSign(editingScenario.priceConfig?.diff?.sign || '+')
         setDiffAmount(editingScenario.priceConfig?.diff?.amount ?? 0)
-        // Infer mode: managed → existing, adhoc → new
-        setBenchmarkMode(editingScenario.priceConfig?.source === 'adhoc' ? 'new' : 'existing')
-        // Reconstruct the selected benchmark from existing config
-        if (editingScenario.priceConfig?.benchmarkId) {
+        if (editingScenario.priceConfig?.publisher) {
           setSelectedBenchmark({
-            type: editingScenario.priceConfig.benchmarkId.startsWith('custom') ? 'custom' : 'quick',
-            quickType: editingScenario.priceConfig.benchmarkId as 'rack-average' | 'rack-low' | 'spot-price' | 'opis-contract',
             publisher: editingScenario.priceConfig.publisher,
-            benchmarkType: editingScenario.priceConfig.benchmarkId as BenchmarkTypeOption,
             productHierarchy: editingScenario.priceConfig.productHierarchy,
             locationHierarchy: editingScenario.priceConfig.locationHierarchy,
           })
@@ -59,35 +55,12 @@ export function BenchmarkScenarioDrawer({
       } else {
         // Add mode - reset form
         setName('')
-        setBenchmarkMode('existing')
         setSelectedBenchmark(undefined)
         setDiffSign('+')
         setDiffAmount(0)
       }
     }
   }, [visible, editingScenario])
-
-  // Reset selected benchmark when switching modes to avoid stale state
-  const handleModeChange = (value: string | number) => {
-    const mode = value as 'existing' | 'new'
-    setBenchmarkMode(mode)
-    setSelectedBenchmark(undefined)
-  }
-
-  // Handle card selection - pre-populate name for quick selects
-  const handleCardSelect = (type: BenchmarkType, title: string) => {
-    // Only pre-populate name for quick selects (not custom), and only if name is empty
-    if (type !== 'custom' && name.trim() === '') {
-      setName(title)
-    } else if (type === 'custom') {
-      // Clear name when switching to custom if it was auto-generated
-      // (Check if the current name matches one of the quick select titles)
-      const quickSelectTitles = ['Rack Low', 'Rack Average', 'Spot', 'OPIS Contract']
-      if (quickSelectTitles.includes(name)) {
-        setName('')
-      }
-    }
-  }
 
   // Compute preview data reactively from selected benchmark
   const hasFullBenchmark =
@@ -97,18 +70,18 @@ export function BenchmarkScenarioDrawer({
     selectedBenchmark.locationHierarchy !== undefined
 
   const matchingInfo = useMemo(
-    () => (hasFullBenchmark ? calculateMatchingInfo(selectedBenchmark) : null),
-    [hasFullBenchmark, selectedBenchmark],
+    () => (isFutureMode && hasFullBenchmark ? calculateMatchingInfo(selectedBenchmark) : null),
+    [isFutureMode, hasFullBenchmark, selectedBenchmark],
   )
 
   const impactEstimate = useMemo(
-    () => (hasFullBenchmark ? calculateImpactEstimate(selectedBenchmark) : null),
-    [hasFullBenchmark, selectedBenchmark],
+    () => (isFutureMode && hasFullBenchmark ? calculateImpactEstimate(selectedBenchmark) : null),
+    [isFutureMode, hasFullBenchmark, selectedBenchmark],
   )
 
   const productDetails = useMemo(
-    () => (hasFullBenchmark ? getProductMatchDetails(selectedBenchmark) : null),
-    [hasFullBenchmark, selectedBenchmark],
+    () => (isFutureMode && hasFullBenchmark ? getProductMatchDetails(selectedBenchmark) : null),
+    [isFutureMode, hasFullBenchmark, selectedBenchmark],
   )
 
   // Validation: need name and a fully configured benchmark
@@ -123,16 +96,8 @@ export function BenchmarkScenarioDrawer({
     if (!canSave || !selectedBenchmark) return
 
     const now = new Date().toISOString()
-    const benchmarkId =
-      selectedBenchmark.type === 'quick'
-        ? selectedBenchmark.quickType
-        : selectedBenchmark.benchmarkType
-
-    const isManaged = selectedBenchmark.type === 'quick'
     const priceConfig: Scenario['priceConfig'] = {
-      source: isManaged ? 'managed' : 'adhoc',
-      managedBenchmarkId: isManaged ? benchmarkId : undefined,
-      benchmarkId,
+      source: 'adhoc',
       publisher: selectedBenchmark.publisher,
       productHierarchy: selectedBenchmark.productHierarchy,
       locationHierarchy: selectedBenchmark.locationHierarchy,
@@ -168,8 +133,8 @@ export function BenchmarkScenarioDrawer({
 
   return (
     <Drawer
-      placement="bottom"
-      height="70%"
+      placement='bottom'
+      height='70%'
       visible={visible}
       onClose={onClose}
       closable={false}
@@ -193,7 +158,7 @@ export function BenchmarkScenarioDrawer({
           flexShrink: 0,
         }}
       >
-        <Horizontal justifyContent="space-between" alignItems="flex-start">
+        <Horizontal justifyContent='space-between' alignItems='flex-start'>
           <Vertical style={{ gap: '4px' }}>
             <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
               {isEditMode ? 'Edit Benchmark Scenario' : 'Add Benchmark Scenario'}
@@ -203,7 +168,7 @@ export function BenchmarkScenarioDrawer({
             </Texto>
           </Vertical>
           <Button
-            type="link"
+            type='link'
             onClick={onClose}
             style={{ color: '#ffffff', fontSize: '20px', padding: 0, height: 'auto', lineHeight: 1 }}
           >
@@ -212,7 +177,7 @@ export function BenchmarkScenarioDrawer({
         </Horizontal>
       </div>
 
-      {/* Content - Scrollable area with two-column layout */}
+      {/* Content - Scrollable area */}
       <div
         style={{
           flex: 1,
@@ -222,9 +187,14 @@ export function BenchmarkScenarioDrawer({
         }}
       >
         <div style={{ display: 'flex', gap: '24px' }}>
-          {/* Left column: Configuration */}
+          {/* Left column: Reference Legend */}
+          <div style={{ width: '220px', flexShrink: 0 }}>
+            <ReferenceLegendCards />
+          </div>
+
+          {/* Center column: Name + Form */}
           <div style={{ flex: 3, minWidth: 0 }}>
-            {/* SECTION 1: Scenario Name */}
+            {/* Scenario Name */}
             <div style={{ marginBottom: '24px', maxWidth: '50%' }}>
               <Texto
                 style={{
@@ -240,16 +210,16 @@ export function BenchmarkScenarioDrawer({
                 Scenario Name
               </Texto>
               <Input
-                placeholder="Enter scenario name..."
+                placeholder='Enter scenario name...'
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                size="large"
+                size='large'
                 maxLength={100}
               />
             </div>
 
-            {/* SECTION 2: Mode Toggle */}
-            <div style={{ marginBottom: '24px' }}>
+            {/* Benchmark Configuration */}
+            <div>
               <Texto
                 style={{
                   fontSize: '12px',
@@ -261,60 +231,39 @@ export function BenchmarkScenarioDrawer({
                   color: '#595959',
                 }}
               >
-                Benchmark Selection
+                Benchmark Configuration
               </Texto>
-              <Segmented
-                value={benchmarkMode}
-                onChange={handleModeChange}
-                options={[
-                  { value: 'existing', label: 'Select Existing' },
-                  { value: 'new', label: 'Create New' },
-                ]}
-                style={{ marginBottom: '16px' }}
+              <BenchmarkSelector
+                selectedBenchmark={selectedBenchmark}
+                onBenchmarkChange={setSelectedBenchmark}
+                diffSign={diffSign}
+                diffAmount={diffAmount}
+                onDiffSignChange={setDiffSign}
+                onDiffAmountChange={(val) => setDiffAmount(val ?? 0)}
               />
-
-              {benchmarkMode === 'existing' ? (
-                <ExistingBenchmarkSelector
-                  selectedBenchmark={selectedBenchmark}
-                  onBenchmarkChange={setSelectedBenchmark}
-                  diffSign={diffSign}
-                  diffAmount={diffAmount}
-                  onDiffSignChange={setDiffSign}
-                  onDiffAmountChange={(val) => setDiffAmount(val ?? 0)}
-                  onCardSelect={handleCardSelect}
-                />
-              ) : (
-                <BenchmarkSelector
-                  selectedBenchmark={selectedBenchmark}
-                  onBenchmarkChange={setSelectedBenchmark}
-                  diffSign={diffSign}
-                  diffAmount={diffAmount}
-                  onDiffSignChange={setDiffSign}
-                  onDiffAmountChange={(val) => setDiffAmount(val ?? 0)}
-                  onCardSelect={handleCardSelect}
-                />
-              )}
             </div>
           </div>
 
-          {/* Right column: Preview Panel */}
-          <div style={{ flex: 2, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {matchingInfo && impactEstimate && productDetails ? (
-              <>
-                <MatchingSummaryCard
-                  matchedCount={matchingInfo.matchedCount}
-                  rollupCount={matchingInfo.rollupCount}
-                  noMatchCount={matchingInfo.noMatchCount}
-                  totalProducts={matchingInfo.totalProducts}
-                  matchPercentage={matchingInfo.matchPercentage}
-                />
-                <EstimatedImpactCard impactEstimate={impactEstimate} />
-                <ProductBreakdownPanel productDetails={productDetails} />
-              </>
-            ) : (
-              <BenchmarkPreview selectedBenchmark={undefined} />
-            )}
-          </div>
+          {/* Right column: Preview Panel (Future mode only) */}
+          {isFutureMode && (
+            <div style={{ flex: 2, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {matchingInfo && impactEstimate && productDetails ? (
+                <>
+                  <MatchingSummaryCard
+                    matchedCount={matchingInfo.matchedCount}
+                    rollupCount={matchingInfo.rollupCount}
+                    noMatchCount={matchingInfo.noMatchCount}
+                    totalProducts={matchingInfo.totalProducts}
+                    matchPercentage={matchingInfo.matchPercentage}
+                  />
+                  <EstimatedImpactCard impactEstimate={impactEstimate} />
+                  <ProductBreakdownPanel productDetails={productDetails} />
+                </>
+              ) : (
+                <BenchmarkPreview selectedBenchmark={undefined} />
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -328,17 +277,17 @@ export function BenchmarkScenarioDrawer({
           zIndex: 100,
         }}
       >
-        <Horizontal justifyContent="flex-end" alignItems="center" style={{ gap: '16px' }}>
+        <Horizontal justifyContent='flex-end' alignItems='center' style={{ gap: '16px' }}>
           <GraviButton
-            buttonText="Cancel"
-            size="large"
-            appearance="outlined"
+            buttonText='Cancel'
+            size='large'
+            appearance='outlined'
             onClick={onClose}
             style={{ minWidth: '100px' }}
           />
           <GraviButton
             buttonText={isEditMode ? 'Save Changes' : 'Add Scenario'}
-            size="large"
+            size='large'
             theme1
             disabled={!canSave}
             onClick={handleSave}
