@@ -1088,6 +1088,19 @@ export const DELIVERED_PRICING_STRATEGIES: DeliveredPricingStrategy[] = [
   'Allocation Maintenance',
 ]
 
+/** Severity levels for supply exceptions */
+export type ExceptionSeverity = 'info' | 'warning' | 'critical'
+
+/** Structured supply exception with severity, label, and optional context */
+export interface SupplyException {
+  /** Short label displayed as a chip */
+  label: string
+  /** Severity determines color: info (blue), warning (orange), critical (red) */
+  severity: ExceptionSeverity
+  /** Optional detail shown on hover */
+  detail?: string
+}
+
 export interface DeliveredPricingQuoteRow {
   id: number
   QuoteConfigurationMappingId: number
@@ -1103,8 +1116,8 @@ export interface DeliveredPricingQuoteRow {
     Liftings: number
     LastPrice: number
   }
-  // Exception alerting
-  Exception: string | null
+  // Exception alerting — structured array of supply exceptions
+  Exception: SupplyException[] | null
   // Whether the user has manually overridden the strategy default
   IsStrategyOverridden: boolean
   // Proposed period

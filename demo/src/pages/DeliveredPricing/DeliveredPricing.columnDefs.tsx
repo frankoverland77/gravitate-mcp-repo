@@ -6,9 +6,9 @@
  */
 
 import type { ColDef, ColGroupDef } from 'ag-grid-community'
-import { Popover } from 'antd'
+import { Popover, Tooltip } from 'antd'
 import { Horizontal, Texto, Vertical } from '@gravitate-js/excalibrr'
-import { DELIVERED_PRICING_STRATEGIES } from '../../shared/data'
+import { DELIVERED_PRICING_STRATEGIES, type SupplyException, type ExceptionSeverity } from '../../shared/data'
 
 const currencyFormatter = (params: any) => {
   if (params.value == null) return ''
@@ -81,24 +81,54 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             values: DELIVERED_PRICING_STRATEGIES,
           },
           width: 195,
-          cellStyle: (params: any) => {
-            if (params.data?.IsStrategyOverridden) {
-              return {
-                fontStyle: 'italic',
-                color: 'var(--theme-warning, #faad14)',
-              }
-            }
-            return {
-              fontStyle: 'italic',
-              color: 'var(--theme-primary, #1890ff)',
-            }
-          },
+          // Plain text for copy/export — renderer handles visual display
           valueFormatter: (params: any) => {
             if (!params.value) return ''
-            if (params.data?.IsStrategyOverridden) {
-              return `\u270E ${params.value}`
-            }
             return params.value
+          },
+          cellRenderer: (params: any) => {
+            if (!params.value) return null
+            const strategy: string = params.value
+            const isOverridden = params.data?.IsStrategyOverridden
+
+            // Strategy → color + abbreviated label
+            const strategyConfig: Record<string, { color: string; bg: string; abbrev: string }> = {
+              'Lowest Price': { color: '#389e0d', bg: 'rgba(56, 158, 13, 0.08)', abbrev: 'Lowest Price' },
+              'Lowest Rack': { color: '#389e0d', bg: 'rgba(56, 158, 13, 0.08)', abbrev: 'Lowest Rack' },
+              'Lowest Contract': { color: '#1890ff', bg: 'rgba(24, 144, 255, 0.08)', abbrev: 'Low Contract' },
+              'Average Rack': { color: '#722ed1', bg: 'rgba(114, 46, 209, 0.08)', abbrev: 'Avg Rack' },
+              'Allocation Maintenance': { color: '#d48806', bg: 'rgba(212, 136, 6, 0.08)', abbrev: 'Alloc Maint' },
+            }
+
+            const config = strategyConfig[strategy] ?? { color: '#595959', bg: '#f5f5f5', abbrev: strategy }
+
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: '100%' }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: isOverridden ? '#d48806' : config.color,
+                    backgroundColor: isOverridden ? 'rgba(250, 173, 20, 0.08)' : config.bg,
+                    padding: '1px 6px',
+                    borderRadius: 3,
+                    lineHeight: '18px',
+                    whiteSpace: 'nowrap',
+                    border: isOverridden ? '1px dashed rgba(212, 136, 6, 0.3)' : '1px solid transparent',
+                  }}
+                >
+                  {isOverridden && (
+                    <span style={{ fontSize: 10, lineHeight: 1 }}>{'\u270E'}</span>
+                  )}
+                  {config.abbrev}
+                </span>
+                {/* Edit affordance — subtle dropdown arrow */}
+                <span style={{ color: '#bfbfbf', fontSize: 9, marginLeft: 'auto' }}>{'\u25BE'}</span>
+              </div>
+            )
           },
         },
         {
@@ -108,19 +138,65 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           sortable: true,
           editable: false,
           width: 220,
-          cellStyle: (params: any) => {
-            if (params.value) {
-              return {
-                color: 'var(--theme-error, #ff4d4f)',
-                fontWeight: 'bold',
-                backgroundColor: 'var(--theme-error-dim, rgba(255, 77, 79, 0.06))',
-              }
-            }
-            return { color: '#8c8c8c' }
+          // Value getter returns exception count for sorting (0 = no issues, higher = more issues)
+          comparator: (a: SupplyException[] | null, b: SupplyException[] | null) => {
+            const aLen = a?.length ?? 0
+            const bLen = b?.length ?? 0
+            if (aLen !== bLen) return bLen - aLen // more exceptions sort first
+            // Secondary sort by highest severity
+            const severityRank: Record<ExceptionSeverity, number> = { critical: 3, warning: 2, info: 1 }
+            const aMax = a ? Math.max(...a.map((e) => severityRank[e.severity] ?? 0)) : 0
+            const bMax = b ? Math.max(...b.map((e) => severityRank[e.severity] ?? 0)) : 0
+            return bMax - aMax
           },
+          // Filter on the labels joined as text
           valueFormatter: (params: any) => {
-            if (!params.value) return '\u2014'
-            return `\u26A0 ${params.value}`
+            const exceptions: SupplyException[] | null = params.value
+            if (!exceptions?.length) return '\u2014'
+            return exceptions.map((e) => e.label).join(', ')
+          },
+          cellRenderer: (params: any) => {
+            const exceptions: SupplyException[] | null = params.value
+            if (!exceptions?.length) {
+              return <span style={{ color: '#bfbfbf' }}>{'\u2014'}</span>
+            }
+
+            const severityConfig: Record<ExceptionSeverity, { bg: string; color: string; icon: string }> = {
+              critical: { bg: 'rgba(207, 19, 34, 0.08)', color: '#cf1322', icon: '\u2716' },
+              warning: { bg: 'rgba(250, 173, 20, 0.10)', color: '#d48806', icon: '\u26A0' },
+              info: { bg: 'rgba(24, 144, 255, 0.08)', color: '#1890ff', icon: '\u2139' },
+            }
+
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: '100%', overflow: 'hidden' }}>
+                {exceptions.map((exc, i) => {
+                  const config = severityConfig[exc.severity]
+                  return (
+                    <Tooltip key={i} title={exc.detail ?? exc.label} mouseEnterDelay={0.2}>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 3,
+                          fontSize: 11,
+                          fontWeight: 500,
+                          color: config.color,
+                          backgroundColor: config.bg,
+                          padding: '1px 5px',
+                          borderRadius: 3,
+                          lineHeight: '16px',
+                          whiteSpace: 'nowrap',
+                          cursor: 'default',
+                        }}
+                      >
+                        <span style={{ fontSize: 9 }}>{config.icon}</span>
+                        {exc.label}
+                      </span>
+                    </Tooltip>
+                  )
+                })}
+              </div>
+            )
           },
         },
       ],

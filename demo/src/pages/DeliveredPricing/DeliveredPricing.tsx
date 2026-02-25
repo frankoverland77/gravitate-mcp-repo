@@ -369,6 +369,7 @@ export function DeliveredPricing() {
         <DeliveredPricingAnalytics
           selectedRow={selectedRow}
           activeSupplyOptionIds={activeSupplyOptionIds}
+          strategyDefaultId={strategyDefault?.id ?? null}
           onSupplyOptionsSelected={handleSupplyOptionsSelected}
         />
       </div>

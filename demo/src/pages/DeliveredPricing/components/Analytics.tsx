@@ -6,12 +6,15 @@ import { SupplyOptionsView } from './SupplyOptionsView'
 interface DeliveredPricingAnalyticsProps {
   selectedRow: DeliveredPricingQuoteRow | null
   activeSupplyOptionIds?: number[]
+  /** The supply option ID that the current strategy would auto-select */
+  strategyDefaultId?: number | null
   onSupplyOptionsSelected?: (rows: SupplyOptionRow[]) => void
 }
 
 export function DeliveredPricingAnalytics({
   selectedRow,
   activeSupplyOptionIds,
+  strategyDefaultId,
   onSupplyOptionsSelected,
 }: DeliveredPricingAnalyticsProps) {
   if (!selectedRow) {
@@ -49,6 +52,7 @@ export function DeliveredPricingAnalytics({
         <SupplyOptionsView
           selectedRow={selectedRow}
           activeSupplyOptionIds={activeSupplyOptionIds}
+          strategyDefaultId={strategyDefaultId}
           onSupplyOptionsSelected={onSupplyOptionsSelected}
         />
       </div>

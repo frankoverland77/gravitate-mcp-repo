@@ -108,5 +108,7 @@ export {
   generateDeliveredPricingData,
   type DeliveredPricingQuoteRow,
   type DeliveredPricingStrategy,
+  type SupplyException,
+  type ExceptionSeverity,
   DELIVERED_PRICING_STRATEGIES,
 } from './generators.data'

@@ -12,6 +12,7 @@
  */
 
 import type { DeliveredPricingQuoteRow } from './DeliveredPricing.data'
+import type { SupplyException } from '../../shared/data'
 
 /** Volume metrics for a single period */
 export interface PeriodVolume {
@@ -68,32 +69,92 @@ function seededValue(seed: number, base: number): number {
   return Math.round(base + ((seed * 7 + 13) % 97) * (base / 80))
 }
 
-/** Generate volume metrics for a single period */
-function generatePeriodVolume(baseSeed: number, ci: number, periodBase: number): PeriodVolume {
+/** Derive commitment status from the To Date % of Forecast value */
+function deriveStatus(toDatePctOfForecast: number): string {
+  if (toDatePctOfForecast >= 90) return 'On Track'
+  if (toDatePctOfForecast >= 50) return 'Behind'
+  return 'At Risk'
+}
+
+/** Contract status assignment per quote row: index → target status category */
+type ContractStatusTarget = 'at-risk' | 'behind' | 'no-commitment' | 'on-track'
+
+/**
+ * Returns the target status for each contract index (0-based among contracts only).
+ * Each quote row gets: 1 at-risk, 1 behind, 1 no-commitment, rest on-track.
+ * The specific indices rotate based on the quote row seed for variety.
+ */
+function getContractStatusTarget(contractIndex: number, quoteSeed: number): ContractStatusTarget {
+  // Rotate the assignment based on the quote row so different rows highlight different contracts
+  const offset = quoteSeed % 7
+  const adjusted = (contractIndex + offset) % 7
+  if (adjusted === 0) return 'at-risk'
+  if (adjusted === 1) return 'behind'
+  if (adjusted === 2) return 'no-commitment'
+  return 'on-track'
+}
+
+/**
+ * Generate volume metrics for a single period with a target TD% range.
+ * - on-track:  TD% 90–110 (capped at 110%)
+ * - behind:    TD% 50–89
+ * - at-risk:   TD% 10–49
+ */
+function generatePeriodVolume(
+  baseSeed: number,
+  ci: number,
+  periodBase: number,
+  targetStatus: 'on-track' | 'behind' | 'at-risk'
+): PeriodVolume {
   const cellSeed = baseSeed + ci * 17
 
   // Forecast
   const forecast = seededValue(cellSeed, periodBase)
-
-  // Liftings (60-100% of forecast)
-  const liftSeed = cellSeed + 31
-  const liftPct = 0.6 + ((liftSeed % 41) / 100)
-  const liftings = Math.round(forecast * liftPct)
-
-  // Status
-  const statuses = ['On Track', 'Behind', 'Allocation Limit', 'At Risk']
-  const statusSeed = cellSeed + 62
-  const status = statuses[statusSeed % statuses.length]
 
   // To Date Forecast (40-90% of forecast)
   const tdSeed = cellSeed + 93
   const tdPct = 0.4 + ((tdSeed % 51) / 100)
   const toDateForecast = Math.round(forecast * tdPct)
 
-  // To Date % of Forecast
+  // Determine target TD% range based on status, then pick a value within it using seed
+  const rangeSeed = cellSeed + 31
+  let targetTdPct: number
+  switch (targetStatus) {
+    case 'on-track':
+      // 90–110%, capped at 110%
+      targetTdPct = 90 + (rangeSeed % 21) // 90 to 110
+      break
+    case 'behind':
+      // 50–89%
+      targetTdPct = 50 + (rangeSeed % 40) // 50 to 89
+      break
+    case 'at-risk':
+      // 10–49%
+      targetTdPct = 10 + (rangeSeed % 40) // 10 to 49
+      break
+  }
+
+  // Derive liftings from the target TD% and toDateForecast
+  const liftings = toDateForecast > 0 ? Math.round(toDateForecast * (targetTdPct / 100)) : 0
+
+  // Recompute actual TD% from the rounded values
   const toDatePctOfForecast = toDateForecast > 0 ? Math.round((liftings / toDateForecast) * 100) : 0
 
-  return { forecast, liftings, status, toDateForecast, toDatePctOfForecast }
+  // Cap On Track at 110%
+  const cappedPct = targetStatus === 'on-track' ? Math.min(toDatePctOfForecast, 110) : toDatePctOfForecast
+  const cappedLiftings = targetStatus === 'on-track' && toDatePctOfForecast > 110
+    ? Math.round(toDateForecast * 1.1)
+    : liftings
+
+  const status = deriveStatus(cappedPct)
+
+  return {
+    forecast,
+    liftings: cappedLiftings,
+    status,
+    toDateForecast,
+    toDatePctOfForecast: cappedPct,
+  }
 }
 
 export function generateSupplyOptionsData(selectedRow: DeliveredPricingQuoteRow): SupplyOptionRow[] {
@@ -108,6 +169,8 @@ export function generateSupplyOptionsData(selectedRow: DeliveredPricingQuoteRow)
 
   // Track the commitment index (only non-Rack entries get volume data)
   let commitmentIdx = 0
+  // Track the contract index separately for status assignment
+  let contractIdx = 0
 
   SUPPLY_OPTIONS.forEach(([origin, supplier, channel], idx) => {
     const rowSeed = (idx + 1) * 31 + Math.round(priceSeed)
@@ -129,10 +192,24 @@ export function generateSupplyOptionsData(selectedRow: DeliveredPricingQuoteRow)
       const ci = commitmentIdx
       const isDayDealChevron = channel === 'Day Deal' && supplier === 'Chevron' && origin === 'Houston'
 
-      // Month — null for Day Deal Chevron Houston (weekly-only)
-      month = isDayDealChevron ? null : generatePeriodVolume(volumeSeed + 1000, ci, 50000)
-      // Week
-      week = generatePeriodVolume(volumeSeed + 2000, ci, 12000)
+      if (channel === 'Contract') {
+        // Each quote row gets: 1 at-risk, 1 behind, 1 no-commitment, rest on-track
+        const target = getContractStatusTarget(contractIdx, selectedRow.id)
+        contractIdx++
+
+        if (target === 'no-commitment') {
+          // No volume commitment for this contract
+          month = null
+          week = null
+        } else {
+          month = generatePeriodVolume(volumeSeed + 1000, ci, 50000, target)
+          week = generatePeriodVolume(volumeSeed + 2000, ci, 12000, target)
+        }
+      } else {
+        // Day Deal — weekly-only, on-track status
+        month = isDayDealChevron ? null : generatePeriodVolume(volumeSeed + 1000, ci, 50000, 'on-track')
+        week = generatePeriodVolume(volumeSeed + 2000, ci, 12000, 'on-track')
+      }
 
       commitmentIdx++
     }
@@ -179,29 +256,27 @@ export function getMonthlyToDatePctBySupplyOption(
 }
 
 /**
- * Compute exception alerts for a quote book row based on its strategy selection.
+ * Compute structured exception alerts for a quote book row based on its strategy selection.
  *
- * Exception types:
- * - "Lower price available" — a Rack or non-over-lifted Contract has a lower price than the active selection
- * - "Over lifting contract" — the active selection is a Contract and its MTD % of forecast exceeds 100%
- * - "Under lifting contract" — the active selection is a Contract and its MTD % of forecast is below 75%
- * - "Day Deal volume requirement" — a Day Deal option's price is lower than the strategy price
+ * Exception types (with severity):
+ * - "Lower price" (info) — a viable option is cheaper than the active selection
+ * - "Over lifting" (critical) — active Contract exceeds 100% of monthly forecast
+ * - "Under lifting" (warning) — active Contract below 75% of monthly forecast
+ * - "Day Deal" (info) — a Day Deal option is cheaper than the strategy price
  *
- * Returns a string summary of exceptions (or null if none).
+ * Returns an array of structured exceptions (or null if none).
  */
 export function computeQuoteRowExceptions(
   _quoteRow: DeliveredPricingQuoteRow,
   supplyOptions: SupplyOptionRow[],
   activeOption: SupplyOptionRow | null
-): string | null {
+): SupplyException[] | null {
   if (!activeOption || !supplyOptions.length) return null
 
-  const alerts: string[] = []
+  const alerts: SupplyException[] = []
   const strategyPrice = activeOption.price
 
   // 1. A viable supply option has a lower price than the strategy selection.
-  //    Viable = Rack (no volume constraints) or Contract with MTD % of forecast under 100%
-  //    (an over-lifted contract is not a viable cheaper alternative).
   const cheaperOption = supplyOptions.find((o) => {
     if (o.id === activeOption.id || o.price >= strategyPrice) return false
     if (o.channel === 'Rack') return true
@@ -212,27 +287,45 @@ export function computeQuoteRowExceptions(
     return false
   })
   if (cheaperOption) {
-    alerts.push('Lower price available')
+    const savings = Number((strategyPrice - cheaperOption.price).toFixed(4))
+    alerts.push({
+      label: 'Lower price',
+      severity: 'info',
+      detail: `${cheaperOption.supplier} ${cheaperOption.channel} is $${savings.toFixed(4)} cheaper`,
+    })
   }
 
   // 2. Contract lifting status — only applies when the active selection is a Contract
   if (activeOption.channel === 'Contract' && activeOption.month?.toDatePctOfForecast != null) {
     if (activeOption.month.toDatePctOfForecast > 100) {
-      alerts.push('Over lifting contract')
+      alerts.push({
+        label: 'Over lifting',
+        severity: 'critical',
+        detail: `${activeOption.supplier} at ${activeOption.month.toDatePctOfForecast}% of monthly forecast`,
+      })
     } else if (activeOption.month.toDatePctOfForecast < 75) {
-      alerts.push('Under lifting contract')
+      alerts.push({
+        label: 'Under lifting',
+        severity: 'warning',
+        detail: `${activeOption.supplier} at ${activeOption.month.toDatePctOfForecast}% of monthly forecast — needs volume`,
+      })
     }
   }
 
-  // 3. Day Deal price is lower than strategy-selected price — signals volume opportunity
+  // 3. Day Deal price is lower than strategy-selected price
   const cheaperDayDeal = supplyOptions.find(
     (o) => o.channel === 'Day Deal' && o.id !== activeOption.id && o.price < strategyPrice
   )
   if (cheaperDayDeal) {
-    alerts.push('Day Deal volume requirement')
+    const savings = Number((strategyPrice - cheaperDayDeal.price).toFixed(4))
+    alerts.push({
+      label: 'Day Deal',
+      severity: 'info',
+      detail: `Day Deal at $${cheaperDayDeal.price.toFixed(4)} saves $${savings.toFixed(4)}`,
+    })
   }
 
-  return alerts.length > 0 ? alerts.join(' · ') : null
+  return alerts.length > 0 ? alerts : null
 }
 
 /**

@@ -12,9 +12,11 @@ import {
   SwapOutlined,
   DollarOutlined,
   BgColorsOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
+import { PriceElasticity } from './pages/demos/PriceElasticity/PriceElasticity';
 import { ContractManagementPage, CreateContractPage } from './pages/ContractManagement';
 import { CustomerForm } from './pages/demos/forms/CustomerForm/CustomerForm';
 import { ProductGrid } from './pages/demos/grids/ProductGrid/ProductGrid';
@@ -38,6 +40,7 @@ import { SubscriptionManagement } from './pages/SubscriptionManagement/Subscript
 import { RFPManagement } from './pages/RFP';
 import { NegotiationModePage } from './pages/NegotiationMode/NegotiationModePage';
 import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
+import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesale';
 import {
   TypographyShowcase,
   ButtonsShowcase,
@@ -293,6 +296,20 @@ export const demoRegistry: DemoRoute[] = [
     ),
     path: '/DeliveredPricing',
     description: 'End of Day delivered pricing quote book with cost, freight, and margin analysis',
+    created: new Date().toISOString(),
+    category: 'grids',
+  },
+  // Quotebook Wholesale
+  {
+    key: 'QuotebookWholesale',
+    title: 'Quotebook Wholesale',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <QuotebookWholesale />
+      </ThemeRouteWrapper>
+    ),
+    path: '/quotebookwholesale',
+    description: 'End of Day wholesale pricing quote book with 25 dummy rows across 5 products and 5 locations',
     created: new Date().toISOString(),
     category: 'grids',
   },
@@ -745,6 +762,32 @@ export const createPageConfig = (): PageConfig => {
         hidden: true,
       },
     ],
+  };
+
+  config.PriceElasticity = {
+    hasPermission: () => true,
+    key: 'PriceElasticity',
+    icon: <LineChartOutlined />,
+    title: 'Price Elasticity',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <PriceElasticity />
+      </ThemeRouteWrapper>
+    ),
+    path: '/PriceElasticity',
+  };
+
+  config.QuotebookWholesale = {
+    hasPermission: () => true,
+    key: 'QuotebookWholesale',
+    icon: <DollarOutlined />,
+    title: 'Quotebook Wholesale',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <QuotebookWholesale />
+      </ThemeRouteWrapper>
+    ),
+    path: '/quotebookwholesale',
   };
 
   return config;

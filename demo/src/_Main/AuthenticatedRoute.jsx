@@ -37,6 +37,8 @@ export function AuthenticatedRoute() {
     Contracts: true,
     NegotiationMode: true,
     DeliveredPricing: true,
+    PriceElasticity: true,
+    QuotebookWholesale: true,
   };
   return (
     <FeatureModeProvider>
