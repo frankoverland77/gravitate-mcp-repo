@@ -181,11 +181,20 @@ function commitmentHealthRenderer(params: any) {
   const data: SupplyOptionRow | undefined = params.data
   if (!data) return null
 
-  // No commitment: Rack options or contracts with no volume obligation
-  if (data.channel === 'Rack' || (data.month == null && data.week == null)) {
+  // Rack options: structurally no commitment tracking
+  if (data.channel === 'Rack') {
     return (
       <span style={{ color: '#8c8c8c', fontSize: 11, fontStyle: 'italic' }}>
-        No commitment
+        Rack
+      </span>
+    )
+  }
+
+  // Contracts/Day Deals with no volume obligation data
+  if (data.month == null && data.week == null) {
+    return (
+      <span style={{ color: '#8c8c8c', fontSize: 11, fontStyle: 'italic' }}>
+        Uncommitted
       </span>
     )
   }
@@ -239,16 +248,22 @@ function commitmentHealthRenderer(params: any) {
       mouseEnterDelay={0.3}
       title={
         <div style={{ fontSize: 12 }}>
-          {monthStatus && (
-            <div>
-              Month: {monthStatus}
-              {data.month?.toDatePctOfForecast != null && ` (${data.month.toDatePctOfForecast}% of forecast)`}
-            </div>
-          )}
+          {/* Show week status + % (not visible in the grid columns) */}
           {weekStatus && (
             <div>
               Week: {weekStatus}
-              {data.week?.toDatePctOfForecast != null && ` (${data.week.toDatePctOfForecast}% of forecast)`}
+              {data.week?.toDatePctOfForecast != null && ` (${data.week.toDatePctOfForecast}%)`}
+            </div>
+          )}
+          {/* Show actual volume numbers behind the percentages */}
+          {data.month && (
+            <div style={{ marginTop: weekStatus ? 4 : 0, borderTop: weekStatus ? '1px solid rgba(255,255,255,0.2)' : 'none', paddingTop: weekStatus ? 4 : 0 }}>
+              MTD: {(data.month.liftings ?? 0).toLocaleString()} / {(data.month.forecast ?? 0).toLocaleString()} vol
+            </div>
+          )}
+          {data.week && (
+            <div>
+              WTD: {(data.week.liftings ?? 0).toLocaleString()} / {(data.week.forecast ?? 0).toLocaleString()} vol
             </div>
           )}
         </div>
@@ -439,9 +454,9 @@ function getFocusedColumnDefs(strategyDefaultId: number | null | undefined) {
       marryChildren: true,
       children: [
         {
-          headerName: '',
+          headerName: '★',
           field: '_recommendation',
-          width: 34,
+          width: 38,
           pinned: 'left' as const,
           sortable: false,
           filter: false,
@@ -547,7 +562,7 @@ function getFocusedColumnDefs(strategyDefaultId: number | null | undefined) {
         },
         {
           field: 'delta',
-          headerName: 'vs. Current',
+          headerName: 'Delta',
           sortable: true,
           filter: 'agNumberColumnFilter',
           type: 'rightAligned',
@@ -569,12 +584,26 @@ function getFocusedColumnDefs(strategyDefaultId: number | null | undefined) {
           width: 170,
         },
         {
-          field: 'month.toDatePctOfForecast',
+          colId: 'mtdPct',
           headerName: 'MTD %',
-          valueFormatter: pctFormatter,
+          valueGetter: (params: any) => {
+            const data: SupplyOptionRow | undefined = params.data
+            if (!data) return null
+            // Rack rows: no commitment tracking
+            if (data.channel === 'Rack') return null
+            // Fall back to week data for Day Deal (weekly-only) rows
+            return data.month?.toDatePctOfForecast ?? data.week?.toDatePctOfForecast ?? null
+          },
+          valueFormatter: (params: any) => {
+            if (params.value == null) {
+              // Show dash for Rack rows or truly missing data
+              return '\u2014'
+            }
+            return `${params.value}%`
+          },
           cellStyle: (params: any) => {
             if (isAllocationLimitRow(params.data)) return INACTIVE_CELL_STYLE
-            if (params.data?.channel === 'Rack') return { color: '#8c8c8c' }
+            if (params.value == null) return { color: '#bfbfbf' }
             return pctCellStyle(params)
           },
           type: 'rightAligned',
@@ -625,11 +654,13 @@ function DecisionSummaryBar({
   strategyDefaultId,
   activeSupplyOptionIds,
   strategy,
+  rackFilterNote,
 }: {
   rowData: SupplyOptionRow[]
   strategyDefaultId: number | null | undefined
   activeSupplyOptionIds: Set<number>
   strategy: string
+  rackFilterNote?: string | null
 }) {
   if (!rowData.length) return null
 
@@ -739,6 +770,16 @@ function DecisionSummaryBar({
           )}
         </span>
       )}
+
+      {/* Rack filtering indicator */}
+      {rackFilterNote && (
+        <>
+          <span style={{ color: '#d9d9d9' }}>|</span>
+          <span style={{ color: '#8c8c8c', fontSize: 11, fontStyle: 'italic' }}>
+            {rackFilterNote}
+          </span>
+        </>
+      )}
     </div>
   )
 }
@@ -756,6 +797,12 @@ export function SupplyOptionsView({
   const [viewMode, setViewMode] = useState<SupplyOptionsViewMode>('focused')
 
   const allRowData = useMemo(() => generateSupplyOptionsData(selectedRow), [selectedRow])
+
+  // Track total vs shown Rack count for focused view indicator
+  const totalRackCount = useMemo(
+    () => allRowData.filter((row) => row.channel === 'Rack').length,
+    [allRowData]
+  )
 
   const rowData = useMemo(() => {
     if (viewMode === 'focused') {
@@ -787,6 +834,11 @@ export function SupplyOptionsView({
     }
     return allRowData
   }, [allRowData, viewMode])
+
+  const shownRackCount = useMemo(
+    () => rowData.filter((row) => row.channel === 'Rack').length,
+    [rowData]
+  )
 
   const activeIdSet = useMemo(
     () => new Set(activeSupplyOptionIds ?? []),
@@ -871,6 +923,11 @@ export function SupplyOptionsView({
           strategyDefaultId={strategyDefaultId}
           activeSupplyOptionIds={activeIdSet}
           strategy={selectedRow.Strategy}
+          rackFilterNote={
+            totalRackCount > shownRackCount
+              ? `${shownRackCount} of ${totalRackCount} Rack options`
+              : null
+          }
         />
       )}
 

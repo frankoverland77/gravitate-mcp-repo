@@ -36,18 +36,7 @@ export function DeliveredPricingAnalytics({
 
   return (
     <Vertical className="bg-1 bordered" style={{ height: '100%' }}>
-      {/* Header */}
-      <Horizontal className="px-4 py-2 bordered" verticalCenter>
-        <Texto category="h5">Delivered Pricing Analytics</Texto>
-        <Texto className="ml-4" style={{ color: '#8c8c8c' }}>
-          {selectedRow.LocationName} → {selectedRow.DestinationLocationName} · {selectedRow.ProductName}
-        </Texto>
-        <Texto className="ml-4" style={{ color: 'var(--theme-primary, #1890ff)', fontStyle: 'italic' }}>
-          Strategy: {selectedRow.Strategy}
-        </Texto>
-      </Horizontal>
-
-      {/* Unified Supply Options + Volume Grid */}
+      {/* Unified Supply Options + Volume Grid (header consolidated into SupplyOptionsView's DecisionSummaryBar) */}
       <div style={{ flex: 1, minHeight: 0 }}>
         <SupplyOptionsView
           selectedRow={selectedRow}

@@ -246,13 +246,13 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           field: 'Diff',
           headerName: 'Diff',
           filter: 'agNumberColumnFilter',
-          valueFormatter: currencyFormatter,
           editable: true,
           type: 'rightAligned',
-          width: 100,
+          width: 110,
+          valueFormatter: currencyFormatter,
           cellStyle: (params: any) => {
-            if (params.value < 0) return { color: 'var(--theme-error)', fontWeight: 'bold' }
-            if (params.value > 0) return { color: 'green', fontWeight: 'bold' }
+            if (params.value < 0) return { color: 'var(--theme-error, #ff4d4f)', fontWeight: 'bold' }
+            if (params.value > 0) return { color: '#389e0d', fontWeight: 'bold' }
             return {}
           },
         },
@@ -384,8 +384,9 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           type: 'rightAligned',
           width: 120,
           cellStyle: (params: any) => {
-            if (params.value < 0) return { color: 'var(--theme-error)' }
-            if (params.value > 0) return { color: 'green' }
+            // Buyer perspective: negative delta = savings (green), positive = cost increase (red)
+            if (params.value < 0) return { color: '#389e0d' }
+            if (params.value > 0) return { color: '#cf1322' }
             return {}
           },
         },

@@ -146,7 +146,7 @@ export function DeliveredPricing() {
   const [rowData, setRowData] = useState<DeliveredPricingQuoteRow[]>(() =>
     enrichWithExceptions(deliveredPricingData, {})
   )
-  const [showAnalytics] = useState(true)
+  const [showAnalytics, setShowAnalytics] = useState(true)
   const [selectedRow, setSelectedRow] = useState<DeliveredPricingQuoteRow | null>(null)
 
   // Track the active supply option IDs per quote row (keyed by quote row id)
@@ -165,6 +165,14 @@ export function DeliveredPricing() {
 
   // AG Grid API ref for programmatic cell updates
   const gridApiRef = useRef<any>(null)
+
+  // Stable ref for overrides — used inside agPropOverrides callbacks to avoid re-memoization
+  const overridesRef = useRef(overrides)
+  overridesRef.current = overrides
+
+  // Stable ref for selectedRow — used inside agPropOverrides callbacks
+  const selectedRowRef = useRef(selectedRow)
+  selectedRowRef.current = selectedRow
 
   // Compute supply options and strategy default for the selected row
   const supplyOptions = useMemo(
@@ -239,7 +247,7 @@ export function DeliveredPricing() {
       setSelectedRow(row)
 
       // If no user override exists, apply the strategy default Cost (with freight/tax adjustment)
-      if (overrides[row.id] == null) {
+      if (overridesRef.current[row.id] == null) {
         const options = generateSupplyOptionsData(row)
         const lifting = getMonthlyToDatePctBySupplyOption(row)
         const defaultOption = resolveStrategyDefault(row.Strategy, options, lifting)
@@ -250,7 +258,7 @@ export function DeliveredPricing() {
             setRowData((prev) =>
               prev.map((r) => {
                 if (r.id !== row.id) return r
-                const updated = computeExceptionForRow({ ...r, ...computeProposedFields(r, defaultOption) }, overrides)
+                const updated = computeExceptionForRow({ ...r, ...computeProposedFields(r, defaultOption) }, overridesRef.current)
                 setSelectedRow(updated)
                 return updated
               })
@@ -259,16 +267,55 @@ export function DeliveredPricing() {
         }
       }
     },
-    [overrides]
+    []
   )
 
   const columnDefs = useMemo(() => getDeliveredPricingColumnDefs(), [])
+
+  // Stable row selection handler that reads from ref
+  const handleRowSelected = useCallback((event: any) => {
+    if (event.node.isSelected() && event.data) {
+      handleQuoteRowSelected(event.data)
+    }
+  }, [handleQuoteRowSelected])
+
+  // Stable cell value changed handler that reads overrides from ref
+  const handleCellValueChanged = useCallback((event: any) => {
+    if (event.colDef.field === 'Strategy') {
+      const updatedRow = event.data as DeliveredPricingQuoteRow
+      // Clear any user override(s) so strategy default takes effect
+      const newOverrides = { ...overridesRef.current }
+      delete newOverrides[updatedRow.id]
+      setOverrides(newOverrides)
+
+      // Re-resolve strategy default and apply new Cost + freight/tax + recompute exception
+      const options = generateSupplyOptionsData(updatedRow)
+      const lifting = getMonthlyToDatePctBySupplyOption(updatedRow)
+      const defaultOption = resolveStrategyDefault(updatedRow.Strategy, options, lifting)
+      if (defaultOption) {
+        setRowData((prev) =>
+          prev.map((r) => {
+            if (r.id !== updatedRow.id) return r
+            const proposed = computeProposedFields(r, defaultOption)
+            const updated = computeExceptionForRow(
+              { ...r, Strategy: updatedRow.Strategy, ...proposed },
+              newOverrides
+            )
+            if (selectedRowRef.current?.id === updatedRow.id) {
+              setSelectedRow(updated)
+            }
+            return updated
+          })
+        )
+      }
+    }
+  }, [])
 
   const agPropOverrides = useMemo(
     () => ({
       getRowId: (params: any) => String(params.data?.id),
       domLayout: 'normal' as const,
-      groupDefaultExpanded: 1,
+      groupDefaultExpanded: -1,
       rowSelection: 'single' as const,
       autoGroupColumnDef: {
         headerName: 'Quote Configuration',
@@ -280,44 +327,10 @@ export function DeliveredPricing() {
       onGridReady: (params: any) => {
         gridApiRef.current = params.api
       },
-      onRowSelected: (event: any) => {
-        if (event.node.isSelected() && event.data && showAnalytics) {
-          handleQuoteRowSelected(event.data)
-        }
-      },
-      // When Strategy changes via cell edit, clear the override and re-resolve
-      onCellValueChanged: (event: any) => {
-        if (event.colDef.field === 'Strategy') {
-          const updatedRow = event.data as DeliveredPricingQuoteRow
-          // Clear any user override(s) so strategy default takes effect
-          const newOverrides = { ...overrides }
-          delete newOverrides[updatedRow.id]
-          setOverrides(newOverrides)
-
-          // Re-resolve strategy default and apply new Cost + freight/tax + recompute exception
-          const options = generateSupplyOptionsData(updatedRow)
-          const lifting = getMonthlyToDatePctBySupplyOption(updatedRow)
-          const defaultOption = resolveStrategyDefault(updatedRow.Strategy, options, lifting)
-          if (defaultOption) {
-            setRowData((prev) =>
-              prev.map((r) => {
-                if (r.id !== updatedRow.id) return r
-                const proposed = computeProposedFields(r, defaultOption)
-                const updated = computeExceptionForRow(
-                  { ...r, Strategy: updatedRow.Strategy, ...proposed },
-                  newOverrides
-                )
-                if (selectedRow?.id === updatedRow.id) {
-                  setSelectedRow(updated)
-                }
-                return updated
-              })
-            )
-          }
-        }
-      },
+      onRowSelected: handleRowSelected,
+      onCellValueChanged: handleCellValueChanged,
     }),
-    [showAnalytics, handleQuoteRowSelected, selectedRow]
+    [handleRowSelected, handleCellValueChanged]
   )
 
   const controlBarProps = useMemo(
@@ -361,7 +374,7 @@ export function DeliveredPricing() {
       <div
         style={{
           height: showAnalytics ? '400px' : '0px',
-          transition: 'height 0.5s ease',
+          transition: 'height 0.3s ease',
           overflow: 'hidden',
           flexShrink: 0,
         }}
@@ -372,6 +385,87 @@ export function DeliveredPricing() {
           strategyDefaultId={strategyDefault?.id ?? null}
           onSupplyOptionsSelected={handleSupplyOptionsSelected}
         />
+      </div>
+
+      {/* Analytics toggle bar */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: 28,
+          flexShrink: 0,
+          borderBottom: '1px solid var(--theme-border, #e8e8e8)',
+          backgroundColor: 'var(--theme-bg-elevated, #fafafa)',
+          cursor: 'pointer',
+          userSelect: 'none',
+          gap: 8,
+          paddingLeft: 8,
+          paddingRight: 12,
+        }}
+        onClick={() => setShowAnalytics((prev) => !prev)}
+      >
+        <span
+          style={{
+            fontSize: 10,
+            color: '#8c8c8c',
+            transition: 'transform 0.3s ease',
+            transform: showAnalytics ? 'rotate(180deg)' : 'rotate(0deg)',
+            display: 'inline-flex',
+          }}
+        >
+          ▲
+        </span>
+        <span style={{ fontSize: 11, color: '#8c8c8c', fontWeight: 500 }}>
+          {showAnalytics ? 'Hide' : 'Show'} Supply Options
+        </span>
+
+        {/* #2 — Context pills showing which quote row the analytics panel is linked to */}
+        {selectedRow && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: 'var(--theme-primary, #1890ff)',
+                backgroundColor: 'rgba(24, 144, 255, 0.08)',
+                padding: '1px 8px',
+                borderRadius: 3,
+                lineHeight: '18px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {selectedRow.LocationName} → {selectedRow.DestinationLocationName}
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: '#595959',
+                backgroundColor: '#f5f5f5',
+                padding: '1px 8px',
+                borderRadius: 3,
+                lineHeight: '18px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {selectedRow.ProductName}
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: '#595959',
+                backgroundColor: '#f5f5f5',
+                padding: '1px 8px',
+                borderRadius: 3,
+                lineHeight: '18px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {selectedRow.Strategy}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Grid */}
