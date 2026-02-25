@@ -3,8 +3,8 @@
  *
  * Generates supply option rows with integrated price and volume commitment data.
  * Each row represents a unique origin/supplier/channel combination with:
- *   - Price info: price, priceRank, change
- *   - Volume commitments per period (Month, Week, Day): Forecast, Liftings, Status,
+ *   - Price info: price, priceRank, delta (vs proposed cost)
+ *   - Volume commitments per period (Month, Week): Forecast, Liftings, Status,
  *     To Date Forecast, To Date % of Forecast
  *
  * Used by the unified SupplyOptionsView analytics grid and the main DeliveredPricing page
@@ -28,12 +28,12 @@ export interface SupplyOptionRow {
   supplier: string
   price: number
   priceRank: number
-  change: number
+  /** Delta between this supply option price and the quote book's proposed cost */
+  delta: number
   channel: string
   /** Volume commitment data per period — null for Rack options */
   month: PeriodVolume | null
   week: PeriodVolume | null
-  day: PeriodVolume | null
 }
 
 /** Fixed supply option entries: [origin, supplier, channel] */
@@ -81,7 +81,7 @@ function generatePeriodVolume(baseSeed: number, ci: number, periodBase: number):
   const liftings = Math.round(forecast * liftPct)
 
   // Status
-  const statuses = ['On Track', 'Behind', 'Ahead', 'At Risk']
+  const statuses = ['On Track', 'Behind', 'Allocation Limit', 'At Risk']
   const statusSeed = cellSeed + 62
   const status = statuses[statusSeed % statuses.length]
 
@@ -111,17 +111,19 @@ export function generateSupplyOptionsData(selectedRow: DeliveredPricingQuoteRow)
 
   SUPPLY_OPTIONS.forEach(([origin, supplier, channel], idx) => {
     const rowSeed = (idx + 1) * 31 + Math.round(priceSeed)
-    // Change in points per gallon (e.g. 0.0001 = 1 point, 0.0100 = 1 cent)
-    const change = Number(((rowSeed % 101 - 50) / 10000).toFixed(4))
+    // Price variation per entry
+    const priceVariation = Number(((rowSeed % 101 - 50) / 10000).toFixed(4))
     // Base price anchored to a stable value, varied per entry
     const basePrice = anchorPrice + ((rowSeed % 200) - 100) / 10000
     // Clamp final price to 2.01 – 2.75
-    const price = Number(Math.min(2.75, Math.max(2.01, basePrice + change)).toFixed(4))
+    const price = Number(Math.min(2.75, Math.max(2.01, basePrice + priceVariation)).toFixed(4))
+    // Delta: supply option price vs the quote book's proposed cost
+    const proposedCost = selectedRow.Cost ?? 0
+    const delta = Number((price - proposedCost).toFixed(4))
 
     // Volume data: only for non-Rack entries
     let month: PeriodVolume | null = null
     let week: PeriodVolume | null = null
-    let day: PeriodVolume | null = null
 
     if (channel !== 'Rack') {
       const ci = commitmentIdx
@@ -131,8 +133,6 @@ export function generateSupplyOptionsData(selectedRow: DeliveredPricingQuoteRow)
       month = isDayDealChevron ? null : generatePeriodVolume(volumeSeed + 1000, ci, 50000)
       // Week
       week = generatePeriodVolume(volumeSeed + 2000, ci, 12000)
-      // Day — null for Day Deal Chevron Houston (weekly-only)
-      day = isDayDealChevron ? null : generatePeriodVolume(volumeSeed + 3000, ci, 2000)
 
       commitmentIdx++
     }
@@ -143,11 +143,10 @@ export function generateSupplyOptionsData(selectedRow: DeliveredPricingQuoteRow)
       supplier,
       price,
       priceRank: 0,
-      change,
+      delta,
       channel,
       month,
       week,
-      day,
     })
   })
 
