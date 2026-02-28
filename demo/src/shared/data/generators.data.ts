@@ -1133,6 +1133,14 @@ export interface DeliveredPricingQuoteRow {
   BaseFreight: number
   /** Original tax for the row's origin — used as reference when supply option origin changes */
   BaseTax: number
+  /** Per-gallon federal excise tax */
+  FederalTax: number
+  /** Per-gallon state excise tax */
+  StateTax: number
+  /** Per-gallon local excise tax (0 if none) */
+  LocalTax: number
+  /** Destination state abbreviation (drives tax jurisdiction) */
+  DestinationState: string
   ProposedPrice: number
   PriceDelta: number
   Margin: number
@@ -1234,8 +1242,12 @@ export function generateDeliveredPricingData(count = 40): DeliveredPricingQuoteR
         // Diff (strategy differential)
         const diff = Number(((seed % 12 - 6) / 100).toFixed(4))
 
-        // Tax as small percentage
-        const tax = Number((baseCost * (0.02 + (seed % 5) / 100)).toFixed(4))
+        // Per-gallon excise tax — destination-driven (TX for this POC)
+        const isGasoline = product.ProductGroup === 'gasoline'
+        const federalTax = isGasoline ? 0.1840 : 0.2440
+        const stateTax = 0.2000 // TX state excise tax (same for gasoline and diesel)
+        const localTax = 0      // No local fuel tax in TX
+        const tax = Number((federalTax + stateTax + localTax).toFixed(4))
 
         // Price = Cost + Freight + Tax + Diff
         const proposedPrice = Number((baseCost + freight + tax + diff).toFixed(4))
@@ -1277,6 +1289,10 @@ export function generateDeliveredPricingData(count = 40): DeliveredPricingQuoteR
           FreightType: freightType,
           BaseFreight: freight,
           BaseTax: tax,
+          FederalTax: federalTax,
+          StateTax: stateTax,
+          LocalTax: localTax,
+          DestinationState: 'TX',
           ProposedPrice: proposedPrice,
           PriceDelta: priceDelta,
           Margin: margin,

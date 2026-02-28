@@ -319,31 +319,41 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             const totalTax = Number(data.Tax)
             const taxDisplay = `$${totalTax.toFixed(4)}`
 
-            // Deterministic split: federal ~40%, state ~35%, local ~25% of total tax
-            const seed = (data.id ?? 0) * 17 + 31
-            const federalPct = 0.38 + ((seed % 7) / 100)       // ~38-44%
-            const statePct = 0.33 + (((seed * 3) % 6) / 100)   // ~33-38%
-            const federalTax = Number((totalTax * federalPct).toFixed(4))
-            const stateTax = Number((totalTax * statePct).toFixed(4))
-            const localTax = Number((totalTax - federalTax - stateTax).toFixed(4))
+            // Use actual per-gallon tax breakdown from the data model
+            const federalTax = data.FederalTax ?? 0
+            const stateTax = data.StateTax ?? 0
+            const localTax = data.LocalTax ?? 0
+            const destState = data.DestinationState ?? 'TX'
+            const commodity = data.ProductGroup === 'gasoline' ? 'Gasoline' : 'Diesel'
 
             const popoverContent = (
-              <Vertical style={{ width: 220, gap: 4 }}>
+              <Vertical style={{ width: 260, gap: 4 }}>
                 <Horizontal justifyContent="space-between">
-                  <Texto>Federal Tax</Texto>
-                  <Texto weight={600}>${federalTax.toFixed(4)}</Texto>
+                  <Texto size={12} color="#8c8c8c">Destination State</Texto>
+                  <Texto weight={600}>{destState}</Texto>
                 </Horizontal>
                 <Horizontal justifyContent="space-between">
-                  <Texto>State Tax</Texto>
-                  <Texto weight={600}>${stateTax.toFixed(4)}</Texto>
+                  <Texto size={12} color="#8c8c8c">Commodity</Texto>
+                  <Texto weight={600}>{commodity}</Texto>
+                </Horizontal>
+                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 2, paddingTop: 4 }} />
+                <Horizontal justifyContent="space-between">
+                  <Texto>Federal Excise</Texto>
+                  <Texto weight={600}>${Number(federalTax).toFixed(4)}</Texto>
                 </Horizontal>
                 <Horizontal justifyContent="space-between">
-                  <Texto>Local Tax</Texto>
-                  <Texto weight={600}>${localTax.toFixed(4)}</Texto>
+                  <Texto>State Excise ({destState})</Texto>
+                  <Texto weight={600}>${Number(stateTax).toFixed(4)}</Texto>
                 </Horizontal>
+                {localTax > 0 && (
+                  <Horizontal justifyContent="space-between">
+                    <Texto>Local Tax</Texto>
+                    <Texto weight={600}>${Number(localTax).toFixed(4)}</Texto>
+                  </Horizontal>
+                )}
                 <div style={{ borderTop: '1px solid var(--theme-border, #d9d9d9)', marginTop: 4, paddingTop: 4 }}>
                   <Horizontal justifyContent="space-between">
-                    <Texto weight={600}>Total Tax</Texto>
+                    <Texto weight={600}>Total Tax / Gal</Texto>
                     <Texto weight={600}>{taxDisplay}</Texto>
                   </Horizontal>
                 </div>

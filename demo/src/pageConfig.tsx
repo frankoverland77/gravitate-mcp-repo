@@ -40,6 +40,8 @@ import { SubscriptionManagement } from './pages/SubscriptionManagement/Subscript
 import { RFPManagement } from './pages/RFP';
 import { NegotiationModePage } from './pages/NegotiationMode/NegotiationModePage';
 import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
+import { FreightManagement } from './pages/DeliveredPricing/FreightManagement/FreightManagement';
+import { TaxManagement } from './pages/DeliveredPricing/TaxManagement/TaxManagement';
 import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesale';
 import {
   TypographyShowcase,
@@ -287,14 +289,14 @@ export const demoRegistry: DemoRoute[] = [
   },
   // Delivered Pricing
   {
-    key: 'DeliveredPricing',
+    key: 'DeliveredPricingQuoteBook',
     title: 'Delivered Pricing',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <DeliveredPricing />
       </ThemeRouteWrapper>
     ),
-    path: '/DeliveredPricing',
+    path: '/DeliveredPricing/QuoteBook',
     description: 'End of Day delivered pricing quote book with cost, freight, and margin analysis',
     created: new Date().toISOString(),
     category: 'grids',
@@ -691,12 +693,41 @@ export const createPageConfig = (): PageConfig => {
     key: 'DeliveredPricing',
     icon: <DollarOutlined />,
     title: 'Delivered Pricing',
-    element: (
-      <ThemeRouteWrapper theme="PE_LIGHT">
-        <DeliveredPricing />
-      </ThemeRouteWrapper>
-    ),
-    path: '/DeliveredPricing',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'DeliveredPricingQuoteBook',
+        title: 'Quote Book',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <DeliveredPricing />
+          </ThemeRouteWrapper>
+        ),
+        path: '/DeliveredPricing/QuoteBook',
+      },
+      {
+        hasPermission: () => true,
+        key: 'FreightManagement',
+        title: 'Freight Management',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <FreightManagement />
+          </ThemeRouteWrapper>
+        ),
+        path: '/DeliveredPricing/FreightManagement',
+      },
+      {
+        hasPermission: () => true,
+        key: 'TaxManagement',
+        title: 'Tax Management',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <TaxManagement />
+          </ThemeRouteWrapper>
+        ),
+        path: '/DeliveredPricing/TaxManagement',
+      },
+    ],
   };
 
   config.BulkChangeTest = {

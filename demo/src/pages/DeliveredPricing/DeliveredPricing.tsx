@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { GraviGrid } from '@gravitate-js/excalibrr'
+import { GraviGrid, Horizontal } from '@gravitate-js/excalibrr'
+import { Switch, Tooltip } from 'antd'
+import { BarChartOutlined } from '@ant-design/icons'
 import { getDeliveredPricingColumnDefs } from './DeliveredPricing.columnDefs'
 import { deliveredPricingData, type DeliveredPricingQuoteRow } from './DeliveredPricing.data'
 import { DeliveredPricingAnalytics } from './components/Analytics'
@@ -23,16 +25,21 @@ function isSameOrigin(quoteRowLocation: string, supplyOptionOrigin: string): boo
 }
 
 /**
- * Compute adjusted Freight and Tax when a supply option's origin differs from the
- * quote row's default origin. Returns the original base values when origins match.
+ * Compute adjusted Freight when a supply option's origin differs from the
+ * quote row's default origin. Returns the original base freight when origins match.
  * The adjustment is a deterministic ±20% shift seeded by the origin strings.
+ *
+ * Tax is NOT adjusted — per-gallon excise tax is destination-driven and does not
+ * change based on the origin terminal. Tax = Federal + State + Local, all determined
+ * by the delivery location's jurisdiction.
  */
 function adjustFreightAndTax(
   row: DeliveredPricingQuoteRow,
   supplyOptionOrigin: string
 ): { freight: number; tax: number } {
-  // Use BaseFreight/BaseTax as reference, falling back to current Freight/Tax
+  // Use BaseFreight as reference, falling back to current Freight
   const baseFreight = row.BaseFreight ?? row.Freight
+  // Tax is always the base value — per-gallon excise tax is destination-driven
   const baseTax = row.BaseTax ?? row.Tax
 
   if (isSameOrigin(row.LocationName, supplyOptionOrigin)) {
@@ -47,15 +54,12 @@ function adjustFreightAndTax(
     hash = (hash * 31 + combined.charCodeAt(i)) | 0
   }
 
-  // Freight adjustment: ±20% of base freight
+  // Freight adjustment: ±20% of base freight (origin/lane-driven)
   const freightPct = ((Math.abs(hash) % 401) - 200) / 1000 // -0.20 to +0.20
   const freight = Number((baseFreight * (1 + freightPct)).toFixed(4))
 
-  // Tax adjustment: ±20% of base tax (use a shifted seed)
-  const taxPct = ((Math.abs(hash * 7 + 13) % 401) - 200) / 1000
-  const tax = Number((baseTax * (1 + taxPct)).toFixed(4))
-
-  return { freight, tax }
+  // Tax stays fixed — destination and product determine per-gallon tax
+  return { freight, tax: baseTax }
 }
 
 /**
@@ -339,8 +343,69 @@ export function DeliveredPricing() {
       subtitle:
         'End of Day quote book — review and adjust delivered pricing by origin, destination, and product.',
       hideActiveFilters: false,
+      actionButtons: (
+        <Horizontal verticalCenter style={{ gap: '0.75rem' }}>
+          {/* Context pills — which quote row is linked to analytics */}
+          {selectedRow && (
+            <Horizontal verticalCenter style={{ gap: 6 }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: 'var(--theme-primary, #1890ff)',
+                  backgroundColor: 'rgba(24, 144, 255, 0.08)',
+                  padding: '1px 8px',
+                  borderRadius: 3,
+                  lineHeight: '18px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {selectedRow.LocationName} → {selectedRow.DestinationLocationName}
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: '#595959',
+                  backgroundColor: '#f5f5f5',
+                  padding: '1px 8px',
+                  borderRadius: 3,
+                  lineHeight: '18px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {selectedRow.ProductName}
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: '#595959',
+                  backgroundColor: '#f5f5f5',
+                  padding: '1px 8px',
+                  borderRadius: 3,
+                  lineHeight: '18px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {selectedRow.Strategy}
+              </span>
+            </Horizontal>
+          )}
+
+          {/* Show/Hide Analytics toggle */}
+          <Tooltip title={showAnalytics ? 'Hide supply options' : 'Show supply options'}>
+            <Switch
+              checked={showAnalytics}
+              onChange={(value) => setShowAnalytics(value)}
+              checkedChildren={<BarChartOutlined />}
+              unCheckedChildren={<BarChartOutlined />}
+            />
+          </Tooltip>
+        </Horizontal>
+      ),
     }),
-    []
+    [selectedRow, showAnalytics]
   )
 
   const updateEP = async () => {
@@ -385,87 +450,6 @@ export function DeliveredPricing() {
           strategyDefaultId={strategyDefault?.id ?? null}
           onSupplyOptionsSelected={handleSupplyOptionsSelected}
         />
-      </div>
-
-      {/* Analytics toggle bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          height: 28,
-          flexShrink: 0,
-          borderBottom: '1px solid var(--theme-border, #e8e8e8)',
-          backgroundColor: 'var(--theme-bg-elevated, #fafafa)',
-          cursor: 'pointer',
-          userSelect: 'none',
-          gap: 8,
-          paddingLeft: 8,
-          paddingRight: 12,
-        }}
-        onClick={() => setShowAnalytics((prev) => !prev)}
-      >
-        <span
-          style={{
-            fontSize: 10,
-            color: '#8c8c8c',
-            transition: 'transform 0.3s ease',
-            transform: showAnalytics ? 'rotate(180deg)' : 'rotate(0deg)',
-            display: 'inline-flex',
-          }}
-        >
-          ▲
-        </span>
-        <span style={{ fontSize: 11, color: '#8c8c8c', fontWeight: 500 }}>
-          {showAnalytics ? 'Hide' : 'Show'} Supply Options
-        </span>
-
-        {/* #2 — Context pills showing which quote row the analytics panel is linked to */}
-        {selectedRow && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: 'var(--theme-primary, #1890ff)',
-                backgroundColor: 'rgba(24, 144, 255, 0.08)',
-                padding: '1px 8px',
-                borderRadius: 3,
-                lineHeight: '18px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {selectedRow.LocationName} → {selectedRow.DestinationLocationName}
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: '#595959',
-                backgroundColor: '#f5f5f5',
-                padding: '1px 8px',
-                borderRadius: 3,
-                lineHeight: '18px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {selectedRow.ProductName}
-            </span>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: '#595959',
-                backgroundColor: '#f5f5f5',
-                padding: '1px 8px',
-                borderRadius: 3,
-                lineHeight: '18px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {selectedRow.Strategy}
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Grid */}
