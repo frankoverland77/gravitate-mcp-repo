@@ -21,13 +21,15 @@ export interface TaxRate {
   id: number
   /** Tax jurisdiction level */
   TaxLevel: TaxLevel
-  /** Jurisdiction name (e.g. "Federal", state name, or city/county name) */
+  /** Jurisdiction name (e.g. "Federal Excise", "Federal LUST", state name, or city/county name) */
   Jurisdiction: string
+  /** Tax component name for display */
+  TaxComponent: string
   /** State abbreviation (null for federal) */
   State: string | null
   /** Commodity group */
   Commodity: 'Gasoline' | 'Diesel'
-  /** Per-gallon tax rate in dollars (4 decimal places, e.g. 0.1840) */
+  /** Per-gallon tax rate in dollars (4 decimal places, e.g. 0.1830) */
   RatePerGallon: number
   /** Rate effective date */
   EffectiveDate: string
@@ -41,65 +43,42 @@ export interface TaxRate {
 // SHARED CONSTANTS
 // ============================================================================
 
-/** Federal excise tax rates (per gallon) */
-const FEDERAL_RATES = {
-  Gasoline: 0.184,
-  Diesel: 0.244,
+/**
+ * Federal motor fuel excise tax rates (per gallon).
+ * These rates have been unchanged since October 1, 1993.
+ */
+const FEDERAL_EXCISE_RATES = {
+  Gasoline: 0.1830,
+  Diesel: 0.2430,
 } as const
 
 /**
- * Approximate state fuel tax rates per gallon (simplified for POC).
- * These are representative values — real rates change frequently and
- * may include multiple components (excise, sales, inspection fees, etc.).
+ * Federal Leaking Underground Storage Tank (LUST) Trust Fund tax (per gallon).
+ * Applies to all motor fuels; funds EPA cleanup of contaminated UST sites.
+ */
+const FEDERAL_LUST_RATE = 0.0010
+
+/**
+ * Texas state motor fuel tax rates per gallon.
+ * Texas has maintained these rates since 1991.
+ * 75% (15¢) dedicated to the state highway system, 25% (5¢) to public education.
+ * Texas does not authorize local option motor fuel taxes.
+ * Motor fuel is exempt from Texas sales tax.
  */
 const STATE_TAX_RATES: Record<string, { Gasoline: number; Diesel: number }> = {
   TX: { Gasoline: 0.2000, Diesel: 0.2000 },
-  OK: { Gasoline: 0.1900, Diesel: 0.1900 },
-  KS: { Gasoline: 0.2441, Diesel: 0.2600 },
-  NE: { Gasoline: 0.2460, Diesel: 0.2460 },
-  IA: { Gasoline: 0.3000, Diesel: 0.3250 },
-  MO: { Gasoline: 0.1950, Diesel: 0.1950 },
-  AR: { Gasoline: 0.2460, Diesel: 0.2850 },
-  MN: { Gasoline: 0.2850, Diesel: 0.2850 },
-  WI: { Gasoline: 0.3090, Diesel: 0.3090 },
-  ND: { Gasoline: 0.2300, Diesel: 0.2300 },
-  SD: { Gasoline: 0.2800, Diesel: 0.2800 },
-  MT: { Gasoline: 0.3275, Diesel: 0.2975 },
-  WY: { Gasoline: 0.2400, Diesel: 0.2400 },
-  CO: { Gasoline: 0.2200, Diesel: 0.2050 },
-  UT: { Gasoline: 0.3190, Diesel: 0.3190 },
-  ID: { Gasoline: 0.3300, Diesel: 0.3300 },
-  NM: { Gasoline: 0.1870, Diesel: 0.2100 },
-  AZ: { Gasoline: 0.1800, Diesel: 0.2600 },
-  NV: { Gasoline: 0.2300, Diesel: 0.2700 },
-  WA: { Gasoline: 0.4940, Diesel: 0.4940 },
-  OR: { Gasoline: 0.4000, Diesel: 0.4000 },
-  LA: { Gasoline: 0.2000, Diesel: 0.2000 },
-  TN: { Gasoline: 0.2600, Diesel: 0.2700 },
-  MS: { Gasoline: 0.1840, Diesel: 0.1840 },
-  OH: { Gasoline: 0.3850, Diesel: 0.4700 },
-  PA: { Gasoline: 0.5870, Diesel: 0.7410 },
-  ME: { Gasoline: 0.3010, Diesel: 0.3120 },
-  IL: { Gasoline: 0.3920, Diesel: 0.4670 },
-  GA: { Gasoline: 0.2780, Diesel: 0.3130 },
-  MI: { Gasoline: 0.2870, Diesel: 0.2870 },
-  SC: { Gasoline: 0.2600, Diesel: 0.2600 },
 }
 
 /**
- * Local tax overrides — a handful of cities/counties that levy additional
- * per-gallon fuel taxes on top of state rates.
+ * Local tax overrides — Texas does not authorize local fuel taxes.
+ * This array is kept for structural completeness but is empty for TX-only.
  */
 const LOCAL_TAXES: {
   name: string
   state: string
   gasoline: number
   diesel: number
-}[] = [
-  { name: 'Chicago Metro', state: 'IL', gasoline: 0.08, diesel: 0.08 },
-  { name: 'Allegheny County', state: 'PA', gasoline: 0.02, diesel: 0.02 },
-  { name: 'Clark County', state: 'NV', gasoline: 0.0105, diesel: 0.0105 },
-]
+}[] = []
 
 // ============================================================================
 // DATA GENERATION
@@ -107,38 +86,56 @@ const LOCAL_TAXES: {
 
 /**
  * Derive the unique set of destination states from the shared location data.
- * These are the states we need state-level tax rates for.
+ * Filtered to TX-only destinations for this delivered pricing demo.
  */
 function getDestinationStates(): string[] {
-  const destinations = LOCATIONS.filter((l) => !l.IsTerminal && l.IsActive)
+  const destinations = LOCATIONS.filter((l) => !l.IsTerminal && l.IsActive && l.State === 'TX')
   const states = new Set(destinations.map((l) => l.State))
   return Array.from(states).sort()
 }
 
 /**
  * Generate the full set of tax rates across all three levels.
+ * Federal rates are broken out into Motor Fuel Excise and LUST Trust Fund components.
  */
 export function generateTaxRates(): TaxRate[] {
   const data: TaxRate[] = []
   let id = 1
   const commodities: TaxRate['Commodity'][] = ['Gasoline', 'Diesel']
 
-  // --- Federal level (2 rows: one per commodity) ---
+  // --- Federal level: Motor Fuel Excise Tax (2 rows: one per commodity) ---
   for (const commodity of commodities) {
     data.push({
       id: id++,
       TaxLevel: 'Federal',
       Jurisdiction: 'Federal',
+      TaxComponent: 'Motor Fuel Excise Tax',
       State: null,
       Commodity: commodity,
-      RatePerGallon: FEDERAL_RATES[commodity],
-      EffectiveDate: '2026-01-01',
+      RatePerGallon: FEDERAL_EXCISE_RATES[commodity],
+      EffectiveDate: '1993-10-01',
       ExpirationDate: null,
       IsActive: true,
     })
   }
 
-  // --- State level (2 rows per state: one per commodity) ---
+  // --- Federal level: LUST Trust Fund Tax (2 rows: one per commodity) ---
+  for (const commodity of commodities) {
+    data.push({
+      id: id++,
+      TaxLevel: 'Federal',
+      Jurisdiction: 'Federal',
+      TaxComponent: 'LUST Trust Fund Tax',
+      State: null,
+      Commodity: commodity,
+      RatePerGallon: FEDERAL_LUST_RATE,
+      EffectiveDate: '1993-10-01',
+      ExpirationDate: null,
+      IsActive: true,
+    })
+  }
+
+  // --- State level (TX only — 2 rows: one per commodity) ---
   const destinationStates = getDestinationStates()
   for (const state of destinationStates) {
     const rates = STATE_TAX_RATES[state]
@@ -149,23 +146,25 @@ export function generateTaxRates(): TaxRate[] {
         id: id++,
         TaxLevel: 'State',
         Jurisdiction: state,
+        TaxComponent: 'Motor Fuel Tax',
         State: state,
         Commodity: commodity,
         RatePerGallon: rates[commodity],
-        EffectiveDate: '2026-01-01',
+        EffectiveDate: '1991-10-01',
         ExpirationDate: null,
         IsActive: true,
       })
     }
   }
 
-  // --- Local level (additional per-gallon taxes) ---
+  // --- Local level (none for TX — no local fuel taxes authorized) ---
   for (const local of LOCAL_TAXES) {
     for (const commodity of commodities) {
       data.push({
         id: id++,
         TaxLevel: 'Local',
         Jurisdiction: local.name,
+        TaxComponent: 'Local Fuel Tax',
         State: local.state,
         Commodity: commodity,
         RatePerGallon: commodity === 'Gasoline' ? local.gasoline : local.diesel,

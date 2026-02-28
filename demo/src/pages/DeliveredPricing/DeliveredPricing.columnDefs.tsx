@@ -321,40 +321,88 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
 
             // Use actual per-gallon tax breakdown from the data model
             const federalTax = data.FederalTax ?? 0
+            const federalExcise = data.FederalExciseTaxRate ?? 0
+            const federalLUST = data.FederalLUSTTaxRate ?? 0
             const stateTax = data.StateTax ?? 0
             const localTax = data.LocalTax ?? 0
             const destState = data.DestinationState ?? 'TX'
             const commodity = data.ProductGroup === 'gasoline' ? 'Gasoline' : 'Diesel'
+            const productName = data.ProductName ?? commodity
+
+            const sectionHeader = (label: string, color: string, bg: string) => (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color,
+                  backgroundColor: bg,
+                  padding: '1px 5px',
+                  borderRadius: 2,
+                  lineHeight: '16px',
+                  letterSpacing: '0.03em',
+                  textTransform: 'uppercase' as const,
+                }}
+              >
+                {label}
+              </span>
+            )
 
             const popoverContent = (
-              <Vertical style={{ width: 260, gap: 4 }}>
+              <Vertical style={{ width: 280, gap: 4 }}>
+                {/* Context */}
                 <Horizontal justifyContent="space-between">
-                  <Texto size={12} color="#8c8c8c">Destination State</Texto>
+                  <Texto size={12} color="#8c8c8c">Destination</Texto>
                   <Texto weight={600}>{destState}</Texto>
+                </Horizontal>
+                <Horizontal justifyContent="space-between">
+                  <Texto size={12} color="#8c8c8c">Product</Texto>
+                  <Texto weight={600}>{productName}</Texto>
                 </Horizontal>
                 <Horizontal justifyContent="space-between">
                   <Texto size={12} color="#8c8c8c">Commodity</Texto>
                   <Texto weight={600}>{commodity}</Texto>
                 </Horizontal>
-                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 2, paddingTop: 4 }} />
+
+                {/* Federal taxes */}
+                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 4, paddingTop: 6 }}>
+                  {sectionHeader('Federal', '#722ed1', 'rgba(114, 46, 209, 0.08)')}
+                </div>
                 <Horizontal justifyContent="space-between">
-                  <Texto>Federal Excise</Texto>
-                  <Texto weight={600}>${Number(federalTax).toFixed(4)}</Texto>
+                  <Texto size={12}>Motor Fuel Excise Tax</Texto>
+                  <Texto weight={600}>${Number(federalExcise).toFixed(4)}</Texto>
                 </Horizontal>
                 <Horizontal justifyContent="space-between">
-                  <Texto>State Excise ({destState})</Texto>
+                  <Texto size={12}>LUST Trust Fund Tax</Texto>
+                  <Texto weight={600}>${Number(federalLUST).toFixed(4)}</Texto>
+                </Horizontal>
+                <Horizontal justifyContent="space-between" style={{ paddingTop: 2 }}>
+                  <Texto size={12} weight={600} color="#722ed1">Federal Subtotal</Texto>
+                  <Texto weight={600} color="#722ed1">${Number(federalTax).toFixed(4)}</Texto>
+                </Horizontal>
+
+                {/* State taxes */}
+                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 4, paddingTop: 6 }}>
+                  {sectionHeader('State — Texas', '#1890ff', 'rgba(24, 144, 255, 0.08)')}
+                </div>
+                <Horizontal justifyContent="space-between">
+                  <Texto size={12}>Motor Fuel Tax</Texto>
                   <Texto weight={600}>${Number(stateTax).toFixed(4)}</Texto>
                 </Horizontal>
-                {localTax > 0 && (
-                  <Horizontal justifyContent="space-between">
-                    <Texto>Local Tax</Texto>
-                    <Texto weight={600}>${Number(localTax).toFixed(4)}</Texto>
-                  </Horizontal>
-                )}
-                <div style={{ borderTop: '1px solid var(--theme-border, #d9d9d9)', marginTop: 4, paddingTop: 4 }}>
+
+                {/* Local taxes */}
+                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 4, paddingTop: 6 }}>
+                  {sectionHeader('Local', '#fa8c16', 'rgba(250, 140, 22, 0.08)')}
+                </div>
+                <Horizontal justifyContent="space-between">
+                  <Texto size={12} color="#8c8c8c">No local fuel tax in TX</Texto>
+                  <Texto weight={600}>${Number(localTax).toFixed(4)}</Texto>
+                </Horizontal>
+
+                {/* Total */}
+                <div style={{ borderTop: '1px solid var(--theme-border, #d9d9d9)', marginTop: 6, paddingTop: 6 }}>
                   <Horizontal justifyContent="space-between">
                     <Texto weight={600}>Total Tax / Gal</Texto>
-                    <Texto weight={600}>{taxDisplay}</Texto>
+                    <Texto weight={700} size={14}>{taxDisplay}</Texto>
                   </Horizontal>
                 </div>
               </Vertical>

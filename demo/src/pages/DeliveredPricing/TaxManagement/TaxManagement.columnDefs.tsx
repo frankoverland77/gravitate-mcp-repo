@@ -58,7 +58,14 @@ export function getTaxManagementColumnDefs(): (ColDef | ColGroupDef)[] {
           headerName: 'Jurisdiction',
           filter: true,
           flex: 1,
-          minWidth: 160,
+          minWidth: 120,
+        },
+        {
+          field: 'TaxComponent',
+          headerName: 'Tax Component',
+          filter: true,
+          flex: 1,
+          minWidth: 180,
         },
         {
           field: 'State',

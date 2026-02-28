@@ -1133,8 +1133,12 @@ export interface DeliveredPricingQuoteRow {
   BaseFreight: number
   /** Original tax for the row's origin — used as reference when supply option origin changes */
   BaseTax: number
-  /** Per-gallon federal excise tax */
+  /** Per-gallon total federal tax (excise + LUST) */
   FederalTax: number
+  /** Per-gallon federal motor fuel excise tax (18.3¢ gasoline, 24.3¢ diesel) */
+  FederalExciseTaxRate: number
+  /** Per-gallon federal Leaking Underground Storage Tank (LUST) Trust Fund tax (0.1¢) */
+  FederalLUSTTaxRate: number
   /** Per-gallon state excise tax */
   StateTax: number
   /** Per-gallon local excise tax (0 if none) */
@@ -1157,7 +1161,7 @@ export interface DeliveredPricingQuoteRow {
  */
 export function generateDeliveredPricingData(count = 40): DeliveredPricingQuoteRow[] {
   const origins = LOCATIONS.filter((l) => l.IsTerminal && l.IsActive)
-  const destinations = LOCATIONS.filter((l) => !l.IsTerminal && l.IsActive).slice(0, 30)
+  const destinations = LOCATIONS.filter((l) => !l.IsTerminal && l.IsActive && l.State === 'TX').slice(0, 30)
   const products = [
     { ProductId: 901, Name: '87 E10', ProductGroup: 'gasoline' },
     { ProductId: 902, Name: '93 E10', ProductGroup: 'gasoline' },
@@ -1242,11 +1246,14 @@ export function generateDeliveredPricingData(count = 40): DeliveredPricingQuoteR
         // Diff (strategy differential)
         const diff = Number(((seed % 12 - 6) / 100).toFixed(4))
 
-        // Per-gallon excise tax — destination-driven (TX for this POC)
+        // Per-gallon excise tax — destination-driven (all TX destinations)
         const isGasoline = product.ProductGroup === 'gasoline'
-        const federalTax = isGasoline ? 0.1840 : 0.2440
-        const stateTax = 0.2000 // TX state excise tax (same for gasoline and diesel)
-        const localTax = 0      // No local fuel tax in TX
+        // Federal: Motor Fuel Excise (18.3¢ gas / 24.3¢ diesel) + LUST Trust Fund (0.1¢)
+        const federalExciseTaxRate = isGasoline ? 0.1830 : 0.2430
+        const federalLUSTTaxRate = 0.0010
+        const federalTax = Number((federalExciseTaxRate + federalLUSTTaxRate).toFixed(4)) // 18.4¢ / 24.4¢
+        const stateTax = 0.2000 // TX state motor fuel tax (same for gasoline and diesel)
+        const localTax = 0      // Texas does not authorize local fuel taxes
         const tax = Number((federalTax + stateTax + localTax).toFixed(4))
 
         // Price = Cost + Freight + Tax + Diff
@@ -1290,6 +1297,8 @@ export function generateDeliveredPricingData(count = 40): DeliveredPricingQuoteR
           BaseFreight: freight,
           BaseTax: tax,
           FederalTax: federalTax,
+          FederalExciseTaxRate: federalExciseTaxRate,
+          FederalLUSTTaxRate: federalLUSTTaxRate,
           StateTax: stateTax,
           LocalTax: localTax,
           DestinationState: 'TX',
