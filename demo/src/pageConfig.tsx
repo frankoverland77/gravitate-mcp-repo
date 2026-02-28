@@ -38,6 +38,7 @@ import { ThemeRouteWrapper } from './components/shared/ThemeRouteWrapper';
 import { BulkChangeTest } from './pages/demos/BulkChangeTest/BulkChangeTest';
 import { SubscriptionManagement } from './pages/SubscriptionManagement/SubscriptionManagement';
 import { RFPManagement } from './pages/RFP';
+import { SellerRFPPage } from './pages/SellerRFP';
 import { NegotiationModePage } from './pages/NegotiationMode/NegotiationModePage';
 import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
 import { FreightManagement } from './pages/DeliveredPricing/FreightManagement/FreightManagement';
@@ -381,6 +382,18 @@ const getContractManagementRoutes = (): RouteConfig[] => [
     ),
     path: '/ContractFormulas/RFPManagement',
     description: 'Manage RFPs and supplier bidding rounds',
+  },
+  {
+    hasPermission: () => true,
+    key: 'SellerRFPResponse',
+    title: 'Seller RFP Response',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <SellerRFPPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/SellerRFPResponse',
+    description: 'Manage seller-side RFP responses with cost-aware pricing',
   },
 ];
 

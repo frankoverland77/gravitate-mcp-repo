@@ -1,0 +1,41 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.overrides-table {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.overrides-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.overrides-table th {
+  background: #fafafa;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.overrides-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.overrides-table tr:last-child td {
+  border-bottom: none;
+}
+
+.override-row {
+  background: #fffbe6;
+}

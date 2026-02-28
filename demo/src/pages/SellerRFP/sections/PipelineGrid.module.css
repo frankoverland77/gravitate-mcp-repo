@@ -1,0 +1,112 @@
+/* PipelineGrid styles */
+
+.stat-card {
+  flex: 1;
+  padding: 20px 24px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-card-highlight {
+  border-color: var(--theme-color-1, #1890ff);
+  background-color: rgba(24, 144, 255, 0.02);
+}
+
+.grid-container {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Status tags */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+/* Product/Terminal chips */
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.chip {
+  display: inline-flex;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  background-color: #f0f0f0;
+  color: #595959;
+  white-space: nowrap;
+}
+
+.chip-overflow {
+  color: #8c8c8c;
+  font-size: 11px;
+}
+
+/* Round badge */
+.round-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #f0f0f0;
+  color: #595959;
+}
+
+/* Deadline */
+.deadline-urgent {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.deadline-past {
+  color: #ff4d4f;
+  text-decoration: line-through;
+}
+
+/* Margin colors */
+.margin-green {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.margin-yellow {
+  color: #faad14;
+  font-weight: 600;
+}
+
+.margin-red {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.margin-neutral {
+  color: #8c8c8c;
+}
+
+/* Action chevron */
+.action-chevron {
+  font-size: 16px;
+  color: #595959;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.action-chevron:hover {
+  color: var(--theme-color-1, #1890ff);
+}

@@ -1,0 +1,145 @@
+/* SaleFormulaDrawer styles */
+
+.drawer :global(.ant-drawer-content) {
+  border-radius: 16px 16px 0 0;
+}
+
+.header {
+  padding: 12px 20px;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.collapse-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  color: #595959;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.collapse-toggle:hover {
+  background-color: #e8e8e8;
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  color: #595959;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.close-btn:hover {
+  background-color: #e8e8e8;
+}
+
+.row-badge {
+  display: inline-flex;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #e6fffb;
+  color: #13c2c2;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-panel {
+  width: 220px;
+  min-width: 220px;
+  padding: 16px;
+  background-color: #f9fafb;
+  border-right: 1px solid #e8e8e8;
+  overflow-y: auto;
+}
+
+.right-panel {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.cost-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Variables Table */
+.variables-table {
+  overflow-x: auto;
+}
+
+.variables-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.variables-table th {
+  padding: 8px 6px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8c8c8c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e8e8e8;
+  white-space: nowrap;
+}
+
+.variables-table td {
+  padding: 6px 4px;
+  vertical-align: middle;
+}
+
+.variables-table tr:not(:last-child) td {
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.remove-btn:hover {
+  background-color: #fff2f0;
+}
+
+.footer {
+  padding: 12px 20px;
+  background-color: #f9fafb;
+  border-top: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}

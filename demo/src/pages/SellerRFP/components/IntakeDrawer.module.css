@@ -1,0 +1,29 @@
+/* IntakeDrawer styles */
+
+.checkbox-list {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkbox-item {
+  padding: 8px 12px;
+  transition: background-color 0.15s;
+}
+
+.checkbox-item:hover {
+  background-color: #fafafa;
+}
+
+.checkbox-item:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.preview {
+  padding: 12px 16px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  background-color: #fafafa;
+  text-align: center;
+}

@@ -1,0 +1,43 @@
+.chart-container {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.sensitivity-table {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 600px;
+}
+
+.sensitivity-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sensitivity-table th {
+  background: #fafafa;
+  padding: 8px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.sensitivity-table td {
+  padding: 8px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sensitivity-table tr:last-child td {
+  border-bottom: none;
+}
+
+.current-row {
+  background: #e6f4ff;
+}
