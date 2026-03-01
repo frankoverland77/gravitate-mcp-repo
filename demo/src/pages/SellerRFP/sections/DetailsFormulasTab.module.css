@@ -65,3 +65,8 @@
   border: 1px solid #ffd591;
   border-radius: 6px;
 }
+
+/* Supply availability column headers */
+:global(.ag-header-cell).supply-header {
+  background-color: #f6ffed;
+}

@@ -1,9 +1,9 @@
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo, useCallback, useRef } from 'react'
 import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
-import { PlusOutlined, AppstoreAddOutlined } from '@ant-design/icons'
-import { Drawer, Checkbox, Tooltip } from 'antd'
-import type { ColDef, ICellRendererParams } from 'ag-grid-community'
-import type { SellerRFP, SellerRFPDetail } from '../types/sellerRfp.types'
+import { PlusOutlined, DeleteOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
+import { Select, Tooltip } from 'antd'
+import type { ColDef, ICellRendererParams, ValueGetterParams, GetContextMenuItemsParams } from 'ag-grid-community'
+import type { SellerRFP, SellerRFPDetail, DetailAvailability, Formula, FormulaVariable } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
   COST_TYPE_COLORS,
@@ -13,11 +13,38 @@ import {
   formatFormulaDisplay,
   getMarginColor,
   formatVolume,
+  formatVolumeTotal,
+  getAvailabilityColor,
 } from '../types/sellerRfp.types'
 import { CostTypePopover } from '../components/CostTypePopover'
 import { SaleFormulaDrawer } from '../components/SaleFormulaDrawer'
-import { SELLER_PRODUCTS, SELLER_TERMINALS } from '../data/sellerRfp.data'
+import { SELLER_PRODUCTS, SELLER_TERMINALS, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY, computeDetailAvailability } from '../data/sellerRfp.data'
 import styles from './DetailsFormulasTab.module.css'
+
+// Helpers for fill-handle formula copy
+const FILL_BASE_PRICES: Record<string, number> = {
+  '87 Octane': 2.30, '89 Octane': 2.34, '93 Octane': 2.42, 'ULSD': 2.26, 'Kerosene': 2.31,
+}
+
+function resolveFormulaPrice(variables: FormulaVariable[], product: string): number | null {
+  if (variables.length === 0) return null
+  const base = FILL_BASE_PRICES[product] || 2.30
+  return variables.reduce((sum, v) => {
+    const pct = typeof v.percentage === 'number' ? v.percentage / 100 : 1
+    return sum + (base + v.differential) * pct
+  }, 0)
+}
+
+function cloneFormula(formula: Formula): Formula {
+  return {
+    ...formula,
+    id: `formula-fill-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    variables: formula.variables.map((v) => ({
+      ...v,
+      id: `var-fill-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    })),
+  }
+}
 
 interface DetailsFormulasTabProps {
   rfp: SellerRFP
@@ -40,9 +67,8 @@ export function DetailsFormulasTab({
   saleFormulaDrawerOpen,
   activeDetail,
 }: DetailsFormulasTabProps) {
-  const [addDrawerOpen, setAddDrawerOpen] = useState(false)
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
-  const [selectedTerminals, setSelectedTerminals] = useState<string[]>([])
+  // Clipboard ref for formula copy/paste
+  const formulaClipboardRef = useRef<Formula | null>(null)
 
   // Round diff tracking
   const hasRoundDiffs = rfp.currentRound > 1
@@ -134,7 +160,7 @@ export function DetailsFormulasTab({
     if (hasRoundDiffs && detail.priorRoundValues?.margin != null && detail.margin != null) {
       const diff = detail.margin - detail.priorRoundValues.margin
       return (
-        <Tooltip title={`R${rfp.currentRound - 1}: ${formatMarginCpg(detail.priorRoundValues.margin)} → R${rfp.currentRound}: ${formatMarginCpg(detail.margin)} (${diff >= 0 ? '+' : ''}${diff.toFixed(2)}¢)`}>
+        <Tooltip title={`R${rfp.currentRound - 1}: ${formatMarginCpg(detail.priorRoundValues.margin)} → R${rfp.currentRound}: ${formatMarginCpg(detail.margin)} (${diff >= 0 ? '+' : ''}${formatMarginCpg(diff)})`}>
           <Horizontal alignItems="center" style={{ gap: '4px' }}>
             {display}
             <span className={styles['diff-indicator']} style={{ color: diff >= 0 ? '#52c41a' : '#ff4d4f' }}>
@@ -155,6 +181,112 @@ export function DetailsFormulasTab({
     return <span>{formatVolume(detail.volume)}</span>
   }, [])
 
+  // Availability color map
+  const availColorMap = { green: '#52c41a', amber: '#faad14', red: '#ff4d4f', neutral: '#8c8c8c' }
+
+  // Build tooltip content for supply source breakdown
+  const buildSourceTooltip = useCallback((detail: SellerRFPDetail, avail: DetailAvailability) => {
+    if (!avail.hasCostType) return 'Select a cost type to view supply availability'
+    if (detail.costType === 'estimated') return 'No committed supply for estimated/spot cost type'
+    if (avail.sources.length === 0) return `No ${detail.costType} sources for ${detail.product} @ ${detail.terminal}`
+
+    const lines: string[] = []
+    lines.push(`Supply Sources: ${detail.product} @ ${detail.terminal}`)
+    lines.push('─'.repeat(40))
+    for (const src of avail.sources) {
+      lines.push(`${src.name}     ${formatVolume(src.availablePerMonth)}`)
+      if (detail.costType === 'contract') {
+        const pct = Math.round((src.availablePerMonth / src.capacityPerMonth) * 100)
+        lines.push(`  (${formatVolume(src.capacityPerMonth).replace(' gal/mo', '')} capacity × ${pct}% available)`)
+      }
+    }
+    lines.push('─'.repeat(40))
+    lines.push(`Aggregate Available:   ${formatVolume(avail.availablePerMonth)}`)
+    if (avail.hasVolume) {
+      lines.push(`This Detail Volume:   −${formatVolume(detail.volume)}`)
+      lines.push(`Net Available/mo:      ${formatVolume(avail.netPerMonth)}`)
+    }
+    return lines.join('\n')
+  }, [])
+
+  // Net Avail/mo renderer
+  const netAvailMonthRenderer = useCallback((params: ICellRendererParams) => {
+    const detail = params.data as SellerRFPDetail
+    if (!detail) return null
+
+    const avail = computeDetailAvailability(detail, rfp.terms, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY)
+
+    if (!detail.costType) {
+      return (
+        <Tooltip title="Select a cost type to view supply availability">
+          <span style={{ color: '#8c8c8c', fontStyle: 'italic', fontSize: '12px' }}>Set cost type</span>
+        </Tooltip>
+      )
+    }
+
+    if (detail.costType === 'estimated') {
+      return (
+        <Tooltip title="No committed supply for estimated/spot cost type">
+          <span style={{ color: '#8c8c8c' }}>—</span>
+        </Tooltip>
+      )
+    }
+
+    const color = getAvailabilityColor(avail.netPerMonth, detail.volume)
+    const tooltipContent = buildSourceTooltip(detail, avail)
+    const displayValue = avail.hasVolume ? avail.netPerMonth : avail.availablePerMonth
+    const icon = avail.netPerMonth !== null && avail.netPerMonth > 0
+      ? <CheckCircleFilled style={{ fontSize: 10, marginLeft: 4 }} />
+      : avail.netPerMonth !== null && avail.netPerMonth <= 0
+        ? <CloseCircleFilled style={{ fontSize: 10, marginLeft: 4 }} />
+        : null
+
+    return (
+      <Tooltip
+        title={<pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '11px', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{tooltipContent}</pre>}
+        overlayStyle={{ maxWidth: 420 }}
+      >
+        <span style={{ color: availColorMap[color], fontWeight: 600, cursor: 'default' }}>
+          {formatVolume(displayValue)}
+          {icon}
+        </span>
+      </Tooltip>
+    )
+  }, [rfp.terms, buildSourceTooltip])
+
+  // Net Avail/Term renderer
+  const netAvailTermRenderer = useCallback((params: ICellRendererParams) => {
+    const detail = params.data as SellerRFPDetail
+    if (!detail) return null
+
+    const avail = computeDetailAvailability(detail, rfp.terms, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY)
+
+    if (!avail.hasCostType || detail.costType === 'estimated') {
+      return <span style={{ color: '#8c8c8c' }}>—</span>
+    }
+
+    if (detail.costType === null) {
+      return <span style={{ color: '#8c8c8c' }}>—</span>
+    }
+
+    if (!avail.hasContractDates || avail.netPerTerm === null) {
+      return (
+        <Tooltip title="Set contract dates in Terms tab">
+          <span style={{ color: '#8c8c8c' }}>—</span>
+        </Tooltip>
+      )
+    }
+
+    const color = getAvailabilityColor(avail.netPerMonth, detail.volume)
+    const displayValue = avail.hasVolume ? avail.netPerTerm : (avail.availablePerMonth !== null && avail.contractMonths !== null ? avail.availablePerMonth * avail.contractMonths : null)
+
+    return (
+      <span style={{ color: availColorMap[color], fontWeight: 600 }}>
+        {formatVolumeTotal(displayValue)}
+      </span>
+    )
+  }, [rfp.terms])
+
   // Status renderer
   const statusRenderer = useCallback((params: ICellRendererParams) => {
     const detail = params.data as SellerRFPDetail
@@ -170,16 +302,101 @@ export function DetailsFormulasTab({
     )
   }, [])
 
+  // Product cell renderer — dropdown for unconfigured rows
+  const productRenderer = useCallback((params: ICellRendererParams) => {
+    const detail = params.data as SellerRFPDetail
+    if (!detail) return null
+    if (detail.product) return <span>{detail.product}</span>
+    return (
+      <Select
+        size="small"
+        placeholder="Select product..."
+        style={{ width: '100%' }}
+        options={SELLER_PRODUCTS.map((p) => ({ value: p, label: p }))}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(value) => onDetailUpdate({ ...detail, product: value })}
+      />
+    )
+  }, [onDetailUpdate])
+
+  // Terminal cell renderer — dropdown for unconfigured rows
+  const terminalRenderer = useCallback((params: ICellRendererParams) => {
+    const detail = params.data as SellerRFPDetail
+    if (!detail) return null
+    if (detail.terminal) return <span>{detail.terminal}</span>
+    return (
+      <Select
+        size="small"
+        placeholder="Select terminal..."
+        style={{ width: '100%' }}
+        options={SELLER_TERMINALS.map((t) => ({ value: t, label: t }))}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(value) => onDetailUpdate({ ...detail, terminal: value })}
+      />
+    )
+  }, [onDetailUpdate])
+
+  // Delete action renderer
+  const deleteRenderer = useCallback((params: ICellRendererParams) => {
+    const detail = params.data as SellerRFPDetail
+    if (!detail) return null
+    return (
+      <DeleteOutlined
+        style={{ color: '#8c8c8c', cursor: 'pointer', fontSize: 14 }}
+        onClick={(e) => {
+          e.stopPropagation()
+          onDetailsReplace(rfp.details.filter((d) => d.id !== detail.id))
+        }}
+      />
+    )
+  }, [rfp.details, onDetailsReplace])
+
   const columnDefs: ColDef[] = useMemo(
     () => [
-      { headerName: 'Product', field: 'product', width: 120, pinned: 'left' },
-      { headerName: 'Terminal', field: 'terminal', width: 150, pinned: 'left' },
+      { headerName: 'Product', field: 'product', width: 140, pinned: 'left', cellRenderer: productRenderer },
+      { headerName: 'Terminal', field: 'terminal', width: 170, pinned: 'left', cellRenderer: terminalRenderer },
       { headerName: 'Cost Type', field: 'costType', width: 110, cellRenderer: costTypeRenderer },
-      { headerName: 'Cost Formula', field: 'costFormula', width: 200, cellRenderer: costFormulaRenderer, sortable: false },
+      {
+        headerName: 'Cost Formula',
+        field: 'costFormula',
+        width: 200,
+        cellRenderer: costFormulaRenderer,
+        sortable: false,
+        editable: true,
+        valueSetter: (params) => {
+          const source = params.newValue
+          if (!source || typeof source !== 'object' || !('variables' in source)) return false
+          const cloned = cloneFormula(source as Formula)
+          const price = resolveFormulaPrice((source as Formula).variables, params.data.product)
+          params.data.costFormula = cloned
+          params.data.costPrice = price ? Math.round(price * 10000) / 10000 : null
+          params.data.margin = params.data.salePrice != null && params.data.costPrice != null
+            ? params.data.salePrice - params.data.costPrice : null
+          return true
+        },
+      },
       { headerName: 'Cost Price', field: 'costPrice', width: 100, cellRenderer: priceRenderer },
-      { headerName: 'Sale Formula', field: 'saleFormula', width: 200, cellRenderer: saleFormulaRenderer, sortable: false },
+      {
+        headerName: 'Sale Formula',
+        field: 'saleFormula',
+        width: 200,
+        cellRenderer: saleFormulaRenderer,
+        sortable: false,
+        editable: true,
+        valueSetter: (params) => {
+          const source = params.newValue
+          if (!source || typeof source !== 'object' || !('variables' in source)) return false
+          const cloned = cloneFormula(source as Formula)
+          const price = resolveFormulaPrice((source as Formula).variables, params.data.product)
+          params.data.saleFormula = cloned
+          params.data.salePrice = price ? Math.round(price * 10000) / 10000 : null
+          params.data.margin = params.data.salePrice != null && params.data.costPrice != null
+            ? params.data.salePrice - params.data.costPrice : null
+          return true
+        },
+      },
       { headerName: 'Sale Price', field: 'salePrice', width: 100, cellRenderer: priceRenderer },
-      { headerName: 'Margin (cpg)', field: 'margin', width: 110, cellRenderer: marginRenderer },
+      { headerName: 'Margin', field: 'margin', width: 110, cellRenderer: marginRenderer },
       {
         headerName: 'Volume',
         field: 'volume',
@@ -187,56 +404,129 @@ export function DetailsFormulasTab({
         cellRenderer: volumeRenderer,
         editable: true,
         valueSetter: (params) => {
-          const newValue = params.newValue ? parseInt(params.newValue) : null
+          const raw = params.newValue
+          const newValue = typeof raw === 'number' ? raw : (raw ? parseInt(raw) : null)
           if (newValue !== params.data.volume) {
-            onDetailUpdate({ ...params.data, volume: newValue })
+            params.data.volume = newValue
             return true
           }
           return false
         },
       },
+      {
+        headerName: 'Net Avail/mo',
+        field: 'netAvailMonth',
+        width: 140,
+        cellRenderer: netAvailMonthRenderer,
+        sortable: true,
+        valueGetter: (params: ValueGetterParams) => {
+          const detail = params.data as SellerRFPDetail
+          if (!detail) return null
+          const avail = computeDetailAvailability(detail, rfp.terms, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY)
+          return avail.netPerMonth
+        },
+        headerClass: styles['supply-header'],
+      },
+      {
+        headerName: 'Net Avail/Term',
+        field: 'netAvailTerm',
+        width: 140,
+        cellRenderer: netAvailTermRenderer,
+        sortable: true,
+        valueGetter: (params: ValueGetterParams) => {
+          const detail = params.data as SellerRFPDetail
+          if (!detail) return null
+          const avail = computeDetailAvailability(detail, rfp.terms, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY)
+          return avail.netPerTerm
+        },
+        headerClass: styles['supply-header'],
+      },
       { headerName: 'Status', field: 'status', width: 100, cellRenderer: statusRenderer },
+      { headerName: '', field: 'actions', width: 50, cellRenderer: deleteRenderer, sortable: false, filter: false, resizable: false, suppressHeaderMenuButton: true },
     ],
-    [costTypeRenderer, costFormulaRenderer, priceRenderer, saleFormulaRenderer, marginRenderer, volumeRenderer, statusRenderer, onDetailUpdate],
+    [productRenderer, terminalRenderer, costTypeRenderer, costFormulaRenderer, priceRenderer, saleFormulaRenderer, marginRenderer, volumeRenderer, netAvailMonthRenderer, netAvailTermRenderer, statusRenderer, deleteRenderer, onDetailUpdate, rfp.terms],
   )
 
-  // Add details handler
-  const handleAddDetails = useCallback(() => {
-    if (selectedProducts.length === 0 || selectedTerminals.length === 0) return
-
-    const existingKeys = new Set(rfp.details.map((d) => `${d.product}|${d.terminal}`))
-    const newDetails: SellerRFPDetail[] = []
-
-    for (const product of selectedProducts) {
-      for (const terminal of selectedTerminals) {
-        const key = `${product}|${terminal}`
-        if (!existingKeys.has(key)) {
-          newDetails.push({
-            id: `detail-add-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            product,
-            terminal,
-            costType: null,
-            costFormula: null,
-            costPrice: null,
-            saleFormula: null,
-            salePrice: null,
-            margin: null,
-            volume: null,
-            status: 'empty',
-            termOverrides: null,
-          })
-        }
-      }
+  // Add empty detail row
+  const handleAddDetail = useCallback(() => {
+    const newDetail: SellerRFPDetail = {
+      id: `detail-add-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      product: '',
+      terminal: '',
+      costType: null,
+      costFormula: null,
+      costPrice: null,
+      saleFormula: null,
+      salePrice: null,
+      margin: null,
+      volume: null,
+      status: 'empty',
+      termOverrides: null,
     }
+    onDetailsReplace([...rfp.details, newDetail])
+  }, [rfp.details, onDetailsReplace])
 
-    if (newDetails.length > 0) {
-      onDetailsReplace([...rfp.details, ...newDetails])
-    }
+  // Handle cell value changes (from fill handle drag or direct edit)
+  const handleCellValueChanged = useCallback((event: { data: SellerRFPDetail }) => {
+    onDetailUpdate({ ...event.data })
+  }, [onDetailUpdate])
 
-    setAddDrawerOpen(false)
-    setSelectedProducts([])
-    setSelectedTerminals([])
-  }, [selectedProducts, selectedTerminals, rfp.details, onDetailsReplace])
+  // Context menu for right-click copy/paste
+  const getContextMenuItems = useCallback((params: GetContextMenuItemsParams<SellerRFPDetail>) => {
+    const colId = params.column?.getColId()
+    const isFormulaCol = colId === 'costFormula' || colId === 'saleFormula'
+    const detail = params.node?.data
+
+    return [
+      'copy',
+      'copyWithHeaders',
+      'separator',
+      {
+        name: 'Copy Formula',
+        disabled: !isFormulaCol || !detail || (colId === 'costFormula' ? !detail.costFormula : !detail.saleFormula),
+        action: () => {
+          if (!detail) return
+          formulaClipboardRef.current = colId === 'costFormula' ? detail.costFormula : detail.saleFormula
+        },
+      },
+      {
+        name: 'Paste Formula',
+        disabled: !isFormulaCol || !formulaClipboardRef.current || !detail,
+        action: () => {
+          if (!detail || !formulaClipboardRef.current) return
+          const formulaCopy: Formula = {
+            ...formulaClipboardRef.current,
+            id: `formula-paste-${Date.now()}`,
+            variables: formulaClipboardRef.current.variables.map((v) => ({ ...v, id: `var-paste-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` })),
+          }
+          if (colId === 'costFormula') {
+            onDetailUpdate({ ...detail, costFormula: formulaCopy })
+          } else {
+            onDetailUpdate({ ...detail, saleFormula: formulaCopy })
+          }
+        },
+      },
+      'separator',
+      {
+        name: 'Duplicate Row',
+        action: () => {
+          if (!detail) return
+          const duplicated: SellerRFPDetail = {
+            ...detail,
+            id: `detail-dup-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          }
+          onDetailsReplace([...rfp.details, duplicated])
+        },
+      },
+      {
+        name: 'Delete Row',
+        action: () => {
+          if (!detail) return
+          onDetailsReplace(rfp.details.filter((d) => d.id !== detail.id))
+        },
+      },
+    ]
+  }, [rfp.details, onDetailUpdate, onDetailsReplace])
 
   // Sale formula apply handler
   const handleSaleFormulaApply = useCallback((updatedDetail: SellerRFPDetail) => {
@@ -266,9 +556,9 @@ export function DetailsFormulasTab({
       {/* Toolbar */}
       <Horizontal justifyContent="flex-end" style={{ gap: '8px' }}>
         <GraviButton
-          buttonText="Add Details"
-          icon={<AppstoreAddOutlined />}
-          onClick={() => setAddDrawerOpen(true)}
+          buttonText="Add Detail"
+          icon={<PlusOutlined />}
+          onClick={handleAddDetail}
         />
       </Horizontal>
 
@@ -282,65 +572,21 @@ export function DetailsFormulasTab({
             getRowId: (params) => params.data.id,
             undoRedoCellEditing: true,
             undoRedoCellEditingLimit: 20,
+            enableFillHandle: true,
+            enableRangeSelection: true,
+            onCellValueChanged: handleCellValueChanged,
+            getContextMenuItems,
+            allowContextMenuWithControlKey: true,
+            onCellEditingStarted: (event: { column: { getColId: () => string }; api: { stopEditing: (cancel: boolean) => void } }) => {
+              const colId = event.column.getColId()
+              if (colId === 'costFormula' || colId === 'saleFormula') {
+                event.api.stopEditing(true)
+              }
+            },
           }}
           storageKey="SellerRFPDetailsGrid"
         />
       </div>
-
-      {/* Add Details Drawer */}
-      <Drawer
-        title="Add Detail Rows"
-        placement="right"
-        width={420}
-        open={addDrawerOpen}
-        onClose={() => { setAddDrawerOpen(false); setSelectedProducts([]); setSelectedTerminals([]) }}
-        footer={
-          <Horizontal justifyContent="flex-end" style={{ gap: '8px' }}>
-            <GraviButton buttonText="Cancel" onClick={() => setAddDrawerOpen(false)} />
-            <GraviButton
-              buttonText={`Add ${selectedProducts.length * selectedTerminals.length} Rows`}
-              theme1
-              onClick={handleAddDetails}
-              disabled={selectedProducts.length === 0 || selectedTerminals.length === 0}
-            />
-          </Horizontal>
-        }
-      >
-        <Vertical style={{ gap: '20px' }}>
-          <Vertical style={{ gap: '8px' }}>
-            <Texto category="p2" weight="600">Products</Texto>
-            <Vertical style={{ gap: '4px' }}>
-              {SELLER_PRODUCTS.map((p) => (
-                <Checkbox
-                  key={p}
-                  checked={selectedProducts.includes(p)}
-                  onChange={(e) => setSelectedProducts((prev) =>
-                    e.target.checked ? [...prev, p] : prev.filter((x) => x !== p),
-                  )}
-                >
-                  {p}
-                </Checkbox>
-              ))}
-            </Vertical>
-          </Vertical>
-          <Vertical style={{ gap: '8px' }}>
-            <Texto category="p2" weight="600">Terminals</Texto>
-            <Vertical style={{ gap: '4px' }}>
-              {SELLER_TERMINALS.map((t) => (
-                <Checkbox
-                  key={t}
-                  checked={selectedTerminals.includes(t)}
-                  onChange={(e) => setSelectedTerminals((prev) =>
-                    e.target.checked ? [...prev, t] : prev.filter((x) => x !== t),
-                  )}
-                >
-                  {t}
-                </Checkbox>
-              ))}
-            </Vertical>
-          </Vertical>
-        </Vertical>
-      </Drawer>
 
       {/* Sale Formula Drawer */}
       <SaleFormulaDrawer

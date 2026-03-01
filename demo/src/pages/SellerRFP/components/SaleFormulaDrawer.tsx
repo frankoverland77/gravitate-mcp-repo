@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
-import { CaretDownOutlined, CloseOutlined, CopyOutlined, SnippetsOutlined } from '@ant-design/icons'
-import { Drawer, Select, InputNumber, Segmented } from 'antd'
+import { CaretDownOutlined, CloseOutlined, CopyOutlined, SnippetsOutlined, FileTextOutlined } from '@ant-design/icons'
+import { Drawer, Segmented } from 'antd'
 import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable, PastBidReference, TerminalProductStats, MarginHistoryPoint } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
@@ -12,16 +12,15 @@ import {
   getMarginColor,
 } from '../types/sellerRfp.types'
 import {
-  PRICE_PUBLISHER_OPTIONS,
-  PRICE_TYPE_OPTIONS,
-  DATE_RULE_OPTIONS,
-  getInstrumentsByProductGroup,
-} from '../../../shared/data'
-import {
   getPastBidsAtTerminalProduct,
   computeTerminalProductStats,
   generateMarginHistory,
 } from '../data/sellerRfp.data'
+import { VariablesTable } from '../../ContractManagement/quick-entry/components/formula/VariablesTable'
+import { TemplateChooser } from '../../../components/shared/TemplateChooser'
+import { useFormulaTemplateContext } from '../../../contexts/FormulaTemplateContext'
+import { buildFormulaPreview, isPlaceholder } from '../../demos/grids/FormulaTemplates.data'
+import type { TemplateComponent } from '../../demos/grids/FormulaTemplates.data'
 import styles from './SaleFormulaDrawer.module.css'
 
 interface SaleFormulaDrawerProps {
@@ -96,8 +95,9 @@ function buildFormulaExpression(variables: FormulaVariable[], mode: FormulaMode)
   if (variables.length === 0) return ''
 
   const formatVar = (v: FormulaVariable) => {
+    const name = v.displayName || `${v.pricePublisher} ${v.priceInstrument} ${v.priceType}`
     const diffStr = v.differential >= 0 ? `+ $${v.differential.toFixed(3)}` : `- $${Math.abs(v.differential).toFixed(3)}`
-    return `${v.pricePublisher} ${v.priceInstrument} ${v.priceType} ${diffStr}`
+    return `${name} ${diffStr}`
   }
 
   if (mode === 'formula') {
@@ -167,7 +167,6 @@ function MarginSparkline({ data }: { data: MarginHistoryPoint[] }) {
       const y1 = height - ((margins[i] - minMargin) / range) * height
       const y2 = height - ((margins[i + 1] - minMargin) / range) * height
 
-      // Determine if segment is positive or negative (relative to zero)
       const avgMargin = (margins[i] + margins[i + 1]) / 2
       const fillColor = avgMargin >= 0 ? 'rgba(82, 196, 26, 0.15)' : 'rgba(255, 77, 79, 0.15)'
 
@@ -202,6 +201,10 @@ function MarginSparkline({ data }: { data: MarginHistoryPoint[] }) {
 export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, currentRfpId }: SaleFormulaDrawerProps) {
   const [mode, setMode] = useState<FormulaMode>('formula')
   const [variables, setVariables] = useState<FormulaVariable[]>([createEmptyVariable()])
+  const [showTemplateChooser, setShowTemplateChooser] = useState(false)
+
+  // Template context
+  const { templates } = useFormulaTemplateContext()
 
   // Load existing formula when detail changes
   useEffect(() => {
@@ -218,16 +221,8 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
       setVariables([createEmptyVariable()])
       setMode('formula')
     }
+    setShowTemplateChooser(false)
   }, [detail])
-
-  const productGroup = useMemo(() => {
-    if (!detail) return 'gasoline'
-    return ['ULSD', 'Kerosene'].includes(detail.product) ? 'diesel' : 'gasoline'
-  }, [detail])
-
-  const instruments = useMemo(() => {
-    return getInstrumentsByProductGroup(productGroup as 'gasoline' | 'diesel')
-  }, [productGroup])
 
   const resolvedPrice = useMemo(() => {
     if (!detail) return null
@@ -277,9 +272,10 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     }
   }, [marginHistory])
 
-  const handleVariableUpdate = useCallback((index: number, field: keyof FormulaVariable, value: string | number) => {
-    setVariables((prev) => prev.map((v, i) =>
-      i === index ? { ...v, [field]: value } : v,
+  // ID-based variable update (for VariablesTable)
+  const handleVariableUpdate = useCallback((variableId: string, updates: Partial<FormulaVariable>) => {
+    setVariables((prev) => prev.map((v) =>
+      v.id === variableId ? { ...v, ...updates } : v,
     ))
   }, [])
 
@@ -289,8 +285,9 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     setVariables((prev) => [...prev, createEmptyVariable(group, newIndex)])
   }, [variables.length])
 
-  const handleRemoveVariable = useCallback((index: number) => {
-    setVariables((prev) => prev.filter((_, i) => i !== index))
+  // ID-based variable removal (for VariablesTable)
+  const handleRemoveVariable = useCallback((variableId: string) => {
+    setVariables((prev) => prev.filter((v) => v.id !== variableId))
   }, [])
 
   const handleModeChange = useCallback((value: string | number) => {
@@ -316,6 +313,32 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     if (!detail?.costFormula?.variables) return
     setVariables(detail.costFormula.variables.map((v) => ({ ...v, id: `var-copy-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` })))
   }, [detail])
+
+  // Template selection handler
+  const handleTemplateSelect = useCallback((template: { components: TemplateComponent[] }) => {
+    const newVariables: FormulaVariable[] = template.components.map((comp, index) => {
+      const pctStr = String(comp.percentage).replace('%', '').trim()
+      const percentage = isPlaceholder(comp.percentage) ? comp.percentage : (parseFloat(pctStr) || 100)
+
+      return {
+        id: `var-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+        variableName: `var_${index + 1}_group_1`,
+        displayName:
+          isPlaceholder(comp.source) || isPlaceholder(comp.instrument)
+            ? null
+            : `${comp.source} ${comp.instrument}`,
+        pricePublisher: comp.source,
+        priceInstrument: comp.instrument,
+        priceType: comp.type,
+        dateRule: comp.dateRule,
+        percentage,
+        differential: 0,
+      }
+    })
+
+    setVariables(newVariables)
+    setShowTemplateChooser(false)
+  }, [])
 
   const handleApply = useCallback(() => {
     if (!detail) return
@@ -367,281 +390,214 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
       </Horizontal>
 
       {/* Body */}
-      <div className={styles.body}>
-        {/* Left Panel - Context + Intelligence */}
-        <Vertical className={styles['left-panel']}>
-          <Vertical style={{ gap: '16px' }}>
-            <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-              Context
-            </Texto>
+      {showTemplateChooser ? (
+        <div className={styles.body} style={{ flexDirection: 'column' }}>
+          <TemplateChooser
+            templates={templates}
+            onTemplateSelect={handleTemplateSelect}
+            buildFormulaPreview={buildFormulaPreview}
+            showManageButton={false}
+            title="Formula Template Chooser"
+            subtitle="Select a pre-built formula template to apply to this sale formula."
+            onClose={() => setShowTemplateChooser(false)}
+            showExternalName={false}
+          />
+        </div>
+      ) : (
+        <div className={styles.body}>
+          {/* Left Panel - Context + Intelligence */}
+          <Vertical className={styles['left-panel']}>
+            <Vertical style={{ gap: '16px' }}>
+              <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+                Context
+              </Texto>
 
-            <Vertical style={{ gap: '8px' }}>
-              <Vertical style={{ gap: '2px' }}>
-                <Texto category="p3" appearance="medium">Product</Texto>
-                <Texto category="p2" weight="500">{detail.product}</Texto>
-              </Vertical>
-              <Vertical style={{ gap: '2px' }}>
-                <Texto category="p3" appearance="medium">Terminal</Texto>
-                <Texto category="p2" weight="500">{detail.terminal}</Texto>
-              </Vertical>
-              {detail.volume && (
+              <Vertical style={{ gap: '8px' }}>
                 <Vertical style={{ gap: '2px' }}>
-                  <Texto category="p3" appearance="medium">Volume</Texto>
-                  <Texto category="p2" weight="500">{(detail.volume / 1000).toFixed(0)}K gal/mo</Texto>
+                  <Texto category="p3" appearance="medium">Product</Texto>
+                  <Texto category="p2" weight="500">{detail.product}</Texto>
                 </Vertical>
-              )}
-            </Vertical>
-
-            {/* Cost Info */}
-            <Vertical style={{ gap: '8px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
-              <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-                Cost Basis
-              </Texto>
-              {detail.costType && (
-                <span
-                  className={styles['cost-badge']}
-                  style={{
-                    color: COST_TYPE_COLORS[detail.costType].color,
-                    backgroundColor: COST_TYPE_COLORS[detail.costType].background,
-                  }}
-                >
-                  {COST_TYPE_LABELS[detail.costType]}
-                </span>
-              )}
-              <Vertical style={{ gap: '2px' }}>
-                <Texto category="p3" appearance="medium">Cost Price</Texto>
-                <Texto category="h4" weight="600">{formatPrice(detail.costPrice)}</Texto>
-              </Vertical>
-            </Vertical>
-
-            {/* Intelligence Section */}
-            <Vertical style={{ gap: '12px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
-              <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-                Intelligence
-              </Texto>
-
-              {/* Past Bids */}
-              <Vertical style={{ gap: '6px' }}>
-                <Texto category="p3" weight="500" appearance="medium">
-                  Past Bids — {detail.terminal.replace(' Terminal', '')}, {detail.product}
-                </Texto>
-                {pastBids.length > 0 ? (
-                  <Vertical style={{ gap: '3px' }}>
-                    {pastBids.map((bid) => (
-                      <Horizontal key={`${bid.rfpId}-${bid.buyerName}`} alignItems="center" style={{ gap: '5px' }}>
-                        <span className={`${styles['outcome-badge']} ${bid.outcome === 'won' ? styles['outcome-won'] : styles['outcome-lost']}`}>
-                          {bid.outcome === 'won' ? 'W' : 'L'}
-                        </span>
-                        <Texto category="p3" style={{ fontFamily: 'monospace', fontSize: '11px' }}>
-                          {bid.saleFormulaDisplay.length > 22 ? bid.saleFormulaDisplay.slice(0, 22) + '...' : bid.saleFormulaDisplay}
-                        </Texto>
-                        <Texto category="p3" appearance="medium">&rarr;</Texto>
-                        <Texto category="p3" weight="500">{bid.marginCpg.toFixed(1)}¢</Texto>
-                        <Texto category="p3" appearance="medium">
-                          {bid.buyerName.length > 10 ? bid.buyerName.slice(0, 10) + '...' : bid.buyerName},{' '}
-                          {new Date(bid.outcomeDate).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
-                        </Texto>
-                      </Horizontal>
-                    ))}
+                <Vertical style={{ gap: '2px' }}>
+                  <Texto category="p3" appearance="medium">Terminal</Texto>
+                  <Texto category="p2" weight="500">{detail.terminal}</Texto>
+                </Vertical>
+                {detail.volume && (
+                  <Vertical style={{ gap: '2px' }}>
+                    <Texto category="p3" appearance="medium">Volume</Texto>
+                    <Texto category="p2" weight="500">{(detail.volume / 1000).toFixed(0)}K gal/mo</Texto>
                   </Vertical>
-                ) : (
-                  <Texto category="p3" appearance="medium">
-                    No prior bids at {detail.terminal} for {detail.product}.
-                  </Texto>
                 )}
               </Vertical>
 
-              {/* Outcome Stats */}
-              {outcomeStats && outcomeStats.totalBids >= 2 && (
-                <Vertical style={{ gap: '3px' }}>
-                  <Texto category="p3" weight="500" appearance="medium">Outcome Stats</Texto>
-                  <Texto category="p3">
-                    Win rate: {outcomeStats.winRate}% ({outcomeStats.wonCount} of {outcomeStats.totalBids})
+              {/* Cost Info */}
+              <Vertical style={{ gap: '8px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
+                <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+                  Cost Basis
+                </Texto>
+                {detail.costType && (
+                  <span
+                    className={styles['cost-badge']}
+                    style={{
+                      color: COST_TYPE_COLORS[detail.costType].color,
+                      backgroundColor: COST_TYPE_COLORS[detail.costType].background,
+                    }}
+                  >
+                    {COST_TYPE_LABELS[detail.costType]}
+                  </span>
+                )}
+                <Vertical style={{ gap: '2px' }}>
+                  <Texto category="p3" appearance="medium">Cost Price</Texto>
+                  <Texto category="h4" weight="600">{formatPrice(detail.costPrice)}</Texto>
+                </Vertical>
+              </Vertical>
+
+              {/* Intelligence Section */}
+              <Vertical style={{ gap: '12px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
+                <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+                  Intelligence
+                </Texto>
+
+                {/* Past Bids */}
+                <Vertical style={{ gap: '6px' }}>
+                  <Texto category="p3" weight="500" appearance="medium">
+                    Past Bids — {detail.terminal.replace(' Terminal', '')}, {detail.product}
                   </Texto>
-                  {outcomeStats.winningDifferentialRange && (
-                    <Texto category="p3">
-                      Winning diff range: +${outcomeStats.winningDifferentialRange.min.toFixed(3)} to +${outcomeStats.winningDifferentialRange.max.toFixed(3)}
-                    </Texto>
-                  )}
-                  {outcomeStats.avgWinningMarginCpg !== null && (
-                    <Texto category="p3">
-                      Avg winning margin: {outcomeStats.avgWinningMarginCpg.toFixed(1)}¢/gal
-                    </Texto>
-                  )}
-                  {outcomeStats.avgLosingMarginCpg !== null && (
-                    <Texto category="p3">
-                      Avg losing margin: {outcomeStats.avgLosingMarginCpg.toFixed(1)}¢/gal
+                  {pastBids.length > 0 ? (
+                    <Vertical style={{ gap: '3px' }}>
+                      {pastBids.map((bid) => (
+                        <Horizontal key={`${bid.rfpId}-${bid.buyerName}`} alignItems="center" style={{ gap: '5px' }}>
+                          <span className={`${styles['outcome-badge']} ${bid.outcome === 'won' ? styles['outcome-won'] : styles['outcome-lost']}`}>
+                            {bid.outcome === 'won' ? 'W' : 'L'}
+                          </span>
+                          <Texto category="p3" style={{ fontFamily: 'monospace', fontSize: '11px' }}>
+                            {bid.saleFormulaDisplay.length > 22 ? bid.saleFormulaDisplay.slice(0, 22) + '...' : bid.saleFormulaDisplay}
+                          </Texto>
+                          <Texto category="p3" appearance="medium">&rarr;</Texto>
+                          <Texto category="p3" weight="500">{bid.marginCpg.toFixed(1)}¢</Texto>
+                          <Texto category="p3" appearance="medium">
+                            {bid.buyerName.length > 10 ? bid.buyerName.slice(0, 10) + '...' : bid.buyerName},{' '}
+                            {new Date(bid.outcomeDate).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
+                          </Texto>
+                        </Horizontal>
+                      ))}
+                    </Vertical>
+                  ) : (
+                    <Texto category="p3" appearance="medium">
+                      No prior bids at {detail.terminal} for {detail.product}.
                     </Texto>
                   )}
                 </Vertical>
-              )}
 
-              {/* Historical Margin Sparkline */}
-              <Vertical style={{ gap: '4px' }}>
-                <Texto category="p3" weight="500" appearance="medium">Historical Margin (6mo)</Texto>
-                {!detail.costFormula ? (
-                  <Texto category="p3" appearance="medium">Set cost to see historical margin.</Texto>
-                ) : variables.length === 0 ? (
-                  <Texto category="p3" appearance="medium">Configure formula to see historical margin.</Texto>
-                ) : marginHistory.length > 0 ? (
-                  <>
-                    <MarginSparkline data={marginHistory} />
-                    {marginHistoryStats && (
-                      <Horizontal alignItems="center" style={{ gap: '4px' }}>
-                        <Texto category="p3">6mo avg: {marginHistoryStats.avgMarginCpg.toFixed(1)}¢/gal</Texto>
-                        <Texto category="p3" appearance="medium">&middot;</Texto>
-                        <Texto category="p3">
-                          {marginHistoryStats.negativeDays === 0
-                            ? 'No negative margin days'
-                            : `Negative: ${marginHistoryStats.negativeDays} days (${marginHistoryStats.negativePct}%)`}
-                        </Texto>
-                      </Horizontal>
+                {/* Outcome Stats */}
+                {outcomeStats && outcomeStats.totalBids >= 2 && (
+                  <Vertical style={{ gap: '3px' }}>
+                    <Texto category="p3" weight="500" appearance="medium">Outcome Stats</Texto>
+                    <Texto category="p3">
+                      Win rate: {outcomeStats.winRate}% ({outcomeStats.wonCount} of {outcomeStats.totalBids})
+                    </Texto>
+                    {outcomeStats.winningDifferentialRange && (
+                      <Texto category="p3">
+                        Winning diff range: +${outcomeStats.winningDifferentialRange.min.toFixed(3)} to +${outcomeStats.winningDifferentialRange.max.toFixed(3)}
+                      </Texto>
                     )}
-                  </>
-                ) : (
-                  <Texto category="p3" appearance="medium">Historical data unavailable.</Texto>
+                    {outcomeStats.avgWinningMarginCpg !== null && (
+                      <Texto category="p3">
+                        Avg winning margin: {outcomeStats.avgWinningMarginCpg.toFixed(1)}¢/gal
+                      </Texto>
+                    )}
+                    {outcomeStats.avgLosingMarginCpg !== null && (
+                      <Texto category="p3">
+                        Avg losing margin: {outcomeStats.avgLosingMarginCpg.toFixed(1)}¢/gal
+                      </Texto>
+                    )}
+                  </Vertical>
                 )}
-              </Vertical>
-            </Vertical>
 
-            {/* Live Margin */}
-            <Vertical style={{ gap: '8px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
-              <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-                Preview
-              </Texto>
-              <Vertical style={{ gap: '2px' }}>
-                <Texto category="p3" appearance="medium">Sale Price</Texto>
-                <Texto category="h4" weight="600">{resolvedPrice !== null ? formatPrice(resolvedPrice) : '—'}</Texto>
+                {/* Historical Margin Sparkline */}
+                <Vertical style={{ gap: '4px' }}>
+                  <Texto category="p3" weight="500" appearance="medium">Historical Margin (6mo)</Texto>
+                  {!detail.costFormula ? (
+                    <Texto category="p3" appearance="medium">Set cost to see historical margin.</Texto>
+                  ) : variables.length === 0 ? (
+                    <Texto category="p3" appearance="medium">Configure formula to see historical margin.</Texto>
+                  ) : marginHistory.length > 0 ? (
+                    <>
+                      <MarginSparkline data={marginHistory} />
+                      {marginHistoryStats && (
+                        <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                          <Texto category="p3">6mo avg: {marginHistoryStats.avgMarginCpg.toFixed(1)}¢/gal</Texto>
+                          <Texto category="p3" appearance="medium">&middot;</Texto>
+                          <Texto category="p3">
+                            {marginHistoryStats.negativeDays === 0
+                              ? 'No negative margin days'
+                              : `Negative: ${marginHistoryStats.negativeDays} days (${marginHistoryStats.negativePct}%)`}
+                          </Texto>
+                        </Horizontal>
+                      )}
+                    </>
+                  ) : (
+                    <Texto category="p3" appearance="medium">Historical data unavailable.</Texto>
+                  )}
+                </Vertical>
               </Vertical>
-              <Vertical style={{ gap: '2px' }}>
-                <Texto category="p3" appearance="medium">Margin</Texto>
-                <Texto
-                  category="h4"
-                  weight="600"
-                  style={{ color: marginColor === 'green' ? '#52c41a' : marginColor === 'yellow' ? '#faad14' : marginColor === 'red' ? '#ff4d4f' : '#8c8c8c' }}
-                >
-                  {formatMarginCpg(currentMargin)}
+
+              {/* Live Margin */}
+              <Vertical style={{ gap: '8px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
+                <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+                  Preview
                 </Texto>
+                <Vertical style={{ gap: '2px' }}>
+                  <Texto category="p3" appearance="medium">Sale Price</Texto>
+                  <Texto category="h4" weight="600">{resolvedPrice !== null ? formatPrice(resolvedPrice) : '—'}</Texto>
+                </Vertical>
+                <Vertical style={{ gap: '2px' }}>
+                  <Texto category="p3" appearance="medium">Margin</Texto>
+                  <Texto
+                    category="h4"
+                    weight="600"
+                    style={{ color: marginColor === 'green' ? '#52c41a' : marginColor === 'yellow' ? '#faad14' : marginColor === 'red' ? '#ff4d4f' : '#8c8c8c' }}
+                  >
+                    {formatMarginCpg(currentMargin)}
+                  </Texto>
+                </Vertical>
               </Vertical>
             </Vertical>
           </Vertical>
-        </Vertical>
 
-        {/* Right Panel - Formula Editor */}
-        <Vertical className={styles['right-panel']} style={{ gap: '16px' }}>
-          {/* Mode selector */}
-          <Horizontal alignItems="center" justifyContent="space-between">
-            <Segmented
-              value={mode}
-              onChange={handleModeChange}
-              options={MODE_OPTIONS}
-              size="small"
-            />
-            {detail.costFormula && (
-              <GraviButton
-                buttonText="Copy from Cost"
-                icon={<CopyOutlined />}
-                onClick={handleCopyFromCost}
+          {/* Right Panel - Formula Editor */}
+          <Vertical className={styles['right-panel']} style={{ gap: '16px' }}>
+            {/* Mode selector + action buttons */}
+            <Horizontal alignItems="center" justifyContent="space-between">
+              <Segmented
+                value={mode}
+                onChange={handleModeChange}
+                options={MODE_OPTIONS}
+                size="small"
               />
-            )}
-          </Horizontal>
+              <Horizontal style={{ gap: '8px' }}>
+                {detail.costFormula && (
+                  <GraviButton
+                    buttonText="Copy from Cost"
+                    icon={<CopyOutlined />}
+                    onClick={handleCopyFromCost}
+                  />
+                )}
+                <GraviButton
+                  buttonText="Use Template"
+                  icon={<FileTextOutlined />}
+                  onClick={() => setShowTemplateChooser(true)}
+                />
+              </Horizontal>
+            </Horizontal>
 
-          {/* Variables Table */}
-          <div className={styles['variables-table']}>
-            <table>
-              <thead>
-                <tr>
-                  {mode !== 'formula' && <th>Group</th>}
-                  <th>Publisher</th>
-                  <th>Instrument</th>
-                  <th>Price Type</th>
-                  <th>Date Rule</th>
-                  <th style={{ width: '70px' }}>%</th>
-                  <th style={{ width: '90px' }}>Differential</th>
-                  <th style={{ width: '40px' }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {variables.map((v, i) => {
-                  const groupMatch = v.variableName.match(/group_(\d+)/)
-                  const groupNum = groupMatch ? parseInt(groupMatch[1]) : 1
+            {/* Variables Grid */}
+            <VariablesTable
+              variables={variables}
+              onVariableUpdate={handleVariableUpdate}
+              onRemoveVariable={handleRemoveVariable}
+            />
 
-                  return (
-                    <tr key={v.id}>
-                      {mode !== 'formula' && <td>G{groupNum}</td>}
-                      <td>
-                        <Select
-                          size="small"
-                          value={v.pricePublisher}
-                          onChange={(val) => handleVariableUpdate(i, 'pricePublisher', val)}
-                          options={PRICE_PUBLISHER_OPTIONS.map((p) => ({ value: p, label: p }))}
-                          style={{ width: '100%' }}
-                        />
-                      </td>
-                      <td>
-                        <Select
-                          size="small"
-                          value={v.priceInstrument}
-                          onChange={(val) => handleVariableUpdate(i, 'priceInstrument', val)}
-                          options={instruments.map((inst) => ({ value: inst.name, label: inst.name }))}
-                          style={{ width: '100%' }}
-                        />
-                      </td>
-                      <td>
-                        <Select
-                          size="small"
-                          value={v.priceType}
-                          onChange={(val) => handleVariableUpdate(i, 'priceType', val)}
-                          options={PRICE_TYPE_OPTIONS.map((p) => ({ value: p, label: p }))}
-                          style={{ width: '100%' }}
-                        />
-                      </td>
-                      <td>
-                        <Select
-                          size="small"
-                          value={v.dateRule}
-                          onChange={(val) => handleVariableUpdate(i, 'dateRule', val)}
-                          options={DATE_RULE_OPTIONS.map((d) => ({ value: d, label: d }))}
-                          style={{ width: '100%' }}
-                        />
-                      </td>
-                      <td>
-                        <InputNumber
-                          size="small"
-                          value={typeof v.percentage === 'number' ? v.percentage : 100}
-                          onChange={(val) => handleVariableUpdate(i, 'percentage', val ?? 100)}
-                          min={0}
-                          max={100}
-                          style={{ width: '100%' }}
-                        />
-                      </td>
-                      <td>
-                        <InputNumber
-                          size="small"
-                          value={v.differential}
-                          onChange={(val) => handleVariableUpdate(i, 'differential', val ?? 0)}
-                          step={0.001}
-                          precision={3}
-                          style={{ width: '100%' }}
-                        />
-                      </td>
-                      <td>
-                        {variables.length > 1 && (
-                          <button
-                            className={styles['remove-btn']}
-                            onClick={() => handleRemoveVariable(i)}
-                          >
-                            ×
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-
-            <Horizontal style={{ gap: '8px', marginTop: '8px' }}>
+            <Horizontal style={{ gap: '8px' }}>
               <GraviButton
                 buttonText="Add Variable"
                 onClick={() => handleAddVariable(1)}
@@ -653,17 +609,17 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                 />
               )}
             </Horizontal>
-          </div>
 
-          {/* Formula Preview */}
-          <Vertical style={{ gap: '4px', padding: '12px', backgroundColor: '#fafafa', borderRadius: '6px' }}>
-            <Texto category="p3" appearance="medium">Formula Expression</Texto>
-            <Texto category="p2" weight="500" style={{ fontFamily: 'monospace' }}>
-              {buildFormulaExpression(variables, mode) || 'Configure variables above'}
-            </Texto>
+            {/* Formula Preview */}
+            <Vertical style={{ gap: '4px', padding: '12px', backgroundColor: '#fafafa', borderRadius: '6px' }}>
+              <Texto category="p3" appearance="medium">Formula Expression</Texto>
+              <Texto category="p2" weight="500" style={{ fontFamily: 'monospace' }}>
+                {buildFormulaExpression(variables, mode) || 'Configure variables above'}
+              </Texto>
+            </Vertical>
           </Vertical>
-        </Vertical>
-      </div>
+        </div>
+      )}
 
       {/* Footer */}
       <Horizontal className={styles.footer} justifyContent="space-between" alignItems="center">

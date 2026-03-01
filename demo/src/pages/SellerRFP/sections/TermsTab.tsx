@@ -133,11 +133,12 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
               value={terms.penaltyCpg}
               onChange={(v) => updateField('penaltyCpg', v)}
               min={0}
-              step={0.5}
-              precision={1}
+              step={0.0001}
+              precision={4}
               style={{ width: '100%' }}
-              placeholder="e.g., 2.0"
-              addonAfter="¢/gal"
+              placeholder="e.g., 0.0200"
+              addonBefore="$"
+              addonAfter="/gal"
             />
           </Vertical>
         </div>

@@ -182,10 +182,13 @@ export function VariablesTable({ variables, onVariableUpdate, onRemoveVariable }
 
   const agPropOverrides = {
     getRowId: (params: { data: FormulaVariable }) => params.data.id,
+    domLayout: 'autoHeight' as const,
     headerHeight: 36,
     rowHeight: 40,
     suppressRowClickSelection: true,
     suppressMovableColumns: true,
+    enableRangeSelection: true,
+    enableFillHandle: true,
     rowGroupPanelShow: 'never' as const,
     overlayNoRowsTemplate:
       '<div style="padding: 32px; text-align: center; color: #8c8c8c;">No variables defined. Click "+ Add Variable" or use a template.</div>',

@@ -17,6 +17,7 @@ import type {
   TerminalProductStats,
   MarginHistoryPoint,
 } from '../types/sellerRfp.types'
+import type { InventoryCapacity, DetailAvailability } from '../types/sellerRfp.types'
 import { formatFormulaDisplay, LOSS_REASON_OPTIONS } from '../types/sellerRfp.types'
 
 // =============================================================================
@@ -891,6 +892,118 @@ export function computeBuyerHistory(
     declinedCount,
     winRate,
     terminalBreakdown,
+  }
+}
+
+// =============================================================================
+// INVENTORY CAPACITY (for owned inventory at each terminal × product)
+// =============================================================================
+
+export const SAMPLE_INVENTORY_CAPACITY: InventoryCapacity[] = [
+  // Houston Terminal — strong owned position in gasoline
+  { id: 'ic-1', terminal: 'Houston Terminal', product: '87 Octane', capacityPerMonth: 400000, currentUtilizationPercent: 50 },
+  { id: 'ic-2', terminal: 'Houston Terminal', product: '89 Octane', capacityPerMonth: 200000, currentUtilizationPercent: 40 },
+  { id: 'ic-3', terminal: 'Houston Terminal', product: '93 Octane', capacityPerMonth: 250000, currentUtilizationPercent: 60 },
+  { id: 'ic-4', terminal: 'Houston Terminal', product: 'ULSD', capacityPerMonth: 300000, currentUtilizationPercent: 55 },
+  // Pasadena Terminal — only gasoline inventory
+  { id: 'ic-5', terminal: 'Pasadena Terminal', product: '87 Octane', capacityPerMonth: 350000, currentUtilizationPercent: 45 },
+  { id: 'ic-6', terminal: 'Pasadena Terminal', product: '93 Octane', capacityPerMonth: 180000, currentUtilizationPercent: 35 },
+  // Beaumont Terminal — moderate position
+  { id: 'ic-7', terminal: 'Beaumont Terminal', product: '87 Octane', capacityPerMonth: 300000, currentUtilizationPercent: 55 },
+  { id: 'ic-8', terminal: 'Beaumont Terminal', product: '89 Octane', capacityPerMonth: 150000, currentUtilizationPercent: 30 },
+  { id: 'ic-9', terminal: 'Beaumont Terminal', product: 'ULSD', capacityPerMonth: 250000, currentUtilizationPercent: 65 },
+  // Dallas Terminal — limited owned inventory
+  { id: 'ic-10', terminal: 'Dallas Terminal', product: '87 Octane', capacityPerMonth: 250000, currentUtilizationPercent: 60 },
+  { id: 'ic-11', terminal: 'Dallas Terminal', product: '89 Octane', capacityPerMonth: 120000, currentUtilizationPercent: 50 },
+  // Baton Rouge Terminal — diesel focused
+  { id: 'ic-12', terminal: 'Baton Rouge Terminal', product: 'ULSD', capacityPerMonth: 280000, currentUtilizationPercent: 45 },
+  { id: 'ic-13', terminal: 'Baton Rouge Terminal', product: '87 Octane', capacityPerMonth: 200000, currentUtilizationPercent: 70 },
+]
+
+// =============================================================================
+// DETAIL AVAILABILITY COMPUTATION
+// =============================================================================
+
+/**
+ * Compute supply availability for a detail row based on its cost type.
+ * Matches supply agreements (for 'contract') or inventory capacity (for 'inventory')
+ * filtered by terminal AND product.
+ */
+export function computeDetailAvailability(
+  detail: SellerRFPDetail,
+  terms: RFPTerms,
+  supplyAgreements: SupplyAgreement[],
+  inventoryCapacity: InventoryCapacity[],
+): DetailAvailability {
+  const hasCostType = detail.costType !== null && detail.costType !== 'estimated'
+  const hasVolume = detail.volume !== null && detail.volume > 0
+  const hasContractDates = terms.contractStart !== null && terms.contractEnd !== null
+
+  // Early return for null or estimated cost types
+  if (!hasCostType) {
+    return {
+      availablePerMonth: null,
+      netPerMonth: null,
+      netPerTerm: null,
+      sources: [],
+      contractMonths: null,
+      hasCostType: detail.costType !== null,
+      hasVolume,
+      hasContractDates,
+    }
+  }
+
+  // Compute contract months
+  let contractMonths: number | null = null
+  if (hasContractDates) {
+    const start = new Date(terms.contractStart!)
+    const end = new Date(terms.contractEnd!)
+    contractMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth())
+    if (contractMonths <= 0) contractMonths = 1
+  }
+
+  // Build sources based on cost type
+  const sources: DetailAvailability['sources'] = []
+
+  if (detail.costType === 'contract') {
+    const matching = supplyAgreements.filter(
+      (sa) => sa.terminal === detail.terminal && sa.products.includes(detail.product),
+    )
+    for (const sa of matching) {
+      const available = Math.round(sa.totalVolumePerMonth * (sa.availableVolumePercent / 100))
+      sources.push({
+        name: sa.supplierName,
+        capacityPerMonth: sa.totalVolumePerMonth,
+        availablePerMonth: available,
+      })
+    }
+  } else if (detail.costType === 'inventory') {
+    const matching = inventoryCapacity.filter(
+      (ic) => ic.terminal === detail.terminal && ic.product === detail.product,
+    )
+    for (const ic of matching) {
+      const available = Math.round(ic.capacityPerMonth * ((100 - ic.currentUtilizationPercent) / 100))
+      sources.push({
+        name: 'Owned Inventory',
+        capacityPerMonth: ic.capacityPerMonth,
+        availablePerMonth: available,
+      })
+    }
+  }
+
+  const availablePerMonth = sources.reduce((sum, s) => sum + s.availablePerMonth, 0)
+  const netPerMonth = hasVolume ? availablePerMonth - detail.volume! : availablePerMonth
+  const netPerTerm = contractMonths !== null ? netPerMonth * contractMonths : null
+
+  return {
+    availablePerMonth,
+    netPerMonth,
+    netPerTerm,
+    sources,
+    contractMonths,
+    hasCostType: true,
+    hasVolume,
+    hasContractDates,
   }
 }
 

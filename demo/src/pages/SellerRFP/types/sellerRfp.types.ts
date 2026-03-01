@@ -266,11 +266,13 @@ export function formatPrice(price: number | null): string {
 }
 
 /**
- * Format margin as cpg
+ * Format margin in $/gal (0.0100 = 1 cent, 0.0001 = 1 point)
  */
 export function formatMarginCpg(marginCpg: number | null): string {
   if (marginCpg === null) return '—'
-  return `${marginCpg.toFixed(2)}¢`
+  const dollarValue = marginCpg / 100
+  if (dollarValue < 0) return `-$${Math.abs(dollarValue).toFixed(4)}`
+  return `$${dollarValue.toFixed(4)}`
 }
 
 /**
@@ -368,4 +370,58 @@ export interface TerminalProductStats {
 export interface MarginHistoryPoint {
   date: string
   marginCpg: number
+}
+
+// =============================================================================
+// INVENTORY CAPACITY & DETAIL AVAILABILITY
+// =============================================================================
+
+export interface InventoryCapacity {
+  id: string
+  terminal: string
+  product: string
+  capacityPerMonth: number // total owned capacity in gal/mo
+  currentUtilizationPercent: number // how much is already committed (0-100)
+}
+
+export interface DetailAvailability {
+  availablePerMonth: number | null // aggregate available gal/mo for cost type
+  netPerMonth: number | null // available - volume
+  netPerTerm: number | null // netPerMonth × contract months
+  sources: Array<{
+    name: string // supplier name or "Owned Inventory"
+    capacityPerMonth: number // total capacity
+    availablePerMonth: number // capacity × availability %
+  }>
+  contractMonths: number | null // derived from terms
+  hasCostType: boolean
+  hasVolume: boolean
+  hasContractDates: boolean
+}
+
+// =============================================================================
+// AVAILABILITY FORMATTING HELPERS
+// =============================================================================
+
+/**
+ * Format volume without "/mo" suffix — for total contract volumes
+ */
+export function formatVolumeTotal(volume: number | null): string {
+  if (volume === null) return '—'
+  if (volume >= 1000000) return `${(volume / 1000000).toFixed(1)}M gal`
+  if (volume >= 1000) return `${(volume / 1000).toFixed(0)}K gal`
+  return `${volume} gal`
+}
+
+/**
+ * Get availability color based on net available vs demand volume
+ */
+export function getAvailabilityColor(
+  netPerMonth: number | null,
+  volume: number | null,
+): 'green' | 'amber' | 'red' | 'neutral' {
+  if (netPerMonth === null) return 'neutral'
+  if (netPerMonth <= 0) return 'red'
+  if (volume !== null && volume > 0 && netPerMonth <= volume * 0.2) return 'amber'
+  return 'green'
 }

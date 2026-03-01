@@ -1,15 +1,11 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Drawer, Input, DatePicker, Checkbox, Select } from 'antd'
-import { CaretDownOutlined, CaretRightOutlined, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
 import type { SellerRFP, SellerRFPDetail, RFPTerms, DeclineReason } from '../types/sellerRfp.types'
-import { DECLINE_REASON_OPTIONS, formatVolume } from '../types/sellerRfp.types'
+import { DECLINE_REASON_OPTIONS } from '../types/sellerRfp.types'
 import {
   SELLER_PRODUCTS,
   SELLER_TERMINALS,
-  SAMPLE_SUPPLY_AGREEMENTS,
-  computeTerminalFeasibility,
-  computeBuyerHistory,
 } from '../data/sellerRfp.data'
 import { getCustomerOptions } from '../../../shared/data'
 import styles from './IntakeDrawer.module.css'
@@ -30,9 +26,6 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [selectedTerminals, setSelectedTerminals] = useState<string[]>([])
 
-  // Feasibility panel state
-  const [feasibilityExpanded, setFeasibilityExpanded] = useState(true)
-
   // Decline state
   const [declineExpanded, setDeclineExpanded] = useState(false)
   const [declineReason, setDeclineReason] = useState<DeclineReason | null>(null)
@@ -44,24 +37,6 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
   }))
 
   const previewCount = selectedProducts.length * selectedTerminals.length
-  const showFeasibility = selectedProducts.length > 0 && selectedTerminals.length > 0
-
-  // Feasibility computations
-  const terminalFeasibilities = useMemo(() => {
-    if (!showFeasibility) return []
-    return selectedTerminals.map((terminal) =>
-      computeTerminalFeasibility(terminal, selectedProducts, SAMPLE_SUPPLY_AGREEMENTS, rfps),
-    )
-  }, [selectedTerminals, selectedProducts, rfps, showFeasibility])
-
-  const coveredTerminalCount = useMemo(() => {
-    return terminalFeasibilities.filter((tf) => tf.agreements.length > 0).length
-  }, [terminalFeasibilities])
-
-  const buyerHistory = useMemo(() => {
-    if (!buyerId || !buyerName || selectedTerminals.length === 0) return null
-    return computeBuyerHistory(buyerId, buyerName, selectedTerminals, rfps)
-  }, [buyerId, buyerName, selectedTerminals, rfps])
 
   const handleProductToggle = useCallback((product: string, checked: boolean) => {
     setSelectedProducts((prev) =>
@@ -99,7 +74,6 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
     setDeclineExpanded(false)
     setDeclineReason(null)
     setDeclineNotes('')
-    setFeasibilityExpanded(true)
   }, [])
 
   const handleCreate = useCallback(() => {
@@ -218,134 +192,6 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
 
   const allProductsSelected = selectedProducts.length === SELLER_PRODUCTS.length
   const allTerminalsSelected = selectedTerminals.length === SELLER_TERMINALS.length
-
-  // Render feasibility panel
-  const renderFeasibilityPanel = () => {
-    if (!showFeasibility) return null
-
-    return (
-      <div className={styles['feasibility-panel']}>
-        {/* Collapsible header */}
-        <button
-          className={styles['feasibility-header']}
-          onClick={() => setFeasibilityExpanded(!feasibilityExpanded)}
-        >
-          <Horizontal alignItems="center" style={{ gap: '6px' }}>
-            {feasibilityExpanded ? <CaretDownOutlined style={{ fontSize: 10 }} /> : <CaretRightOutlined style={{ fontSize: 10 }} />}
-            <Texto category="p2" weight="600">Feasibility</Texto>
-            <Texto category="p3" appearance="medium">
-              {coveredTerminalCount} of {selectedTerminals.length} terminals covered
-            </Texto>
-          </Horizontal>
-        </button>
-
-        {feasibilityExpanded && (
-          <Vertical style={{ gap: '16px', padding: '12px 0 4px' }}>
-            {/* Section 1: Supply Coverage & Capacity */}
-            <Vertical style={{ gap: '8px' }}>
-              <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-                Supply Coverage & Capacity
-              </Texto>
-              {terminalFeasibilities.map((tf) => (
-                <div
-                  key={tf.terminal}
-                  className={`${styles['terminal-card']} ${tf.agreements.length === 0 ? styles['terminal-card-uncovered'] : ''}`}
-                >
-                  <Texto category="p2" weight="600">{tf.terminal}</Texto>
-                  {tf.agreements.length > 0 ? (
-                    <Vertical style={{ gap: '4px', marginTop: '4px' }}>
-                      {tf.agreements.map((a, i) => (
-                        <Horizontal key={i} alignItems="center" style={{ gap: '6px' }}>
-                          <Texto category="p3" weight="500">{a.supplierName}</Texto>
-                          <Texto category="p3" appearance="medium">—</Texto>
-                          {a.productsCovered.map((p) => (
-                            <span key={p} className={styles['product-tag']}>
-                              <CheckCircleFilled style={{ color: '#52c41a', fontSize: 10 }} /> {p}
-                            </span>
-                          ))}
-                        </Horizontal>
-                      ))}
-                      {tf.productsUncovered.length > 0 && (
-                        <Horizontal alignItems="center" style={{ gap: '6px' }}>
-                          {tf.productsUncovered.map((p) => (
-                            <span key={p} className={styles['product-tag-uncovered']}>
-                              <MinusCircleFilled style={{ color: '#8c8c8c', fontSize: 10 }} /> {p} — no coverage
-                            </span>
-                          ))}
-                        </Horizontal>
-                      )}
-                      <Texto category="p3" appearance="medium" style={{ marginTop: '2px' }}>
-                        Available: {formatVolume(tf.totalAvailableCapacity)} | Committed: {formatVolume(tf.totalCommittedVolume)} | Net:{' '}
-                        <span style={{ color: tf.netAvailable <= 0 ? '#fa8c16' : undefined, fontWeight: tf.netAvailable <= 0 ? 600 : undefined }}>
-                          {formatVolume(tf.netAvailable)}
-                        </span>
-                      </Texto>
-                    </Vertical>
-                  ) : (
-                    <Texto category="p3" appearance="medium" style={{ marginTop: '2px' }}>
-                      No supply agreements for selected products
-                    </Texto>
-                  )}
-                </div>
-              ))}
-            </Vertical>
-
-            {/* Section 2: Past Outcomes with Buyer */}
-            <Vertical style={{ gap: '8px' }}>
-              <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-                Past Outcomes
-              </Texto>
-              {!buyerId ? (
-                <Texto category="p3" appearance="medium">Select a buyer to see past outcomes.</Texto>
-              ) : buyerHistory && buyerHistory.totalRfps > 0 ? (
-                <Vertical style={{ gap: '8px' }}>
-                  {/* Buyer summary */}
-                  <Horizontal alignItems="center" style={{ gap: '4px', flexWrap: 'wrap' }}>
-                    <Texto category="p2" weight="600">{buyerHistory.buyerName}</Texto>
-                    <Texto category="p3" appearance="medium">&mdash;</Texto>
-                    <Texto category="p2">{buyerHistory.totalRfps} past RFP{buyerHistory.totalRfps !== 1 ? 's' : ''}</Texto>
-                    <Texto category="p3" appearance="medium">&middot;</Texto>
-                    <Texto category="p2" weight="500">{buyerHistory.winRate}% win rate</Texto>
-                    <Texto category="p3" appearance="medium">
-                      ({buyerHistory.wonCount} won, {buyerHistory.lostCount} lost{buyerHistory.declinedCount > 0 ? `, ${buyerHistory.declinedCount} declined` : ''})
-                    </Texto>
-                  </Horizontal>
-
-                  {/* Terminal breakdown */}
-                  {buyerHistory.terminalBreakdown.map((tb) => (
-                    <div key={tb.terminal} className={styles['buyer-terminal-row']}>
-                      <Texto category="p3" weight="500">{tb.terminal}</Texto>
-                      {tb.rfpCount > 0 ? (
-                        <Vertical style={{ gap: '2px' }}>
-                          <Texto category="p3" appearance="medium">
-                            {tb.rfpCount} RFP{tb.rfpCount !== 1 ? 's' : ''}{tb.wonCount > 0 ? `, ${tb.wonCount} won` : ''}{tb.lostCount > 0 ? `, ${tb.lostCount} lost` : ''}
-                          </Texto>
-                          {tb.lastOutcome && (
-                            <Texto category="p3" appearance="medium">
-                              Last: <span style={{ color: tb.lastOutcome.result === 'won' ? '#52c41a' : '#ff4d4f', fontWeight: 500 }}>
-                                {tb.lastOutcome.result === 'won' ? 'Won' : 'Lost'}
-                                {tb.lastOutcome.result === 'lost' && tb.lastOutcome.reason ? ` (${tb.lastOutcome.reason})` : ''}
-                              </span>
-                              , {new Date(tb.lastOutcome.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                              {tb.lastOutcome.avgMarginCpg !== null ? ` — avg margin ${tb.lastOutcome.avgMarginCpg.toFixed(1)}¢/gal` : ''}
-                            </Texto>
-                          )}
-                        </Vertical>
-                      ) : (
-                        <Texto category="p3" appearance="medium">No prior RFPs with {buyerHistory.buyerName}</Texto>
-                      )}
-                    </div>
-                  ))}
-                </Vertical>
-              ) : (
-                <Texto category="p3" appearance="medium">No past RFPs with {buyerName}.</Texto>
-              )}
-            </Vertical>
-          </Vertical>
-        )}
-      </div>
-    )
-  }
 
   return (
     <Drawer
@@ -504,9 +350,6 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
             ))}
           </div>
         </Vertical>
-
-        {/* Feasibility Panel */}
-        {renderFeasibilityPanel()}
 
         {/* Preview */}
         {previewCount > 0 && (
