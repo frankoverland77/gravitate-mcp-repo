@@ -27,3 +27,67 @@
   background-color: #fafafa;
   text-align: center;
 }
+
+/* Feasibility Panel */
+.feasibility-panel {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 0 12px 12px;
+  background-color: #fafafa;
+}
+
+.feasibility-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.feasibility-header:hover {
+  opacity: 0.8;
+}
+
+.terminal-card {
+  padding: 8px 10px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  background-color: #ffffff;
+}
+
+.terminal-card-uncovered {
+  background-color: #fafafa;
+  border-color: #f0f0f0;
+}
+
+.product-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #389e0d;
+}
+
+.product-tag-uncovered {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #8c8c8c;
+}
+
+.buyer-terminal-row {
+  padding: 4px 10px;
+  border-left: 2px solid #e8e8e8;
+}
+
+/* Decline UI */
+.decline-expansion {
+  padding: 10px 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  background-color: #fafafa;
+}

@@ -1,6 +1,7 @@
-import { useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviGrid, GraviButton } from '@gravitate-js/excalibrr'
 import { PlusOutlined, RightOutlined } from '@ant-design/icons'
+import { Switch } from 'antd'
 import type { ColDef, ICellRendererParams, RowStyle } from 'ag-grid-community'
 import type { SellerRFP } from '../types/sellerRfp.types'
 import {
@@ -44,6 +45,16 @@ function StatCard({ label, value, highlight }: { label: string; value: string | 
 }
 
 export function PipelineGrid({ rfps, onRFPClick, onNewRFP }: PipelineGridProps) {
+  const [showDeclined, setShowDeclined] = useState(false)
+
+  const filteredRfps = useMemo(() => {
+    if (showDeclined) return rfps
+    return rfps.filter((r) => r.status !== 'declined')
+  }, [rfps, showDeclined])
+
+  // Stat cards always exclude declined
+  const nonDeclinedRfps = useMemo(() => rfps.filter((r) => r.status !== 'declined'), [rfps])
+
   // Status cell renderer
   const statusRenderer = useCallback((params: ICellRendererParams) => {
     const rfp = params.data as SellerRFP
@@ -265,16 +276,20 @@ export function PipelineGrid({ rfps, onRFPClick, onNewRFP }: PipelineGridProps) 
 
       {/* Stat Cards */}
       <Horizontal style={{ gap: '16px' }}>
-        <StatCard label="Active RFPs" value={getActiveCount(rfps)} highlight />
-        <StatCard label="Due This Week" value={getDueThisWeekCount(rfps)} />
-        <StatCard label="Awaiting Adjudication" value={getAwaitingAdjudicationCount(rfps)} />
-        <StatCard label="Win Rate" value={getWinRate(rfps)} />
+        <StatCard label="Active RFPs" value={getActiveCount(nonDeclinedRfps)} highlight />
+        <StatCard label="Due This Week" value={getDueThisWeekCount(nonDeclinedRfps)} />
+        <StatCard label="Awaiting Adjudication" value={getAwaitingAdjudicationCount(nonDeclinedRfps)} />
+        <StatCard label="Win Rate" value={getWinRate(nonDeclinedRfps)} />
       </Horizontal>
 
       {/* Pipeline Grid */}
+      <Horizontal justifyContent="flex-end" alignItems="center" style={{ gap: '8px' }}>
+        <Texto category="p3" appearance="medium">Show declined</Texto>
+        <Switch size="small" checked={showDeclined} onChange={setShowDeclined} />
+      </Horizontal>
       <div className={styles['grid-container']}>
         <GraviGrid
-          rowData={rfps}
+          rowData={filteredRfps}
           columnDefs={columnDefs}
           agPropOverrides={{
             domLayout: 'autoHeight',

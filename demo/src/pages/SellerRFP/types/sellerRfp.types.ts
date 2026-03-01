@@ -17,7 +17,7 @@ export type { AllocationPeriod } from '../../RFP/rfp.types'
 // STATUS & ENUMS
 // =============================================================================
 
-export type SellerRFPStatus = 'draft' | 'in-progress' | 'submitted' | 'won' | 'lost' | 'advanced'
+export type SellerRFPStatus = 'draft' | 'in-progress' | 'submitted' | 'won' | 'lost' | 'advanced' | 'declined'
 
 export type CostType = 'inventory' | 'contract' | 'estimated'
 
@@ -30,6 +30,20 @@ export type WinReason = 'best-price' | 'incumbent' | 'relationship' | 'volume-fl
 export type LossReason = 'price-too-high' | 'lost-on-terms' | 'lost-on-volume' | 'incumbent-won' | 'unknown' | 'other'
 
 export type PaymentTerms = 'net-10' | 'net-15' | 'net-30' | 'prepay'
+
+export type DeclineReason =
+  | 'no-supply'
+  | 'margin-not-viable'
+  | 'capacity-constraints'
+  | 'deadline-too-tight'
+  | 'strategic-pass'
+  | 'other'
+
+export interface DeclineMetadata {
+  reason: DeclineReason
+  notes: string | null
+  declinedAt: string // ISO date
+}
 
 // =============================================================================
 // CORE ENTITIES
@@ -46,6 +60,7 @@ export interface SellerRFP {
   details: SellerRFPDetail[]
   terms: RFPTerms
   rounds: RFPRoundHistory[]
+  declineMetadata?: DeclineMetadata | null
   createdAt: string
   updatedAt: string
 }
@@ -130,6 +145,7 @@ export const STATUS_LABELS: Record<SellerRFPStatus, string> = {
   'won': 'Won',
   'lost': 'Lost',
   'advanced': 'Advanced',
+  'declined': 'Declined',
 }
 
 export const STATUS_COLORS: Record<SellerRFPStatus, { color: string; background: string }> = {
@@ -139,6 +155,7 @@ export const STATUS_COLORS: Record<SellerRFPStatus, { color: string; background:
   'won': { color: '#52c41a', background: '#f6ffed' },
   'lost': { color: '#ff4d4f', background: '#fff2f0' },
   'advanced': { color: '#fa8c16', background: '#fff7e6' },
+  'declined': { color: '#8c8c8c', background: '#fafafa' },
 }
 
 export const COST_TYPE_LABELS: Record<CostType, string> = {
@@ -180,6 +197,15 @@ export const LOSS_REASON_OPTIONS: Array<{ value: LossReason; label: string }> = 
   { value: 'lost-on-volume', label: 'Lost on Volume' },
   { value: 'incumbent-won', label: 'Incumbent Won' },
   { value: 'unknown', label: 'Unknown' },
+  { value: 'other', label: 'Other' },
+]
+
+export const DECLINE_REASON_OPTIONS: Array<{ value: DeclineReason; label: string }> = [
+  { value: 'no-supply', label: 'No supply position' },
+  { value: 'margin-not-viable', label: 'Margin not viable' },
+  { value: 'capacity-constraints', label: 'Capacity constraints' },
+  { value: 'deadline-too-tight', label: 'Deadline too tight' },
+  { value: 'strategic-pass', label: 'Relationship / strategic pass' },
   { value: 'other', label: 'Other' },
 ]
 
@@ -273,4 +299,73 @@ export function isDeadlineUrgent(deadline: string, daysThreshold: number = 3): b
  */
 export function isDeadlinePast(deadline: string): boolean {
   return new Date(deadline) < new Date()
+}
+
+// =============================================================================
+// FEASIBILITY & INTELLIGENCE TYPES
+// =============================================================================
+
+export interface TerminalFeasibility {
+  terminal: string
+  agreements: Array<{
+    supplierName: string
+    productsCovered: string[]
+    availableVolumePerMonth: number
+  }>
+  productsUncovered: string[]
+  totalAvailableCapacity: number
+  totalCommittedVolume: number
+  netAvailable: number
+}
+
+export interface BuyerHistory {
+  buyerId: string
+  buyerName: string
+  totalRfps: number
+  wonCount: number
+  lostCount: number
+  declinedCount: number
+  winRate: number
+  terminalBreakdown: Array<{
+    terminal: string
+    rfpCount: number
+    wonCount: number
+    lostCount: number
+    lastOutcome: {
+      result: 'won' | 'lost'
+      date: string
+      reason: string | null
+      avgMarginCpg: number | null
+    } | null
+  }>
+}
+
+export interface PastBidReference {
+  rfpId: string
+  rfpName: string
+  buyerName: string
+  outcome: 'won' | 'lost'
+  outcomeDate: string
+  lossReason: string | null
+  saleFormulaDisplay: string
+  saleDifferential: number
+  marginCpg: number
+  volume: number
+}
+
+export interface TerminalProductStats {
+  terminal: string
+  product: string
+  totalBids: number
+  wonCount: number
+  lostCount: number
+  winRate: number
+  winningDifferentialRange: { min: number; max: number } | null
+  avgWinningMarginCpg: number | null
+  avgLosingMarginCpg: number | null
+}
+
+export interface MarginHistoryPoint {
+  date: string
+  marginCpg: number
 }

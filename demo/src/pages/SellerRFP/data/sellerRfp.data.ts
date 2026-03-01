@@ -9,11 +9,15 @@ import type {
   SellerRFP,
   SellerRFPDetail,
   RFPTerms,
-  RFPRoundHistory,
   CostType,
-  SellerRFPStatus,
   PriorRoundSnapshot,
+  TerminalFeasibility,
+  BuyerHistory,
+  PastBidReference,
+  TerminalProductStats,
+  MarginHistoryPoint,
 } from '../types/sellerRfp.types'
+import { formatFormulaDisplay, LOSS_REASON_OPTIONS } from '../types/sellerRfp.types'
 
 // =============================================================================
 // PRODUCTS & TERMINALS FOR SELLER RFP
@@ -480,14 +484,14 @@ export const SAMPLE_SELLER_RFPS: SellerRFP[] = [
 // =============================================================================
 
 export function getActiveCount(rfps: SellerRFP[]): number {
-  return rfps.filter((r) => !['won', 'lost'].includes(r.status)).length
+  return rfps.filter((r) => !['won', 'lost', 'declined'].includes(r.status)).length
 }
 
 export function getDueThisWeekCount(rfps: SellerRFP[]): number {
   const now = new Date()
   const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
   return rfps.filter((r) => {
-    if (['won', 'lost'].includes(r.status)) return false
+    if (['won', 'lost', 'declined'].includes(r.status)) return false
     const deadline = new Date(r.deadline)
     return deadline >= now && deadline <= weekFromNow
   }).length
@@ -654,6 +658,7 @@ export interface SupplyAgreement {
   products: string[]
   formula: Formula
   availableVolumePercent: number
+  totalVolumePerMonth: number // gal/mo
 }
 
 export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
@@ -664,6 +669,7 @@ export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
     products: ['87 Octane', '89 Octane', '93 Octane'],
     formula: createFormula('OPIS', 'CBOB USGC', 'Low', -0.015, 'Marathon Houston Gasoline'),
     availableVolumePercent: 85,
+    totalVolumePerMonth: 500000,
   },
   {
     id: 'sa-2',
@@ -672,6 +678,7 @@ export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
     products: ['ULSD', 'Kerosene'],
     formula: createFormula('OPIS', 'ULSD USGC', 'Low', -0.010, 'Valero Houston Diesel'),
     availableVolumePercent: 70,
+    totalVolumePerMonth: 350000,
   },
   {
     id: 'sa-3',
@@ -680,6 +687,7 @@ export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
     products: ['87 Octane', '93 Octane'],
     formula: createFormula('OPIS', 'CBOB USGC', 'Low', -0.018, 'P66 Pasadena Gasoline'),
     availableVolumePercent: 90,
+    totalVolumePerMonth: 400000,
   },
   {
     id: 'sa-4',
@@ -688,6 +696,7 @@ export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
     products: ['87 Octane', '89 Octane', '93 Octane', 'ULSD'],
     formula: createFormula('OPIS', 'CBOB USGC', 'Low', -0.012, 'Shell Beaumont Supply'),
     availableVolumePercent: 75,
+    totalVolumePerMonth: 450000,
   },
   {
     id: 'sa-5',
@@ -696,6 +705,7 @@ export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
     products: ['87 Octane', '89 Octane', 'ULSD'],
     formula: createFormula('OPIS', 'CBOB USGC', 'Low', -0.020, 'Marathon Dallas Supply'),
     availableVolumePercent: 60,
+    totalVolumePerMonth: 300000,
   },
   {
     id: 'sa-6',
@@ -704,6 +714,7 @@ export const SAMPLE_SUPPLY_AGREEMENTS: SupplyAgreement[] = [
     products: ['87 Octane', 'ULSD', 'Kerosene'],
     formula: createFormula('OPIS', 'CBOB USGC', 'Low', -0.016, 'Valero Baton Rouge Supply'),
     availableVolumePercent: 80,
+    totalVolumePerMonth: 380000,
   },
 ]
 
@@ -744,4 +755,297 @@ for (const product of SELLER_PRODUCTS) {
  */
 export function getInventoryCostFormula(terminal: string, product: string): Formula | null {
   return INVENTORY_COSTS[`${terminal}|${product}`] || null
+}
+
+// =============================================================================
+// FEASIBILITY HELPERS (for IntakeDrawer feasibility panel)
+// =============================================================================
+
+/**
+ * Compute terminal feasibility data for selected products/terminals against supply agreements and active RFPs
+ */
+export function computeTerminalFeasibility(
+  terminal: string,
+  selectedProducts: string[],
+  agreements: SupplyAgreement[],
+  rfps: SellerRFP[],
+): TerminalFeasibility {
+  const matchingAgreements = agreements.filter((sa) => sa.terminal === terminal)
+
+  const agreementData = matchingAgreements.map((sa) => {
+    const productsCovered = sa.products.filter((p) => selectedProducts.includes(p))
+    const availableVolume = Math.round(sa.totalVolumePerMonth * (sa.availableVolumePercent / 100))
+    return {
+      supplierName: sa.supplierName,
+      productsCovered,
+      availableVolumePerMonth: availableVolume,
+    }
+  }).filter((a) => a.productsCovered.length > 0)
+
+  const coveredProducts = new Set(agreementData.flatMap((a) => a.productsCovered))
+  const productsUncovered = selectedProducts.filter((p) => !coveredProducts.has(p))
+
+  const totalAvailableCapacity = agreementData.reduce((sum, a) => sum + a.availableVolumePerMonth, 0)
+
+  // Committed volume = sum of detail volumes at this terminal across active/submitted/advanced RFPs
+  const activeStatuses = ['in-progress', 'submitted', 'advanced', 'draft']
+  const totalCommittedVolume = rfps
+    .filter((r) => activeStatuses.includes(r.status))
+    .reduce((sum, r) => {
+      return sum + r.details
+        .filter((d) => d.terminal === terminal && d.volume)
+        .reduce((s, d) => s + (d.volume || 0), 0)
+    }, 0)
+
+  return {
+    terminal,
+    agreements: agreementData,
+    productsUncovered,
+    totalAvailableCapacity,
+    totalCommittedVolume,
+    netAvailable: totalAvailableCapacity - totalCommittedVolume,
+  }
+}
+
+/**
+ * Compute bid load stats from RFPs
+ */
+export function computeBidLoad(rfps: SellerRFP[]): { active: number; dueThisWeek: number; awaitingResult: number } {
+  const now = new Date()
+  const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+
+  const activeRfps = rfps.filter((r) => ['draft', 'in-progress', 'advanced'].includes(r.status))
+
+  return {
+    active: activeRfps.length,
+    dueThisWeek: activeRfps.filter((r) => {
+      const deadline = new Date(r.deadline)
+      return deadline >= now && deadline <= weekFromNow
+    }).length,
+    awaitingResult: rfps.filter((r) => r.status === 'submitted').length,
+  }
+}
+
+/**
+ * Compute past outcomes with a specific buyer
+ */
+export function computeBuyerHistory(
+  buyerId: string,
+  buyerName: string,
+  selectedTerminals: string[],
+  rfps: SellerRFP[],
+): BuyerHistory {
+  const buyerRfps = rfps.filter((r) => r.buyerId === buyerId)
+
+  const wonCount = buyerRfps.filter((r) => r.status === 'won').length
+  const lostCount = buyerRfps.filter((r) => r.status === 'lost').length
+  const declinedCount = buyerRfps.filter((r) => r.status === 'declined').length
+  const totalRfps = buyerRfps.length
+  const winRate = wonCount + lostCount > 0 ? Math.round((wonCount / (wonCount + lostCount)) * 100) : 0
+
+  const terminalBreakdown = selectedTerminals.map((terminal) => {
+    const terminalRfps = buyerRfps.filter((r) =>
+      r.details.some((d) => d.terminal === terminal),
+    )
+
+    const tWon = terminalRfps.filter((r) => r.status === 'won').length
+    const tLost = terminalRfps.filter((r) => r.status === 'lost').length
+
+    // Find most recent terminal-specific outcome
+    const terminalOutcomes = terminalRfps
+      .filter((r) => r.status === 'won' || r.status === 'lost')
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+
+    let lastOutcome: BuyerHistory['terminalBreakdown'][0]['lastOutcome'] = null
+    if (terminalOutcomes.length > 0) {
+      const last = terminalOutcomes[0]
+      const lastRound = last.rounds.length > 0 ? last.rounds[last.rounds.length - 1] : null
+      const terminalDetails = last.details.filter((d) => d.terminal === terminal)
+      const avgMargin = terminalDetails.length > 0
+        ? terminalDetails.reduce((s, d) => s + (d.margin || 0), 0) / terminalDetails.length
+        : null
+
+      lastOutcome = {
+        result: last.status as 'won' | 'lost',
+        date: last.updatedAt,
+        reason: lastRound?.adjudicationReason || null,
+        avgMarginCpg: avgMargin ? Math.round(avgMargin * 100) / 100 : null,
+      }
+    }
+
+    return {
+      terminal,
+      rfpCount: terminalRfps.length,
+      wonCount: tWon,
+      lostCount: tLost,
+      lastOutcome,
+    }
+  })
+
+  return {
+    buyerId,
+    buyerName,
+    totalRfps,
+    wonCount,
+    lostCount,
+    declinedCount,
+    winRate,
+    terminalBreakdown,
+  }
+}
+
+// =============================================================================
+// INTELLIGENCE HELPERS (for SaleFormulaDrawer intelligence panel)
+// =============================================================================
+
+/**
+ * Get past bid references at a specific terminal × product, excluding the current RFP
+ */
+export function getPastBidsAtTerminalProduct(
+  rfps: SellerRFP[],
+  terminal: string,
+  product: string,
+  excludeRfpId: string,
+): PastBidReference[] {
+  const results: PastBidReference[] = []
+
+  for (const rfp of rfps) {
+    if (rfp.id === excludeRfpId) continue
+    if (rfp.status !== 'won' && rfp.status !== 'lost') continue
+
+    const matchingDetails = rfp.details.filter(
+      (d) => d.terminal === terminal && d.product === product,
+    )
+    if (matchingDetails.length === 0) continue
+
+    const lastRound = rfp.rounds.length > 0 ? rfp.rounds[rfp.rounds.length - 1] : null
+    const lossReasonLabel = lastRound?.adjudicationReason
+      ? LOSS_REASON_OPTIONS.find((o) => o.value === lastRound.adjudicationReason)?.label || lastRound.adjudicationReason
+      : null
+
+    for (const detail of matchingDetails) {
+      if (detail.saleFormula && detail.margin !== null) {
+        const diff = detail.saleFormula.variables.length > 0
+          ? detail.saleFormula.variables[0].differential
+          : 0
+
+        results.push({
+          rfpId: rfp.id,
+          rfpName: rfp.name,
+          buyerName: rfp.buyerName,
+          outcome: rfp.status as 'won' | 'lost',
+          outcomeDate: rfp.updatedAt,
+          lossReason: rfp.status === 'lost' ? lossReasonLabel : null,
+          saleFormulaDisplay: formatFormulaDisplay(detail.saleFormula),
+          saleDifferential: diff,
+          marginCpg: detail.margin,
+          volume: detail.volume || 0,
+        })
+      }
+    }
+  }
+
+  // Sort by date descending, cap at 5
+  results.sort((a, b) => new Date(b.outcomeDate).getTime() - new Date(a.outcomeDate).getTime())
+  return results.slice(0, 5)
+}
+
+/**
+ * Compute aggregate outcome stats for a terminal × product
+ */
+export function computeTerminalProductStats(
+  rfps: SellerRFP[],
+  terminal: string,
+  product: string,
+  excludeRfpId: string,
+): TerminalProductStats {
+  const pastBids = getPastBidsAtTerminalProduct(rfps, terminal, product, excludeRfpId)
+
+  const wonBids = pastBids.filter((b) => b.outcome === 'won')
+  const lostBids = pastBids.filter((b) => b.outcome === 'lost')
+
+  const winRate = wonBids.length + lostBids.length > 0
+    ? Math.round((wonBids.length / (wonBids.length + lostBids.length)) * 100)
+    : 0
+
+  let winningDifferentialRange: { min: number; max: number } | null = null
+  if (wonBids.length > 0) {
+    const diffs = wonBids.map((b) => b.saleDifferential)
+    winningDifferentialRange = { min: Math.min(...diffs), max: Math.max(...diffs) }
+  }
+
+  const avgWinningMarginCpg = wonBids.length > 0
+    ? Math.round(wonBids.reduce((s, b) => s + b.marginCpg, 0) / wonBids.length * 100) / 100
+    : null
+
+  const avgLosingMarginCpg = lostBids.length > 0
+    ? Math.round(lostBids.reduce((s, b) => s + b.marginCpg, 0) / lostBids.length * 100) / 100
+    : null
+
+  return {
+    terminal,
+    product,
+    totalBids: pastBids.length,
+    wonCount: wonBids.length,
+    lostCount: lostBids.length,
+    winRate,
+    winningDifferentialRange,
+    avgWinningMarginCpg,
+    avgLosingMarginCpg,
+  }
+}
+
+/**
+ * Generate historical margin data for sparkline — resolves cost and sale formulas against historical prices.
+ */
+export function generateMarginHistory(
+  product: string,
+  costDifferential: number,
+  saleDifferential: number,
+  months: number = 6,
+): MarginHistoryPoint[] {
+  const basePrice = BASE_PRICES[product] || 2.30
+  const points: MarginHistoryPoint[] = []
+  const endDate = new Date('2026-02-28')
+  const startDate = new Date(endDate)
+  startDate.setMonth(startDate.getMonth() - months)
+
+  let seed = product.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const seededRandom = () => {
+    seed = (seed * 16807 + 0) % 2147483647
+    return (seed - 1) / 2147483646
+  }
+
+  const current = new Date(startDate)
+  let priceOffset = 0
+
+  while (current <= endDate) {
+    const dayOfWeek = current.getDay()
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      current.setDate(current.getDate() + 1)
+      continue
+    }
+
+    const month = current.getMonth()
+    const seasonalFactor = (month >= 4 && month <= 8)
+      ? 0.08 * Math.sin(((month - 4) / 4) * Math.PI)
+      : -0.03 * Math.sin(((month - 10) / 4) * Math.PI)
+
+    priceOffset += (seededRandom() - 0.5) * 0.01
+    priceOffset = Math.max(-0.15, Math.min(0.15, priceOffset))
+
+    const rackPrice = basePrice + seasonalFactor + priceOffset
+    const costPrice = rackPrice + costDifferential
+    const salePrice = rackPrice + saleDifferential
+    const marginCpg = Math.round((salePrice - costPrice) * 10000) / 100
+
+    points.push({
+      date: current.toISOString().split('T')[0],
+      marginCpg,
+    })
+
+    current.setDate(current.getDate() + 1)
+  }
+
+  return points
 }

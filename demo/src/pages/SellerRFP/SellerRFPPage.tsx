@@ -96,6 +96,15 @@ export function SellerRFPPage() {
     }))
   }, [])
 
+  const handleDeclineRFP = useCallback((declinedRFP: SellerRFP) => {
+    setState((prev) => ({
+      ...prev,
+      rfps: [declinedRFP, ...prev.rfps],
+      intakeDrawerOpen: false,
+    }))
+    NotificationMessage('Declined', `RFP declined — ${declinedRFP.buyerName}.`, false)
+  }, [])
+
   // =========================================================================
   // DETAIL UPDATES
   // =========================================================================
@@ -337,6 +346,7 @@ export function SellerRFPPage() {
             <TabPane tab="Details & Formulas" key="details">
               <DetailsFormulasTab
                 rfp={rfp}
+                rfps={state.rfps}
                 onDetailUpdate={handleDetailUpdate}
                 onDetailsReplace={handleDetailsReplace}
                 onOpenSaleFormula={handleOpenSaleFormula}
@@ -384,6 +394,8 @@ export function SellerRFPPage() {
             visible={state.intakeDrawerOpen}
             onClose={handleCloseIntake}
             onCreate={handleCreateRFP}
+            onDecline={handleDeclineRFP}
+            rfps={state.rfps}
           />
         </>
       ) : (

@@ -3,7 +3,7 @@ import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, BBDTag } from '@gr
 import { PlusOutlined, AppstoreAddOutlined } from '@ant-design/icons'
 import { Drawer, Checkbox, Tooltip } from 'antd'
 import type { ColDef, ICellRendererParams } from 'ag-grid-community'
-import type { SellerRFP, SellerRFPDetail, CostType } from '../types/sellerRfp.types'
+import type { SellerRFP, SellerRFPDetail } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
   COST_TYPE_COLORS,
@@ -21,6 +21,7 @@ import styles from './DetailsFormulasTab.module.css'
 
 interface DetailsFormulasTabProps {
   rfp: SellerRFP
+  rfps: SellerRFP[]
   onDetailUpdate: (detail: SellerRFPDetail) => void
   onDetailsReplace: (details: SellerRFPDetail[]) => void
   onOpenSaleFormula: (detailId: string) => void
@@ -31,6 +32,7 @@ interface DetailsFormulasTabProps {
 
 export function DetailsFormulasTab({
   rfp,
+  rfps,
   onDetailUpdate,
   onDetailsReplace,
   onOpenSaleFormula,
@@ -346,6 +348,8 @@ export function DetailsFormulasTab({
         detail={activeDetail}
         onClose={onCloseSaleFormula}
         onApply={handleSaleFormulaApply}
+        rfps={rfps}
+        currentRfpId={rfp.id}
       />
     </Vertical>
   )
