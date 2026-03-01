@@ -1,9 +1,9 @@
 import { useMemo, useCallback, useRef } from 'react'
 import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
-import { PlusOutlined, DeleteOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Select, Tooltip } from 'antd'
 import type { ColDef, ICellRendererParams, ValueGetterParams, GetContextMenuItemsParams } from 'ag-grid-community'
-import type { SellerRFP, SellerRFPDetail, DetailAvailability, Formula, FormulaVariable } from '../types/sellerRfp.types'
+import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
   COST_TYPE_COLORS,
@@ -17,6 +17,7 @@ import {
   getAvailabilityColor,
 } from '../types/sellerRfp.types'
 import { CostTypePopover } from '../components/CostTypePopover'
+import { AvailabilityPopover } from '../components/AvailabilityPopover'
 import { SaleFormulaDrawer } from '../components/SaleFormulaDrawer'
 import { SELLER_PRODUCTS, SELLER_TERMINALS, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY, computeDetailAvailability } from '../data/sellerRfp.data'
 import styles from './DetailsFormulasTab.module.css'
@@ -184,31 +185,6 @@ export function DetailsFormulasTab({
   // Availability color map
   const availColorMap = { green: '#52c41a', amber: '#faad14', red: '#ff4d4f', neutral: '#8c8c8c' }
 
-  // Build tooltip content for supply source breakdown
-  const buildSourceTooltip = useCallback((detail: SellerRFPDetail, avail: DetailAvailability) => {
-    if (!avail.hasCostType) return 'Select a cost type to view supply availability'
-    if (detail.costType === 'estimated') return 'No committed supply for estimated/spot cost type'
-    if (avail.sources.length === 0) return `No ${detail.costType} sources for ${detail.product} @ ${detail.terminal}`
-
-    const lines: string[] = []
-    lines.push(`Supply Sources: ${detail.product} @ ${detail.terminal}`)
-    lines.push('─'.repeat(40))
-    for (const src of avail.sources) {
-      lines.push(`${src.name}     ${formatVolume(src.availablePerMonth)}`)
-      if (detail.costType === 'contract') {
-        const pct = Math.round((src.availablePerMonth / src.capacityPerMonth) * 100)
-        lines.push(`  (${formatVolume(src.capacityPerMonth).replace(' gal/mo', '')} capacity × ${pct}% available)`)
-      }
-    }
-    lines.push('─'.repeat(40))
-    lines.push(`Aggregate Available:   ${formatVolume(avail.availablePerMonth)}`)
-    if (avail.hasVolume) {
-      lines.push(`This Detail Volume:   −${formatVolume(detail.volume)}`)
-      lines.push(`Net Available/mo:      ${formatVolume(avail.netPerMonth)}`)
-    }
-    return lines.join('\n')
-  }, [])
-
   // Net Avail/mo renderer
   const netAvailMonthRenderer = useCallback((params: ICellRendererParams) => {
     const detail = params.data as SellerRFPDetail
@@ -233,26 +209,16 @@ export function DetailsFormulasTab({
     }
 
     const color = getAvailabilityColor(avail.netPerMonth, detail.volume)
-    const tooltipContent = buildSourceTooltip(detail, avail)
     const displayValue = avail.hasVolume ? avail.netPerMonth : avail.availablePerMonth
-    const icon = avail.netPerMonth !== null && avail.netPerMonth > 0
-      ? <CheckCircleFilled style={{ fontSize: 10, marginLeft: 4 }} />
-      : avail.netPerMonth !== null && avail.netPerMonth <= 0
-        ? <CloseCircleFilled style={{ fontSize: 10, marginLeft: 4 }} />
-        : null
 
     return (
-      <Tooltip
-        title={<pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '11px', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{tooltipContent}</pre>}
-        overlayStyle={{ maxWidth: 420 }}
-      >
-        <span style={{ color: availColorMap[color], fontWeight: 600, cursor: 'default' }}>
+      <AvailabilityPopover detail={detail} avail={avail}>
+        <span style={{ color: availColorMap[color], fontWeight: 600, cursor: 'pointer' }}>
           {formatVolume(displayValue)}
-          {icon}
         </span>
-      </Tooltip>
+      </AvailabilityPopover>
     )
-  }, [rfp.terms, buildSourceTooltip])
+  }, [rfp.terms])
 
   // Net Avail/Term renderer
   const netAvailTermRenderer = useCallback((params: ICellRendererParams) => {
