@@ -16,6 +16,7 @@ import type {
   PastBidReference,
   TerminalProductStats,
   MarginHistoryPoint,
+  BenchmarkType,
 } from '../types/sellerRfp.types'
 import type { InventoryCapacity, DetailAvailability } from '../types/sellerRfp.types'
 import { formatFormulaDisplay, LOSS_REASON_OPTIONS } from '../types/sellerRfp.types'
@@ -134,6 +135,53 @@ function resolvePrice(formula: Formula | null, product: string): number | null {
 }
 
 // =============================================================================
+// BENCHMARK PRICES
+// =============================================================================
+
+export const BENCHMARK_PRICES: Record<string, Record<BenchmarkType, number>> = {
+  'CBOB USGC': {
+    'opis-low': 2.2850,
+    'opis-average': 2.3250,
+    'spot': 2.3100,
+    'opis-contract-low': 2.2700,
+    'opis-contract-2nd-low': 2.2780,
+  },
+  'RBOB USGC': {
+    'opis-low': 2.3950,
+    'opis-average': 2.4350,
+    'spot': 2.4200,
+    'opis-contract-low': 2.3800,
+    'opis-contract-2nd-low': 2.3880,
+  },
+  'ULSD USGC': {
+    'opis-low': 2.2450,
+    'opis-average': 2.2850,
+    'spot': 2.2700,
+    'opis-contract-low': 2.2300,
+    'opis-contract-2nd-low': 2.2380,
+  },
+}
+
+export function resolveBenchmarkPrice(product: string, benchmarkType: BenchmarkType): number | null {
+  const pi = PRODUCT_INSTRUMENTS[product]
+  if (!pi) return null
+  const instrumentPrices = BENCHMARK_PRICES[pi.instrument]
+  if (!instrumentPrices) return null
+  return instrumentPrices[benchmarkType] ?? null
+}
+
+export function calculateBenchmarkDelta(
+  salePrice: number | null,
+  product: string,
+  benchmarkType: BenchmarkType,
+): number | null {
+  if (salePrice === null) return null
+  const benchmarkPrice = resolveBenchmarkPrice(product, benchmarkType)
+  if (benchmarkPrice === null) return null
+  return Math.round((salePrice - benchmarkPrice) * 10000) / 10000
+}
+
+// =============================================================================
 // DETAIL ROW GENERATORS
 // =============================================================================
 
@@ -146,7 +194,7 @@ function createDetail(
   costDiff: number | null,
   saleDiff: number | null,
   volume: number | null,
-  overrides?: { costFormula?: Formula; saleFormula?: Formula; priorRoundValues?: PriorRoundSnapshot },
+  overrides?: { costFormula?: Formula; saleFormula?: Formula; priorRoundValues?: PriorRoundSnapshot; formulaDiff?: number | null },
 ): SellerRFPDetail {
   const id = `detail-${detailIdCounter++}`
   const pi = PRODUCT_INSTRUMENTS[product] || { instrument: 'CBOB USGC', productGroup: 'gasoline' }
@@ -156,8 +204,11 @@ function createDetail(
   const saleFormula = overrides?.saleFormula ??
     (saleDiff !== null ? createFormula('OPIS', pi.instrument, 'Low', saleDiff) : null)
 
+  const formulaDiff = overrides?.formulaDiff ?? null
+
   const costPrice = resolvePrice(costFormula, product)
-  const salePrice = resolvePrice(saleFormula, product)
+  const rawSalePrice = resolvePrice(saleFormula, product)
+  const salePrice = rawSalePrice !== null ? Math.round((rawSalePrice + (formulaDiff ?? 0)) * 10000) / 10000 : null
 
   let margin: number | null = null
   if (costPrice !== null && salePrice !== null) {
@@ -176,6 +227,7 @@ function createDetail(
     costFormula,
     costPrice,
     saleFormula,
+    formulaDiff,
     salePrice,
     margin,
     volume,
@@ -224,11 +276,11 @@ export const SAMPLE_SELLER_RFPS: SellerRFP[] = [
     currentRound: 1,
     status: 'in-progress',
     details: [
-      createDetail('87 Octane', 'Houston Terminal', 'inventory', -0.020, 0.015, 200000),
-      createDetail('87 Octane', 'Pasadena Terminal', 'inventory', -0.018, 0.018, 180000),
-      createDetail('93 Octane', 'Houston Terminal', 'contract', -0.010, 0.025, 100000),
+      createDetail('87 Octane', 'Houston Terminal', 'inventory', -0.020, 0.015, 200000, { formulaDiff: 0.005 }),
+      createDetail('87 Octane', 'Pasadena Terminal', 'inventory', -0.018, 0.018, 180000, { formulaDiff: -0.003 }),
+      createDetail('93 Octane', 'Houston Terminal', 'contract', -0.010, 0.025, 100000, { formulaDiff: 0.01 }),
       createDetail('93 Octane', 'Pasadena Terminal', 'contract', -0.010, null, 90000),
-      createDetail('ULSD', 'Houston Terminal', 'estimated', 0.005, 0.035, 150000),
+      createDetail('ULSD', 'Houston Terminal', 'estimated', 0.005, 0.035, 150000, { formulaDiff: 0 }),
       createDetail('ULSD', 'Pasadena Terminal', null, null, null, null),
     ],
     terms: {
@@ -353,16 +405,19 @@ export const SAMPLE_SELLER_RFPS: SellerRFP[] = [
     status: 'in-progress',
     details: [
       createDetail('87 Octane', 'Houston Terminal', 'inventory', -0.020, 0.012, 220000, {
-        priorRoundValues: { costPrice: 2.2800, salePrice: 2.3200, margin: 4.00, saleFormulaDisplay: 'OPIS CBOB USGC Low + $0.020', volume: 200000 },
+        formulaDiff: 0.005,
+        priorRoundValues: { costPrice: 2.2800, salePrice: 2.3200, margin: 4.00, saleFormulaDisplay: 'OPIS CBOB USGC Low + $0.020', formulaDiff: 0.008, volume: 200000 },
       }),
       createDetail('93 Octane', 'Houston Terminal', 'contract', -0.012, 0.020, 120000, {
-        priorRoundValues: { costPrice: 2.4080, salePrice: 2.4500, margin: 4.20, saleFormulaDisplay: 'OPIS RBOB USGC Low + $0.030', volume: 100000 },
+        formulaDiff: -0.002,
+        priorRoundValues: { costPrice: 2.4080, salePrice: 2.4500, margin: 4.20, saleFormulaDisplay: 'OPIS RBOB USGC Low + $0.030', formulaDiff: null, volume: 100000 },
       }),
       createDetail('ULSD', 'Houston Terminal', 'estimated', 0.005, 0.030, 160000, {
-        priorRoundValues: { costPrice: 2.2650, salePrice: 2.3000, margin: 3.50, saleFormulaDisplay: 'OPIS ULSD USGC Low + $0.040', volume: 150000 },
+        formulaDiff: 0.003,
+        priorRoundValues: { costPrice: 2.2650, salePrice: 2.3000, margin: 3.50, saleFormulaDisplay: 'OPIS ULSD USGC Low + $0.040', formulaDiff: 0.003, volume: 150000 },
       }),
       createDetail('87 Octane', 'Beaumont Terminal', 'inventory', -0.022, 0.010, 200000, {
-        priorRoundValues: { costPrice: 2.2780, salePrice: 2.3180, margin: 4.00, saleFormulaDisplay: 'OPIS CBOB USGC Low + $0.018', volume: 180000 },
+        priorRoundValues: { costPrice: 2.2780, salePrice: 2.3180, margin: 4.00, saleFormulaDisplay: 'OPIS CBOB USGC Low + $0.018', formulaDiff: null, volume: 180000 },
       }),
     ],
     terms: {

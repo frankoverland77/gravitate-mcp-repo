@@ -46,6 +46,41 @@ export interface DeclineMetadata {
 }
 
 // =============================================================================
+// BENCHMARK TYPES
+// =============================================================================
+
+export type BenchmarkType = 'opis-low' | 'opis-average' | 'spot' | 'opis-contract-low' | 'opis-contract-2nd-low'
+
+export const BENCHMARK_LABELS: Record<BenchmarkType, string> = {
+  'opis-low': 'OPIS Low',
+  'opis-average': 'OPIS Avg',
+  'spot': 'Spot',
+  'opis-contract-low': 'Contract Low',
+  'opis-contract-2nd-low': 'Contract 2nd',
+}
+
+export const BENCHMARK_TYPES: BenchmarkType[] = [
+  'opis-low',
+  'opis-average',
+  'spot',
+  'opis-contract-low',
+  'opis-contract-2nd-low',
+]
+
+export function formatBenchmarkDelta(delta: number | null): string {
+  if (delta === null) return '—'
+  const prefix = delta > 0 ? '+' : delta < 0 ? '-' : ''
+  return `${prefix}$${Math.abs(delta).toFixed(4)}`
+}
+
+export function getBenchmarkDeltaColor(delta: number | null): string {
+  if (delta === null) return '#8c8c8c'
+  if (delta > 0) return '#ff4d4f'
+  if (delta < 0) return '#52c41a'
+  return '#8c8c8c'
+}
+
+// =============================================================================
 // CORE ENTITIES
 // =============================================================================
 
@@ -73,7 +108,8 @@ export interface SellerRFPDetail {
   costFormula: Formula | null
   costPrice: number | null // resolved $/gal
   saleFormula: Formula | null
-  salePrice: number | null // resolved $/gal
+  formulaDiff: number | null // $/gal differential on resolved formula price
+  salePrice: number | null // resolved $/gal (includes formulaDiff)
   margin: number | null // salePrice - costPrice in cpg (cents per gallon)
   volume: number | null // gal/month
   status: SellerDetailStatus
@@ -107,6 +143,7 @@ export interface PriorRoundSnapshot {
   salePrice: number | null
   margin: number | null
   saleFormulaDisplay: string | null
+  formulaDiff: number | null
   volume: number | null
 }
 
@@ -281,6 +318,15 @@ export function formatMarginCpg(marginCpg: number | null): string {
   const dollarValue = marginCpg / 100
   if (dollarValue < 0) return `-$${Math.abs(dollarValue).toFixed(4)}`
   return `$${dollarValue.toFixed(4)}`
+}
+
+/**
+ * Format formula diff in $/gal with 4 decimal places
+ */
+export function formatFormulaDiff(diff: number | null): string {
+  if (diff === null) return '—'
+  if (diff < 0) return `-$${Math.abs(diff).toFixed(4)}`
+  return `$${diff.toFixed(4)}`
 }
 
 /**

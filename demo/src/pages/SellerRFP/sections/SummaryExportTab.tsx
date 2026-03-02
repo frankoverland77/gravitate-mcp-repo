@@ -5,6 +5,7 @@ import type { SellerRFP } from '../types/sellerRfp.types'
 import {
   formatPrice,
   formatMarginCpg,
+  formatFormulaDiff,
   formatVolume,
   getMarginColor,
   COST_TYPE_LABELS,
@@ -147,6 +148,7 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
                 <th>Cost Type</th>
                 <th>Cost Price</th>
                 <th>Sale Formula</th>
+                <th>Formula Diff</th>
                 <th>Sale Price</th>
                 <th>Margin</th>
                 <th>Volume</th>
@@ -176,6 +178,7 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
                     </td>
                     <td><Texto category="p2">{formatPrice(detail.costPrice)}</Texto></td>
                     <td><Texto category="p2" appearance="medium">{formatFormulaDisplay(detail.saleFormula) || '—'}</Texto></td>
+                    <td><Texto category="p2" style={{ fontWeight: 500 }}>{formatFormulaDiff(detail.formulaDiff)}</Texto></td>
                     <td><Texto category="p2">{formatPrice(detail.salePrice)}</Texto></td>
                     <td>
                       <Texto

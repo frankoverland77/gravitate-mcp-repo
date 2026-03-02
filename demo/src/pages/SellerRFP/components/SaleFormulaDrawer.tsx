@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { CaretDownOutlined, CloseOutlined, CopyOutlined, SnippetsOutlined, FileTextOutlined } from '@ant-design/icons'
-import { Drawer, Input, Segmented } from 'antd'
+import { Drawer, Input, InputNumber, Segmented } from 'antd'
 import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable, PastBidReference, TerminalProductStats, MarginHistoryPoint } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
@@ -281,6 +281,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
   const [showTemplateChooser, setShowTemplateChooser] = useState(false)
   const [displayNameOverride, setDisplayNameOverride] = useState<string | null>(null)
   const [showAllBids, setShowAllBids] = useState(false)
+  const [localFormulaDiff, setLocalFormulaDiff] = useState<number | null>(null)
 
   // Template context
   const { templates } = useFormulaTemplateContext()
@@ -309,6 +310,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
       setMode('formula')
       setDisplayNameOverride(null)
     }
+    setLocalFormulaDiff(detail?.formulaDiff ?? null)
     setShowTemplateChooser(false)
     setShowAllBids(false)
   }, [detail])
@@ -318,10 +320,15 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     return resolveFormulaPrice(variables, detail.product, mode)
   }, [variables, detail, mode])
 
+  const effectiveSalePrice = useMemo(() => {
+    if (resolvedPrice === null) return null
+    return Math.round((resolvedPrice + (localFormulaDiff ?? 0)) * 10000) / 10000
+  }, [resolvedPrice, localFormulaDiff])
+
   const currentMargin = useMemo(() => {
-    if (!detail || resolvedPrice === null) return null
-    return calculateMarginCpg(resolvedPrice, detail.costPrice)
-  }, [resolvedPrice, detail])
+    if (!detail || effectiveSalePrice === null) return null
+    return calculateMarginCpg(effectiveSalePrice, detail.costPrice)
+  }, [effectiveSalePrice, detail])
 
   // Intelligence data
   const pastBids = useMemo<PastBidReference[]>(() => {
@@ -442,15 +449,17 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     }
 
     const resolved = resolveFormulaPrice(variables, detail.product, mode)
-    const margin = calculateMarginCpg(resolved, detail.costPrice)
+    const salePriceWithDiff = resolved !== null ? Math.round((resolved + (localFormulaDiff ?? 0)) * 10000) / 10000 : null
+    const margin = calculateMarginCpg(salePriceWithDiff, detail.costPrice)
 
     onApply({
       ...detail,
       saleFormula: formula,
-      salePrice: resolved ? Math.round(resolved * 10000) / 10000 : null,
+      formulaDiff: localFormulaDiff,
+      salePrice: salePriceWithDiff,
       margin,
     })
-  }, [detail, variables, mode, onApply, displayNameOverride])
+  }, [detail, variables, mode, onApply, displayNameOverride, localFormulaDiff])
 
   if (!detail) return null
 
@@ -538,7 +547,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                   <Vertical style={{ flex: 1, padding: '8px', backgroundColor: '#fff', gap: '2px' }}>
                     <Texto category="p3" appearance="medium" style={{ fontSize: '10px' }}>Sale</Texto>
                     <Texto category="p1" weight="600">
-                      {resolvedPrice !== null ? formatPrice(resolvedPrice) : '—'}
+                      {effectiveSalePrice !== null ? formatPrice(effectiveSalePrice) : '—'}
                     </Texto>
                   </Vertical>
                   {/* Margin */}
@@ -752,6 +761,26 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                   {buildFormulaExpression(variables, mode) || 'Configure variables above'}
                 </Texto>
               )}
+            </Vertical>
+
+            {/* Formula Diff Input */}
+            <Vertical style={{ gap: '4px' }}>
+              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+                <Texto category="p3" appearance="medium">Formula Diff</Texto>
+                <Texto category="p3" appearance="medium" style={{ fontSize: '10px', color: '#bfbfbf' }}>
+                  Applied to resolved formula price
+                </Texto>
+              </Horizontal>
+              <InputNumber
+                size="small"
+                prefix="$"
+                precision={4}
+                step={0.001}
+                value={localFormulaDiff}
+                onChange={(value) => setLocalFormulaDiff(value)}
+                placeholder="0.0000"
+                style={{ width: '160px', fontFamily: 'monospace' }}
+              />
             </Vertical>
           </Vertical>
         </div>

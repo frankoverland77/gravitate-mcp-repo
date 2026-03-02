@@ -111,6 +111,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
         costFormula: null,
         costPrice: null,
         saleFormula: null,
+        formulaDiff: null,
         salePrice: null,
         margin: null,
         volume: row.volume,

@@ -103,6 +103,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
       costFormula: includeCostData ? d.costFormula : null,
       costPrice: includeCostData ? d.costPrice : null,
       saleFormula: includeFormulas ? d.saleFormula : null,
+      formulaDiff: includeFormulas ? d.formulaDiff : null,
       salePrice: includeFormulas ? d.salePrice : null,
       margin: includeFormulas && includeCostData ? d.margin : null,
       volume: d.volume,

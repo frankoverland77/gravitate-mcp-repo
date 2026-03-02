@@ -122,6 +122,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
       costFormula: null,
       costPrice: null,
       saleFormula: null,
+      formulaDiff: null,
       salePrice: null,
       margin: null,
       volume: null,

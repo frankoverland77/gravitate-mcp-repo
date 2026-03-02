@@ -276,6 +276,7 @@ export function SellerRFPPage() {
             salePrice: d.salePrice,
             margin: d.margin,
             saleFormulaDisplay: d.saleFormula ? d.saleFormula.expression : null,
+            formulaDiff: d.formulaDiff,
             volume: d.volume,
           },
         }))

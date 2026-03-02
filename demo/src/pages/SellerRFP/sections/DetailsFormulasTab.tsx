@@ -3,15 +3,21 @@ import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, BBDTag } from '@gr
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Select, Tooltip } from 'antd'
 import type { ColDef, ICellRendererParams, ValueGetterParams, GetContextMenuItemsParams } from 'ag-grid-community'
-import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable } from '../types/sellerRfp.types'
+import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable, BenchmarkType } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
   COST_TYPE_COLORS,
   DETAIL_STATUS_LABELS,
+  BENCHMARK_LABELS,
+  BENCHMARK_TYPES,
   formatPrice,
   formatMarginCpg,
+  formatFormulaDiff,
   formatFormulaDisplay,
+  formatBenchmarkDelta,
+  getBenchmarkDeltaColor,
   getMarginColor,
+  calculateMarginCpg,
   formatVolume,
   formatVolumeTotal,
   getAvailabilityColor,
@@ -19,7 +25,7 @@ import {
 import { CostTypePopover } from '../components/CostTypePopover'
 import { AvailabilityPopover } from '../components/AvailabilityPopover'
 import { SaleFormulaDrawer } from '../components/SaleFormulaDrawer'
-import { SELLER_PRODUCTS, SELLER_TERMINALS, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY, computeDetailAvailability } from '../data/sellerRfp.data'
+import { SELLER_PRODUCTS, SELLER_TERMINALS, SAMPLE_SUPPLY_AGREEMENTS, SAMPLE_INVENTORY_CAPACITY, computeDetailAvailability, resolveBenchmarkPrice, calculateBenchmarkDelta } from '../data/sellerRfp.data'
 import styles from './DetailsFormulasTab.module.css'
 
 // Helpers for fill-handle formula copy
@@ -45,6 +51,49 @@ function cloneFormula(formula: Formula): Formula {
       id: `var-fill-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     })),
   }
+}
+
+function createBenchmarkColumnPair(benchmarkType: BenchmarkType): ColDef[] {
+  const label = BENCHMARK_LABELS[benchmarkType]
+  return [
+    {
+      headerName: label,
+      colId: `benchmark-${benchmarkType}`,
+      width: 120,
+      hide: true,
+      sortable: true,
+      valueGetter: (params: ValueGetterParams) => {
+        const detail = params.data as SellerRFPDetail
+        if (!detail?.product) return null
+        return resolveBenchmarkPrice(detail.product, benchmarkType)
+      },
+      cellRenderer: (params: ICellRendererParams) => {
+        const value = params.value as number | null
+        return <span>{formatPrice(value)}</span>
+      },
+    },
+    {
+      headerName: `${label} Δ`,
+      colId: `benchmark-delta-${benchmarkType}`,
+      width: 120,
+      hide: true,
+      sortable: true,
+      valueGetter: (params: ValueGetterParams) => {
+        const detail = params.data as SellerRFPDetail
+        if (!detail?.product || detail.salePrice === null) return null
+        return calculateBenchmarkDelta(detail.salePrice, detail.product, benchmarkType)
+      },
+      cellRenderer: (params: ICellRendererParams) => {
+        const value = params.value as number | null
+        const color = getBenchmarkDeltaColor(value)
+        return (
+          <span style={{ color, fontWeight: 600 }}>
+            {formatBenchmarkDelta(value)}
+          </span>
+        )
+      },
+    },
+  ]
 }
 
 interface DetailsFormulasTabProps {
@@ -355,14 +404,42 @@ export function DetailsFormulasTab({
           const cloned = cloneFormula(source as Formula)
           const price = resolveFormulaPrice((source as Formula).variables, params.data.product)
           params.data.saleFormula = cloned
-          params.data.salePrice = price ? Math.round(price * 10000) / 10000 : null
-          params.data.margin = params.data.salePrice != null && params.data.costPrice != null
-            ? params.data.salePrice - params.data.costPrice : null
+          const resolvedPrice = price ? Math.round(price * 10000) / 10000 : null
+          params.data.salePrice = resolvedPrice !== null ? Math.round((resolvedPrice + (params.data.formulaDiff ?? 0)) * 10000) / 10000 : null
+          params.data.margin = calculateMarginCpg(params.data.salePrice, params.data.costPrice)
+          return true
+        },
+      },
+      {
+        headerName: 'Formula Diff',
+        field: 'formulaDiff',
+        width: 110,
+        editable: true,
+        cellRenderer: (params: ICellRendererParams) => {
+          const detail = params.data as SellerRFPDetail
+          if (!detail) return null
+          return (
+            <span style={{ fontWeight: 500 }}>{formatFormulaDiff(detail.formulaDiff)}</span>
+          )
+        },
+        valueSetter: (params) => {
+          const raw = params.newValue
+          const parsed = raw === '' || raw === null || raw === undefined ? null : parseFloat(raw)
+          const newValue = parsed !== null && !isNaN(parsed) ? parsed : null
+          params.data.formulaDiff = newValue
+          if (params.data.saleFormula) {
+            const price = resolveFormulaPrice(params.data.saleFormula.variables, params.data.product)
+            const resolvedPrice = price ? Math.round(price * 10000) / 10000 : null
+            params.data.salePrice = resolvedPrice !== null ? Math.round((resolvedPrice + (newValue ?? 0)) * 10000) / 10000 : null
+          }
+          params.data.margin = calculateMarginCpg(params.data.salePrice, params.data.costPrice)
           return true
         },
       },
       { headerName: 'Sale Price', field: 'salePrice', width: 100, cellRenderer: priceRenderer },
       { headerName: 'Margin', field: 'margin', width: 110, cellRenderer: marginRenderer },
+      // Benchmark columns (hidden by default — toggle via column menu)
+      ...BENCHMARK_TYPES.flatMap((bt) => createBenchmarkColumnPair(bt)),
       {
         headerName: 'Volume',
         field: 'volume',
@@ -423,6 +500,7 @@ export function DetailsFormulasTab({
       costFormula: null,
       costPrice: null,
       saleFormula: null,
+      formulaDiff: null,
       salePrice: null,
       margin: null,
       volume: null,
