@@ -2,8 +2,8 @@ import { useMemo, useCallback, useRef } from 'react'
 import { Vertical, Horizontal, Texto, GraviGrid, GraviButton, BBDTag } from '@gravitate-js/excalibrr'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Select, Tooltip } from 'antd'
-import type { ColDef, ICellRendererParams, ValueGetterParams, GetContextMenuItemsParams } from 'ag-grid-community'
-import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable, BenchmarkType } from '../types/sellerRfp.types'
+import type { ColDef, ColGroupDef, ICellRendererParams, ValueGetterParams, GetContextMenuItemsParams } from 'ag-grid-community'
+import type { SellerRFP, SellerRFPDetail, RFPRoundHistory, Formula, FormulaVariable, BenchmarkType } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
   COST_TYPE_COLORS,
@@ -94,6 +94,19 @@ function createBenchmarkColumnPair(benchmarkType: BenchmarkType): ColDef[] {
       },
     },
   ]
+}
+
+function getPriorRoundValue(
+  rounds: RFPRoundHistory[],
+  roundNumber: number,
+  detailId: string,
+  field: 'salePrice' | 'margin'
+): number | null {
+  const roundHistory = rounds.find(r => r.round === roundNumber)
+  if (!roundHistory?.detailSnapshot) return null
+  const priorDetail = roundHistory.detailSnapshot.find(d => d.id === detailId)
+  if (!priorDetail) return null
+  return priorDetail[field]
 }
 
 interface DetailsFormulasTabProps {
@@ -209,8 +222,30 @@ export function DetailsFormulasTab({
 
     if (hasRoundDiffs && detail.priorRoundValues?.margin != null && detail.margin != null) {
       const diff = detail.margin - detail.priorRoundValues.margin
+
+      // Build multi-round progression tooltip
+      const advancedRounds = rfp.rounds.filter(r => r.adjudication === 'advanced')
+      let tooltipText: string
+
+      if (advancedRounds.length >= 2) {
+        // Round 3+: show full progression
+        const parts: string[] = []
+        for (const r of advancedRounds) {
+          const rMargin = getPriorRoundValue(rfp.rounds, r.round, detail.id, 'margin')
+          if (rMargin != null) {
+            parts.push(`R${r.round}: ${formatMarginCpg(rMargin)}`)
+          }
+        }
+        parts.push(`R${rfp.currentRound}: ${formatMarginCpg(detail.margin)}`)
+        const lastDiff = diff >= 0 ? `+${formatMarginCpg(diff)}` : formatMarginCpg(diff)
+        tooltipText = `${parts.join(' → ')} (R${rfp.currentRound - 1}→R${rfp.currentRound}: ${lastDiff})`
+      } else {
+        // Round 2: simple comparison
+        tooltipText = `R${rfp.currentRound - 1}: ${formatMarginCpg(detail.priorRoundValues.margin)} → R${rfp.currentRound}: ${formatMarginCpg(detail.margin)} (${diff >= 0 ? '+' : ''}${formatMarginCpg(diff)})`
+      }
+
       return (
-        <Tooltip title={`R${rfp.currentRound - 1}: ${formatMarginCpg(detail.priorRoundValues.margin)} → R${rfp.currentRound}: ${formatMarginCpg(detail.margin)} (${diff >= 0 ? '+' : ''}${formatMarginCpg(diff)})`}>
+        <Tooltip title={tooltipText}>
           <Horizontal alignItems="center" style={{ gap: '4px' }}>
             {display}
             <span className={styles['diff-indicator']} style={{ color: diff >= 0 ? '#52c41a' : '#ff4d4f' }}>
@@ -222,7 +257,7 @@ export function DetailsFormulasTab({
     }
 
     return display
-  }, [hasRoundDiffs, rfp.currentRound])
+  }, [hasRoundDiffs, rfp.currentRound, rfp.rounds])
 
   // Volume renderer (editable)
   const volumeRenderer = useCallback((params: ICellRendererParams) => {
@@ -366,7 +401,69 @@ export function DetailsFormulasTab({
     )
   }, [rfp.details, onDetailsReplace])
 
-  const columnDefs: ColDef[] = useMemo(
+  // Generate prior round columns dynamically
+  const advancedRounds = useMemo(
+    () => rfp.rounds.filter(r => r.adjudication === 'advanced'),
+    [rfp.rounds],
+  )
+
+  const priorRoundColumns: ColDef[] = useMemo(() => {
+    return advancedRounds.flatMap((roundHistory): ColDef[] => {
+      const rn = roundHistory.round
+      return [
+        {
+          headerName: `R${rn} Sale`,
+          colId: `prior-r${rn}-sale`,
+          width: 100,
+          sortable: true,
+          editable: false,
+          valueGetter: (params: ValueGetterParams) => {
+            const detail = params.data as SellerRFPDetail
+            if (!detail) return null
+            return getPriorRoundValue(rfp.rounds, rn, detail.id, 'salePrice')
+          },
+          cellRenderer: (params: ICellRendererParams) => {
+            const value = params.value as number | null
+            return <span style={{ color: '#8c8c8c' }}>{value != null ? formatPrice(value) : '—'}</span>
+          },
+        },
+        {
+          headerName: `R${rn} Margin`,
+          colId: `prior-r${rn}-margin`,
+          width: 100,
+          sortable: true,
+          editable: false,
+          valueGetter: (params: ValueGetterParams) => {
+            const detail = params.data as SellerRFPDetail
+            if (!detail) return null
+            return getPriorRoundValue(rfp.rounds, rn, detail.id, 'margin')
+          },
+          cellRenderer: (params: ICellRendererParams) => {
+            const value = params.value as number | null
+            if (value == null) return <span style={{ color: '#8c8c8c' }}>—</span>
+            const color = getMarginColor(value)
+            const colorMap = { green: '#52c41a', yellow: '#faad14', red: '#ff4d4f', neutral: '#8c8c8c' }
+            return (
+              <span style={{ color: colorMap[color], fontWeight: 600, opacity: 0.6 }}>
+                {formatMarginCpg(value)}
+              </span>
+            )
+          },
+        },
+      ]
+    })
+  }, [advancedRounds, rfp.rounds])
+
+  const priorRoundGroup: ColGroupDef[] = useMemo(() => {
+    if (priorRoundColumns.length === 0) return []
+    return [{
+      headerName: 'Prior Rounds',
+      headerClass: styles['prior-rounds-header'],
+      children: priorRoundColumns,
+    }]
+  }, [priorRoundColumns])
+
+  const columnDefs: (ColDef | ColGroupDef)[] = useMemo(
     () => [
       { headerName: 'Product', field: 'product', width: 140, pinned: 'left', cellRenderer: productRenderer },
       { headerName: 'Terminal', field: 'terminal', width: 170, pinned: 'left', cellRenderer: terminalRenderer },
@@ -438,6 +535,8 @@ export function DetailsFormulasTab({
       },
       { headerName: 'Sale Price', field: 'salePrice', width: 100, cellRenderer: priceRenderer },
       { headerName: 'Margin', field: 'margin', width: 110, cellRenderer: marginRenderer },
+      // Prior round benchmark columns (dynamic — only present in Round 2+)
+      ...priorRoundGroup,
       // Benchmark columns (hidden by default — toggle via column menu)
       ...BENCHMARK_TYPES.flatMap((bt) => createBenchmarkColumnPair(bt)),
       {
@@ -487,7 +586,7 @@ export function DetailsFormulasTab({
       { headerName: 'Status', field: 'status', width: 100, cellRenderer: statusRenderer },
       { headerName: '', field: 'actions', width: 50, cellRenderer: deleteRenderer, sortable: false, filter: false, resizable: false, suppressHeaderMenuButton: true },
     ],
-    [productRenderer, terminalRenderer, costTypeRenderer, costFormulaRenderer, priceRenderer, saleFormulaRenderer, marginRenderer, volumeRenderer, netAvailMonthRenderer, netAvailTermRenderer, statusRenderer, deleteRenderer, onDetailUpdate, rfp.terms],
+    [productRenderer, terminalRenderer, costTypeRenderer, costFormulaRenderer, priceRenderer, saleFormulaRenderer, marginRenderer, priorRoundGroup, volumeRenderer, netAvailMonthRenderer, netAvailTermRenderer, statusRenderer, deleteRenderer, onDetailUpdate, rfp.terms],
   )
 
   // Add empty detail row
@@ -578,10 +677,11 @@ export function DetailsFormulasTab({
     onCloseSaleFormula()
   }, [onDetailUpdate, onCloseSaleFormula])
 
-  // Round diff summary
+  // Round diff summary (includes formulaDiff as primary lever between rounds)
   const changedCount = hasRoundDiffs
     ? rfp.details.filter((d) => d.priorRoundValues && (
       d.salePrice !== d.priorRoundValues.salePrice ||
+      d.formulaDiff !== d.priorRoundValues.formulaDiff ||
       d.volume !== d.priorRoundValues.volume
     )).length
     : 0
@@ -592,7 +692,7 @@ export function DetailsFormulasTab({
       {hasRoundDiffs && changedCount > 0 && (
         <div className={styles['diff-banner']}>
           <Texto category="p2">
-            {changedCount} detail{changedCount !== 1 ? 's' : ''} changed from Round {rfp.currentRound - 1}. Look for ▲▼ indicators in the Margin column.
+            {changedCount} detail{changedCount !== 1 ? 's' : ''} changed from Round {rfp.currentRound - 1}. Compare against the R{rfp.currentRound - 1} Sale and R{rfp.currentRound - 1} Margin columns.
           </Texto>
         </div>
       )}

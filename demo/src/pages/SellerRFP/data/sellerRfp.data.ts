@@ -194,9 +194,9 @@ function createDetail(
   costDiff: number | null,
   saleDiff: number | null,
   volume: number | null,
-  overrides?: { costFormula?: Formula; saleFormula?: Formula; priorRoundValues?: PriorRoundSnapshot; formulaDiff?: number | null },
+  overrides?: { id?: string; costFormula?: Formula; saleFormula?: Formula; priorRoundValues?: PriorRoundSnapshot; formulaDiff?: number | null },
 ): SellerRFPDetail {
-  const id = `detail-${detailIdCounter++}`
+  const id = overrides?.id ?? `detail-${detailIdCounter++}`
   const pi = PRODUCT_INSTRUMENTS[product] || { instrument: 'CBOB USGC', productGroup: 'gasoline' }
 
   const costFormula = overrides?.costFormula ??
@@ -405,18 +405,22 @@ export const SAMPLE_SELLER_RFPS: SellerRFP[] = [
     status: 'in-progress',
     details: [
       createDetail('87 Octane', 'Houston Terminal', 'inventory', -0.020, 0.012, 220000, {
+        id: 'sheetz-d1',
         formulaDiff: 0.005,
         priorRoundValues: { costPrice: 2.2800, salePrice: 2.3200, margin: 4.00, saleFormulaDisplay: 'OPIS CBOB USGC Low + $0.020', formulaDiff: 0.008, volume: 200000 },
       }),
       createDetail('93 Octane', 'Houston Terminal', 'contract', -0.012, 0.020, 120000, {
+        id: 'sheetz-d2',
         formulaDiff: -0.002,
         priorRoundValues: { costPrice: 2.4080, salePrice: 2.4500, margin: 4.20, saleFormulaDisplay: 'OPIS RBOB USGC Low + $0.030', formulaDiff: null, volume: 100000 },
       }),
       createDetail('ULSD', 'Houston Terminal', 'estimated', 0.005, 0.030, 160000, {
+        id: 'sheetz-d3',
         formulaDiff: 0.003,
         priorRoundValues: { costPrice: 2.2650, salePrice: 2.3000, margin: 3.50, saleFormulaDisplay: 'OPIS ULSD USGC Low + $0.040', formulaDiff: 0.003, volume: 150000 },
       }),
       createDetail('87 Octane', 'Beaumont Terminal', 'inventory', -0.022, 0.010, 200000, {
+        id: 'sheetz-d4',
         priorRoundValues: { costPrice: 2.2780, salePrice: 2.3180, margin: 4.00, saleFormulaDisplay: 'OPIS CBOB USGC Low + $0.018', formulaDiff: null, volume: 180000 },
       }),
     ],
@@ -439,10 +443,10 @@ export const SAMPLE_SELLER_RFPS: SellerRFP[] = [
         adjudicationReason: null,
         adjudicationNotes: 'Buyer requested tighter pricing on gasoline grades.',
         detailSnapshot: [
-          createDetail('87 Octane', 'Houston Terminal', 'inventory', -0.020, 0.020, 200000),
-          createDetail('93 Octane', 'Houston Terminal', 'contract', -0.012, 0.030, 100000),
-          createDetail('ULSD', 'Houston Terminal', 'estimated', 0.005, 0.040, 150000),
-          createDetail('87 Octane', 'Beaumont Terminal', 'inventory', -0.022, 0.018, 180000),
+          createDetail('87 Octane', 'Houston Terminal', 'inventory', -0.020, 0.020, 200000, { id: 'sheetz-d1' }),
+          createDetail('93 Octane', 'Houston Terminal', 'contract', -0.012, 0.030, 100000, { id: 'sheetz-d2' }),
+          createDetail('ULSD', 'Houston Terminal', 'estimated', 0.005, 0.040, 150000, { id: 'sheetz-d3' }),
+          createDetail('87 Octane', 'Beaumont Terminal', 'inventory', -0.022, 0.018, 180000, { id: 'sheetz-d4' }),
         ],
       },
     ],

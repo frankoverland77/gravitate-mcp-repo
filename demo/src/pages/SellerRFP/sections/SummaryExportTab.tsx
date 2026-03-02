@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
 import { FileExcelOutlined, FilePdfOutlined, CopyOutlined } from '@ant-design/icons'
-import type { SellerRFP } from '../types/sellerRfp.types'
+import type { SellerRFP, RFPRoundHistory } from '../types/sellerRfp.types'
 import {
   formatPrice,
   formatMarginCpg,
@@ -55,6 +55,20 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
 
   const handleCopy = () => {
     NotificationMessage('Copied', 'Summary copied to clipboard.', false)
+  }
+
+  // Determine prior rounds with 'advanced' adjudication
+  const advancedRounds = useMemo(
+    () => rfp.rounds.filter((r: RFPRoundHistory) => r.adjudication === 'advanced'),
+    [rfp.rounds],
+  )
+
+  const getPriorValue = (roundNumber: number, detailId: string, field: 'salePrice' | 'margin'): number | null => {
+    const roundHistory = rfp.rounds.find(r => r.round === roundNumber)
+    if (!roundHistory?.detailSnapshot) return null
+    const priorDetail = roundHistory.detailSnapshot.find(d => d.id === detailId)
+    if (!priorDetail) return null
+    return priorDetail[field]
   }
 
   const allocationLabel = rfp.terms.allocationPeriod
@@ -151,6 +165,12 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
                 <th>Formula Diff</th>
                 <th>Sale Price</th>
                 <th>Margin</th>
+                {advancedRounds.map((r) => (
+                  <th key={`prior-sale-${r.round}`} className={styles['prior-round-header']}>R{r.round} Sale</th>
+                ))}
+                {advancedRounds.map((r) => (
+                  <th key={`prior-margin-${r.round}`} className={styles['prior-round-header']}>R{r.round} Margin</th>
+                ))}
                 <th>Volume</th>
               </tr>
             </thead>
@@ -191,6 +211,32 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
                         {formatMarginCpg(detail.margin)}
                       </Texto>
                     </td>
+                    {advancedRounds.map((r) => {
+                      const priorSale = getPriorValue(r.round, detail.id, 'salePrice')
+                      return (
+                        <td key={`prior-sale-${r.round}`}>
+                          <Texto category="p2" style={{ color: '#8c8c8c' }}>{priorSale != null ? formatPrice(priorSale) : '—'}</Texto>
+                        </td>
+                      )
+                    })}
+                    {advancedRounds.map((r) => {
+                      const priorMargin = getPriorValue(r.round, detail.id, 'margin')
+                      const priorMarginColor = getMarginColor(priorMargin)
+                      return (
+                        <td key={`prior-margin-${r.round}`}>
+                          <Texto
+                            category="p2"
+                            weight="600"
+                            style={{
+                              color: priorMarginColor === 'green' ? '#52c41a' : priorMarginColor === 'yellow' ? '#faad14' : priorMarginColor === 'red' ? '#ff4d4f' : '#8c8c8c',
+                              opacity: priorMargin != null ? 0.6 : 1,
+                            }}
+                          >
+                            {priorMargin != null ? formatMarginCpg(priorMargin) : '—'}
+                          </Texto>
+                        </td>
+                      )
+                    })}
                     <td><Texto category="p2">{detail.volume ? `${detail.volume.toLocaleString()}` : '—'}</Texto></td>
                   </tr>
                 )

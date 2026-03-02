@@ -17,7 +17,7 @@ export type { AllocationPeriod, ParameterConfig } from '../../RFP/rfp.types'
 // STATUS & ENUMS
 // =============================================================================
 
-export type SellerRFPStatus = 'draft' | 'in-progress' | 'submitted' | 'won' | 'lost' | 'advanced' | 'declined'
+export type SellerRFPStatus = 'draft' | 'in-progress' | 'submitted' | 'won' | 'lost' | 'partial-win' | 'advanced' | 'declined'
 
 export type CostType = 'inventory' | 'contract' | 'estimated'
 
@@ -43,6 +43,15 @@ export interface DeclineMetadata {
   reason: DeclineReason
   notes: string | null
   declinedAt: string // ISO date
+}
+
+export type DetailOutcome = 'won' | 'lost'
+
+export interface DetailAdjudication {
+  detailId: string
+  outcome: DetailOutcome
+  reason: string | null // WinReason | LossReason
+  notes: string | null
 }
 
 // =============================================================================
@@ -96,6 +105,10 @@ export interface SellerRFP {
   terms: RFPTerms
   rounds: RFPRoundHistory[]
   declineMetadata?: DeclineMetadata | null
+  adjudicationResult?: AdjudicationResult | null
+  adjudicationReason?: string | null
+  adjudicationNotes?: string | null
+  detailAdjudications?: DetailAdjudication[]
   createdAt: string
   updatedAt: string
 }
@@ -135,6 +148,7 @@ export interface RFPRoundHistory {
   adjudication: AdjudicationResult | null
   adjudicationReason: string | null
   adjudicationNotes: string | null
+  detailAdjudications?: DetailAdjudication[]
   detailSnapshot: SellerRFPDetail[]
 }
 
@@ -189,6 +203,7 @@ export const STATUS_LABELS: Record<SellerRFPStatus, string> = {
   'submitted': 'Submitted',
   'won': 'Won',
   'lost': 'Lost',
+  'partial-win': 'Partial Win',
   'advanced': 'Advanced',
   'declined': 'Declined',
 }
@@ -199,6 +214,7 @@ export const STATUS_COLORS: Record<SellerRFPStatus, { color: string; background:
   'submitted': { color: '#722ed1', background: '#f9f0ff' },
   'won': { color: '#52c41a', background: '#f6ffed' },
   'lost': { color: '#ff4d4f', background: '#fff2f0' },
+  'partial-win': { color: '#faad14', background: '#fff7e6' },
   'advanced': { color: '#fa8c16', background: '#fff7e6' },
   'declined': { color: '#8c8c8c', background: '#fafafa' },
 }

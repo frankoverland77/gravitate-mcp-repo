@@ -12,6 +12,7 @@ import type {
   RFPTerms,
   EntryPath,
   ParameterConfig,
+  DetailAdjudication,
 } from './types/sellerRfp.types'
 import {
   STATUS_LABELS,
@@ -250,18 +251,15 @@ export function SellerRFPPage() {
     setState((prev) => ({ ...prev, adjudicationModalOpen: false }))
   }, [])
 
-  const handleAdjudicate = useCallback((result: 'won' | 'lost' | 'advanced', reason?: string, notes?: string) => {
+  const handleAdjudicate = useCallback((result: 'won' | 'lost' | 'advanced', reason?: string, notes?: string, detailAdjudications?: DetailAdjudication[]) => {
     setState((prev) => {
       if (!prev.selectedRFP) return prev
       const now = new Date().toISOString()
-      const currentRound = prev.selectedRFP.rounds.length > 0
-        ? prev.selectedRFP.rounds[prev.selectedRFP.rounds.length - 1]
-        : null
 
       // Update the last round with adjudication
       const updatedRounds = prev.selectedRFP.rounds.map((r, i) =>
         i === prev.selectedRFP!.rounds.length - 1
-          ? { ...r, adjudication: result, adjudicationReason: reason || null, adjudicationNotes: notes || null }
+          ? { ...r, adjudication: result, adjudicationReason: reason || null, adjudicationNotes: notes || null, detailAdjudications: detailAdjudications || undefined }
           : r,
       )
 
@@ -290,9 +288,23 @@ export function SellerRFPPage() {
           updatedAt: now,
         }
       } else {
+        // Derive status: if split award with mixed outcomes, use 'partial-win'
+        let finalStatus: 'won' | 'lost' | 'partial-win' = result as 'won' | 'lost'
+        if (detailAdjudications && detailAdjudications.length > 0) {
+          const allWon = detailAdjudications.every((da) => da.outcome === 'won')
+          const allLost = detailAdjudications.every((da) => da.outcome === 'lost')
+          if (!allWon && !allLost) finalStatus = 'partial-win'
+          else if (allWon) finalStatus = 'won'
+          else finalStatus = 'lost'
+        }
+
         updatedRFP = {
           ...prev.selectedRFP,
-          status: result,
+          status: finalStatus,
+          adjudicationResult: result as 'won' | 'lost',
+          adjudicationReason: reason || null,
+          adjudicationNotes: notes || null,
+          detailAdjudications: detailAdjudications || undefined,
           rounds: updatedRounds,
           updatedAt: now,
         }
@@ -308,7 +320,7 @@ export function SellerRFPPage() {
       }
     })
 
-    const messages = {
+    const messages: Record<string, string> = {
       won: 'Congratulations! RFP marked as won.',
       lost: 'RFP marked as lost. Outcome recorded.',
       advanced: 'Advanced to next round. Prior submission loaded.',
