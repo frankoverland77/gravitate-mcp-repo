@@ -1,0 +1,65 @@
+/* CreateContractModal styles */
+
+.intro-box {
+  padding: 12px 16px;
+  background-color: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: 6px;
+}
+
+.mapping-table {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mapping-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mapping-row:last-child {
+  border-bottom: none;
+}
+
+.detail-preview {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.detail-preview-header {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.detail-preview-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-preview-row:last-child {
+  border-bottom: none;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.nav-hint {
+  padding: 10px 14px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 6px;
+}

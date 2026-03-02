@@ -184,6 +184,7 @@ export interface SellerRFPPageState {
   intakeDrawerOpen: boolean
   saleFormulaDrawerOpen: boolean
   adjudicationModalOpen: boolean
+  createContractModalOpen: boolean
   parametersModalOpen: boolean
 
   // Active detail for formula editing

@@ -109,9 +109,9 @@ export function AnalysisTab({ rfp }: AnalysisTabProps) {
   }
 
   return (
-    <Vertical style={{ gap: '32px' }}>
+    <Vertical style={{ gap: '32px', overflow: 'visible' }}>
       {/* Historical Price Comparison */}
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical style={{ gap: '16px', overflow: 'visible' }}>
         <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
             Historical Price Comparison
@@ -228,7 +228,7 @@ export function AnalysisTab({ rfp }: AnalysisTabProps) {
       </Vertical>
 
       {/* Margin Sensitivity */}
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical style={{ gap: '16px', overflow: 'visible' }}>
         <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Margin Sensitivity Analysis
         </Texto>

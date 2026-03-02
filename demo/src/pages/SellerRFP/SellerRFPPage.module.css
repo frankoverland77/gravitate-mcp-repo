@@ -88,8 +88,7 @@
 
 /* Tabs content */
 .workspace-content {
-  flex: 1;
-  overflow: auto;
+  flex: none;
 }
 
 /* Tab placeholder */

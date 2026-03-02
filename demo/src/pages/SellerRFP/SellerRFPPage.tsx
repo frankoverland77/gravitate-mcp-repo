@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
-import { LeftOutlined, SaveOutlined, SendOutlined, SettingOutlined } from '@ant-design/icons'
+import { LeftOutlined, SaveOutlined, SendOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
 
 const { TabPane } = Tabs
@@ -13,6 +13,7 @@ import type {
   EntryPath,
   ParameterConfig,
   DetailAdjudication,
+  SellerRFPStatus,
 } from './types/sellerRfp.types'
 import {
   STATUS_LABELS,
@@ -35,6 +36,7 @@ import { CopyResponseModal } from './components/CopyResponseModal'
 import { ManualEntryDrawer } from './components/ManualEntryDrawer'
 import { SellerParametersModal } from './components/SellerParametersModal'
 import { AdjudicationModal } from './components/AdjudicationModal'
+import { CreateContractModal } from './components/CreateContractModal'
 import styles from './SellerRFPPage.module.css'
 
 const initialState: SellerRFPPageState = {
@@ -48,6 +50,7 @@ const initialState: SellerRFPPageState = {
   intakeDrawerOpen: false,
   saleFormulaDrawerOpen: false,
   adjudicationModalOpen: false,
+  createContractModalOpen: false,
   parametersModalOpen: false,
   activeDetailId: null,
   parameters: DEFAULT_PARAMETERS,
@@ -329,6 +332,28 @@ export function SellerRFPPage() {
   }, [])
 
   // =========================================================================
+  // CREATE CONTRACT
+  // =========================================================================
+
+  const handleOpenCreateContract = useCallback(() => {
+    setState((prev) => ({ ...prev, createContractModalOpen: true }))
+  }, [])
+
+  const handleCloseCreateContract = useCallback(() => {
+    setState((prev) => ({ ...prev, createContractModalOpen: false }))
+  }, [])
+
+  const handleCreateContract = useCallback((wonDetails: SellerRFPDetail[]) => {
+    setState((prev) => ({ ...prev, createContractModalOpen: false }))
+    NotificationMessage(
+      'Contract Created',
+      `Contract draft created with ${wonDetails.length} detail${wonDetails.length !== 1 ? 's' : ''} from ${state.selectedRFP?.buyerName}. Navigating to Create Contract...`,
+      false,
+    )
+    // In production, this would navigate to /Contracts/CreateContract with pre-populated state
+  }, [state.selectedRFP?.buyerName])
+
+  // =========================================================================
   // PARAMETERS
   // =========================================================================
 
@@ -393,13 +418,21 @@ export function SellerRFPPage() {
                   onClick={handleOpenAdjudication}
                 />
               )}
+              {(rfp.status === 'won' || rfp.status === 'partial-win') && (
+                <GraviButton
+                  buttonText="Create Contract"
+                  icon={<FileTextOutlined />}
+                  theme1
+                  onClick={handleOpenCreateContract}
+                />
+              )}
               <GraviButton
                 buttonText="Save"
                 icon={<SaveOutlined />}
                 onClick={handleSave}
                 disabled={!state.isDirty}
               />
-              {rfp.status !== 'submitted' && rfp.status !== 'won' && rfp.status !== 'lost' && (
+              {rfp.status !== 'submitted' && rfp.status !== 'won' && rfp.status !== 'lost' && rfp.status !== 'partial-win' && (
                 <GraviButton
                   buttonText="Submit Response"
                   icon={<SendOutlined />}
@@ -450,6 +483,14 @@ export function SellerRFPPage() {
           rfp={rfp}
           onClose={handleCloseAdjudication}
           onResult={handleAdjudicate}
+        />
+
+        {/* Create Contract Modal */}
+        <CreateContractModal
+          visible={state.createContractModalOpen}
+          rfp={rfp}
+          onClose={handleCloseCreateContract}
+          onConfirm={handleCreateContract}
         />
 
         {/* Parameters Modal */}

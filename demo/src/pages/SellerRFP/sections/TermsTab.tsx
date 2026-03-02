@@ -58,9 +58,9 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
   }, [rfp.details])
 
   return (
-    <Vertical style={{ gap: '32px' }}>
+    <Vertical style={{ gap: '32px', overflow: 'visible' }}>
       {/* Volume & Allocation */}
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical style={{ gap: '16px', overflow: 'visible' }}>
         <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Volume & Allocation
         </Texto>
@@ -69,7 +69,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
         <div className={styles['volume-card']}>
           <Horizontal alignItems="stretch" style={{ gap: '1px', backgroundColor: '#e8e8e8' }}>
             {/* Aggregated from details */}
-            <Vertical style={{ flex: 1, padding: '16px', backgroundColor: '#fff', gap: '4px' }}>
+            <Vertical style={{ flex: 1, padding: '20px', backgroundColor: '#fff', gap: '6px' }}>
               <Texto category="p3" appearance="medium">Detail Volume (sum)</Texto>
               <Texto category="h5" weight="600">
                 {detailVolumeTotal > 0 ? formatVolume(detailVolumeTotal) : '—'}
@@ -80,7 +80,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
             </Vertical>
 
             {/* RFP-level commitment */}
-            <Vertical style={{ flex: 1, padding: '16px', backgroundColor: '#fff', gap: '4px' }}>
+            <Vertical style={{ flex: 1, padding: '20px', backgroundColor: '#fff', gap: '6px' }}>
               <Horizontal alignItems="center" justifyContent="space-between">
                 <Texto category="p3" appearance="medium">RFP Volume Commitment</Texto>
                 <Segmented
@@ -129,7 +129,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
             </Vertical>
 
             {/* Allocation Period */}
-            <Vertical style={{ flex: 1, padding: '16px', backgroundColor: '#fff', gap: '4px' }}>
+            <Vertical style={{ flex: 1, padding: '20px', backgroundColor: '#fff', gap: '6px' }}>
               <Texto category="p3" appearance="medium">Allocation Period</Texto>
               <Select
                 value={terms.allocationPeriod}
@@ -216,7 +216,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
       </Vertical>
 
       {/* Contract & Payment Terms */}
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical style={{ gap: '16px', overflow: 'visible' }}>
         <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Contract & Payment Terms
         </Texto>

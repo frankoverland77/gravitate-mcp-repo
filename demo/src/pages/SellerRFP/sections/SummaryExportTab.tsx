@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
-import { Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
+import { useMemo, useCallback } from 'react'
+import { Vertical, Horizontal, Texto, GraviButton, GraviGrid, NotificationMessage } from '@gravitate-js/excalibrr'
 import { FileExcelOutlined, FilePdfOutlined, CopyOutlined } from '@ant-design/icons'
-import type { SellerRFP, RFPRoundHistory } from '../types/sellerRfp.types'
+import type { ColDef, ColGroupDef, ICellRendererParams, ValueGetterParams } from 'ag-grid-community'
+import type { SellerRFP, SellerRFPDetail, RFPRoundHistory } from '../types/sellerRfp.types'
 import {
   formatPrice,
   formatMarginCpg,
@@ -63,13 +64,189 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
     [rfp.rounds],
   )
 
-  const getPriorValue = (roundNumber: number, detailId: string, field: 'salePrice' | 'margin'): number | null => {
+  const getPriorValue = useCallback((roundNumber: number, detailId: string, field: 'salePrice' | 'margin'): number | null => {
     const roundHistory = rfp.rounds.find(r => r.round === roundNumber)
     if (!roundHistory?.detailSnapshot) return null
     const priorDetail = roundHistory.detailSnapshot.find(d => d.id === detailId)
     if (!priorDetail) return null
     return priorDetail[field]
-  }
+  }, [rfp.rounds])
+
+  // AG Grid column definitions for detail summary
+  const priorRoundColumns: ColDef[] = useMemo(() => {
+    return advancedRounds.flatMap((roundHistory): ColDef[] => {
+      const rn = roundHistory.round
+      return [
+        {
+          headerName: `R${rn} Sale`,
+          colId: `prior-r${rn}-sale`,
+          width: 110,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          valueGetter: (params: ValueGetterParams) => {
+            const detail = params.data as SellerRFPDetail
+            if (!detail) return null
+            return getPriorValue(rn, detail.id, 'salePrice')
+          },
+          cellRenderer: (params: ICellRendererParams) => {
+            const value = params.value as number | null
+            return <span style={{ color: '#8c8c8c' }}>{value != null ? formatPrice(value) : '—'}</span>
+          },
+        },
+        {
+          headerName: `R${rn} Margin`,
+          colId: `prior-r${rn}-margin`,
+          width: 110,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          valueGetter: (params: ValueGetterParams) => {
+            const detail = params.data as SellerRFPDetail
+            if (!detail) return null
+            return getPriorValue(rn, detail.id, 'margin')
+          },
+          cellRenderer: (params: ICellRendererParams) => {
+            const value = params.value as number | null
+            if (value == null) return <span style={{ color: '#8c8c8c' }}>—</span>
+            const color = getMarginColor(value)
+            const colorMap: Record<string, string> = { green: '#52c41a', yellow: '#faad14', red: '#ff4d4f', neutral: '#8c8c8c' }
+            return (
+              <span style={{ color: colorMap[color], fontWeight: 600, opacity: 0.6 }}>
+                {formatMarginCpg(value)}
+              </span>
+            )
+          },
+        },
+      ]
+    })
+  }, [advancedRounds, getPriorValue])
+
+  const priorRoundGroup: ColGroupDef[] = useMemo(() => {
+    if (priorRoundColumns.length === 0) return []
+    return [{
+      headerName: 'Prior Rounds',
+      children: priorRoundColumns,
+    }]
+  }, [priorRoundColumns])
+
+  const columnDefs: (ColDef | ColGroupDef)[] = useMemo(() => [
+    {
+      headerName: 'Product',
+      field: 'product',
+      width: 140,
+      pinned: 'left' as const,
+      sortable: true,
+      filter: true,
+      enableRowGroup: true,
+    },
+    {
+      headerName: 'Terminal',
+      field: 'terminal',
+      width: 170,
+      pinned: 'left' as const,
+      sortable: true,
+      filter: true,
+      enableRowGroup: true,
+    },
+    {
+      headerName: 'Cost Type',
+      field: 'costType',
+      width: 120,
+      sortable: true,
+      filter: true,
+      enableRowGroup: true,
+      cellRenderer: (params: ICellRendererParams) => {
+        const detail = params.data as SellerRFPDetail
+        if (!detail?.costType) return <span style={{ color: '#8c8c8c' }}>—</span>
+        const colors = COST_TYPE_COLORS[detail.costType]
+        return (
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: colors.color,
+              backgroundColor: colors.background,
+            }}
+          >
+            {COST_TYPE_LABELS[detail.costType]}
+          </span>
+        )
+      },
+      valueGetter: (params: ValueGetterParams) => {
+        const detail = params.data as SellerRFPDetail
+        return detail?.costType ? COST_TYPE_LABELS[detail.costType] : null
+      },
+    },
+    {
+      headerName: 'Cost Price',
+      field: 'costPrice',
+      width: 110,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      cellRenderer: (params: ICellRendererParams) => <span>{formatPrice(params.value)}</span>,
+    },
+    {
+      headerName: 'Sale Formula',
+      field: 'saleFormula',
+      width: 200,
+      sortable: false,
+      filter: false,
+      cellRenderer: (params: ICellRendererParams) => {
+        const detail = params.data as SellerRFPDetail
+        return <span style={{ color: '#8c8c8c' }}>{formatFormulaDisplay(detail?.saleFormula) || '—'}</span>
+      },
+    },
+    {
+      headerName: 'Formula Diff',
+      field: 'formulaDiff',
+      width: 120,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      cellRenderer: (params: ICellRendererParams) => (
+        <span style={{ fontWeight: 500 }}>{formatFormulaDiff(params.value)}</span>
+      ),
+    },
+    {
+      headerName: 'Sale Price',
+      field: 'salePrice',
+      width: 110,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      cellRenderer: (params: ICellRendererParams) => <span>{formatPrice(params.value)}</span>,
+    },
+    {
+      headerName: 'Margin',
+      field: 'margin',
+      width: 110,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      cellRenderer: (params: ICellRendererParams) => {
+        const detail = params.data as SellerRFPDetail
+        if (!detail) return null
+        const color = getMarginColor(detail.margin)
+        const colorMap: Record<string, string | undefined> = { green: '#52c41a', yellow: '#faad14', red: '#ff4d4f' }
+        return (
+          <span style={{ fontWeight: 600, color: colorMap[color] }}>
+            {formatMarginCpg(detail.margin)}
+          </span>
+        )
+      },
+    },
+    ...priorRoundGroup,
+    {
+      headerName: 'Volume',
+      field: 'volume',
+      width: 120,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      cellRenderer: (params: ICellRendererParams) => {
+        const detail = params.data as SellerRFPDetail
+        return <span>{detail?.volume ? detail.volume.toLocaleString() : '—'}</span>
+      },
+    },
+  ], [priorRoundGroup])
 
   const allocationLabel = rfp.terms.allocationPeriod
     ? ALLOCATION_PERIOD_OPTIONS.find((o) => o.value === rfp.terms.allocationPeriod)?.label || rfp.terms.allocationPeriod
@@ -79,7 +256,7 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
     : '—'
 
   return (
-    <Vertical style={{ gap: '32px' }}>
+    <Vertical style={{ gap: '32px', overflow: 'visible' }}>
       {/* Summary Cards */}
       <div className={styles['stats-row']}>
         <div className={styles['stat-card']}>
@@ -107,7 +284,7 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
       </div>
 
       {/* Terms Summary */}
-      <Vertical style={{ gap: '12px' }}>
+      <Vertical style={{ gap: '12px', overflow: 'visible' }}>
         <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Terms Summary
         </Texto>
@@ -147,102 +324,24 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
         </div>
       </Vertical>
 
-      {/* Detail Summary Table */}
-      <Vertical style={{ gap: '12px' }}>
+      {/* Detail Summary Grid */}
+      <Vertical style={{ gap: '12px', overflow: 'visible' }}>
         <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Detail Summary
         </Texto>
 
-        <div className={styles['summary-table']}>
-          <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Terminal</th>
-                <th>Cost Type</th>
-                <th>Cost Price</th>
-                <th>Sale Formula</th>
-                <th>Formula Diff</th>
-                <th>Sale Price</th>
-                <th>Margin</th>
-                {advancedRounds.map((r) => (
-                  <th key={`prior-sale-${r.round}`} className={styles['prior-round-header']}>R{r.round} Sale</th>
-                ))}
-                {advancedRounds.map((r) => (
-                  <th key={`prior-margin-${r.round}`} className={styles['prior-round-header']}>R{r.round} Margin</th>
-                ))}
-                <th>Volume</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rfp.details.map((detail) => {
-                const marginColor = getMarginColor(detail.margin)
-                return (
-                  <tr key={detail.id}>
-                    <td><Texto category="p2">{detail.product}</Texto></td>
-                    <td><Texto category="p2">{detail.terminal}</Texto></td>
-                    <td>
-                      {detail.costType ? (
-                        <span
-                          className={styles['cost-badge']}
-                          style={{
-                            color: COST_TYPE_COLORS[detail.costType].color,
-                            backgroundColor: COST_TYPE_COLORS[detail.costType].background,
-                          }}
-                        >
-                          {COST_TYPE_LABELS[detail.costType]}
-                        </span>
-                      ) : (
-                        <Texto category="p2" appearance="medium">—</Texto>
-                      )}
-                    </td>
-                    <td><Texto category="p2">{formatPrice(detail.costPrice)}</Texto></td>
-                    <td><Texto category="p2" appearance="medium">{formatFormulaDisplay(detail.saleFormula) || '—'}</Texto></td>
-                    <td><Texto category="p2" style={{ fontWeight: 500 }}>{formatFormulaDiff(detail.formulaDiff)}</Texto></td>
-                    <td><Texto category="p2">{formatPrice(detail.salePrice)}</Texto></td>
-                    <td>
-                      <Texto
-                        category="p2"
-                        weight="600"
-                        style={{
-                          color: marginColor === 'green' ? '#52c41a' : marginColor === 'yellow' ? '#faad14' : marginColor === 'red' ? '#ff4d4f' : undefined,
-                        }}
-                      >
-                        {formatMarginCpg(detail.margin)}
-                      </Texto>
-                    </td>
-                    {advancedRounds.map((r) => {
-                      const priorSale = getPriorValue(r.round, detail.id, 'salePrice')
-                      return (
-                        <td key={`prior-sale-${r.round}`}>
-                          <Texto category="p2" style={{ color: '#8c8c8c' }}>{priorSale != null ? formatPrice(priorSale) : '—'}</Texto>
-                        </td>
-                      )
-                    })}
-                    {advancedRounds.map((r) => {
-                      const priorMargin = getPriorValue(r.round, detail.id, 'margin')
-                      const priorMarginColor = getMarginColor(priorMargin)
-                      return (
-                        <td key={`prior-margin-${r.round}`}>
-                          <Texto
-                            category="p2"
-                            weight="600"
-                            style={{
-                              color: priorMarginColor === 'green' ? '#52c41a' : priorMarginColor === 'yellow' ? '#faad14' : priorMarginColor === 'red' ? '#ff4d4f' : '#8c8c8c',
-                              opacity: priorMargin != null ? 0.6 : 1,
-                            }}
-                          >
-                            {priorMargin != null ? formatMarginCpg(priorMargin) : '—'}
-                          </Texto>
-                        </td>
-                      )
-                    })}
-                    <td><Texto category="p2">{detail.volume ? `${detail.volume.toLocaleString()}` : '—'}</Texto></td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+        <div className={styles['detail-grid-container']}>
+          <GraviGrid
+            rowData={rfp.details}
+            columnDefs={columnDefs}
+            agPropOverrides={{
+              domLayout: 'autoHeight',
+              getRowId: (params) => params.data.id,
+              rowGroupPanelShow: 'always',
+              groupDisplayType: 'groupRows',
+            }}
+            storageKey="SellerRFPSummaryGrid"
+          />
         </div>
       </Vertical>
 
