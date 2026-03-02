@@ -23,6 +23,7 @@
   color: #595959;
   cursor: pointer;
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .collapse-toggle:hover {
@@ -41,6 +42,7 @@
   color: #595959;
   cursor: pointer;
   font-size: 12px;
+  flex-shrink: 0;
 }
 
 .close-btn:hover {
@@ -55,6 +57,22 @@
   font-weight: 500;
   background-color: #e6fffb;
   color: #13c2c2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.volume-badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #f0f0f0;
+  color: #595959;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .body {
@@ -64,8 +82,8 @@
 }
 
 .left-panel {
-  width: 220px;
-  min-width: 220px;
+  width: 260px;
+  min-width: 260px;
   padding: 16px;
   background-color: #f9fafb;
   border-right: 1px solid #e8e8e8;
@@ -81,10 +99,54 @@
 .cost-badge {
   display: inline-flex;
   align-self: flex-start;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 500;
+}
+
+/* Past Bid Cards */
+.bid-card {
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.show-more {
+  border: none;
+  background: none;
+  color: #1890ff;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 0;
+  text-align: left;
+}
+
+.show-more:hover {
+  text-decoration: underline;
+}
+
+/* Win Rate Bar */
+.winrate-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.winrate-fill {
+  height: 100%;
+  background-color: #52c41a;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Winning Differential Range callout */
+.winning-range {
+  border-left: 3px solid #52c41a;
+  padding-left: 8px;
 }
 
 /* Variables Table */
@@ -170,6 +232,6 @@
 /* Sparkline */
 .sparkline {
   display: block;
-  width: 200px;
-  height: 40px;
+  width: 100%;
+  height: 72px;
 }

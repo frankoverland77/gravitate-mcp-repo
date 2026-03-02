@@ -10,6 +10,7 @@ import type {
   SellerRFPPageState,
   WorkspaceTab,
   RFPTerms,
+  EntryPath,
 } from './types/sellerRfp.types'
 import {
   STATUS_LABELS,
@@ -24,7 +25,11 @@ import { DetailsFormulasTab } from './sections/DetailsFormulasTab'
 import { TermsTab } from './sections/TermsTab'
 import { SummaryExportTab } from './sections/SummaryExportTab'
 import { AnalysisTab } from './sections/AnalysisTab'
+import { EntryPathModal } from './components/EntryPathModal'
 import { IntakeDrawer } from './components/IntakeDrawer'
+import { UploadRFPModal } from './components/UploadRFPModal'
+import { CopyResponseModal } from './components/CopyResponseModal'
+import { ManualEntryDrawer } from './components/ManualEntryDrawer'
 import { AdjudicationModal } from './components/AdjudicationModal'
 import styles from './SellerRFPPage.module.css'
 
@@ -34,6 +39,8 @@ const initialState: SellerRFPPageState = {
   activeTab: 'details',
   isDirty: false,
   rfps: [...SAMPLE_SELLER_RFPS],
+  entryPathModalOpen: false,
+  activeEntryPath: null,
   intakeDrawerOpen: false,
   saleFormulaDrawerOpen: false,
   adjudicationModalOpen: false,
@@ -73,15 +80,40 @@ export function SellerRFPPage() {
   }, [])
 
   // =========================================================================
-  // INTAKE
+  // ENTRY PATH & INTAKE
   // =========================================================================
 
-  const handleOpenIntake = useCallback(() => {
-    setState((prev) => ({ ...prev, intakeDrawerOpen: true }))
+  const handleOpenEntryPath = useCallback(() => {
+    setState((prev) => ({ ...prev, entryPathModalOpen: true }))
+  }, [])
+
+  const handleCloseEntryPath = useCallback(() => {
+    setState((prev) => ({ ...prev, entryPathModalOpen: false, activeEntryPath: null }))
+  }, [])
+
+  const handleSelectEntryPath = useCallback((path: EntryPath) => {
+    setState((prev) => ({
+      ...prev,
+      entryPathModalOpen: false,
+      activeEntryPath: path,
+      intakeDrawerOpen: path === 'matrix',
+    }))
   }, [])
 
   const handleCloseIntake = useCallback(() => {
-    setState((prev) => ({ ...prev, intakeDrawerOpen: false }))
+    setState((prev) => ({ ...prev, intakeDrawerOpen: false, activeEntryPath: null }))
+  }, [])
+
+  const handleCloseUpload = useCallback(() => {
+    setState((prev) => ({ ...prev, activeEntryPath: null }))
+  }, [])
+
+  const handleCloseCopy = useCallback(() => {
+    setState((prev) => ({ ...prev, activeEntryPath: null }))
+  }, [])
+
+  const handleCloseManual = useCallback(() => {
+    setState((prev) => ({ ...prev, activeEntryPath: null }))
   }, [])
 
   const handleCreateRFP = useCallback((newRFP: SellerRFP) => {
@@ -89,6 +121,8 @@ export function SellerRFPPage() {
       ...prev,
       rfps: [newRFP, ...prev.rfps],
       intakeDrawerOpen: false,
+      activeEntryPath: null,
+      entryPathModalOpen: false,
       currentScreen: 'workspace',
       selectedRFP: newRFP,
       activeTab: 'details',
@@ -101,6 +135,7 @@ export function SellerRFPPage() {
       ...prev,
       rfps: [declinedRFP, ...prev.rfps],
       intakeDrawerOpen: false,
+      activeEntryPath: null,
     }))
     NotificationMessage('Declined', `RFP declined — ${declinedRFP.buyerName}.`, false)
   }, [])
@@ -388,14 +423,45 @@ export function SellerRFPPage() {
           <PipelineGrid
             rfps={state.rfps}
             onRFPClick={handleRFPClick}
-            onNewRFP={handleOpenIntake}
+            onNewRFP={handleOpenEntryPath}
           />
+
+          {/* Entry Path Selection Modal */}
+          <EntryPathModal
+            visible={state.entryPathModalOpen}
+            onClose={handleCloseEntryPath}
+            onSelect={handleSelectEntryPath}
+          />
+
+          {/* Path 1: Build from Matrix */}
           <IntakeDrawer
             visible={state.intakeDrawerOpen}
             onClose={handleCloseIntake}
             onCreate={handleCreateRFP}
             onDecline={handleDeclineRFP}
             rfps={state.rfps}
+          />
+
+          {/* Path 2: Upload Buyer's RFP */}
+          <UploadRFPModal
+            visible={state.activeEntryPath === 'upload'}
+            onClose={handleCloseUpload}
+            onCreate={handleCreateRFP}
+          />
+
+          {/* Path 3: Copy Previous Response */}
+          <CopyResponseModal
+            visible={state.activeEntryPath === 'copy'}
+            onClose={handleCloseCopy}
+            onCreate={handleCreateRFP}
+            rfps={state.rfps}
+          />
+
+          {/* Path 4: Add Rows Manually */}
+          <ManualEntryDrawer
+            visible={state.activeEntryPath === 'manual'}
+            onClose={handleCloseManual}
+            onCreate={handleCreateRFP}
           />
         </>
       ) : (

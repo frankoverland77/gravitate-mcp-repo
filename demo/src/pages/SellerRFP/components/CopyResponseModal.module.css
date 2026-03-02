@@ -1,0 +1,42 @@
+/* CopyResponseModal styles */
+
+.rfp-list {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.rfp-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.rfp-item:hover {
+  background-color: #f5f5f5;
+}
+
+.rfp-item-selected {
+  background-color: #e6f4ff;
+}
+
+.rfp-item-selected:hover {
+  background-color: #d6e8fa;
+}
+
+.rfp-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

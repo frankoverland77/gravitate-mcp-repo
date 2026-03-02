@@ -118,6 +118,8 @@ export type SellerRFPScreen = 'pipeline' | 'workspace'
 
 export type WorkspaceTab = 'details' | 'terms' | 'summary' | 'analysis'
 
+export type EntryPath = 'matrix' | 'upload' | 'copy' | 'manual'
+
 export interface SellerRFPPageState {
   currentScreen: SellerRFPScreen
   selectedRFP: SellerRFP | null
@@ -126,6 +128,8 @@ export interface SellerRFPPageState {
   rfps: SellerRFP[]
 
   // Drawer/modal visibility
+  entryPathModalOpen: boolean
+  activeEntryPath: EntryPath | null
   intakeDrawerOpen: boolean
   saleFormulaDrawerOpen: boolean
   adjudicationModalOpen: boolean
