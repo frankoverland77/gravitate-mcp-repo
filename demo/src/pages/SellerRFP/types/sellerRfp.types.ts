@@ -299,9 +299,8 @@ export function calculateMarginCpg(salePrice: number | null, costPrice: number |
  */
 export function getMarginColor(marginCpg: number | null): 'green' | 'yellow' | 'red' | 'neutral' {
   if (marginCpg === null) return 'neutral'
-  if (marginCpg > 3) return 'green'
-  if (marginCpg >= 1) return 'yellow'
-  return 'red'
+  if (marginCpg < 0) return 'red'
+  return 'neutral'
 }
 
 /**
