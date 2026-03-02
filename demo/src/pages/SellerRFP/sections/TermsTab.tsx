@@ -154,7 +154,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
               <tr>
                 <th>Terminal</th>
                 <th>Product</th>
-                <th style={{ textAlign: 'right' }}>Volume (gal/mo)</th>
+                <th>Volume (gal/mo)</th>
                 <th>Allocation</th>
                 <th style={{ textAlign: 'center', width: '36px' }}></th>
               </tr>
@@ -185,8 +185,8 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
                         </td>
                       ) : null}
                       <td><Texto category="p2">{detail.product}</Texto></td>
-                      <td style={{ textAlign: 'right' }}>
-                        <Texto category="p2" style={{ fontFamily: 'monospace' }}>
+                      <td>
+                        <Texto category="p2">
                           {detail.volume ? detail.volume.toLocaleString() : <span style={{ color: '#bfbfbf' }}>—</span>}
                         </Texto>
                       </td>

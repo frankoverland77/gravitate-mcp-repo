@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr'
-import { LeftOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons'
+import { LeftOutlined, SaveOutlined, SendOutlined, SettingOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
 
 const { TabPane } = Tabs
@@ -11,6 +11,7 @@ import type {
   WorkspaceTab,
   RFPTerms,
   EntryPath,
+  ParameterConfig,
 } from './types/sellerRfp.types'
 import {
   STATUS_LABELS,
@@ -20,6 +21,7 @@ import {
   calculateMarginCpg,
 } from './types/sellerRfp.types'
 import { SAMPLE_SELLER_RFPS } from './data/sellerRfp.data'
+import { DEFAULT_PARAMETERS } from '../RFP/rfp.types'
 import { PipelineGrid } from './sections/PipelineGrid'
 import { DetailsFormulasTab } from './sections/DetailsFormulasTab'
 import { TermsTab } from './sections/TermsTab'
@@ -30,6 +32,7 @@ import { IntakeDrawer } from './components/IntakeDrawer'
 import { UploadRFPModal } from './components/UploadRFPModal'
 import { CopyResponseModal } from './components/CopyResponseModal'
 import { ManualEntryDrawer } from './components/ManualEntryDrawer'
+import { SellerParametersModal } from './components/SellerParametersModal'
 import { AdjudicationModal } from './components/AdjudicationModal'
 import styles from './SellerRFPPage.module.css'
 
@@ -44,7 +47,9 @@ const initialState: SellerRFPPageState = {
   intakeDrawerOpen: false,
   saleFormulaDrawerOpen: false,
   adjudicationModalOpen: false,
+  parametersModalOpen: false,
   activeDetailId: null,
+  parameters: DEFAULT_PARAMETERS,
 }
 
 export function SellerRFPPage() {
@@ -311,6 +316,22 @@ export function SellerRFPPage() {
   }, [])
 
   // =========================================================================
+  // PARAMETERS
+  // =========================================================================
+
+  const handleOpenParameters = useCallback(() => {
+    setState((prev) => ({ ...prev, parametersModalOpen: true }))
+  }, [])
+
+  const handleCloseParameters = useCallback(() => {
+    setState((prev) => ({ ...prev, parametersModalOpen: false }))
+  }, [])
+
+  const handleSaveParameters = useCallback((parameters: ParameterConfig) => {
+    setState((prev) => ({ ...prev, parameters, parametersModalOpen: false }))
+  }, [])
+
+  // =========================================================================
   // RENDER
   // =========================================================================
 
@@ -348,6 +369,11 @@ export function SellerRFPPage() {
             </div>
 
             <div className={styles['header-right']}>
+              <GraviButton
+                icon={<SettingOutlined />}
+                onClick={handleOpenParameters}
+                title="Parameters"
+              />
               {rfp.status === 'submitted' && (
                 <GraviButton
                   buttonText="Record Result"
@@ -411,6 +437,14 @@ export function SellerRFPPage() {
           rfp={rfp}
           onClose={handleCloseAdjudication}
           onResult={handleAdjudicate}
+        />
+
+        {/* Parameters Modal */}
+        <SellerParametersModal
+          visible={state.parametersModalOpen}
+          parameters={state.parameters}
+          onClose={handleCloseParameters}
+          onSave={handleSaveParameters}
         />
       </>
     )

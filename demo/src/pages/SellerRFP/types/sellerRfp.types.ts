@@ -6,12 +6,12 @@
  */
 
 import type { Formula } from '../../../shared/types/formula.types'
-import type { AllocationPeriod } from '../../RFP/rfp.types'
+import type { AllocationPeriod, ParameterConfig } from '../../RFP/rfp.types'
 
 // Re-export for convenience
 export type { Formula, FormulaVariable, ProvisionType, FormulaMode } from '../../../shared/types/formula.types'
 export type { PricePublisher, PriceType, DateRule } from '../../../shared/types/price.types'
-export type { AllocationPeriod } from '../../RFP/rfp.types'
+export type { AllocationPeriod, ParameterConfig } from '../../RFP/rfp.types'
 
 // =============================================================================
 // STATUS & ENUMS
@@ -133,9 +133,13 @@ export interface SellerRFPPageState {
   intakeDrawerOpen: boolean
   saleFormulaDrawerOpen: boolean
   adjudicationModalOpen: boolean
+  parametersModalOpen: boolean
 
   // Active detail for formula editing
   activeDetailId: string | null
+
+  // Historical parameters
+  parameters: ParameterConfig
 }
 
 // =============================================================================
