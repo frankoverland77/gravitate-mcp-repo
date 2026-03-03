@@ -447,7 +447,7 @@ const allViewColumnDefs = [
 ]
 
 /** Simplified column set for the "Focused" view — collapsed commitment health */
-function getFocusedColumnDefs(strategyDefaultId: number | null | undefined) {
+function getFocusedColumnDefs(strategyDefaultId: number | null | undefined, quoteRowFreight: number, costRankMap: Map<number, number>) {
   return [
     {
       headerName: '',
@@ -537,27 +537,37 @@ function getFocusedColumnDefs(strategyDefaultId: number | null | undefined) {
       marryChildren: true,
       children: [
         {
-          field: 'price',
-          headerName: 'Price',
+          colId: 'focusedCost',
+          headerName: 'Cost',
           sortable: true,
           filter: 'agNumberColumnFilter',
           type: 'rightAligned',
+          valueGetter: (params: any) => {
+            const data: SupplyOptionRow | undefined = params.data
+            if (!data) return null
+            return Number((data.price + quoteRowFreight).toFixed(4))
+          },
           valueFormatter: currencyFormatter,
           width: 110,
           cellStyle: (params: any) => {
             if (isAllocationLimitRow(params.data)) return INACTIVE_CELL_STYLE
-            if (params.data?.priceRank === 1)
+            if (params.data && costRankMap.get(params.data.id) === 1)
               return { color: '#389e0d', fontWeight: 'bold' }
             return {}
           },
         },
         {
-          field: 'priceRank',
+          colId: 'costRank',
           headerName: 'Rank',
           sortable: true,
           filter: 'agNumberColumnFilter',
           type: 'rightAligned',
           width: 70,
+          valueGetter: (params: any) => {
+            const data: SupplyOptionRow | undefined = params.data
+            if (!data) return null
+            return costRankMap.get(data.id) ?? null
+          },
           cellStyle: (params: any) => (isAllocationLimitRow(params.data) ? INACTIVE_CELL_STYLE : {}),
         },
         {
@@ -845,9 +855,22 @@ export function SupplyOptionsView({
     [activeSupplyOptionIds]
   )
 
+  /** Cost-based rank map: supply option id → rank (1 = lowest cost) */
+  const costRankMap = useMemo(() => {
+    const freight = selectedRow.Freight
+    const ranked = [...rowData]
+      .map((row) => ({ id: row.id, cost: row.price + freight }))
+      .sort((a, b) => a.cost - b.cost)
+    const map = new Map<number, number>()
+    ranked.forEach((entry, idx) => {
+      map.set(entry.id, idx + 1)
+    })
+    return map
+  }, [rowData, selectedRow.Freight])
+
   const columnDefs = useMemo(
-    () => (viewMode === 'focused' ? getFocusedColumnDefs(strategyDefaultId) : allViewColumnDefs),
-    [viewMode, strategyDefaultId]
+    () => (viewMode === 'focused' ? getFocusedColumnDefs(strategyDefaultId, selectedRow.Freight, costRankMap) : allViewColumnDefs),
+    [viewMode, strategyDefaultId, selectedRow.Freight, costRankMap]
   )
 
   const controlBarProps = useMemo(
