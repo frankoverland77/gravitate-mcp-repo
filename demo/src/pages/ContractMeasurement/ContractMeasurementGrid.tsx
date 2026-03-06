@@ -87,66 +87,15 @@ export function ContractMeasurementGrid() {
         headerName: 'DAYS LEFT',
         width: 100,
         cellRenderer: (params: any) => (
-          <span style={{ color: '#52c41a', fontWeight: 600 }}>
+          <span style={{ color: params.value < 30 ? '#cf1322' : '#52c41a', fontWeight: 600 }}>
             {params.value} days
           </span>
         ),
       },
-      {
-        field: 'volumeProgress',
-        headerName: 'VOLUME PROGRESS',
-        width: 180,
-        valueGetter: (params: any) => params.data,
-        cellRenderer: (params: any) => {
-          const pct = Math.round((params.data.volumeCompleted / params.data.volumeTotal) * 100);
-          return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '4px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 600 }}>
-                  {pct}%
-                </span>
-                <span style={{ fontSize: '11px', color: '#8c8c8c' }}>
-                  {params.data.volumeCompleted.toLocaleString()} / {params.data.volumeTotal.toLocaleString()}
-                </span>
-              </div>
-              <div style={{
-                width: '100%',
-                height: '6px',
-                backgroundColor: '#e8e8e8',
-                borderRadius: '3px',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  width: `${pct}%`,
-                  height: '100%',
-                  backgroundColor: '#52c41a',
-                  borderRadius: '3px',
-                }} />
-              </div>
-            </div>
-          );
-        },
-      },
-      {
-        field: 'ratability',
-        headerName: 'RATABILITY',
-        width: 110,
-        cellRenderer: (params: any) => {
-          const value = params.value;
-          return (
-            <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
-              <span>{value}%</span>
-              {value < 70 && <WarningOutlined style={{ color: '#faad14', fontSize: '14px' }} />}
-            </Horizontal>
-          );
-        },
-      },
-      {
-        field: 'riskLevel',
-        headerName: 'RISK LEVEL',
-        width: 100,
-      },
-      {
+    ];
+
+    if (isFutureMode) {
+      cols.push({
         field: 'financialImpact',
         headerName: 'BENCHMARK IMPACT',
         width: 140,
@@ -160,40 +109,8 @@ export function ContractMeasurementGrid() {
             </span>
           );
         },
-      },
-      {
-        field: 'margin',
-        headerName: 'MARGIN (CPG)',
-        width: 130,
-        type: 'numericColumn',
-        cellRenderer: (params: any) => {
-          const value = params.value;
-          const color = value >= 0 ? '#52c41a' : '#cf1322';
-          const prefix = value >= 0 ? '+' : '';
-          return (
-            <span style={{ color, fontWeight: 600 }}>
-              {prefix}${value.toFixed(4)}
-            </span>
-          );
-        },
-      },
-      {
-        field: 'profitability',
-        headerName: 'PROFITABILITY',
-        width: 140,
-        valueGetter: (params: any) => params.data.margin * params.data.volumeCompleted,
-        cellRenderer: (params: any) => {
-          const value = params.value;
-          const color = value >= 0 ? '#52c41a' : '#cf1322';
-          const prefix = value >= 0 ? '+' : '';
-          return (
-            <span style={{ color, fontWeight: 600 }}>
-              {prefix}${Math.round(value).toLocaleString()}
-            </span>
-          );
-        },
-      },
-    ];
+      });
+    }
 
     cols.push(
       {
@@ -224,20 +141,22 @@ export function ContractMeasurementGrid() {
               <Menu.Item key="download" onClick={() => console.log('Download', params.data)}>
                 Download Report
               </Menu.Item>
-              <Menu.Divider />
-              {!isArchivedRow && !isReadOnly && (
+              {isFutureMode && <Menu.Divider />}
+              {isFutureMode && !isArchivedRow && !isReadOnly && (
                 <Menu.Item key="archive" onClick={() => handleArchive(params.data.id)}>
                   Archive
                 </Menu.Item>
               )}
-              {isArchivedRow && !isReadOnly && (
+              {isFutureMode && isArchivedRow && !isReadOnly && (
                 <Menu.Item key="restore" onClick={() => handleRestore(params.data.id)}>
                   Restore
                 </Menu.Item>
               )}
-              <Menu.Item key="delete" danger onClick={() => console.log('Delete', params.data)}>
-                Delete
-              </Menu.Item>
+              {isFutureMode && (
+                <Menu.Item key="delete" danger onClick={() => console.log('Delete', params.data)}>
+                  Delete
+                </Menu.Item>
+              )}
             </Menu>
           );
 
@@ -287,18 +206,20 @@ export function ContractMeasurementGrid() {
             Track and manage contract performance metrics
           </Texto>
         </div>
-        <GraviButton
-          icon={<SettingOutlined />}
-          buttonText="Ratability Settings"
-          appearance="outlined"
-          onClick={() => setIsRatabilitySettingsOpen(true)}
-        />
+        {isFutureMode && (
+          <GraviButton
+            icon={<SettingOutlined />}
+            buttonText="Ratability Settings"
+            appearance="outlined"
+            onClick={() => setIsRatabilitySettingsOpen(true)}
+          />
+        )}
       </Horizontal>
 
       {/* Tiles Section */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isFutureMode ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)',
+        gridTemplateColumns: isFutureMode ? 'repeat(3, minmax(0, 300px))' : 'minmax(0, 300px)',
         gap: '20px'
       }}>
         {/* Tile 1: Total Contracts */}
@@ -325,31 +246,7 @@ export function ContractMeasurementGrid() {
           </Vertical>
         </div>
 
-        {/* Tile 2: At Risk */}
-        <div style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #e8e8e8',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-        }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-              <WarningOutlined style={{ fontSize: '16px', color: '#cf1322' }} />
-              <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                At Risk
-              </Texto>
-            </Horizontal>
-            <Texto category="h3" weight="600" style={{ color: '#cf1322' }}>
-              2
-            </Texto>
-            <Texto category="p2" appearance="medium">
-              Require immediate attention
-            </Texto>
-          </Vertical>
-        </div>
-
-        {/* Tile 3: Total Volume (Future State only) */}
+        {/* Tile 2: Total Volume (Future State only) */}
         {isFutureMode && (
           <div style={{
             backgroundColor: '#ffffff',
@@ -380,48 +277,52 @@ export function ContractMeasurementGrid() {
           </div>
         )}
 
-        {/* Tile 4: Benchmark Impact */}
-        <div style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #e8e8e8',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-        }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
-              <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
-              <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Benchmark Impact
+        {/* Tile 4: Benchmark Impact (Future State only) */}
+        {isFutureMode && (
+          <div style={{
+            backgroundColor: '#ffffff',
+            border: '1px solid #e8e8e8',
+            borderRadius: '8px',
+            padding: '24px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+          }}>
+            <Vertical style={{ gap: '12px' }}>
+              <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
+                <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Benchmark Impact
+                </Texto>
+              </Horizontal>
+              <Horizontal style={{ alignItems: 'baseline', gap: '12px' }}>
+                <Texto category="h3" weight="600" style={{ color: '#52c41a' }}>
+                  +$14,832
+                </Texto>
+                <Texto category="p2" style={{ color: '#52c41a' }}>
+                  ↗ 12.5% vs last month
+                </Texto>
+              </Horizontal>
+              <Texto category="p2" appearance="medium">
+                Net impact this period
               </Texto>
-            </Horizontal>
-            <Horizontal style={{ alignItems: 'baseline', gap: '12px' }}>
-              <Texto category="h3" weight="600" style={{ color: '#52c41a' }}>
-                +$14,832
-              </Texto>
-              <Texto category="p2" style={{ color: '#52c41a' }}>
-                ↗ 12.5% vs last month
-              </Texto>
-            </Horizontal>
-            <Texto category="p2" appearance="medium">
-              Net impact this period
-            </Texto>
-          </Vertical>
-        </div>
+            </Vertical>
+          </div>
+        )}
       </div>
 
-      {/* Active / Archived Toggle */}
-      <div style={{ alignSelf: 'flex-start' }}>
-        <Segmented
-          size='large'
-          options={[
-            { label: 'Active', value: 'active' },
-            { label: 'Archived', value: 'archived' },
-          ]}
-          value={viewMode}
-          onChange={(v) => setViewMode(v as 'active' | 'archived')}
-        />
-      </div>
+      {/* Active / Archived Toggle (Future State only) */}
+      {isFutureMode && (
+        <div style={{ alignSelf: 'flex-start' }}>
+          <Segmented
+            size='large'
+            options={[
+              { label: 'Active', value: 'active' },
+              { label: 'Archived', value: 'archived' },
+            ]}
+            value={viewMode}
+            onChange={(v) => setViewMode(v as 'active' | 'archived')}
+          />
+        </div>
+      )}
 
       {/* Grid Section */}
       <div style={{ height: '500px' }}>

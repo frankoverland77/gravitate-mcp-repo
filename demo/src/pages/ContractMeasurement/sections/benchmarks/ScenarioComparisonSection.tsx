@@ -15,7 +15,8 @@ import {
   RightOutlined,
   WarningFilled,
 } from '@ant-design/icons';
-import { Table, Checkbox, Tooltip, Select, Popover, Popconfirm } from 'antd';
+import { Table, Checkbox, Tooltip, Select, Popover, Popconfirm, DatePicker } from 'antd';
+import type { Dayjs } from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
 import type { Scenario, ComparisonRowData, ScenarioCellData, GroupingDimension, GroupHeaderRow, TableRow } from '../../types/scenario.types';
 import { GROUPING_OPTIONS } from '../../types/scenario.types';
@@ -120,7 +121,6 @@ interface ScenarioComparisonSectionProps {
   onRestoreDetails: (ids: string[]) => void;
   onRestoreAll: () => void;
   referenceSelections: Record<string, string>;
-  onSetReference: (detailId: string, scenarioId: string) => void;
   onSetColumnReference: (scenarioId: string) => void;
   onAddScenario?: (scenario: Scenario) => void;
   onUpdateScenario?: (scenario: Scenario) => void;
@@ -128,6 +128,8 @@ interface ScenarioComparisonSectionProps {
   groupingDimension: GroupingDimension;
   onGroupingChange: (dimension: GroupingDimension) => void;
   hasComparisonScenarios?: boolean;
+  effectiveDateRange?: [Dayjs | null, Dayjs | null] | null;
+  onEffectiveDateRangeChange?: (range: [Dayjs | null, Dayjs | null] | null) => void;
 }
 
 function generateScenarioCellData(
@@ -220,7 +222,6 @@ export function ScenarioComparisonSection({
   onRestoreDetails,
   onRestoreAll,
   referenceSelections,
-  onSetReference,
   onSetColumnReference,
   onAddScenario,
   onUpdateScenario,
@@ -228,10 +229,12 @@ export function ScenarioComparisonSection({
   groupingDimension,
   onGroupingChange,
   hasComparisonScenarios = true,
+  effectiveDateRange,
+  onEffectiveDateRangeChange,
 }: ScenarioComparisonSectionProps) {
   const { isFutureMode } = useFeatureMode();
   const [isReferenceMode, setIsReferenceMode] = useState(false);
-  const [showDraftColumn, setShowDraftColumn] = useState(false);
+  const [addScenarioOpen, setAddScenarioOpen] = useState(false);
   const [benchmarkDrawerVisible, setBenchmarkDrawerVisible] = useState(false);
   const [formulaDrawerVisible, setFormulaDrawerVisible] = useState(false);
   const [uploadDrawerVisible, setUploadDrawerVisible] = useState(false);
@@ -296,14 +299,8 @@ export function ScenarioComparisonSection({
     setFormulaDrawerVisible(true);
   }, []);
 
-  // Handle Add Scenario - show draft column instead of opening drawer
-  const handleAddScenarioClick = useCallback(() => {
-    setShowDraftColumn(true);
-  }, []);
-
   // Handle selecting a scenario type (Benchmark, Formula, or Upload)
   const handleSelectScenarioType = useCallback((type: 'benchmark' | 'formula' | 'upload') => {
-    setShowDraftColumn(false);
     setEditingScenario(null);
     setEditingDetailId(null);
     if (type === 'benchmark') {
@@ -400,14 +397,6 @@ export function ScenarioComparisonSection({
       return selections[0] === scenarioId;
     },
     [allRowsHaveSameReference, referenceSelections, scenarios]
-  );
-
-  const hasRowReference = useCallback(
-    (detailId: string, scenarioId: string) => {
-      if (allRowsHaveSameReference) return false;
-      return referenceSelections[detailId] === scenarioId;
-    },
-    [allRowsHaveSameReference, referenceSelections]
   );
 
   // Derived filter options from data
@@ -697,6 +686,19 @@ export function ScenarioComparisonSection({
     setDragOverId(null);
   }, []);
 
+  const addScenarioPopoverContent = useMemo(() => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px 0', minWidth: 160 }}>
+      <GraviButton buttonText="Benchmark" appearance="outlined" style={{ width: '100%' }}
+        onClick={() => { setAddScenarioOpen(false); handleSelectScenarioType('benchmark'); }} />
+      <GraviButton buttonText="Formula" appearance="outlined" style={{ width: '100%' }}
+        onClick={() => { setAddScenarioOpen(false); handleSelectScenarioType('formula'); }} />
+      {isFutureMode && (
+        <GraviButton buttonText="Upload" appearance="outlined" style={{ width: '100%' }}
+          onClick={() => { setAddScenarioOpen(false); handleSelectScenarioType('upload'); }} />
+      )}
+    </div>
+  ), [isFutureMode, handleSelectScenarioType]);
+
   const renderScenarioCell = useCallback(
     (record: ComparisonRowData, scenario: Scenario) => {
       // For formula scenarios, check if this specific detail has been configured
@@ -738,45 +740,61 @@ export function ScenarioComparisonSection({
 
       // No match — lookup failure (benchmark scenario, isMissingPrice=true, no missingPriceInfo)
       if (scenario.entryMethod === 'benchmark' && cellData.isMissingPrice && !cellData.missingPriceInfo) {
-        return (
-          <Popover
-            trigger="click"
-            placement="right"
-            content={
-              <InstrumentPickerPopover
-                product={record.product}
-                location={record.location}
-                productGroup={record.productGroup}
-                onApply={(instrumentId, price) =>
-                  handleInstrumentOverride(record.detailId, scenario.id, instrumentId, price)
-                }
-              />
-            }
-          >
-            <div className={styles.noMatchCell}>
-              <div className={styles.noMatchIconCircle}>
-                <WarningFilled className={styles.noMatchIcon} />
+        if (isFutureMode) {
+          return (
+            <Popover
+              trigger="click"
+              placement="right"
+              content={
+                <InstrumentPickerPopover
+                  product={record.product}
+                  location={record.location}
+                  productGroup={record.productGroup}
+                  onApply={(instrumentId, price) =>
+                    handleInstrumentOverride(record.detailId, scenario.id, instrumentId, price)
+                  }
+                />
+              }
+            >
+              <div className={styles.noMatchCell}>
+                <div className={styles.noMatchIconCircle}>
+                  <WarningFilled className={styles.noMatchIcon} />
+                </div>
+                <BBDTag danger>No Match</BBDTag>
+                <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
+                  No instrument found for
+                </Texto>
+                <Texto category="p2" weight="600" style={{ fontSize: '11px', textAlign: 'center' }}>
+                  {record.product}
+                </Texto>
+                <span className={styles.noMatchFixLink}>
+                  <EditOutlined style={{ fontSize: 12 }} />
+                  Select instrument
+                </span>
               </div>
-              <BBDTag danger>No Match</BBDTag>
-              <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
-                No instrument found for
-              </Texto>
-              <Texto category="p2" weight="600" style={{ fontSize: '11px', textAlign: 'center' }}>
-                {record.product}
-              </Texto>
-              <span className={styles.noMatchFixLink}>
-                <EditOutlined style={{ fontSize: 12 }} />
-                Select instrument
-              </span>
+            </Popover>
+          );
+        }
+        return (
+          <div className={styles.noMatchCell}>
+            <div className={styles.noMatchIconCircle}>
+              <WarningFilled className={styles.noMatchIcon} />
             </div>
-          </Popover>
+            <BBDTag danger>No Match</BBDTag>
+            <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
+              No instrument found for
+            </Texto>
+            <Texto category="p2" weight="600" style={{ fontSize: '11px', textAlign: 'center' }}>
+              {record.product}
+            </Texto>
+          </div>
         );
       }
 
       const isReferenceForRow =
         referenceSelections[record.detailId] === scenario.id ||
         (!referenceSelections[record.detailId] && (scenario.isReference ?? false));
-      const showRowStar = hasRowReference(record.detailId, scenario.id);
+      const showRowStar = isColumnReference(scenario.id);
 
       // For formula scenarios, wrap with edit icon
       if (scenario.entryMethod === 'formula') {
@@ -786,8 +804,6 @@ export function ScenarioComparisonSection({
               cellData={cellData}
               isReferenceForRow={isReferenceForRow}
               showRowStar={showRowStar}
-              isReferenceMode={isReferenceMode}
-              onSetReference={() => onSetReference(record.detailId, scenario.id)}
             />
             <Tooltip title="Edit detail">
               <EditOutlined
@@ -807,12 +823,10 @@ export function ScenarioComparisonSection({
           cellData={cellData}
           isReferenceForRow={isReferenceForRow}
           showRowStar={showRowStar}
-          isReferenceMode={isReferenceMode}
-          onSetReference={() => onSetReference(record.detailId, scenario.id)}
         />
       );
     },
-    [referenceSelections, hasRowReference, isReferenceMode, onSetReference, handleEditDetail, handleInstrumentOverride]
+    [referenceSelections, isColumnReference, isReferenceMode, handleEditDetail, handleInstrumentOverride]
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -827,6 +841,7 @@ export function ScenarioComparisonSection({
         width: 200,
         maxWidth: 270,
         fixed: 'left',
+        onCell: () => ({ style: { verticalAlign: 'top' } }),
         render: (_: unknown, record: TableRow) => {
           if (record.isGroupHeader) {
             const isExpanded = expandedGroups.has(record.groupKey);
@@ -1018,130 +1033,29 @@ export function ScenarioComparisonSection({
           }
           return renderScenarioCell(record as ComparisonRowData, scenario);
         },
+        onCell: () => ({ style: { verticalAlign: 'top' } }),
       };
     });
-
-    // Add draft column if showDraftColumn is true
-    const draftColumn: ColumnsType<TableRow> = showDraftColumn
-      ? [
-          {
-            title: 'NEW SCENARIO',
-            dataIndex: 'draft',
-            key: 'draft',
-            minWidth: 250,
-            onCell: (_, index) => ({
-              rowSpan: index === 0 ? displayData.filter((r) => !r.isGroupHeader).length || includedDetails.length : 0,
-            }),
-            render: (_: unknown, record: TableRow, index: number) => {
-              if (record.isGroupHeader || index !== 0) return null;
-              return (
-                <Vertical
-                  alignItems="center"
-                  justifyContent="center"
-                  style={{
-                    height: '100%',
-                    minHeight: '200px',
-                    gap: '16px',
-                    padding: '24px',
-                  }}
-                >
-                  <Texto category="p2" appearance="medium">
-                    What type of scenario do you need?
-                  </Texto>
-                  <Vertical style={{ gap: '12px', width: '100%' }}>
-                    <GraviButton
-                      buttonText="Benchmark"
-                      appearance="outlined"
-                      onClick={() => handleSelectScenarioType('benchmark')}
-                      style={{ width: '100%' }}
-                    />
-                    <GraviButton
-                      buttonText="Formula"
-                      appearance="outlined"
-                      onClick={() => handleSelectScenarioType('formula')}
-                      style={{ width: '100%' }}
-                    />
-                    {isFutureMode && (
-                      <GraviButton
-                        buttonText="Upload"
-                        appearance="outlined"
-                        onClick={() => handleSelectScenarioType('upload')}
-                        style={{ width: '100%' }}
-                      />
-                    )}
-                  </Vertical>
-                  <GraviButton
-                    buttonText="Cancel"
-                    appearance="text"
-                    onClick={() => setShowDraftColumn(false)}
-                  />
-                </Vertical>
-              );
-            },
-          },
-        ]
-      : [];
-
-    // Ghost placeholder column — visible when no comparison scenarios and no draft column
-    const ghostColumn: ColumnsType<TableRow> =
-      !hasComparisonScenarios && !showDraftColumn
-        ? [
-            {
-              title: (
-                <div className={styles.ghostColumnHeader}>
-                  <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>
-                    Add a scenario...
-                  </Texto>
-                </div>
-              ),
-              dataIndex: 'ghost',
-              key: 'ghost',
-              width: 300,
-              onCell: (_, index) => ({
-                rowSpan: index === 0 ? displayData.filter((r) => !r.isGroupHeader).length || includedDetails.length : 0,
-              }),
-              render: (_: unknown, record: TableRow, index: number) => {
-                if (record.isGroupHeader || index !== 0) return null;
-                return (
-                  <div className={styles.ghostColumnContent}>
-                    <div className={styles.ghostIconCircle}>
-                      <PlusOutlined className={styles.ghostIcon} />
-                    </div>
-                    <Texto category="h5" weight="600">
-                      Add a scenario to compare
-                    </Texto>
-                    <Texto category="p2" appearance="medium" style={{ textAlign: 'center' }}>
-                      Compare your contract against benchmarks, custom formulas, or uploaded pricing
-                    </Texto>
-                    <GraviButton
-                      buttonText="Add Scenario"
-                      icon={<PlusOutlined />}
-                      theme1
-                      onClick={handleAddScenarioClick}
-                    />
-                  </div>
-                );
-              },
-            },
-          ]
-        : [];
 
     const fixedDeltaColumn: ColumnsType<TableRow> =
       allRowsHaveSameReference && columnReferenceScenarioId
         ? [
             {
               title: (
-                <Vertical style={{ gap: '2px' }}>
-                  <Texto category="p2" weight="600">
-                    DELTA
-                  </Texto>
-                  <Texto category="p2" appearance="medium">
-                    vs Contract
-                  </Texto>
-                </Vertical>
+                <Tooltip title="Difference between contract price and the selected reference benchmark price">
+                  <Vertical style={{ gap: '2px', cursor: 'default' }}>
+                    <Texto category="p2" weight="600">
+                      CONTRACT DELTA
+                    </Texto>
+                    <Texto category="p2" appearance="medium">
+                      vs Benchmark
+                    </Texto>
+                  </Vertical>
+                </Tooltip>
               ),
               key: 'fixedDelta',
               width: 130,
+              onCell: () => ({ style: { verticalAlign: 'top' } }),
               render: (_: unknown, record: TableRow) => {
                 if (record.isGroupHeader) {
                   if (!fixedDeltas) return null;
@@ -1159,10 +1073,14 @@ export function ScenarioComparisonSection({
                       count++;
                     }
                   });
-                  if (count === 0) return <Texto weight="600" appearance="medium">--</Texto>;
+                  if (count === 0) return (
+                    <Tooltip title="No benchmark price found for this contract detail">
+                      <span><Texto weight="600" appearance="medium">—</Texto></span>
+                    </Tooltip>
+                  );
                   const avg = sum / count;
                   return (
-                    <Texto weight="600" className={getDeltaColorClass(avg)}>
+                    <Texto category="p2" weight="600" className={getDeltaColorClass(avg)}>
                       {avg >= 0 ? '+$' : '-$'}
                       {Math.abs(avg).toFixed(4)}/gal
                     </Texto>
@@ -1172,10 +1090,14 @@ export function ScenarioComparisonSection({
                 if (!fixedDeltas) return null;
                 const delta = fixedDeltas.perRow.get(record.detailId);
                 if (delta === null || delta === undefined) {
-                  return <Texto weight="600" appearance="medium">--</Texto>;
+                  return (
+                    <Tooltip title="No benchmark price found for this contract detail">
+                      <span><Texto category="p2" weight="600" appearance="medium">—</Texto></span>
+                    </Tooltip>
+                  );
                 }
                 return (
-                  <Texto weight="600" className={getDeltaColorClass(delta)}>
+                  <Texto category="p2" weight="600" className={getDeltaColorClass(delta)}>
                     {delta >= 0 ? '+$' : '-$'}
                     {Math.abs(delta).toFixed(4)}/gal
                   </Texto>
@@ -1185,7 +1107,7 @@ export function ScenarioComparisonSection({
           ]
         : [];
 
-    const actionColumn: ColumnsType<TableRow> = [
+    const actionColumn: ColumnsType<TableRow> = isFutureMode ? [
       {
         title: '',
         key: 'rowActions',
@@ -1219,9 +1141,9 @@ export function ScenarioComparisonSection({
           )
         },
       },
-    ];
+    ] : [];
 
-    return [...baseColumns, ...scenarioColumns, ...ghostColumn, ...fixedDeltaColumn, ...draftColumn, ...actionColumn];
+    return [...baseColumns, ...scenarioColumns, ...fixedDeltaColumn, ...actionColumn];
   }, [
     scenarios,
     hasComparisonScenarios,
@@ -1229,9 +1151,9 @@ export function ScenarioComparisonSection({
     isReferenceMode,
     isColumnReference,
     onSetColumnReference,
-    onSetReference,
     renderScenarioCell,
-    showDraftColumn,
+    addScenarioOpen,
+    addScenarioPopoverContent,
     handleSelectScenarioType,
     handleEditScenario,
     isFutureMode,
@@ -1300,11 +1222,10 @@ export function ScenarioComparisonSection({
                     {Math.abs(scenarioTotals?.avgCpgDelta).toFixed(4)}/gal
                   </Texto>
                   {scenarioTotals?.excludedCount > 0 && (
-                    <Tooltip title={`${scenarioTotals.excludedCount} no-match row(s) excluded from this average`}>
-                      <div className={styles.summaryExclusionIndicator}>
-                        <WarningFilled style={{ fontSize: 11 }} />
-                        <span>Avg of {scenarioTotals.includedCount}/{scenarioTotals.includedCount + scenarioTotals.excludedCount}</span>
-                      </div>
+                    <Tooltip title={`${scenarioTotals.excludedCount} row(s) had no benchmark price and are excluded from this average`}>
+                      <Texto category="p2" appearance="medium" style={{ cursor: 'default' }}>
+                        {scenarioTotals.includedCount}/{scenarioTotals.includedCount + scenarioTotals.excludedCount} rows
+                      </Texto>
                     </Tooltip>
                   )}
                 </td>
@@ -1318,26 +1239,23 @@ export function ScenarioComparisonSection({
                   {Math.abs(fixedDeltas.average).toFixed(4)}/gal
                 </Texto>
                 {fixedDeltas.excludedCount > 0 && (
-                  <Tooltip title={`${fixedDeltas.excludedCount} no-match row(s) excluded from this average`}>
-                    <div className={styles.summaryExclusionIndicator}>
-                      <WarningFilled style={{ fontSize: 11 }} />
-                      <span>Avg of {fixedDeltas.includedCount}/{fixedDeltas.includedCount + fixedDeltas.excludedCount}</span>
-                    </div>
+                  <Tooltip title={`${fixedDeltas.excludedCount} row(s) had no benchmark price and are excluded from this average`}>
+                    <Texto category="p2" appearance="medium" style={{ cursor: 'default' }}>
+                      {fixedDeltas.includedCount}/{fixedDeltas.includedCount + fixedDeltas.excludedCount} rows
+                    </Texto>
                   </Tooltip>
                 )}
               </td>
             )}
             {/* Ghost column (conditional, empty) */}
-            {!hasComparisonScenarios && !showDraftColumn && <td className={styles.summaryHeaderCell} />}
-            {/* Draft column (conditional, empty) */}
-            {showDraftColumn && <td className={styles.summaryHeaderCell} />}
-            {/* Action column (empty) */}
-            <td className={styles.summaryHeaderCell} />
+            {!hasComparisonScenarios && <td className={styles.summaryHeaderCell} />}
+            {/* Action column (empty, Future State only) */}
+            {isFutureMode && <td className={styles.summaryHeaderCell} />}
           </tr>
         </thead>
       )
     },
-    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, showDraftColumn, hasComparisonScenarios]
+    [sortedData.length, isFutureMode, scenarios, totals, filteredData, hasFixedDelta, fixedDeltas, hasComparisonScenarios]
   )
 
   if (scenarios.length === 0) {
@@ -1364,19 +1282,31 @@ export function ScenarioComparisonSection({
               ? 'Compare pricing scenarios across all product details'
               : 'Add a comparison scenario to get started'}
           </Texto>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+            <Texto category="p2" appearance="medium">Effective date:</Texto>
+            <DatePicker.RangePicker
+              value={effectiveDateRange ?? undefined}
+              onChange={(range) => onEffectiveDateRangeChange?.(range as [Dayjs | null, Dayjs | null] | null)}
+              allowClear
+            />
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
           {hasComparisonScenarios && (
             <>
-              <Texto category="p2" appearance="medium" weight="600">
-                Group by
-              </Texto>
-              <Select
-                value={groupingDimension}
-                onChange={onGroupingChange}
-                options={GROUPING_OPTIONS}
-                style={{ minWidth: 150 }}
-              />
+              {isFutureMode && (
+                <>
+                  <Texto category="p2" appearance="medium" weight="600">
+                    Group by
+                  </Texto>
+                  <Select
+                    value={groupingDimension}
+                    onChange={onGroupingChange}
+                    options={GROUPING_OPTIONS}
+                    style={{ minWidth: 150 }}
+                  />
+                </>
+              )}
               <Texto category="p2" appearance="medium" weight="600">
                 Filter by
               </Texto>
@@ -1425,18 +1355,17 @@ export function ScenarioComparisonSection({
               />
             </>
           )}
-          {!showDraftColumn && (
+          <Popover trigger="click" visible={addScenarioOpen} onVisibleChange={(v) => setAddScenarioOpen(v)} content={addScenarioPopoverContent}>
             <GraviButton
               buttonText="Add Scenario"
               icon={<PlusOutlined />}
               theme1
-              onClick={handleAddScenarioClick}
             />
-          )}
+          </Popover>
           {hasComparisonScenarios && (
             <GraviButton buttonText="Export Results" appearance="outlined" />
           )}
-          {selectedRowKeys.length > 0 && (
+          {isFutureMode && selectedRowKeys.length > 0 && (
             <>
               <div style={{ width: '1px', height: '24px', backgroundColor: '#e8e8e8' }} />
               <GraviButton
@@ -1466,13 +1395,13 @@ export function ScenarioComparisonSection({
       {isReferenceMode && (
         <div className={styles.infoBar}>
           <Texto category="p2">
-            <strong>Reference Selection Mode:</strong> Click cells or column headers to set which
-            scenario is the reference for each row.
+            <strong>Reference Selection Mode:</strong> Click a column header to set that scenario
+            as the reference for all rows.
           </Texto>
         </div>
       )}
 
-      {excludedDetailIds.size > 0 && (
+      {isFutureMode && excludedDetailIds.size > 0 && (
         <div className={styles.exclusionBar}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Texto category="p2">
@@ -1530,14 +1459,14 @@ export function ScenarioComparisonSection({
               components={{
                 header: { wrapper: HeaderWrapper },
               }}
-              rowSelection={{
+              rowSelection={isFutureMode ? {
                 selectedRowKeys,
                 onChange: (keys) => setSelectedRowKeys(keys as string[]),
                 getCheckboxProps: (record: TableRow) => ({
                   style: record.isGroupHeader ? { display: 'none' } : undefined,
                   disabled: record.isGroupHeader,
                 }),
-              }}
+              } : undefined}
               columns={columns}
               dataSource={displayData}
               rowKey={(record: TableRow) =>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, Fragment } from 'react'
 import { Texto, GraviButton, Horizontal, Vertical } from '@gravitate-js/excalibrr'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
 import {
@@ -14,25 +14,24 @@ import {
   ResponsiveContainer,
   Label,
 } from 'recharts'
-import { Select, Button, Segmented } from 'antd'
+import { Select, Button, Segmented, DatePicker } from 'antd'
+import type { Dayjs } from 'dayjs'
 import {
   LineChartOutlined,
   BarChartOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
-  CopyOutlined,
-  DownloadOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
-import type { Scenario, AnalysisParameters } from '../../types/scenario.types'
+import type { Scenario } from '../../types/scenario.types'
 import { SAMPLE_DETAILS, type ContractDetail } from '../../ContractMeasurement.data'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type Aggregation = AnalysisParameters['price']['aggregation']
-type Method = AnalysisParameters['price']['method']
+type Aggregation = 'daily' | 'weekly' | 'monthly' | 'quarterly'
+type Method = 'simple' | 'weekly-median' | 'monthly-median'
 
 interface ChartDataPoint {
   date: Date
@@ -55,10 +54,12 @@ interface DetailDailyData {
 }
 
 // ============================================================================
-// SCENARIO COLORS
+// COLOR SCHEME
 // ============================================================================
 
-const SCENARIO_COLORS = ['#722ed1', '#eb2f96', '#fa8c16', '#13c2c2', '#2f54eb', '#a0d911']
+// Per-detail palette (first is blue to match existing "Entire Deal" appearance)
+const DETAIL_COLORS = ['#1890ff', '#722ed1', '#fa8c16', '#13c2c2', '#eb2f96', '#a0d911', '#2f54eb']
+const SCENARIO_DASH_PATTERNS = ['8 4', '5 3', '12 3', '3 3']
 
 // ============================================================================
 // DATA GENERATION - Per-detail daily series
@@ -336,9 +337,8 @@ const cardStyle = {
   boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
 }
 
-// Chart colors (Quote Book aligned)
+// Chart colors for reference series
 const chartColors = {
-  contractPrice: '#1890ff',
   rackAverage: '#52c41a',
   spotPrice: '#ff4d4f',
   volume: '#1890ff',
@@ -449,19 +449,22 @@ interface HistoricalComparisonSectionProps {
   scenarios?: Scenario[]
   includedDetails?: ContractDetail[]
   aggregation: Aggregation
-  method: Method
   onAggregationChange: (value: Aggregation) => void
   hasComparisonScenarios?: boolean
+  effectiveDateRange?: [Dayjs | null, Dayjs | null] | null
+  onEffectiveDateRangeChange?: (range: [Dayjs | null, Dayjs | null] | null) => void
 }
 
 export function HistoricalComparisonSection({
   scenarios = [],
   includedDetails,
   aggregation,
-  method,
   onAggregationChange,
   hasComparisonScenarios = true,
+  effectiveDateRange,
+  onEffectiveDateRangeChange,
 }: HistoricalComparisonSectionProps) {
+  const method: Method = 'simple'
   const { isFutureMode } = useFeatureMode()
   const [activeView, setActiveView] = useState<ViewMode>('prices')
   const [visibleSeries, setVisibleSeries] = useState<VisibleSeries>({
@@ -469,7 +472,7 @@ export function HistoricalComparisonSection({
     rackAverage: true,
     spotPrice: true,
   })
-  const [selectedProduct, setSelectedProduct] = useState('all')
+  const [selectedDetails, setSelectedDetails] = useState<string[]>(['all'])
   const [visibleScenarios, setVisibleScenarios] = useState<Record<string, boolean>>({})
 
   const isScenarioVisible = (id: string) => visibleScenarios[id] !== false
@@ -498,16 +501,15 @@ export function HistoricalComparisonSection({
     return perDetailData.filter((d) => includedIds.has(d.detailId))
   }, [includedDetails])
 
-  // Auto-reset if currently-selected detail is excluded
+  // Auto-reset if any selected detail is excluded
   useEffect(() => {
-    if (
-      selectedProduct !== 'all' &&
-      includedDetails &&
-      !includedDetails.some((d) => d.detailId === selectedProduct)
-    ) {
-      setSelectedProduct('all')
-    }
-  }, [includedDetails, selectedProduct])
+    if (!includedDetails) return
+    const includedIds = new Set(includedDetails.map((d) => d.detailId))
+    setSelectedDetails((prev) => {
+      const filtered = prev.filter((key) => key === 'all' || includedIds.has(key))
+      return filtered.length > 0 ? filtered : ['all']
+    })
+  }, [includedDetails])
 
   // View dropdown options
   const viewOptions = useMemo(
@@ -515,37 +517,56 @@ export function HistoricalComparisonSection({
       { value: 'all', label: 'Entire Deal' },
       ...(includedDetails || SAMPLE_DETAILS).map((d) => ({
         value: d.detailId,
-        label: `${d.product} - ${d.location}`,
+        label: `${d.product} — ${d.location}`,
       })),
     ],
     [includedDetails],
   )
 
-  // Base daily data: entire deal (aggregated) or specific detail
-  const baseDailyData = useMemo(() => {
-    if (selectedProduct === 'all') {
-      return aggregateEntireDeal(includedPerDetailData, method)
-    }
-    const found = includedPerDetailData.find((d) => d.detailId === selectedProduct)
-    return found ? found.dailyData : includedPerDetailData[0]?.dailyData ?? []
-  }, [selectedProduct, method, includedPerDetailData])
-
-  // Aggregate + merge scenario prices
-  const displayData = useMemo(() => {
-    const aggregated = aggregateChartData(baseDailyData, aggregation, method)
-
-    if (nonReferenceScenarios.length === 0) return aggregated
-
-    return aggregated.map((point) => {
-      const extended: ChartDataPoint = { ...point }
-      nonReferenceScenarios.forEach((s, idx) => {
-        const scenarioPrice = deriveScenarioPrice(point, s, idx)
-        extended[`scenario-${s.id}`] = scenarioPrice
-        extended[`scenarioDiff-${s.id}`] = Number((scenarioPrice - (point.contractPrice as number)).toFixed(4))
-      })
-      return extended
+  // Resolve each selected key to its raw daily data + label
+  const selectedSeriesData = useMemo(() => {
+    const detailsToUse = includedDetails ?? SAMPLE_DETAILS
+    return selectedDetails.map((key) => {
+      if (key === 'all') {
+        return { key: 'all', label: 'Entire Deal', rawData: aggregateEntireDeal(includedPerDetailData, method) }
+      }
+      const d = detailsToUse.find((d) => d.detailId === key)
+      const rawData = includedPerDetailData.find((d) => d.detailId === key)?.dailyData ?? []
+      return { key, label: d ? `${d.product} — ${d.location}` : key, rawData }
     })
-  }, [baseDailyData, aggregation, method, nonReferenceScenarios])
+  }, [selectedDetails, method, includedPerDetailData, includedDetails])
+
+  // Aggregate each series
+  const allAggregatedSeries = useMemo(() => {
+    return selectedSeriesData.map(({ key, label, rawData }) => ({
+      key,
+      label,
+      data: aggregateChartData(rawData, aggregation, method),
+    }))
+  }, [selectedSeriesData, aggregation, method])
+
+  // Merge all series into a single ChartDataPoint[] array
+  // rackAverage and spotPrice come from the longest (base) series for reference lines
+  const displayData = useMemo(() => {
+    if (allAggregatedSeries.length === 0) return []
+    const base = allAggregatedSeries.reduce((a, b) => (a.data.length > b.data.length ? a : b))
+
+    return base.data.map((point, i) => {
+      const merged: ChartDataPoint = { ...point } // keeps rackAverage, spotPrice, volume from base
+      allAggregatedSeries.forEach(({ key, data }) => {
+        const p = data[i] ?? point
+        merged[`cp-${key}`] = p.contractPrice
+        merged[`rackAvgDiff-${key}`] = Number((p.contractPrice - p.rackAverage).toFixed(4))
+        merged[`spotDiff-${key}`] = Number((p.contractPrice - p.spotPrice).toFixed(4))
+        nonReferenceScenarios.forEach((s, sIdx) => {
+          const scenarioPrice = deriveScenarioPrice(p, s, sIdx)
+          merged[`scenario-${key}-${s.id}`] = scenarioPrice
+          merged[`scenarioDiff-${key}-${s.id}`] = Number((scenarioPrice - p.contractPrice).toFixed(4))
+        })
+      })
+      return merged
+    })
+  }, [allAggregatedSeries, nonReferenceScenarios])
 
   // Dynamic dot visibility — hide dots when data is dense
   const showDots = displayData.length <= 52
@@ -556,36 +577,46 @@ export function HistoricalComparisonSection({
     return Math.ceil(displayData.length / 14) - 1
   }, [displayData.length])
 
-  // Calculate Y-axis domain for prices view (include scenario prices)
+  // Calculate Y-axis domain for prices view
   const pricesDomain = useMemo(() => {
     const allPrices: number[] = []
     for (const d of displayData) {
-      allPrices.push(d.contractPrice as number, d.rackAverage as number, d.spotPrice as number)
-      nonReferenceScenarios.forEach((s) => {
-        const val = d[`scenario-${s.id}`]
-        if (typeof val === 'number') allPrices.push(val)
+      allPrices.push(d.rackAverage as number, d.spotPrice as number)
+      allAggregatedSeries.forEach(({ key }) => {
+        const cp = d[`cp-${key}`]
+        if (typeof cp === 'number') allPrices.push(cp)
+        nonReferenceScenarios.forEach((s) => {
+          const val = d[`scenario-${key}-${s.id}`]
+          if (typeof val === 'number') allPrices.push(val)
+        })
       })
     }
     const min = Math.min(...allPrices)
     const max = Math.max(...allPrices)
     const padding = (max - min) * 0.1
     return [min - padding, max + padding]
-  }, [displayData, nonReferenceScenarios])
+  }, [displayData, allAggregatedSeries, nonReferenceScenarios])
 
-  // Calculate Y-axis domain for difference view (include scenario diffs)
+  // Calculate Y-axis domain for difference view
   const differenceDomain = useMemo(() => {
     const allDiffs: number[] = []
     for (const d of displayData) {
-      allDiffs.push(d.rackAvgDiff as number, d.spotDiff as number)
-      nonReferenceScenarios.forEach((s) => {
-        const val = d[`scenarioDiff-${s.id}`]
-        if (typeof val === 'number') allDiffs.push(val)
+      allAggregatedSeries.forEach(({ key }) => {
+        const rd = d[`rackAvgDiff-${key}`]
+        const sd = d[`spotDiff-${key}`]
+        if (typeof rd === 'number') allDiffs.push(rd)
+        if (typeof sd === 'number') allDiffs.push(sd)
+        nonReferenceScenarios.forEach((s) => {
+          const val = d[`scenarioDiff-${key}-${s.id}`]
+          if (typeof val === 'number') allDiffs.push(val)
+        })
       })
     }
+    if (allDiffs.length === 0) return [-0.1, 0.1]
     const absMax = Math.max(...allDiffs.map(Math.abs))
     const padding = absMax * 0.2
     return [-(absMax + padding), absMax + padding]
-  }, [displayData, nonReferenceScenarios])
+  }, [displayData, allAggregatedSeries, nonReferenceScenarios])
 
   // Calculate volume domain
   const volumeDomain = useMemo(() => {
@@ -637,6 +668,16 @@ export function HistoricalComparisonSection({
             </Button>
           </Button.Group>
 
+          {/* Effective Date Range */}
+          <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+            <Texto category='p2' appearance='medium'>Effective date:</Texto>
+            <DatePicker.RangePicker
+              value={effectiveDateRange ?? undefined}
+              onChange={(range) => onEffectiveDateRangeChange?.(range as [Dayjs | null, Dayjs | null] | null)}
+              allowClear
+            />
+          </Horizontal>
+
           {/* Granularity Selector */}
           <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
             <Texto category='p2' appearance='medium'>
@@ -655,57 +696,98 @@ export function HistoricalComparisonSection({
             />
           </Horizontal>
 
-          {/* Product Filter / View */}
+          {/* Multi-select View */}
           <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
             <Texto category='p2' appearance='medium'>
               View:
             </Texto>
             <Select
-              value={selectedProduct}
-              onChange={setSelectedProduct}
-              style={{ width: 280 }}
+              mode='multiple'
+              value={selectedDetails}
+              onChange={(vals: string[]) => setSelectedDetails(vals.length > 0 ? vals : ['all'])}
+              style={{ minWidth: 280, maxWidth: 420 }}
+              maxTagCount={2}
+              maxTagPlaceholder={(omitted) => `+${omitted.length} more`}
               options={viewOptions}
             />
           </Horizontal>
 
-          {/* Right: Timestamp and Export */}
-          <Horizontal style={{ alignItems: 'center', gap: '16px' }}>
-            <Texto category='p2' appearance='medium'>
-              Updated 1m ago
-            </Texto>
-            <Horizontal style={{ gap: '8px' }}>
-              <GraviButton icon={<CopyOutlined />}>Copy Data</GraviButton>
-              <GraviButton icon={<DownloadOutlined />}>Export</GraviButton>
-            </Horizontal>
-          </Horizontal>
         </Horizontal>
 
         {/* Legend Controls */}
-        <Horizontal style={{ gap: '24px', marginBottom: '16px', flexWrap: 'wrap' }}>
-          {activeView === 'prices' && (
-            <Horizontal
-              style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-              onClick={() => toggleSeries('contractPrice')}
-            >
-              {visibleSeries.contractPrice ? (
-                <EyeOutlined style={{ color: '#8c8c8c' }} />
-              ) : (
-                <EyeInvisibleOutlined style={{ color: '#bfbfbf' }} />
-              )}
+        <Horizontal style={{ gap: '16px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          {/* Per-detail contract price groups */}
+          {allAggregatedSeries.map(({ key, label }, detailIdx) => {
+            const color = DETAIL_COLORS[detailIdx % DETAIL_COLORS.length]
+            return (
               <div
+                key={key}
                 style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  backgroundColor: visibleSeries.contractPrice ? chartColors.contractPrice : '#d9d9d9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: `1px solid ${color}22`,
+                  backgroundColor: `${color}08`,
                 }}
-              />
-              <Texto category='p2' style={{ color: visibleSeries.contractPrice ? '#262626' : '#bfbfbf' }}>
-                {selectedProduct === 'all' ? 'Current Contract' : 'Contract Price'}
-              </Texto>
-            </Horizontal>
-          )}
+              >
+                {/* Detail color swatch */}
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
+                <Texto category='p2' weight='600' style={{ color }}>
+                  {label}
+                </Texto>
+                {/* Contract price toggle (solid line indicator) */}
+                {activeView === 'prices' && (
+                  <span
+                    style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', marginLeft: '4px' }}
+                    onClick={() => toggleSeries('contractPrice')}
+                  >
+                    {visibleSeries.contractPrice ? (
+                      <EyeOutlined style={{ color: '#8c8c8c', fontSize: 12 }} />
+                    ) : (
+                      <EyeInvisibleOutlined style={{ color: '#bfbfbf', fontSize: 12 }} />
+                    )}
+                    <div style={{ width: 16, height: 2, backgroundColor: visibleSeries.contractPrice ? color : '#d9d9d9' }} />
+                    <Texto category='p2' style={{ color: visibleSeries.contractPrice ? '#595959' : '#bfbfbf' }}>
+                      Contract
+                    </Texto>
+                  </span>
+                )}
+                {/* Scenario indicators */}
+                {nonReferenceScenarios.map((s, sIdx) => {
+                  const visible = isScenarioVisible(s.id)
+                  const dash = SCENARIO_DASH_PATTERNS[sIdx % SCENARIO_DASH_PATTERNS.length]
+                  return (
+                    <span
+                      key={s.id}
+                      style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', marginLeft: '4px' }}
+                      onClick={() => toggleScenarioVisibility(s.id)}
+                    >
+                      {visible ? (
+                        <EyeOutlined style={{ color: '#8c8c8c', fontSize: 12 }} />
+                      ) : (
+                        <EyeInvisibleOutlined style={{ color: '#bfbfbf', fontSize: 12 }} />
+                      )}
+                      <svg width='16' height='4'>
+                        <line
+                          x1='0' y1='2' x2='16' y2='2'
+                          stroke={visible ? color : '#d9d9d9'}
+                          strokeWidth='2'
+                          strokeDasharray={dash}
+                        />
+                      </svg>
+                      <Texto category='p2' style={{ color: visible ? '#595959' : '#bfbfbf' }}>
+                        {s.name}
+                      </Texto>
+                    </span>
+                  )
+                })}
+              </div>
+            )
+          })}
 
+          {/* Reference line toggles */}
           <Horizontal
             style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
             onClick={() => toggleSeries('rackAverage')}
@@ -724,7 +806,7 @@ export function HistoricalComparisonSection({
               }}
             />
             <Texto category='p2' style={{ color: visibleSeries.rackAverage ? '#262626' : '#bfbfbf' }}>
-              {activeView === 'prices' ? 'Rack Average' : 'Rack Average Difference'}
+              {activeView === 'prices' ? 'Rack Average' : 'Rack Avg Diff'}
             </Texto>
             <div
               style={{
@@ -736,7 +818,7 @@ export function HistoricalComparisonSection({
                 borderRadius: '4px',
               }}
             >
-              REFERENCE
+              REF
             </div>
           </Horizontal>
 
@@ -758,39 +840,9 @@ export function HistoricalComparisonSection({
               }}
             />
             <Texto category='p2' style={{ color: visibleSeries.spotPrice ? '#262626' : '#bfbfbf' }}>
-              {activeView === 'prices' ? 'Spot Price' : 'Spot Price Difference'}
+              {activeView === 'prices' ? 'Spot Price' : 'Spot Diff'}
             </Texto>
           </Horizontal>
-
-          {/* Scenario legend entries */}
-          {nonReferenceScenarios.map((s, idx) => {
-            const color = SCENARIO_COLORS[idx % SCENARIO_COLORS.length]
-            const visible = isScenarioVisible(s.id)
-            return (
-              <Horizontal
-                key={s.id}
-                style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-                onClick={() => toggleScenarioVisibility(s.id)}
-              >
-                {visible ? (
-                  <EyeOutlined style={{ color: '#8c8c8c' }} />
-                ) : (
-                  <EyeInvisibleOutlined style={{ color: '#bfbfbf' }} />
-                )}
-                <div
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    backgroundColor: visible ? color : '#d9d9d9',
-                  }}
-                />
-                <Texto category='p2' style={{ color: visible ? '#262626' : '#bfbfbf' }}>
-                  {activeView === 'prices' ? s.name : `${s.name} Difference`}
-                </Texto>
-              </Horizontal>
-            )
-          })}
         </Horizontal>
 
         {/* Chart Container */}
@@ -879,23 +931,7 @@ export function HistoricalComparisonSection({
                   />
                 )}
 
-                {/* Contract Price - Area */}
-                {visibleSeries.contractPrice && (
-                  <Area
-                    yAxisId='price'
-                    type='monotone'
-                    dataKey='contractPrice'
-                    name={selectedProduct === 'all' ? 'Current Contract' : 'Contract Price'}
-                    stroke={chartColors.contractPrice}
-                    fill={chartColors.contractPrice}
-                    fillOpacity={0.15}
-                    strokeWidth={2}
-                    dot={showDots ? { r: 3, fill: chartColors.contractPrice } : false}
-                    activeDot={{ r: 5 }}
-                  />
-                )}
-
-                {/* Rack Average - Thick Line (REFERENCE) */}
+                {/* Rack Average - Thick Reference Line */}
                 {visibleSeries.rackAverage && (
                   <Line
                     yAxisId='price'
@@ -909,7 +945,7 @@ export function HistoricalComparisonSection({
                   />
                 )}
 
-                {/* Spot Price - Dashed Line */}
+                {/* Spot Price - Dashed Reference Line */}
                 {visibleSeries.spotPrice && (
                   <Line
                     yAxisId='price'
@@ -924,23 +960,59 @@ export function HistoricalComparisonSection({
                   />
                 )}
 
-                {/* Scenario Lines */}
-                {nonReferenceScenarios
-                  .filter((s) => isScenarioVisible(s.id))
-                  .map((s, idx) => (
-                    <Line
-                      key={s.id}
-                      yAxisId='price'
-                      type='monotone'
-                      dataKey={`scenario-${s.id}`}
-                      name={s.name}
-                      stroke={SCENARIO_COLORS[nonReferenceScenarios.indexOf(s) % SCENARIO_COLORS.length]}
-                      strokeWidth={2}
-                      strokeDasharray={idx % 2 === 0 ? undefined : '8 4'}
-                      dot={showDots ? { r: 2 } : false}
-                      activeDot={{ r: 4 }}
-                    />
-                  ))}
+                {/* Per-detail contract price and scenario lines */}
+                {allAggregatedSeries.map(({ key, label }, detailIdx) => {
+                  const color = DETAIL_COLORS[detailIdx % DETAIL_COLORS.length]
+                  return (
+                    <Fragment key={key}>
+                      {/* Contract Price — Area when single detail, Line when multiple */}
+                      {visibleSeries.contractPrice && (
+                        allAggregatedSeries.length === 1 ? (
+                          <Area
+                            yAxisId='price'
+                            type='monotone'
+                            dataKey={`cp-${key}`}
+                            name={label}
+                            stroke={color}
+                            fill={color}
+                            fillOpacity={0.15}
+                            strokeWidth={2}
+                            dot={showDots ? { r: 3, fill: color } : false}
+                            activeDot={{ r: 5 }}
+                          />
+                        ) : (
+                          <Line
+                            yAxisId='price'
+                            type='monotone'
+                            dataKey={`cp-${key}`}
+                            name={label}
+                            stroke={color}
+                            strokeWidth={2}
+                            dot={showDots ? { r: 3, fill: color } : false}
+                            activeDot={{ r: 5 }}
+                          />
+                        )
+                      )}
+                      {/* Scenario lines for this detail */}
+                      {nonReferenceScenarios
+                        .filter((s) => isScenarioVisible(s.id))
+                        .map((s, sIdx) => (
+                          <Line
+                            key={`scenario-${key}-${s.id}`}
+                            yAxisId='price'
+                            type='monotone'
+                            dataKey={`scenario-${key}-${s.id}`}
+                            name={allAggregatedSeries.length === 1 ? s.name : `${label} — ${s.name}`}
+                            stroke={color}
+                            strokeWidth={1.5}
+                            strokeDasharray={SCENARIO_DASH_PATTERNS[sIdx % SCENARIO_DASH_PATTERNS.length]}
+                            dot={false}
+                            activeDot={{ r: 4 }}
+                          />
+                        ))}
+                    </Fragment>
+                  )
+                })}
               </ComposedChart>
             ) : (
               <ComposedChart data={displayData} margin={{ top: 20, right: 40, bottom: 20, left: 80 }}>
@@ -984,49 +1056,55 @@ export function HistoricalComparisonSection({
                   cursor={{ strokeDasharray: '3 3' }}
                 />
 
-                {/* Rack Average Difference - Solid Line */}
-                {visibleSeries.rackAverage && (
-                  <Line
-                    type='monotone'
-                    dataKey='rackAvgDiff'
-                    name='Rack Average Difference'
-                    stroke={chartColors.rackAverage}
-                    strokeWidth={2}
-                    dot={showDots ? { r: 3, fill: chartColors.rackAverage } : false}
-                    activeDot={{ r: 5 }}
-                  />
-                )}
-
-                {/* Spot Price Difference - Dashed Line */}
-                {visibleSeries.spotPrice && (
-                  <Line
-                    type='monotone'
-                    dataKey='spotDiff'
-                    name='Spot Price Difference'
-                    stroke={chartColors.spotPrice}
-                    strokeWidth={2}
-                    strokeDasharray='5 5'
-                    dot={showDots ? { r: 3, fill: chartColors.spotPrice } : false}
-                    activeDot={{ r: 5 }}
-                  />
-                )}
-
-                {/* Scenario Difference Lines */}
-                {nonReferenceScenarios
-                  .filter((s) => isScenarioVisible(s.id))
-                  .map((s, idx) => (
-                    <Line
-                      key={s.id}
-                      type='monotone'
-                      dataKey={`scenarioDiff-${s.id}`}
-                      name={`${s.name} Difference`}
-                      stroke={SCENARIO_COLORS[nonReferenceScenarios.indexOf(s) % SCENARIO_COLORS.length]}
-                      strokeWidth={2}
-                      strokeDasharray={idx % 2 === 0 ? undefined : '8 4'}
-                      dot={showDots ? { r: 2 } : false}
-                      activeDot={{ r: 4 }}
-                    />
-                  ))}
+                {/* Per-detail difference lines */}
+                {allAggregatedSeries.map(({ key, label }, detailIdx) => {
+                  const color = DETAIL_COLORS[detailIdx % DETAIL_COLORS.length]
+                  return (
+                    <Fragment key={key}>
+                      {/* Rack Avg Diff */}
+                      {visibleSeries.rackAverage && (
+                        <Line
+                          type='monotone'
+                          dataKey={`rackAvgDiff-${key}`}
+                          name={allAggregatedSeries.length === 1 ? 'Rack Average Difference' : `${label} vs Rack Avg`}
+                          stroke={color}
+                          strokeWidth={2}
+                          dot={showDots ? { r: 3, fill: color } : false}
+                          activeDot={{ r: 5 }}
+                        />
+                      )}
+                      {/* Spot Diff */}
+                      {visibleSeries.spotPrice && (
+                        <Line
+                          type='monotone'
+                          dataKey={`spotDiff-${key}`}
+                          name={allAggregatedSeries.length === 1 ? 'Spot Price Difference' : `${label} vs Spot`}
+                          stroke={color}
+                          strokeWidth={2}
+                          strokeDasharray='5 5'
+                          dot={showDots ? { r: 3, fill: color } : false}
+                          activeDot={{ r: 5 }}
+                        />
+                      )}
+                      {/* Scenario diff lines */}
+                      {nonReferenceScenarios
+                        .filter((s) => isScenarioVisible(s.id))
+                        .map((s, sIdx) => (
+                          <Line
+                            key={`scenarioDiff-${key}-${s.id}`}
+                            type='monotone'
+                            dataKey={`scenarioDiff-${key}-${s.id}`}
+                            name={allAggregatedSeries.length === 1 ? `${s.name} Difference` : `${label} — ${s.name} Diff`}
+                            stroke={color}
+                            strokeWidth={1.5}
+                            strokeDasharray={SCENARIO_DASH_PATTERNS[sIdx % SCENARIO_DASH_PATTERNS.length]}
+                            dot={false}
+                            activeDot={{ r: 4 }}
+                          />
+                        ))}
+                    </Fragment>
+                  )
+                })}
               </ComposedChart>
             )}
           </ResponsiveContainer>

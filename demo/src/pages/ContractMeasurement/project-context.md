@@ -3450,4 +3450,55 @@ The preview validation panel (MatchingSummaryCard, EstimatedImpactCard, ProductB
 | `../../shared/data/generators.data.ts` | Added fields to `GeneratedContractDetail`; deterministic date generation in `generateContractDetails()` |
 | `sections/benchmarks/ScenarioComparisonSection.tsx` | `formatShortDate` helper; updated detail column renderer with 4-line layout; width 180→200 |
 
+### Session 31 (2026-03-05) - Gate 4 Features Behind `isFutureMode`
+
+**Context:** Four features in the Benchmarks / ScenarioComparison area moved to Future State (hidden in MVP mode). All files already had `isFutureMode` wired up — this session adds the conditional guards.
+
+**Completed:**
+
+1. **Delete menu item** (`ContractMeasurementGrid.tsx` ~238) — Wrapped `<Menu.Item key="delete">` with `{isFutureMode && (...)}`. In MVP the action menu shows Edit/Archive/Restore only.
+
+2. **Instrument picker popover** (`ScenarioComparisonSection.tsx` ~740–773) — No-match cells now conditionally render: Future → full Popover with `InstrumentPickerPopover` + "Select instrument" link; MVP → static no-match cell (WarningFilled + BBDTag + product name, no link).
+
+3. **Group by control** (`ScenarioComparisonSection.tsx` ~1369–1379) — "Group by" label + Select wrapped in `{isFutureMode && (...)}`. Filter by controls remain visible in both modes.
+
+4. **Remove rows** (`ScenarioComparisonSection.tsx` ~1439–1462 and rowSelection ~1533–1540):
+   - "Remove X Selected" button gated by `isFutureMode && selectedRowKeys.length > 0`
+   - `rowSelection` Table prop is `undefined` in MVP (hides row checkboxes entirely)
+
+5. **Reference mode info bar text** (`ScenarioComparisonSection.tsx` ~1466–1473) — Mode-aware text:
+   - MVP: "Click a column header to set that scenario as the reference for all rows."
+   - Future: "Click cells or column headers to set which scenario is the reference for each row."
+
+6. **Per-cell reference checkbox** (`ScenarioCellRenderer.tsx` ~39–43) — Changed `{isReferenceMode && (...)}` → `{isReferenceMode && isFutureMode && (...)}`. Column-header checkbox is unchanged (MVP-visible).
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `ContractMeasurementGrid.tsx` | Delete menu item wrapped in `isFutureMode` guard |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | Instrument picker, Group by, Remove rows, rowSelection, info bar text all gated |
+| `sections/benchmarks/ScenarioCellRenderer.tsx` | Per-cell reference checkbox requires `isFutureMode` |
+
+### Session 32 (2026-03-05) - Column Cleanup & Label Rename
+
+**Context:** Streamlining the Measurements grid and renaming a column header in Scenario Comparison.
+
+**Completed:**
+
+1. **Remove 5 columns from Measurements grid** (`ContractMeasurementGrid.tsx`):
+   - Removed: VOLUME PROGRESS, RATABILITY, RISK LEVEL, MARGIN (CPG), PROFITABILITY
+   - Remaining columns: CONTRACT ID → CUSTOMER → TYPE → INSTRUMENT → CONTRACT PERIOD → DAYS LEFT → BENCHMARK IMPACT → actions
+
+2. **Rename "Delta vs Contract" → "Reference vs Contract"** (`sections/benchmarks/ScenarioComparisonSection.tsx`):
+   - `fixedDeltaColumn` title: changed `DELTA` → `REFERENCE` (line ~1152)
+   - `vs Contract` subtitle unchanged
+
+**Files Modified:**
+
+| File | Changes |
+|------|---------|
+| `ContractMeasurementGrid.tsx` | Removed volumeProgress, ratability, riskLevel, margin, profitability column defs |
+| `sections/benchmarks/ScenarioComparisonSection.tsx` | fixedDeltaColumn header: DELTA → REFERENCE |
+
 **Build status:** Vite build passes. No new TS errors.

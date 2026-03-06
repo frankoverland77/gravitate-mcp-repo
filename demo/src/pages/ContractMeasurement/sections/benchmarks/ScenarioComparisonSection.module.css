@@ -63,9 +63,14 @@
   overflow: auto;
 }
 
+.tableContainer :global(.ant-table-small .ant-table-tbody > tr > td),
+.tableContainer :global(.ant-table-small .ant-table-thead > tr > th) {
+  padding: 12px;
+}
+
 .scenarioCell {
-  padding: 8px;
-  margin: -8px;
+  padding: 12px;
+  margin: -12px;
   position: relative;
   height: 100%;
   min-height: 100px;
@@ -83,8 +88,8 @@
   align-items: center;
   justify-content: center;
   min-height: 100px;
-  padding: 8px;
-  margin: -8px;
+  padding: 12px;
+  margin: -12px;
   background-color: #fafafa;
 }
 
@@ -93,8 +98,8 @@
   align-items: center;
   justify-content: center;
   min-height: 100px;
-  padding: 8px;
-  margin: -8px;
+  padding: 12px;
+  margin: -12px;
   background-color: #fafafa;
 }
 
@@ -145,7 +150,7 @@
 
 .summaryHeaderRow td {
   border-bottom: 1px solid #e8e8e8;
-  padding: 8px 12px;
+  padding: 12px 16px;
   vertical-align: middle;
 }
 
@@ -329,7 +334,7 @@
 
 /* Group child row indentation */
 .groupChildRow td:first-child {
-  padding-left: 32px;
+  padding-left: 36px;
 }
 
 /* Group header cell (detail column) */
@@ -356,8 +361,8 @@
   justify-content: center;
   gap: 6px;
   min-height: 100px;
-  padding: 12px 8px;
-  margin: -8px;
+  padding: 16px 12px;
+  margin: -12px;
   background-color: #fff2f0;
   border-left: 3px solid #ff4d4f;
   cursor: pointer;
@@ -406,8 +411,8 @@
 
 /* Partial-match cell — amber border + tint */
 .partialMatchCell {
-  padding: 8px;
-  margin: -8px;
+  padding: 12px;
+  margin: -12px;
   position: relative;
   height: 100%;
   min-height: 100px;

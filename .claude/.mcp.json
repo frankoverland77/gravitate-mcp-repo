@@ -4,10 +4,6 @@
       "command": "node",
       "args": ["/Users/frankoverland/Documents/repos/excalibrr-mcp-server/mcp-server/build/index.js"],
       "env": {}
-    },
-    "Figma Desktop": {
-      "url": "http://127.0.0.1:3845/mcp"
     }
   }
 }
-

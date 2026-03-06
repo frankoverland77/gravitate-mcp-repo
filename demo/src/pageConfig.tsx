@@ -13,6 +13,7 @@ import {
   DollarOutlined,
   BgColorsOutlined,
   LineChartOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
@@ -44,6 +45,8 @@ import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
 import { FreightManagement } from './pages/DeliveredPricing/FreightManagement/FreightManagement';
 import { TaxManagement } from './pages/DeliveredPricing/TaxManagement/TaxManagement';
 import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesale';
+import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBook';
+import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRows';
 import {
   TypographyShowcase,
   ButtonsShowcase,
@@ -819,6 +822,39 @@ export const createPageConfig = (): PageConfig => {
       </ThemeRouteWrapper>
     ),
     path: '/PriceElasticity',
+  };
+
+  config.QuotePricing = {
+    hasPermission: () => true,
+    key: 'QuotePricing',
+    icon: <BookOutlined />,
+    title: 'Quote Pricing',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'QuoteBook',
+        title: 'Quote Book',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <QuoteBook />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotePricing/QuoteBook',
+        description: 'Live pricing grid for managing and publishing quote group prices',
+      },
+      {
+        hasPermission: () => true,
+        key: 'ManageQuoteRows',
+        title: 'Manage Quote Rows',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ManageQuoteRows />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotePricing/ManageQuoteRows',
+        description: 'Configure which products and locations have active quote rows',
+      },
+    ],
   };
 
   config.QuotebookWholesale = {

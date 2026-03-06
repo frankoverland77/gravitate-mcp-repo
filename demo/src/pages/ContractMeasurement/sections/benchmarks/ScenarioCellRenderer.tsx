@@ -1,5 +1,5 @@
 import { Texto, Horizontal, Vertical } from '@gravitate-js/excalibrr';
-import { Checkbox, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { StarFilled, ExclamationCircleOutlined } from '@ant-design/icons';
 import type { ScenarioCellData } from '../../types/scenario.types';
 import styles from './ScenarioComparisonSection.module.css';
@@ -9,8 +9,6 @@ interface ScenarioCellRendererProps {
   cellData: ScenarioCellData;
   isReferenceForRow: boolean;
   showRowStar: boolean;
-  isReferenceMode: boolean;
-  onSetReference: () => void;
 }
 
 function getDeltaColorClass(delta: number | undefined): string {
@@ -24,8 +22,6 @@ export function ScenarioCellRenderer({
   cellData,
   isReferenceForRow,
   showRowStar,
-  isReferenceMode,
-  onSetReference,
 }: ScenarioCellRendererProps) {
   const { isFutureMode } = useFeatureMode();
   const hasPartialData = !!cellData.missingPriceInfo;
@@ -36,12 +32,6 @@ export function ScenarioCellRenderer({
 
   return (
     <div className={cellClassName}>
-      {isReferenceMode && (
-        <div className={styles.cellCheckbox}>
-          <Checkbox checked={isReferenceForRow} onChange={onSetReference} />
-        </div>
-      )}
-
       <Vertical gap="4px" alignItems="flex-start">
         <Horizontal alignItems="center" gap="8px" justifyContent="flex-start">
           <Texto weight="600">${cellData.price.toFixed(2)}/gal</Texto>

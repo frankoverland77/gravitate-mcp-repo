@@ -37,12 +37,12 @@ export function ContractMeasurementDetails() {
   return (
     <div className={styles.detailsPage}>
       {/* Page Header with Back Button - flexShrink: 0 prevents compression */}
-      <Horizontal alignItems="center" className={styles.pageHeader} style={{ gap: '12px' }}>
+      <Horizontal alignItems="center" className={styles.pageHeader} style={{ gap: '12px', background: 'transparent' }}>
         <GraviButton
           type="text"
           icon={<LeftOutlined />}
           onClick={handleBack}
-          style={{ padding: '4px 8px' }}
+          style={{ padding: '4px 8px', background: 'transparent', border: 'none', boxShadow: 'none' }}
         />
         <Texto category="h3" weight="600">
           Measurement Details - ID: {data.id}
@@ -53,7 +53,7 @@ export function ContractMeasurementDetails() {
             icon={<LinkOutlined />}
             buttonText={data.contractId}
             onClick={handleViewContract}
-            style={{ color: 'var(--theme-color-link, #1890ff)', fontWeight: 500 }}
+            style={{ color: '#595959', textDecoration: 'underline', fontWeight: 500, background: 'transparent', border: 'none', boxShadow: 'none' }}
           />
         )}
       </Horizontal>

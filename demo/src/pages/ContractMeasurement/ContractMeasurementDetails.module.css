@@ -12,6 +12,7 @@
 .pageHeader {
   flex-shrink: 0;
   margin-bottom: 16px;
+  background: transparent;
 }
 
 /* Tabs container - enable proper flex behavior for scrollable content */

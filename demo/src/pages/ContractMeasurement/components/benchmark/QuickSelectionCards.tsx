@@ -1,10 +1,10 @@
 import { Texto, Horizontal, Vertical } from '@gravitate-js/excalibrr'
 import { BarChartOutlined, LineChartOutlined, StockOutlined, FileTextOutlined } from '@ant-design/icons'
-import type { BenchmarkType } from '../../types/scenario.types'
+import type { QuickBenchmarkType } from '../../types/scenario.types'
 import styles from './BenchmarkSelector.module.css'
 
 interface BenchmarkOptionConfig {
-  type: BenchmarkType
+  type: QuickBenchmarkType
   title: string
   description: string
   icon: React.ReactNode
@@ -37,7 +37,12 @@ export const BENCHMARK_OPTIONS: BenchmarkOptionConfig[] = [
   },
 ]
 
-export function ReferenceLegendCards() {
+interface ReferenceLegendCardsProps {
+  selectedType?: QuickBenchmarkType
+  onTypeSelect?: (type: QuickBenchmarkType, title: string) => void
+}
+
+export function ReferenceLegendCards({ selectedType, onTypeSelect }: ReferenceLegendCardsProps) {
   return (
     <div>
       <Texto
@@ -50,7 +55,17 @@ export function ReferenceLegendCards() {
       </Texto>
       <Vertical style={{ gap: '10px' }}>
         {BENCHMARK_OPTIONS.map((option) => (
-          <div key={option.type} className={styles.optionCard}>
+          <div
+            key={option.type}
+            className={[
+              styles.optionCard,
+              onTypeSelect ? styles.optionCardClickable : '',
+              selectedType === option.type ? styles.optionCardSelected : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={() => onTypeSelect?.(option.type, option.title)}
+          >
             <Horizontal alignItems='flex-start' style={{ gap: '12px' }}>
               {option.icon}
               <Vertical style={{ gap: '4px', flex: 1 }}>

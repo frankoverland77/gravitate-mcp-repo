@@ -9,6 +9,8 @@
 
 // Import shared types for price publisher consistency
 import type { PricePublisher } from '../../../shared/types'
+import type { FormulaMode } from '../../../shared/types/formula.types'
+export type { FormulaMode }
 
 // Re-export for backward compatibility
 export type { PricePublisher as BenchmarkPublisherType }
@@ -81,6 +83,8 @@ export interface ScenarioFormulaComponent {
   dateRule: string;
   required: boolean;
   customDisplayName?: string | null;
+  differential?: number;  // +/- adjustment in $/gal
+  group?: number;         // formula group (1, 2, or 3) for Lower-of modes
 }
 
 // Per-detail formula configuration for formula scenarios
@@ -92,6 +96,7 @@ export interface DetailFormulaConfig {
   status: DetailStatus;
   components: ScenarioFormulaComponent[];
   hasTemplate?: boolean;
+  formulaMode?: FormulaMode;
 }
 
 // Clipboard state for copy/paste workflow
@@ -123,6 +128,7 @@ export interface Scenario {
     publisher?: BenchmarkPublisher;
     productHierarchy?: ProductHierarchy;
     locationHierarchy?: LocationHierarchy;
+    quickBenchmarkType?: QuickBenchmarkType;
     diff?: {
       sign: '+' | '-';
       amount: number;

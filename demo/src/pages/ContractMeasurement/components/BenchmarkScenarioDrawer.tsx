@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Texto, Horizontal, Vertical, GraviButton } from '@gravitate-js/excalibrr'
 import { Drawer, Button, Input, Segmented } from 'antd'
-import type { SelectedBenchmark, Scenario } from '../types/scenario.types'
+import type { SelectedBenchmark, Scenario, QuickBenchmarkType } from '../types/scenario.types'
 import { generateScenarioId } from '../types/scenario.types'
 import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 import { BenchmarkSelector, ExistingBenchmarkSelector } from './benchmark'
@@ -36,10 +36,15 @@ export function BenchmarkScenarioDrawer({
   const [diffAmount, setDiffAmount] = useState<number>(0)
   const [benchmarkMode, setBenchmarkMode] = useState<'existing' | 'new'>('existing')
   const [managedBenchmarkId, setManagedBenchmarkId] = useState<string | undefined>(undefined)
+  const [selectedCommonType, setSelectedCommonType] = useState<QuickBenchmarkType | undefined>(undefined)
 
   const isEditMode = !!editingScenario
 
-  // Reset form when drawer opens, or populate with editing data
+  // Reset form when drawer opens, or populate with editing data.
+  // Only depend on `visible` — editingScenario is set by the parent in the
+  // same React batch before visible changes, so it's available when this fires.
+  // Including editingScenario caused the effect to re-fire on parent re-renders
+  // (new object reference), resetting selectedBenchmark and keeping the button disabled.
   useEffect(() => {
     if (visible) {
       if (editingScenario) {
@@ -49,6 +54,7 @@ export function BenchmarkScenarioDrawer({
         setDiffAmount(editingScenario.priceConfig?.diff?.amount ?? 0)
         setBenchmarkMode(editingScenario.priceConfig?.source === 'adhoc' ? 'new' : 'existing')
         setManagedBenchmarkId(editingScenario.priceConfig?.managedBenchmarkId)
+        setSelectedCommonType(editingScenario.priceConfig?.quickBenchmarkType)
         if (editingScenario.priceConfig?.publisher) {
           setSelectedBenchmark({
             publisher: editingScenario.priceConfig.publisher,
@@ -64,9 +70,11 @@ export function BenchmarkScenarioDrawer({
         setDiffAmount(0)
         setBenchmarkMode('existing')
         setManagedBenchmarkId(undefined)
+        setSelectedCommonType(undefined)
       }
     }
-  }, [visible, editingScenario])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible])
 
   // Compute preview data reactively from selected benchmark
   const hasFullBenchmark =
@@ -91,12 +99,20 @@ export function BenchmarkScenarioDrawer({
   )
 
   // Validation: need name and a fully configured benchmark
-  const canSave =
-    name.trim().length > 0 &&
-    selectedBenchmark !== undefined &&
-    selectedBenchmark.publisher !== undefined &&
-    selectedBenchmark.productHierarchy !== undefined &&
-    selectedBenchmark.locationHierarchy !== undefined
+  const canSave = useMemo(() => {
+    if (name.trim().length === 0) return false
+    if (!selectedBenchmark) return false
+    if (!selectedBenchmark.publisher) return false
+    if (!selectedBenchmark.productHierarchy) return false
+    if (!selectedBenchmark.locationHierarchy) return false
+    if (benchmarkMode === 'new' && !selectedCommonType) return false
+    return true
+  }, [name, selectedBenchmark, benchmarkMode, selectedCommonType])
+
+  const handleCommonBenchmarkSelect = (type: QuickBenchmarkType, title: string) => {
+    setSelectedCommonType(type)
+    setName(title)
+  }
 
   const handleSave = () => {
     if (!canSave || !selectedBenchmark) return
@@ -108,6 +124,7 @@ export function BenchmarkScenarioDrawer({
       publisher: selectedBenchmark.publisher,
       productHierarchy: selectedBenchmark.productHierarchy,
       locationHierarchy: selectedBenchmark.locationHierarchy,
+      quickBenchmarkType: benchmarkMode === 'new' ? selectedCommonType : undefined,
       diff: { sign: diffSign, amount: diffAmount },
     }
 
@@ -225,6 +242,7 @@ export function BenchmarkScenarioDrawer({
               setBenchmarkMode(value as 'existing' | 'new')
               setSelectedBenchmark(undefined)
               setManagedBenchmarkId(undefined)
+              setSelectedCommonType(undefined)
             }}
             options={[
               { value: 'existing', label: 'Select Existing' },
@@ -248,7 +266,10 @@ export function BenchmarkScenarioDrawer({
           <div style={{ display: 'flex', gap: '24px' }}>
             {/* Left column: Reference Legend */}
             <div style={{ width: '220px', flexShrink: 0 }}>
-              <ReferenceLegendCards />
+              <ReferenceLegendCards
+                selectedType={selectedCommonType}
+                onTypeSelect={handleCommonBenchmarkSelect}
+              />
             </div>
 
             {/* Center column: Benchmark Configuration */}

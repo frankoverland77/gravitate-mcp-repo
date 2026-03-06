@@ -1,15 +1,15 @@
 import { useState, useCallback, useMemo } from 'react'
 import { Texto } from '@gravitate-js/excalibrr'
 import { Segmented } from 'antd'
-import { SettingOutlined, WarningFilled } from '@ant-design/icons'
+import { WarningFilled } from '@ant-design/icons'
+import type { Dayjs } from 'dayjs'
 import { ScenarioComparisonSection } from '../sections/benchmarks/ScenarioComparisonSection'
 import { HistoricalComparisonSection } from '../sections/benchmarks'
 import { ScenarioDrawer } from '../components/ScenarioDrawer'
-import { ParametersModal } from '../components/ParametersModal'
 import { getDeltaColorClass } from '../sections/benchmarks/ScenarioCellRenderer'
 import { SAMPLE_DETAILS } from '../ContractMeasurement.data'
-import type { Scenario, AnalysisParameters, ScenarioFormData, GroupingDimension } from '../types/scenario.types'
-import { DEFAULT_PARAMETERS, generateScenarioId } from '../types/scenario.types'
+import type { Scenario, ScenarioFormData, GroupingDimension } from '../types/scenario.types'
+import { generateScenarioId } from '../types/scenario.types'
 
 // Initial sample scenarios
 const INITIAL_SCENARIOS: Scenario[] = [
@@ -42,8 +42,8 @@ export function BenchmarksTab() {
   // Scenarios state
   const [scenarios, setScenarios] = useState<Scenario[]>(INITIAL_SCENARIOS)
 
-  // Parameters state
-  const [parameters, setParameters] = useState<AnalysisParameters>(DEFAULT_PARAMETERS)
+  // Aggregation state for historical comparison
+  const [aggregation, setAggregation] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('daily')
 
   // Primary selections per row (detailId -> scenarioId)
   const [referenceSelections, setReferenceSelections] = useState<Record<string, string>>({})
@@ -69,8 +69,8 @@ export function BenchmarksTab() {
   const [drawerVisible, setDrawerVisible] = useState(false)
   const [editingScenario, setEditingScenario] = useState<Scenario | undefined>(undefined)
 
-  // Parameters modal state
-  const [parametersModalVisible, setParametersModalVisible] = useState(false)
+  // Effective date range state
+  const [effectiveDateRange, setEffectiveDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
 
   // Handle adding a new scenario (directly receives the scenario object)
   const handleAddScenario = useCallback((scenario: Scenario) => {
@@ -154,14 +154,6 @@ export function BenchmarksTab() {
   // Handle restoring all excluded details
   const handleRestoreAll = useCallback(() => {
     setExcludedDetailIds(new Set())
-  }, [])
-
-  // Handle setting primary for a specific row
-  const handleSetReference = useCallback((detailId: string, scenarioId: string) => {
-    setReferenceSelections((prev) => ({
-      ...prev,
-      [detailId]: scenarioId,
-    }))
   }, [])
 
   // Handle setting primary for entire column
@@ -333,8 +325,8 @@ export function BenchmarksTab() {
           </div>
         )}
 
-        {/* View Toggle with Parameters link */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+        {/* View Toggle */}
+        <div style={{ flexShrink: 0 }}>
           <Segmented
             size="large"
             options={[
@@ -344,15 +336,6 @@ export function BenchmarksTab() {
             value={activeView}
             onChange={(value) => setActiveView(value as ViewTab)}
           />
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
-            onClick={() => setParametersModalVisible(true)}
-          >
-            <SettingOutlined style={{ fontSize: '14px', color: '#666' }} />
-            <Texto category="p2" appearance="medium" style={{ textDecoration: 'underline' }}>
-              Parameters
-            </Texto>
-          </div>
         </div>
 
         {/* Conditional Content */}
@@ -365,7 +348,6 @@ export function BenchmarksTab() {
             onRestoreDetails={handleRestoreDetails}
             onRestoreAll={handleRestoreAll}
             referenceSelections={referenceSelections}
-            onSetReference={handleSetReference}
             onSetColumnReference={handleSetColumnReference}
             onAddScenario={handleAddScenario}
             onUpdateScenario={handleUpdateScenario}
@@ -373,20 +355,18 @@ export function BenchmarksTab() {
             groupingDimension={groupingDimension}
             onGroupingChange={setGroupingDimension}
             hasComparisonScenarios={hasComparisonScenarios}
+            effectiveDateRange={effectiveDateRange}
+            onEffectiveDateRangeChange={setEffectiveDateRange}
           />
         ) : (
           <HistoricalComparisonSection
             scenarios={scenarios}
             includedDetails={includedDetails}
-            aggregation={parameters.price.aggregation}
-            method={parameters.price.method}
-            onAggregationChange={(value) =>
-              setParameters((prev) => ({
-                ...prev,
-                price: { ...prev.price, aggregation: value },
-              }))
-            }
+            aggregation={aggregation}
+            onAggregationChange={setAggregation}
             hasComparisonScenarios={hasComparisonScenarios}
+            effectiveDateRange={effectiveDateRange}
+            onEffectiveDateRangeChange={setEffectiveDateRange}
           />
         )}
       </div>
@@ -399,16 +379,6 @@ export function BenchmarksTab() {
         onSave={handleSaveScenario}
       />
 
-      {/* Parameters Modal */}
-      <ParametersModal
-        visible={parametersModalVisible}
-        parameters={parameters}
-        onClose={() => setParametersModalVisible(false)}
-        onApply={(newParams) => {
-          setParameters(newParams)
-          setParametersModalVisible(false)
-        }}
-      />
     </>
   )
 }

@@ -101,6 +101,61 @@
   display: block;
 }
 
+/* Formula header: type selector + generated formula preview */
+.formulaHeader {
+  padding: 12px 0 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 12px 14px 14px;
+  margin-bottom: 16px;
+}
+
+.formulaTypeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.formulaPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formulaExpression {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 6px 10px;
+  min-height: 32px;
+  color: #595959;
+  line-height: 1.5;
+}
+
+.formulaExpressionEmpty {
+  color: #722ed1;
+  font-style: italic;
+}
+
+/* Grouped formula sections (Lower-of modes) */
+.groupSection {
+  margin-bottom: 20px;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
 /* Actions row */
 .actions {
   display: flex;
