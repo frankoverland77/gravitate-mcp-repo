@@ -1033,7 +1033,17 @@ export function ScenarioComparisonSection({
           }
           return renderScenarioCell(record as ComparisonRowData, scenario);
         },
-        onCell: () => ({ style: { verticalAlign: 'top' } }),
+        onCell: (record: TableRow) => {
+          const style: React.CSSProperties = { verticalAlign: 'top' };
+          if (!record.isGroupHeader) {
+            const compRecord = record as ComparisonRowData;
+            const isRef =
+              referenceSelections[compRecord.detailId] === scenario.id ||
+              (!referenceSelections[compRecord.detailId] && (scenario.isReference ?? false));
+            if (isRef) style.backgroundColor = 'rgba(81, 176, 115, 0.08)';
+          }
+          return { style };
+        },
       };
     });
 

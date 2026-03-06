@@ -31,10 +31,10 @@ export function BenchmarkScenarioDrawer({
 }: BenchmarkScenarioDrawerProps) {
   const { isFutureMode } = useFeatureMode()
   const [name, setName] = useState('')
+  const [benchmarkMode, setBenchmarkMode] = useState<'existing' | 'new'>('existing')
   const [selectedBenchmark, setSelectedBenchmark] = useState<SelectedBenchmark | undefined>(undefined)
   const [diffSign, setDiffSign] = useState<'+' | '-'>('+')
   const [diffAmount, setDiffAmount] = useState<number>(0)
-  const [benchmarkMode, setBenchmarkMode] = useState<'existing' | 'new'>('existing')
   const [managedBenchmarkId, setManagedBenchmarkId] = useState<string | undefined>(undefined)
   const [selectedCommonType, setSelectedCommonType] = useState<QuickBenchmarkType | undefined>(undefined)
 
@@ -65,6 +65,7 @@ export function BenchmarkScenarioDrawer({
       } else {
         // Add mode - reset form
         setName('')
+        setBenchmarkMode('existing')
         setSelectedBenchmark(undefined)
         setDiffSign('+')
         setDiffAmount(0)

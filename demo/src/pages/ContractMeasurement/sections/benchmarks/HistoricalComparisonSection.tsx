@@ -577,7 +577,7 @@ export function HistoricalComparisonSection({
     return Math.ceil(displayData.length / 14) - 1
   }, [displayData.length])
 
-  // Calculate Y-axis domain for prices view
+  // Calculate Y-axis domain for prices view (include scenario prices)
   const pricesDomain = useMemo(() => {
     const allPrices: number[] = []
     for (const d of displayData) {
@@ -597,7 +597,7 @@ export function HistoricalComparisonSection({
     return [min - padding, max + padding]
   }, [displayData, allAggregatedSeries, nonReferenceScenarios])
 
-  // Calculate Y-axis domain for difference view
+  // Calculate Y-axis domain for difference view (include scenario diffs)
   const differenceDomain = useMemo(() => {
     const allDiffs: number[] = []
     for (const d of displayData) {
@@ -843,6 +843,36 @@ export function HistoricalComparisonSection({
               {activeView === 'prices' ? 'Spot Price' : 'Spot Diff'}
             </Texto>
           </Horizontal>
+
+          {/* Scenario legend entries */}
+          {nonReferenceScenarios.map((s, idx) => {
+            const color = SCENARIO_COLORS[idx % SCENARIO_COLORS.length]
+            const visible = isScenarioVisible(s.id)
+            return (
+              <Horizontal
+                key={s.id}
+                style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                onClick={() => toggleScenarioVisibility(s.id)}
+              >
+                {visible ? (
+                  <EyeOutlined style={{ color: '#8c8c8c' }} />
+                ) : (
+                  <EyeInvisibleOutlined style={{ color: '#bfbfbf' }} />
+                )}
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    backgroundColor: visible ? color : '#d9d9d9',
+                  }}
+                />
+                <Texto category='p2' style={{ color: visible ? '#262626' : '#bfbfbf' }}>
+                  {activeView === 'prices' ? s.name : `${s.name} Difference`}
+                </Texto>
+              </Horizontal>
+            )
+          })}
         </Horizontal>
 
         {/* Chart Container */}

@@ -80,7 +80,7 @@
 }
 
 .scenarioCellReference {
-  background-color: rgba(81, 176, 115, 0.08);
+  /* background-color removed — applied via onCell to the td instead */
 }
 
 .unconfirmedCell {
