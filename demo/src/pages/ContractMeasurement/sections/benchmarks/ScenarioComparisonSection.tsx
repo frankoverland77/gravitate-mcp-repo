@@ -21,7 +21,8 @@ import type { ColumnsType } from 'antd/es/table';
 import type { Scenario, ComparisonRowData, ScenarioCellData, GroupingDimension, GroupHeaderRow, TableRow } from '../../types/scenario.types';
 import { GROUPING_OPTIONS } from '../../types/scenario.types';
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext';
-import { ScenarioCellRenderer, getDeltaColorClass } from './ScenarioCellRenderer';
+import { ScenarioCellRenderer, getDeltaColorClass } from './ScenarioCellRenderer'
+import { exportScenarioComparison } from './scenarioExport';
 import { BenchmarkScenarioDrawer } from '../../components/BenchmarkScenarioDrawer';
 import { FormulaScenarioDrawer } from '../../components/FormulaScenarioDrawer';
 import { UploadScenarioDrawer } from '../../components/UploadScenarioDrawer';
@@ -757,15 +758,12 @@ export function ScenarioComparisonSection({
               }
             >
               <div className={styles.noMatchCell}>
-                <div className={styles.noMatchIconCircle}>
-                  <WarningFilled className={styles.noMatchIcon} />
-                </div>
-                <BBDTag danger>No Match</BBDTag>
-                <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
-                  No instrument found for
+                <WarningFilled style={{ color: '#ff4d4f', fontSize: 18 }} />
+                <Texto category="p2" weight="600" style={{ fontSize: '11px', color: '#ff4d4f', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                  No Match
                 </Texto>
-                <Texto category="p2" weight="600" style={{ fontSize: '11px', textAlign: 'center' }}>
-                  {record.product}
+                <Texto category="p2" style={{ fontSize: '11px', textAlign: 'center' }}>
+                  No instrument found for <span style={{ fontWeight: 600 }}>{record.product}</span>
                 </Texto>
                 <span className={styles.noMatchFixLink}>
                   <EditOutlined style={{ fontSize: 12 }} />
@@ -777,15 +775,12 @@ export function ScenarioComparisonSection({
         }
         return (
           <div className={styles.noMatchCell}>
-            <div className={styles.noMatchIconCircle}>
-              <WarningFilled className={styles.noMatchIcon} />
-            </div>
-            <BBDTag danger>No Match</BBDTag>
-            <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textAlign: 'center' }}>
-              No instrument found for
+            <WarningFilled style={{ color: '#ff4d4f', fontSize: 18 }} />
+            <Texto category="p2" weight="600" style={{ fontSize: '11px', color: '#ff4d4f', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+              No Match
             </Texto>
-            <Texto category="p2" weight="600" style={{ fontSize: '11px', textAlign: 'center' }}>
-              {record.product}
+            <Texto category="p2" style={{ fontSize: '11px', textAlign: 'center' }}>
+              No instrument found for <span style={{ fontWeight: 600 }}>{record.product}</span>
             </Texto>
           </div>
         );
@@ -1037,10 +1032,19 @@ export function ScenarioComparisonSection({
           const style: React.CSSProperties = { verticalAlign: 'top' };
           if (!record.isGroupHeader) {
             const compRecord = record as ComparisonRowData;
+            const cellData = compRecord.scenarios[scenario.id];
+            const isPartial = !!cellData?.missingPriceInfo;
             const isRef =
               referenceSelections[compRecord.detailId] === scenario.id ||
               (!referenceSelections[compRecord.detailId] && (scenario.isReference ?? false));
-            if (isRef) style.backgroundColor = 'rgba(81, 176, 115, 0.08)';
+
+            if (isPartial) {
+              // Amber takes priority — signals data quality issue
+              style.backgroundColor = 'rgba(250, 173, 20, 0.04)';
+              style.borderLeft = '3px solid #faad14';
+            } else if (isRef) {
+              style.backgroundColor = 'rgba(81, 176, 115, 0.08)';
+            }
           }
           return { style };
         },
@@ -1207,7 +1211,7 @@ export function ScenarioComparisonSection({
             {/* DETAIL column */}
             <td className={styles.summaryHeaderCell}>
               <div className={styles.summaryHeaderLabel}>
-                <Texto weight="600">AVG CPG DELTA</Texto>
+                <Texto>AVG CPG DELTA</Texto>
                 <Texto category="p2" appearance="medium">vs Contract Price</Texto>
               </div>
             </td>
@@ -1281,7 +1285,7 @@ export function ScenarioComparisonSection({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <Texto category="h4" weight="600">
@@ -1292,21 +1296,19 @@ export function ScenarioComparisonSection({
               ? 'Compare pricing scenarios across all product details'
               : 'Add a comparison scenario to get started'}
           </Texto>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
-            <Texto category="p2" appearance="medium">Effective date:</Texto>
-            <DatePicker.RangePicker
-              value={effectiveDateRange ?? undefined}
-              onChange={(range) => onEffectiveDateRangeChange?.(range as [Dayjs | null, Dayjs | null] | null)}
-              allowClear
-            />
-          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+          <Texto category="p2" style={{ color: '#595959' }}>Effective date</Texto>
+          <DatePicker.RangePicker
+            value={effectiveDateRange ?? undefined}
+            onChange={(range) => onEffectiveDateRangeChange?.(range as [Dayjs | null, Dayjs | null] | null)}
+            allowClear
+          />
           {hasComparisonScenarios && (
             <>
               {isFutureMode && (
                 <>
-                  <Texto category="p2" appearance="medium" weight="600">
+                  <Texto category="p2" style={{ color: '#595959' }}>
                     Group by
                   </Texto>
                   <Select
@@ -1317,7 +1319,7 @@ export function ScenarioComparisonSection({
                   />
                 </>
               )}
-              <Texto category="p2" appearance="medium" weight="600">
+              <Texto category="p2" style={{ color: '#595959' }}>
                 Filter by
               </Texto>
               <Select
@@ -1373,7 +1375,11 @@ export function ScenarioComparisonSection({
             />
           </Popover>
           {hasComparisonScenarios && (
-            <GraviButton buttonText="Export Results" appearance="outlined" />
+            <GraviButton
+              buttonText="Export Results"
+              appearance="outlined"
+              onClick={() => exportScenarioComparison(scenarios, filteredData, totals)}
+            />
           )}
           {isFutureMode && selectedRowKeys.length > 0 && (
             <>

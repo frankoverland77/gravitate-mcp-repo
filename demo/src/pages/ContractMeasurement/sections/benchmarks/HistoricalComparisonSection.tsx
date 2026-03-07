@@ -339,7 +339,7 @@ const cardStyle = {
 
 // Chart colors for reference series
 const chartColors = {
-  rackAverage: '#52c41a',
+  rackAverage: '#51B073',
   spotPrice: '#ff4d4f',
   volume: '#1890ff',
   zeroLine: '#bfbfbf',
@@ -654,7 +654,7 @@ export function HistoricalComparisonSection({
               type={activeView === 'prices' ? 'primary' : 'default'}
               icon={<LineChartOutlined />}
               onClick={() => setActiveView('prices')}
-              style={activeView === 'prices' ? { backgroundColor: '#52c41a', borderColor: '#52c41a' } : {}}
+              style={activeView === 'prices' ? { backgroundColor: '#51B073', borderColor: '#51B073' } : {}}
             >
               {isFutureMode ? 'Prices & Volume' : 'Prices'}
             </Button>
@@ -662,7 +662,7 @@ export function HistoricalComparisonSection({
               type={activeView === 'difference' ? 'primary' : 'default'}
               icon={<BarChartOutlined />}
               onClick={() => setActiveView('difference')}
-              style={activeView === 'difference' ? { backgroundColor: '#52c41a', borderColor: '#52c41a' } : {}}
+              style={activeView === 'difference' ? { backgroundColor: '#51B073', borderColor: '#51B073' } : {}}
             >
               Difference
             </Button>
@@ -810,7 +810,7 @@ export function HistoricalComparisonSection({
             </Texto>
             <div
               style={{
-                backgroundColor: '#52c41a',
+                backgroundColor: '#51B073',
                 color: '#ffffff',
                 fontSize: '10px',
                 fontWeight: 600,

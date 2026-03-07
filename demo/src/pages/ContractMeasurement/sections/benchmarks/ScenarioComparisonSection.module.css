@@ -61,6 +61,8 @@
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   overflow: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .tableContainer :global(.ant-table-small .ant-table-tbody > tr > td),
@@ -111,7 +113,7 @@
 
 .starIcon {
   font-size: 12px;
-  color: #52c41a;
+  color: #faad14;
 }
 
 .starIconHeader {
@@ -409,7 +411,7 @@
   text-decoration: underline;
 }
 
-/* Partial-match cell — amber border + tint */
+/* Partial-match cell — amber border + tint applied via onCell to td */
 .partialMatchCell {
   padding: 12px;
   margin: -12px;
@@ -419,8 +421,7 @@
   display: flex;
   flex-direction: column;
   text-align: left;
-  border-left: 3px solid #faad14;
-  background-color: rgba(250, 173, 20, 0.04);
+  /* background-color and border-left removed — applied via onCell to the td */
 }
 
 /* Amber italic delta for partial data */

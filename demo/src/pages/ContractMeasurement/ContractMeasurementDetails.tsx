@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { LeftOutlined, EyeOutlined, LinkOutlined } from '@ant-design/icons';
-import { Tabs, Button } from 'antd';
-import { OverviewTab, ScenarioAnalysisTab, PerformanceDetailsTab, BenchmarksTab } from './tabs';
+import { Button } from 'antd';
+import { BenchmarksTab } from './tabs';
 import { CMViewSettingsDrawer } from './components/CMViewSettingsDrawer';
 import styles from './ContractMeasurementDetails.module.css';
-
-const { TabPane } = Tabs;
 
 export function ContractMeasurementDetails() {
   const navigate = useNavigate();
@@ -45,7 +43,7 @@ export function ContractMeasurementDetails() {
           style={{ padding: '4px 8px', background: 'transparent', border: 'none', boxShadow: 'none' }}
         />
         <Texto category="h3" weight="600">
-          Measurement Details - ID: {data.id}
+          Measurement Details
         </Texto>
         {data.contractId && (
           <GraviButton
@@ -58,21 +56,9 @@ export function ContractMeasurementDetails() {
         )}
       </Horizontal>
 
-      {/* Tabs - CSS handles flex + scroll behavior */}
-      <Tabs defaultActiveKey="overview" className={styles.detailsTabs}>
-        <TabPane tab="Overview" key="overview">
-          <OverviewTab />
-        </TabPane>
-        <TabPane tab="Scenario Analysis" key="scenario-analysis">
-          <ScenarioAnalysisTab />
-        </TabPane>
-        <TabPane tab="Performance Details" key="performance-details">
-          <PerformanceDetailsTab />
-        </TabPane>
-        <TabPane tab="Benchmarks" key="benchmarks">
-          <BenchmarksTab />
-        </TabPane>
-      </Tabs>
+      <div className={styles.benchmarksContainer}>
+        <BenchmarksTab />
+      </div>
 
       {/* View Settings Floating Button */}
       <Button
