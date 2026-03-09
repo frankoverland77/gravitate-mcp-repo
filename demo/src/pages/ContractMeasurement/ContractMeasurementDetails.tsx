@@ -28,7 +28,7 @@ export function ContractMeasurementDetails() {
 
   const handleViewContract = () => {
     navigate(`/ContractFormulas/ContractDetails/${data.contractId}`, {
-      state: { id: data.contractId, externalCompany: data.customer },
+      state: { id: data.contractId, externalCompany: data.externalCounterparty },
     })
   };
 

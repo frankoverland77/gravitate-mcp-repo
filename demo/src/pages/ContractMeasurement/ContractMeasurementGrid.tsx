@@ -33,19 +33,19 @@ export function ContractMeasurementGrid() {
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    const d = new Date(dateStr);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
   };
 
   const columnDefs = useMemo(() => {
     const cols: any[] = [
       {
         field: 'contractId',
-        headerName: 'CONTRACT ID',
-        width: 120,
+        headerName: 'Id',
+        width: 100,
         cellRenderer: (params: any) => (
           <span
             style={{ color: '#52c41a', cursor: 'pointer', fontWeight: 600 }}
@@ -56,49 +56,127 @@ export function ContractMeasurementGrid() {
         ),
       },
       {
-        field: 'customer',
-        headerName: 'CUSTOMER',
+        field: 'status',
+        headerName: 'Status',
+        width: 100,
+      },
+      {
+        field: 'createdDate',
+        headerName: 'Created',
+        width: 120,
+        valueFormatter: (params: any) => formatDate(params.value),
+      },
+      {
+        field: 'startDate',
+        headerName: 'Contract From',
+        width: 130,
+        valueFormatter: (params: any) => formatDate(params.value),
+      },
+      {
+        field: 'endDate',
+        headerName: 'Contract To',
+        width: 130,
+        valueFormatter: (params: any) => formatDate(params.value),
+      },
+      {
+        field: 'externalCounterparty',
+        headerName: 'External Counterparty',
+        minWidth: 200,
         flex: 1,
-        minWidth: 150,
       },
       {
         field: 'type',
-        headerName: 'TYPE',
+        headerName: 'Type',
         width: 100,
       },
       {
         field: 'instrument',
-        headerName: 'INSTRUMENT',
-        width: 130,
+        headerName: 'Instrument',
+        width: 140,
       },
       {
-        field: 'contractPeriod',
-        headerName: 'CONTRACT PERIOD',
-        width: 180,
-        valueGetter: (params: any) => params.data,
-        cellRenderer: (params: any) => (
-          <span>
-            {formatDate(params.data.startDate)} — {formatDate(params.data.endDate)}
-          </span>
-        ),
+        field: 'locations',
+        headerName: 'Locations',
+        minWidth: 180,
+        cellRenderer: (params: any) => {
+          const locations: string[] = params.value;
+          if (!locations || locations.length === 0) return 'N/A';
+          if (locations.length === 1) return locations[0];
+          return (
+            <Popover
+              placement="bottomLeft"
+              content={
+                <Vertical>
+                  {locations.map((loc: string) => (
+                    <Horizontal key={loc}><Texto>{loc}</Texto></Horizontal>
+                  ))}
+                </Vertical>
+              }
+            >
+              <span style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}>Multiple Locations</span>
+            </Popover>
+          );
+        },
       },
       {
+        field: 'products',
+        headerName: 'Products',
+        minWidth: 180,
+        flex: 1,
+        cellRenderer: (params: any) => {
+          const products: string[] = params.value;
+          if (!products || products.length === 0) return 'N/A';
+          if (products.length <= 2) return products.join(', ');
+          return (
+            <Popover
+              placement="bottomLeft"
+              content={
+                <Vertical>
+                  {products.map((p: string) => (
+                    <Horizontal key={p}><Texto>{p}</Texto></Horizontal>
+                  ))}
+                </Vertical>
+              }
+            >
+              <span style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}>Multiple Products</span>
+            </Popover>
+          );
+        },
+      },
+      {
+        field: 'description',
+        headerName: 'Description',
+        minWidth: 200,
+      },
+      {
+        field: 'internalContractNumber',
+        headerName: 'Internal Contract#',
+        minWidth: 160,
+        hide: true,
+      },
+      {
+        field: 'externalContractNumber',
+        headerName: 'External Contract#',
+        minWidth: 160,
+        hide: true,
+      },
+    ];
+
+    if (isFutureMode) {
+      cols.push({
         field: 'daysLeft',
-        headerName: 'DAYS LEFT',
+        headerName: 'Days Left',
         width: 100,
         cellRenderer: (params: any) => (
           <span style={{ color: params.value < 30 ? '#cf1322' : '#52c41a', fontWeight: 600 }}>
             {params.value} days
           </span>
         ),
-      },
-    ];
-
-    if (isFutureMode) {
+      });
       cols.push({
         field: 'financialImpact',
-        headerName: 'BENCHMARK IMPACT',
-        width: 140,
+        headerName: 'Benchmark Impact',
+        width: 150,
         cellRenderer: (params: any) => {
           const value = params.value;
           const color = value >= 0 ? '#52c41a' : '#cf1322';
@@ -132,7 +210,7 @@ export function ContractMeasurementGrid() {
                 icon={<LinkOutlined />}
                 onClick={() =>
                   navigate(`/ContractFormulas/ContractDetails/${params.data.contractId}`, {
-                    state: { id: params.data.contractId, externalCompany: params.data.customer },
+                    state: { id: params.data.contractId, externalCompany: params.data.externalCounterparty },
                   })
                 }
               >
