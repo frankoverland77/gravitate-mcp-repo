@@ -23,6 +23,7 @@ export interface ContractMeasurementRecord {
   volumeTotal: number;
   riskLevel: 'High' | 'Medium' | 'Low';
   riskScore: number;
+  benchmarkImpactCpg: number;
   financialImpact: number;
   margin: number;
   ratability: number;
@@ -53,6 +54,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 45000000,
     riskLevel: 'High',
     riskScore: 26.5,
+    benchmarkImpactCpg: 0.0050,
     financialImpact: 5432,
     margin: 0.0843,
     ratability: 72,
@@ -78,6 +80,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 30000000,
     riskLevel: 'High',
     riskScore: 45.7,
+    benchmarkImpactCpg: -0.0120,
     financialImpact: -4521,
     margin: -0.0147,
     ratability: 58,
@@ -103,6 +106,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 60000000,
     riskLevel: 'Medium',
     riskScore: 18.3,
+    benchmarkImpactCpg: 0.0035,
     financialImpact: 2150,
     margin: 0.1562,
     ratability: 81,
@@ -128,6 +132,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 13500000,
     riskLevel: 'Low',
     riskScore: 8.2,
+    benchmarkImpactCpg: 0.0015,
     financialImpact: 890,
     margin: 0.2104,
     ratability: 88,
@@ -153,6 +158,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 75000000,
     riskLevel: 'Medium',
     riskScore: 22.1,
+    benchmarkImpactCpg: -0.0025,
     financialImpact: -1250,
     margin: 0.0391,
     ratability: 67,
@@ -178,6 +184,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 18000000,
     riskLevel: 'High',
     riskScore: 52.4,
+    benchmarkImpactCpg: -0.0200,
     financialImpact: -8200,
     margin: -0.0218,
     ratability: 53,
@@ -203,6 +210,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 22000000,
     riskLevel: 'Low',
     riskScore: 4.1,
+    benchmarkImpactCpg: 0.0080,
     financialImpact: 3200,
     margin: 0.1275,
     ratability: 90,
@@ -228,6 +236,7 @@ export const MEASUREMENT_DATA: ContractMeasurementRecord[] = [
     volumeTotal: 55000000,
     riskLevel: 'Medium',
     riskScore: 15.8,
+    benchmarkImpactCpg: -0.0042,
     financialImpact: -2100,
     margin: 0.0612,
     ratability: 76,

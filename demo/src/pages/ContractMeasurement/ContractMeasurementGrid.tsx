@@ -149,6 +149,24 @@ export function ContractMeasurementGrid() {
         minWidth: 200,
       },
       {
+        field: 'benchmarkImpactCpg',
+        headerName: 'Benchmark Impact',
+        width: 160,
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          if (value == null) return '';
+          const type = params.data?.type;
+          const isFavorable = type === 'Purchase' ? value < 0 : value > 0;
+          const color = value === 0 ? '#595959' : isFavorable ? '#52c41a' : '#cf1322';
+          const formatted = `$ .${Math.abs(value).toFixed(4).split('.')[1]}`;
+          return (
+            <span style={{ color, fontWeight: 600 }}>
+              {value < 0 ? `-${formatted}` : formatted}
+            </span>
+          );
+        },
+      },
+      {
         field: 'internalContractNumber',
         headerName: 'Internal Contract#',
         minWidth: 160,
