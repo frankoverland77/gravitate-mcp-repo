@@ -94,7 +94,7 @@ export function DogGroomingPage() {
       />
 
       <DogGroomingFormModal
-        visible={isModalOpen}
+        open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         initialValues={editingItem}

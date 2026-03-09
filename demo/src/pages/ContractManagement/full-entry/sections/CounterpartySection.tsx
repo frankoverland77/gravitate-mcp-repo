@@ -22,7 +22,7 @@ export function CounterpartySection({ header, onChange, disabled, lockExternalPa
     <Vertical className='bg-1 bordered pb-4' style={{ borderRadius: 8, overflow: 'hidden' }} flex='none' height='auto'>
       {/* Header Bar */}
       <Horizontal className='p-4 bg-2 border-bottom'>
-        <Texto category='h6' className='ml-3 font-weight-normal'>
+        <Texto category='h5' className='ml-3 font-weight-normal'>
           Counterparty Info
         </Texto>
       </Horizontal>

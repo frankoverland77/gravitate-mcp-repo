@@ -21,9 +21,9 @@ export function AwardSection({
   onCreateContract,
 }: AwardSectionProps) {
   return (
-    <Vertical style={{ gap: '24px' }}>
+    <Vertical gap={24}>
       {/* Header */}
-      <Horizontal alignItems="center" style={{ gap: '12px' }}>
+      <Horizontal gap={12} alignItems="center">
         <GraviButton type="text" icon={<LeftOutlined />} onClick={onBack} style={{ padding: '4px 8px' }} />
         <Vertical>
           <Texto category="h3" weight="600">
@@ -46,12 +46,12 @@ export function AwardSection({
 
       {/* Winner Card */}
       <div className={styles.winnerCard}>
-        <Horizontal alignItems="center" style={{ gap: '16px' }} className="mb-2">
+        <Horizontal gap={16} alignItems="center" className="mb-2">
           <div className={styles.trophyIcon}>
             <TrophyOutlined />
           </div>
           <Vertical>
-            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems="center">
               <Texto category="h2" weight="600">
                 {winner.name}
               </Texto>
@@ -64,8 +64,8 @@ export function AwardSection({
         </Horizontal>
 
         {/* Winner Metrics */}
-        <Horizontal style={{ gap: '24px' }} className="mt-2">
-          <Vertical style={{ gap: '4px' }}>
+        <Horizontal gap={24} className="mt-2">
+          <Vertical gap={4}>
             <Texto category="p2" appearance="medium">
               Avg Price/Gal
             </Texto>
@@ -73,7 +73,7 @@ export function AwardSection({
               {formatPrice(winner.metrics.avgPrice)}
             </Texto>
           </Vertical>
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" appearance="medium">
               Gallons/Month
             </Texto>
@@ -81,7 +81,7 @@ export function AwardSection({
               {formatVolume(winner.metrics.totalVolume)}
             </Texto>
           </Vertical>
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" appearance="medium">
               Threshold Issues
             </Texto>
@@ -89,7 +89,7 @@ export function AwardSection({
               {winner.metrics.issues}
             </Texto>
           </Vertical>
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" appearance="medium">
               Contract Term
             </Texto>
@@ -105,7 +105,7 @@ export function AwardSection({
         <Texto category="h5" weight="600" className="mb-2">
           Contract Preview
         </Texto>
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           <Horizontal justifyContent="space-between">
             <Texto appearance="medium">Contract Name</Texto>
             <Texto weight="600">{contractPreview.name}</Texto>
@@ -134,7 +134,7 @@ export function AwardSection({
       </div>
 
       {/* Action buttons */}
-      <Horizontal justifyContent="flex-end" style={{ gap: '12px' }}>
+      <Horizontal gap={12} justifyContent="flex-end">
         <GraviButton buttonText="Back to Comparison" onClick={onBack} />
         <GraviButton buttonText="Create Contract in Pricing Engine" success onClick={onCreateContract} />
       </Horizontal>

@@ -180,7 +180,7 @@ export function SaveTemplateForm({
                 padding: '16px 20px',
                 paddingBottom: '80px' // Space for fixed footer
             }}>
-                <Vertical style={{ gap: '16px' }}>
+                <Vertical gap={16}>
                     {/* Template Information Section - All on one row */}
                     <div>
                         <Texto style={{
@@ -193,7 +193,7 @@ export function SaveTemplateForm({
                             Template Information
                         </Texto>
 
-                        <Horizontal style={{ gap: '12px', flexWrap: 'nowrap' }}>
+                        <Horizontal gap={12} style={{ flexWrap: 'nowrap' }}>
                             <div style={{ flex: '2', minWidth: '150px' }}>
                                 <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', fontWeight: 500 }}>
                                     Template Name *
@@ -316,7 +316,7 @@ export function SaveTemplateForm({
                             </Texto>
                         </div>
 
-                        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                        <Horizontal gap={8} style={{ alignItems: 'center' }}>
                             <Checkbox
                                 checked={useCustomPreview}
                                 onChange={(e) => setUseCustomPreview(e.target.checked)}
@@ -383,7 +383,7 @@ export function SaveTemplateForm({
                 zIndex: 100,
                 flexShrink: 0
             }}>
-                <Horizontal style={{ justifyContent: 'flex-end', gap: '12px' }}>
+                <Horizontal gap={12} style={{ justifyContent: 'flex-end' }}>
                     <GraviButton
                         buttonText="Cancel"
                         appearance="outlined"

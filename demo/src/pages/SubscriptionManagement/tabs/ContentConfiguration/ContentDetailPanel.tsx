@@ -20,12 +20,12 @@ export function ContentDetailPanel({ data, onEdit, onCopy, onReset, onPreview }:
   const rightColumnFields = CONTENT_CONFIG_FIELDS.slice(8)
 
   return (
-    <Vertical className='p-3' style={{ backgroundColor: 'var(--theme-bg-elevated)', gap: '16px' }}>
+    <Vertical className='p-3' gap={16} style={{ backgroundColor: 'var(--theme-bg-elevated)' }}>
       <Horizontal justifyContent='space-between' alignItems='center'>
-        <Texto category='h6' weight='600'>
+        <Texto category='h5' weight='600'>
           Content Configuration Details
         </Texto>
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton buttonText='Preview' icon={<EyeOutlined />} onClick={() => onPreview(data)} />
           <GraviButton buttonText='Edit' theme1 icon={<EditOutlined />} onClick={() => onEdit(data)} />
           <GraviButton buttonText='Copy From' icon={<CopyOutlined />} onClick={() => onCopy(data)} />
@@ -33,10 +33,10 @@ export function ContentDetailPanel({ data, onEdit, onCopy, onReset, onPreview }:
         </Horizontal>
       </Horizontal>
 
-      <Horizontal style={{ gap: '32px' }}>
+      <Horizontal gap={32}>
         {/* Left Side - Templates */}
-        <Vertical flex='1' style={{ gap: '12px' }}>
-          <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={12} flex='1'>
+          <Vertical gap={4}>
             <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Subject
             </Texto>
@@ -55,7 +55,7 @@ export function ContentDetailPanel({ data, onEdit, onCopy, onReset, onPreview }:
             </Texto>
           </Vertical>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Body
             </Texto>
@@ -80,14 +80,14 @@ export function ContentDetailPanel({ data, onEdit, onCopy, onReset, onPreview }:
         </Vertical>
 
         {/* Right Side - Content Configuration Fields */}
-        <Vertical style={{ gap: '12px', minWidth: '400px' }}>
+        <Vertical gap={12} style={{ minWidth: '400px' }}>
           <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             Content Configuration Fields
           </Texto>
 
-          <Horizontal style={{ gap: '24px' }}>
+          <Horizontal gap={24}>
             {/* Left Column of Checkboxes */}
-            <Vertical style={{ gap: '4px', minWidth: '140px' }}>
+            <Vertical gap={4} style={{ minWidth: '140px' }}>
               {leftColumnFields.map((fieldConfig) => (
                 <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
                   <Checkbox
@@ -101,7 +101,7 @@ export function ContentDetailPanel({ data, onEdit, onCopy, onReset, onPreview }:
             </Vertical>
 
             {/* Right Column of Checkboxes */}
-            <Vertical style={{ gap: '4px', minWidth: '160px' }}>
+            <Vertical gap={4} style={{ minWidth: '160px' }}>
               {rightColumnFields.map((fieldConfig) => (
                 <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
                   <Checkbox

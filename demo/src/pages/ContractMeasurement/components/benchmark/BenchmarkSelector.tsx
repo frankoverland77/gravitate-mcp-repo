@@ -50,7 +50,7 @@ export function BenchmarkSelector({
           Configuration
         </Texto>
 
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           {/* Publisher */}
           <div>
             <Texto category='p2' appearance='medium' style={{ marginBottom: '4px', display: 'block' }}>
@@ -101,7 +101,7 @@ export function BenchmarkSelector({
             <Texto category='p2' appearance='medium' style={{ marginBottom: '4px', display: 'block' }}>
               Differential (Optional)
             </Texto>
-            <Horizontal alignItems='center' style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems='center'>
               <Select
                 value={diffSign}
                 onChange={(val) => onDiffSignChange(val as '+' | '-')}

@@ -77,7 +77,7 @@ export function ValidationStep({ validationResult, onConfirm, onBack }: Validati
               <ArrowUpOutlined style={{ color: 'var(--theme-error-color)' }} />
             )
           return (
-            <Horizontal alignItems='center' style={{ gap: '4px' }}>
+            <Horizontal gap={4} alignItems='center'>
               {formatted} {icon}
             </Horizontal>
           )
@@ -128,7 +128,7 @@ export function ValidationStep({ validationResult, onConfirm, onBack }: Validati
           icon={<CloseCircleOutlined />}
           message='Validation Failed'
           description={
-            <Vertical style={{ gap: '4px' }}>
+            <Vertical gap={4}>
               {validationResult.errors.slice(0, 5).map((err, idx) => (
                 <Texto key={idx} category='p2'>
                   {err.field}: {err.message}
@@ -153,7 +153,7 @@ export function ValidationStep({ validationResult, onConfirm, onBack }: Validati
           icon={<WarningOutlined />}
           message={`${validationResult.warnings.length} Warning(s)`}
           description={
-            <Vertical style={{ gap: '4px' }}>
+            <Vertical gap={4}>
               {validationResult.warnings.slice(0, 5).map((warn, idx) => (
                 <Texto key={idx} category='p2'>
                   {warn.message}
@@ -171,7 +171,7 @@ export function ValidationStep({ validationResult, onConfirm, onBack }: Validati
       )}
 
       {/* Summary Stats */}
-      <Horizontal style={{ gap: '16px' }} className='mb-4'>
+      <Horizontal gap={16} className='mb-4'>
         <div className={styles.statCard}>
           <Texto category='h3' weight='600'>
             {summary.totalChanges}

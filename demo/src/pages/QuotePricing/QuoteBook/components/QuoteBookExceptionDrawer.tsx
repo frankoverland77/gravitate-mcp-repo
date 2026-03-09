@@ -350,7 +350,7 @@ function ThresholdPreview({ profileKey, profileMap }: { profileKey: string | nul
               justifyContent="space-between"
               alignItems="center"
             >
-              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+              <Horizontal alignItems="center" gap={6}>
                 <span style={{
                   width: 8,
                   height: 8,
@@ -419,7 +419,7 @@ function OverrideForm({
   }
 
   const boundaryRow = (label: string, color: string, value: number | null, onChange: (v: number | null) => void, disabled?: boolean) => (
-    <Horizontal alignItems="center" style={{ gap: '8px', marginBottom: 8 }}>
+    <Horizontal alignItems="center" gap={8} style={{ marginBottom: 8 }}>
       <span style={{
         width: 110,
         fontSize: 12,
@@ -609,7 +609,8 @@ function MultiRowState({
       {/* Selection summary header */}
       <Horizontal
         alignItems="center"
-        style={{ gap: '12px', padding: '16px', borderBottom: '1px solid var(--gray-100)' }}
+        gap={12}
+        style={{ padding: '16px', borderBottom: '1px solid var(--gray-100)' }}
       >
         <div style={{
           width: 36,
@@ -642,10 +643,10 @@ function MultiRowState({
           borderRadius: 6,
           fontSize: 12,
         }}>
-          <Horizontal alignItems="center" style={{ gap: '6px', marginBottom: 6 }}>
+          <Horizontal alignItems="center" gap={6} style={{ marginBottom: 6 }}>
             <span style={{ color: '#d97706', fontWeight: 600 }}>Profile mismatch</span>
           </Horizontal>
-          <Horizontal style={{ gap: '6px', flexWrap: 'wrap' }}>
+          <Horizontal gap={6} style={{ flexWrap: 'wrap' }}>
             {profileKeys.map(key => {
               const profile = profileMap[key]
               const name = profile?.name || key

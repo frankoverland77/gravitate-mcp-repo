@@ -21,14 +21,14 @@ export function SuccessSection({
 }: SuccessSectionProps) {
   return (
     <Vertical alignItems="center" justifyContent="center" className={styles.successContainer}>
-      <Vertical alignItems="center" style={{ gap: '24px', maxWidth: '600px', textAlign: 'center' }}>
+      <Vertical alignItems="center" gap={24} style={{ maxWidth: '600px', textAlign: 'center' }}>
         {/* Success Icon */}
         <div className={styles.successIcon}>
           <CheckCircleFilled />
         </div>
 
         {/* Success Message */}
-        <Vertical alignItems="center" style={{ gap: '8px' }}>
+        <Vertical gap={8} alignItems="center">
           <Texto category="h1" weight="600">
             Contract Created Successfully!
           </Texto>
@@ -40,10 +40,10 @@ export function SuccessSection({
 
         {/* Contract Details Card */}
         <div className={styles.detailsCard}>
-          <Texto category="h6" weight="600" appearance="medium" className="mb-2">
+          <Texto category="h5" weight="600" appearance="medium" className="mb-2">
             CONTRACT DETAILS
           </Texto>
-          <Vertical style={{ gap: '12px' }}>
+          <Vertical gap={12}>
             <Horizontal justifyContent="space-between">
               <Texto appearance="medium">Contract Name</Texto>
               <Texto weight="600">{contractPreview.name}</Texto>
@@ -74,16 +74,16 @@ export function SuccessSection({
           <Texto category="p2" weight="600" className="mb-1">
             Next Steps
           </Texto>
-          <Vertical style={{ gap: '8px' }}>
-            <Horizontal alignItems="flex-start" style={{ gap: '8px' }}>
+          <Vertical gap={8}>
+            <Horizontal gap={8} alignItems="flex-start">
               <span className={styles.stepNumber}>1</span>
               <Texto category="p2">Review and configure pricing rules in the Pricing Engine</Texto>
             </Horizontal>
-            <Horizontal alignItems="flex-start" style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems="flex-start">
               <span className={styles.stepNumber}>2</span>
               <Texto category="p2">Set up daily pricing automation for the contract</Texto>
             </Horizontal>
-            <Horizontal alignItems="flex-start" style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems="flex-start">
               <span className={styles.stepNumber}>3</span>
               <Texto category="p2">Notify {winner.name} that the contract is ready</Texto>
             </Horizontal>
@@ -91,7 +91,7 @@ export function SuccessSection({
         </div>
 
         {/* Action Buttons */}
-        <Horizontal style={{ gap: '12px' }} className="mt-2">
+        <Horizontal gap={12} className="mt-2">
           <GraviButton buttonText="Back to RFP List" onClick={onBackToList} />
           <GraviButton buttonText="View Contract in Pricing Engine" success onClick={onViewContract} />
         </Horizontal>

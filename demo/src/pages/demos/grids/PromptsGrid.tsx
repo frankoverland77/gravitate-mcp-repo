@@ -401,7 +401,7 @@ export function PromptsGrid() {
             width: 140,
             pinned: 'right',
             cellRenderer: (params: any) => (
-                <Horizontal style={{ gap: '12px', alignItems: 'center', height: '100%' }}>
+                <Horizontal gap={12} style={{ alignItems: 'center', height: '100%' }}>
                     <RightOutlined
                         style={{
                             color: '#595959',

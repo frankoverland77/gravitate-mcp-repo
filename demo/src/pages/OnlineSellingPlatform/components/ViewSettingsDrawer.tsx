@@ -38,11 +38,11 @@ export function ViewSettingsDrawer({
       placement="right"
       width={450}
       onClose={onClose}
-      visible={visible}
+      open={visible}
       zIndex={2000}
       maskClosable={true}
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Feature Prioritization Section */}
         <div>
           <Texto category="p1" weight="600" style={{ marginBottom: '12px', display: 'block' }}>
@@ -57,7 +57,7 @@ export function ViewSettingsDrawer({
             onChange={(e) => setFeatureMode(e.target.value)}
             style={{ width: '100%' }}
           >
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               {/* MVP Mode */}
               <div
                 style={getOptionCardStyle(featureMode === 'mvp')}
@@ -121,7 +121,7 @@ export function ViewSettingsDrawer({
               onChange={(e) => setViewMode(e.target.value as ViewMode)}
               style={{ width: '100%' }}
             >
-              <Vertical style={{ gap: '12px' }}>
+              <Vertical gap={12}>
                 {/* Panel Mode */}
                 <div
                   style={getOptionCardStyle(viewMode === 'panel')}

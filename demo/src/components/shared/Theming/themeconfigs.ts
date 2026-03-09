@@ -1,155 +1,174 @@
-import moment from "moment";
-import React from "react";
+import Color from 'color'
+import dayjs from 'dayjs'
 
-import BPAuthBackground from "../../../assets/bp/logos/bp-auth-background.png";
-import BPAuthLogo from "../../../assets/bp/logos/bp-logo-light.png";
-import DKBAuthBackground from "../../../assets/dkb/dkb-auth-background.png";
-import DKBAuthLogo from "../../../assets/dkb/dkb-logo-dark.png";
-import FHRAuthBackground from "../../../assets/fhr/fhr-auth-background.png";
-import FHRAuthLogo from "../../../assets/fhr/fhr-logo-light.png";
-import GrowmarkAuthBackground from "../../../assets/growmark/growmark-auth-background.jpg";
-import GrowmarkAuthLogo from "../../../assets/growmark/growmark-logo-dark.png";
-import MotivaAuthBackground from "../../../assets/motiva/motiva-auth-background.png";
-import MotivaAuthLogo from "../../../assets/motiva/motiva-logo-dark.png";
-import MurphyAuthBackground from "../../../assets/murphy/murphy-auth-background.png";
-import MurphyAuthLogo from "../../../assets/murphy/murphy-logo-dark.png";
-import OSPAuthBackground from "../../../assets/osp/logos/osp-auth-background.jpg";
-import OSPAuthLogo from "../../../assets/osp/logos/osp-logo-dark.png";
-import P66AuthBackground from "../../../assets/p66/p66-auth-background.png";
-import P66AuthLogo from "../../../assets/p66/p66-logo-dark.png";
-import PEAuthBackground from "../../../assets/pe/logos/sunoco-auth-background.png";
-import PEAuthLogo from "../../../assets/pe/logos/sunoco-lp-logo-light.png";
-import PoweredByOSP from "../../../assets/SiteImages/PoweredByLogos/PoweredByOSP.png";
-import PoweredByPE from "../../../assets/SiteImages/PoweredByLogos/PoweredByPE.png";
-import christmasLoginImage from "../../../assets/SiteImages/Themes/Christmas/christmas-tree.jpg";
-import SunocoAuthBackground from "../../../assets/sunoco/logos/sunoco-auth-background.png";
-import SunocoAuthLogo from "../../../assets/sunoco/logos/sunoco-lp-logo-dark.png";
+export type ThemeConfigDisplay = string
 
-export const themeConfigs = {
-  LIGHT_MODE: {
+export interface ThemeConfig {
+  display: string
+  key: string
+  isDark: boolean
+  isActive?: boolean | (() => boolean)
+  default?: boolean
+  isFallback?: boolean
+
+  colors: {
+    info: string
+    nav1: string
+    nav2: string
+    primary?: string
+  }
+
+  loginBackgroundImage?: string
+  loginLogoImage?: string
+  loginTransLogoImage?: string
+}
+
+export const themeConfigs: ThemeConfig[] = [
+  {
+    display: 'Light',
+    key: 'LIGHT_MODE',
+    isDark: false,
     isFallback: true,
-    display: "Light",
-    key: "LIGHT_MODE",
-    ThemeImportComponent: React.lazy(() => import("./Themes/Light/Light")),
-    isDark: false,
     default: true,
+    colors: {
+      info: '#0C5A58',
+      nav1: '#0C5A58',
+      nav2: Color('#0C5A58').lighten(0.8).hex(),
+      primary: '#51B073',
+    },
   },
-  DARK_MODE: {
-    display: "Dark",
-    key: "DARK_MODE",
-    ThemeImportComponent: React.lazy(() => import("./Themes/Dark/Dark")),
+  {
+    display: 'Dark',
+    key: 'DARK_MODE',
     isDark: true,
+    colors: {
+      info: '#59cfff',
+      nav1: '#19304B',
+      nav2: Color('#19304B').lighten(0.8).hex(),
+    },
   },
-  SUNOCO: {
-    display: "Sunoco",
-    key: "SUNOCO",
-    ThemeImportComponent: React.lazy(() => import("./Themes/Sunoco")),
-    LoginBanner: SunocoAuthBackground,
-    LoginLogo: SunocoAuthLogo,
+  {
+    display: 'Sunoco',
+    key: 'SUNOCO',
     isDark: false,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#F04B34',
+      nav1: '#262F47',
+      nav2: Color('#262F47').lighten(0.2).hex(),
+    },
   },
-  FHR: {
-    display: "FHR",
-    key: "FHR",
-    ThemeImportComponent: React.lazy(() => import("./Themes/FHR")),
-    LoginBanner: FHRAuthBackground,
-    LoginLogo: FHRAuthLogo,
+  {
+    display: 'FHR',
+    key: 'FHR',
     isDark: false,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#908d71',
+      nav1: '#2B2F35',
+      nav2: Color('#2B2F35').lighten(0.2).hex(),
+    },
   },
-  MURPHY: {
-    display: "Murphy",
-    key: "MURPHY",
-    ThemeImportComponent: React.lazy(() => import("./Themes/Murphy")),
-    LoginBanner: MurphyAuthBackground,
-    LoginLogo: MurphyAuthLogo,
+  {
+    display: 'Murphy',
+    key: 'MURPHY',
     isDark: false,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#c5c5c5',
+      nav1: '#313131',
+      nav2: Color('#313131').lighten(0.2).hex(),
+    },
   },
-  GROWMARK: {
-    display: "Growmark",
-    key: "GROWMARK",
-    ThemeImportComponent: React.lazy(() => import("./Themes/Growmark")),
-    LoginBanner: GrowmarkAuthBackground,
-    LoginLogo: GrowmarkAuthLogo,
+  {
+    display: 'Growmark',
+    key: 'GROWMARK',
     isDark: false,
-    poweredByLogo: PoweredByPE,
+    colors: {
+      info: Color('#000').lighten(0.4).hex(),
+      nav1: '#000',
+      nav2: Color('#000').lighten(0.4).hex(),
+    },
   },
-  OSP: {
-    display: "OSP",
-    key: "OSP",
-    ThemeImportComponent: React.lazy(() => import("./Themes/OSP")),
-    LoginBanner: OSPAuthBackground,
-    LoginLogo: OSPAuthLogo,
+  {
+    display: 'OSP',
+    key: 'OSP',
     isDark: false,
+    colors: {
+      info: '#0F1121',
+      nav1: '#0F1121',
+      nav2: Color('#334e6d').lighten(0.8).hex(),
+      primary: '#4BADE9',
+    },
   },
-  BP: {
-    display: "BP",
-    key: "BP",
-    ThemeImportComponent: React.lazy(() => import("./Themes/BP")),
-    LoginBanner: BPAuthBackground,
-    LoginLogo: BPAuthLogo,
+  {
+    display: 'BP',
+    key: 'BP',
     isDark: false,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#74CDD7',
+      nav1: '#007f00',
+      nav2: Color('#007f00').lighten(0.2).hex(),
+    },
   },
-  DKB: {
-    display: "DKB",
-    key: "DKB",
-    ThemeImportComponent: React.lazy(() => import("./Themes/DKB")),
-    LoginBanner: DKBAuthBackground,
-    LoginLogo: DKBAuthLogo,
+  {
+    display: 'DKB',
+    key: 'DKB',
     isDark: false,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#1d1d1d',
+      nav1: '#000',
+      nav2: Color('#000').lighten(0.3).hex(),
+    },
   },
-  P66: {
-    display: "P66",
-    key: "P66",
-    ThemeImportComponent: React.lazy(() => import("./Themes/P66")),
-    LoginBanner: P66AuthBackground,
-    LoginLogo: P66AuthLogo,
+  {
+    display: 'P66',
+    key: 'P66',
     isDark: false,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#d60000',
+      nav1: '#1e1e1e',
+      nav2: Color('#1e1e1e').lighten(0.3).hex(),
+    },
   },
-  PE_LIGHT: {
-    display: "PE Light",
-    key: "PE_LIGHT",
-    ThemeImportComponent: React.lazy(() => import("./Themes/PE/Light")),
-    LoginBanner: PEAuthBackground,
-    LoginLogo: PEAuthLogo,
+  {
+    display: 'PE Light',
+    key: 'PE_LIGHT',
     isDark: false,
-    poweredByLogo: PoweredByPE,
+    colors: {
+      info: '#0C5A58',
+      nav1: '#0C5A58',
+      nav2: Color('#0C5A58').lighten(0.8).hex(),
+    },
   },
-  MOTIVA: {
-    display: "Motiva",
-    key: "MOTIVA",
-    ThemeImportComponent: React.lazy(() => import("./Themes/Motiva")),
-    LoginBanner: MotivaAuthBackground,
-    LoginLogo: MotivaAuthLogo,
+  {
+    display: 'Motiva',
+    key: 'MOTIVA',
     isDark: false,
     isActive: true,
-    poweredByLogo: PoweredByOSP,
+    colors: {
+      info: '#004b7f',
+      nav1: '#081a2b',
+      nav2: '#113b55',
+    },
   },
-  THANKSGIVING: {
-    display: "Thanksgiving",
-    key: "THANKSGIVING",
-    ThemeImportComponent: React.lazy(
-      () => import("./Themes/Thanksgiving/Thanksgiving")
-    ),
-    isActive: () => moment().month() + 1 === 11,
+  {
+    display: 'Thanksgiving',
+    key: 'THANKSGIVING',
     isDark: false,
+    isActive: () => dayjs().month() + 1 === 11,
+    colors: {
+      info: '#cce5ff',
+      nav1: '#532d08',
+      nav2: '#5a2900',
+    },
   },
-  CHRISTMAS: {
-    display: "Christmas",
-    key: "CHRISTMAS",
-    ThemeImportComponent: React.lazy(
-      () => import("./Themes/Christmas/Christmas")
-    ),
-    isActive: () => moment().month() + 1 === 12,
+  {
+    display: 'Christmas',
+    key: 'CHRISTMAS',
     isDark: false,
-    LoginBanner: christmasLoginImage,
+    isActive: () => dayjs().month() + 1 === 12,
+    colors: {
+      info: '#cce5ff',
+      nav1: '#950d0d',
+      nav2: '#b50c0c',
+    },
   },
-} as const;
-
-export type ThemeConfigs = typeof themeConfigs;
-export type ThemeConfigDisplay = ThemeConfigs[keyof ThemeConfigs]["display"];
+]

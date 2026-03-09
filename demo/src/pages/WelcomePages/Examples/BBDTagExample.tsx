@@ -34,7 +34,7 @@ export function BBDTagExample() {
       {/* Theme Variations */}
       <Texto category="h5">Theme Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag theme1>Theme 1</BBDTag>
           <BBDTag theme2>Theme 2</BBDTag>
           <BBDTag theme3>Theme 3</BBDTag>
@@ -45,7 +45,7 @@ export function BBDTagExample() {
       {/* Status Variations */}
       <Texto category="h5">Status Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag success>Success</BBDTag>
           <BBDTag warning>Warning</BBDTag>
           <BBDTag error>Error</BBDTag>
@@ -55,7 +55,7 @@ export function BBDTagExample() {
       {/* Text Transform Variations */}
       <Texto category="h5">Text Transform</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag textTransform="uppercase">uppercase text</BBDTag>
           <BBDTag textTransform="lowercase">LOWERCASE TEXT</BBDTag>
           <BBDTag textTransform="capitalize">capitalize text</BBDTag>
@@ -66,7 +66,7 @@ export function BBDTagExample() {
       {/* Custom Styling */}
       <Texto category="h5">Custom Styling</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag
             className="font-bold"
             style={{
@@ -87,7 +87,7 @@ export function BBDTagExample() {
       {/* Filter Tags (Removable) */}
       <Texto category="h5">Filter Tags</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag theme2 className="filter-tag my-2">
             <span className="filter-tag-label">
               <FilterOutlined className="mr-1" />
@@ -111,7 +111,7 @@ export function BBDTagExample() {
       {/* Validation Tags */}
       <Texto category="h5">Form Validation</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px", flexWrap: "wrap" }}>
+        <Horizontal gap={10} style={{ flexWrap: "wrap" }}>
           {validationRules.map((rule) => (
             <BBDTag
               key={rule.type}
@@ -129,7 +129,7 @@ export function BBDTagExample() {
       {/* Grid Cell Tags with Tooltip */}
       <Texto category="h5">Grid Cell Tags</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <Tooltip title="This is a very long value that needs a tooltip">
             <div>
               <BBDTag
@@ -159,7 +159,7 @@ export function BBDTagExample() {
       {/* Multiple Tags */}
       <Texto category="h5">Multiple Tags</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "8px", flexWrap: "wrap" }}>
+        <Horizontal gap={8} style={{ flexWrap: "wrap" }}>
           {tagItems.map((item, index) => (
             <BBDTag className="text-ellipsis" key={index} theme3>
               {item}
@@ -171,7 +171,7 @@ export function BBDTagExample() {
       {/* Priority Tags */}
       <Texto category="h5">Priority Indicators</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag error className="priority-tag">
             <ExclamationCircleOutlined className="mr-1" />
             High Priority
@@ -190,7 +190,7 @@ export function BBDTagExample() {
       {/* Interactive Tags */}
       <Texto category="h5">Interactive Tags</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <BBDTag
             theme1
             className="cursor-pointer hover:opacity-80"
@@ -215,7 +215,7 @@ export function BBDTagExample() {
       {/* Combination Examples */}
       <Texto category="h5">Combination Examples</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px", flexWrap: "wrap" }} verticalCenter>
+        <Horizontal gap={10} style={{ flexWrap: "wrap" }} verticalCenter>
           <BBDTag
             success
             textTransform="uppercase"

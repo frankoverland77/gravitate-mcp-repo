@@ -1,7 +1,7 @@
 import { BulkCellEditorHandle } from '@gravitate-js/excalibrr/dist/components/GraviGrid/index.types'
 import { Horizontal } from '@gravitate-js/excalibrr'
 import { DatePicker } from 'antd'
-import { Moment } from 'moment'
+import { Dayjs } from 'dayjs'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
 type DateEditorParams = {
@@ -14,7 +14,7 @@ type DateEditorParams = {
 export const BulkDateEditor = forwardRef<BulkCellEditorHandle<unknown>, DateEditorParams>(
   (props, ref) => {
     const { propKey, placeholder, format, refreshBulkDrawerUI } = props
-    const [value, setValue] = useState<Moment | null>(null)
+    const [value, setValue] = useState<Dayjs | null>(null)
 
     useImperativeHandle(ref, () => ({
       getChanges: () => {

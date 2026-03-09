@@ -22,7 +22,7 @@ This file covers **shared infrastructure only**. For feature-specific context, s
 
 ## Technical Stack
 - **Build:** Vite 5 + TypeScript + React 18
-- **Components:** Excalibrr (4.0.34-osp) + Ant Design (4.20)
+- **Components:** Excalibrr (5.2.0) + Ant Design (5.23+)
 - **Grid:** AG Grid (Community/Enterprise)
 - **Quality:** ESLint, Prettier, lint-staged pre-commit hooks
 

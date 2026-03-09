@@ -927,10 +927,10 @@ export function FormulaTemplates() {
                 title={null}
                 placement="bottom"
                 height="80%"
-                visible={drawerOpen}
+                open={drawerOpen}
                 onClose={handleCloseDrawer}
                 closable={false}
-                bodyStyle={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
             >
                 {/* Drawer Header */}
                 <div style={{
@@ -939,7 +939,7 @@ export function FormulaTemplates() {
                     flexShrink: 0
                 }}>
                     <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <Vertical style={{ gap: '4px' }}>
+                        <Vertical gap={4}>
                             <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
                                 Create Formula Template
                             </Texto>
@@ -958,7 +958,7 @@ export function FormulaTemplates() {
                 </div>
 
                 {/* Drawer Content */}
-                <Vertical style={{ padding: '24px', paddingBottom: '80px', gap: '24px', height: 'calc(100% - 72px)', overflow: 'auto' }}>
+                <Vertical gap={24} style={{ padding: '24px', paddingBottom: '80px', height: 'calc(100% - 72px)', overflow: 'auto' }}>
                     {/* Validation Errors */}
                     {validationErrors.length > 0 && (
                         <Alert
@@ -990,7 +990,7 @@ export function FormulaTemplates() {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             {/* Single Row: All fields */}
-                            <Horizontal style={{ gap: '16px' }}>
+                            <Horizontal gap={16}>
                                 <div style={{ flex: 1 }}>
                                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                                         Template Name *
@@ -1214,7 +1214,7 @@ export function FormulaTemplates() {
                     backgroundColor: '#ffffff',
                     zIndex: 10
                 }}>
-                    <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
+                    <Horizontal gap={16} style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
                         <Button
                             size="large"
                             onClick={handleCloseDrawer}
@@ -1239,10 +1239,10 @@ export function FormulaTemplates() {
                 title={null}
                 placement="bottom"
                 height="85%"
-                visible={editDrawerOpen}
+                open={editDrawerOpen}
                 onClose={handleCloseEditDrawer}
                 closable={false}
-                bodyStyle={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
             >
                 {/* Drawer Header */}
                 <div style={{
@@ -1251,7 +1251,7 @@ export function FormulaTemplates() {
                     flexShrink: 0
                 }}>
                     <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <Vertical style={{ gap: '4px' }}>
+                        <Vertical gap={4}>
                             <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
                                 {isDuplicateMode ? 'Duplicate Formula Template' : 'Edit Formula Template'}
                             </Texto>
@@ -1270,7 +1270,7 @@ export function FormulaTemplates() {
                 </div>
 
                 {/* Drawer Body */}
-                <Vertical style={{ padding: '24px', paddingBottom: '80px', gap: '20px', height: 'calc(100% - 65px)', overflow: 'auto' }}>
+                <Vertical gap={20} style={{ padding: '24px', paddingBottom: '80px', height: 'calc(100% - 65px)', overflow: 'auto' }}>
                     {/* Validation Errors */}
                     {validationErrors.length > 0 && (
                         <Alert
@@ -1300,7 +1300,7 @@ export function FormulaTemplates() {
                             Template Information
                         </Texto>
                         <div style={{ padding: '20px', backgroundColor: '#fafafa', borderRadius: '4px', border: '1px solid #f0f0f0' }}>
-                            <Horizontal style={{ gap: '16px' }}>
+                            <Horizontal gap={16}>
                                 <div style={{ flex: 1 }}>
                                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                                         Template Name *
@@ -1514,7 +1514,7 @@ export function FormulaTemplates() {
                     backgroundColor: '#ffffff',
                     zIndex: 10
                 }}>
-                    <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
+                    <Horizontal gap={16} style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
                         <Button
                             size="large"
                             onClick={handleCloseEditDrawer}
@@ -1562,13 +1562,13 @@ export function FormulaTemplates() {
                 placement="right"
                 width={450}
                 onClose={() => setSettingsDrawerVisible(false)}
-                visible={settingsDrawerVisible}
+                open={settingsDrawerVisible}
                 zIndex={2000}
                 maskClosable={true}
-                destroyOnClose={true}
+                destroyOnHidden={true}
                 getContainer={() => document.body}
             >
-                <Vertical style={{ gap: '24px' }}>
+                <Vertical gap={24}>
                     {/* Feature Prioritization Section */}
                     <div>
                         <Texto category="p1" weight="600" style={{ marginBottom: '12px', display: 'block' }}>
@@ -1583,7 +1583,7 @@ export function FormulaTemplates() {
                             onChange={(e) => setFeatureMode(e.target.value)}
                             style={{ width: '100%' }}
                         >
-                            <Vertical style={{ gap: '12px' }}>
+                            <Vertical gap={12}>
                                 <Radio value="mvp" style={{ width: '100%', padding: '12px', border: '1px solid #d9d9d9', borderRadius: '4px' }}>
                                     <div>
                                         <Texto weight="600">MVP (Minimum Viable Product)</Texto>
@@ -1621,7 +1621,7 @@ export function FormulaTemplates() {
             {/* Placeholder Info Modal */}
             <Modal
                 title={<Texto category="h5" weight="600">About Placeholders in Formula Templates</Texto>}
-                visible={placeholderModalVisible}
+                open={placeholderModalVisible}
                 onCancel={() => setPlaceholderModalVisible(false)}
                 footer={[
                     <GraviButton
@@ -1638,7 +1638,7 @@ export function FormulaTemplates() {
                 ]}
                 width={700}
             >
-                <Vertical style={{ gap: '20px' }}>
+                <Vertical gap={20}>
                     {/* What are placeholders */}
                     <div>
                         <Texto category="p1" weight="600" style={{ marginBottom: '8px', display: 'block' }}>
@@ -1665,24 +1665,24 @@ export function FormulaTemplates() {
                             Available placeholders:
                         </Texto>
                         <div style={{ padding: '12px', backgroundColor: '#fafafa', borderRadius: '4px', border: '1px solid #f0f0f0' }}>
-                            <Vertical style={{ gap: '8px' }}>
-                                <Horizontal style={{ gap: '12px' }}>
+                            <Vertical gap={8}>
+                                <Horizontal gap={12}>
                                     <span style={{ fontFamily: 'monospace', color: '#722ed1', fontWeight: 600, minWidth: '120px' }}>[*PCT*]</span>
                                     <Texto category="p2" appearance="medium">Percentage value</Texto>
                                 </Horizontal>
-                                <Horizontal style={{ gap: '12px' }}>
+                                <Horizontal gap={12}>
                                     <span style={{ fontFamily: 'monospace', color: '#722ed1', fontWeight: 600, minWidth: '120px' }}>[*SRC*]</span>
                                     <Texto category="p2" appearance="medium">Publisher/Source (Argus, OPIS, etc.)</Texto>
                                 </Horizontal>
-                                <Horizontal style={{ gap: '12px' }}>
+                                <Horizontal gap={12}>
                                     <span style={{ fontFamily: 'monospace', color: '#722ed1', fontWeight: 600, minWidth: '120px' }}>[*INSTR*]</span>
                                     <Texto category="p2" appearance="medium">Instrument (CBOB, ULSD, etc.)</Texto>
                                 </Horizontal>
-                                <Horizontal style={{ gap: '12px' }}>
+                                <Horizontal gap={12}>
                                     <span style={{ fontFamily: 'monospace', color: '#722ed1', fontWeight: 600, minWidth: '120px' }}>[*DATE*]</span>
                                     <Texto category="p2" appearance="medium">Date Rule (Prior Day, Current, etc.)</Texto>
                                 </Horizontal>
-                                <Horizontal style={{ gap: '12px' }}>
+                                <Horizontal gap={12}>
                                     <span style={{ fontFamily: 'monospace', color: '#722ed1', fontWeight: 600, minWidth: '120px' }}>[*TYPE*]</span>
                                     <Texto category="p2" appearance="medium">Type (Settle, Average, Fixed, etc.)</Texto>
                                 </Horizontal>
@@ -1696,7 +1696,7 @@ export function FormulaTemplates() {
                             How do placeholders work?
                         </Texto>
                         <div style={{ padding: '16px', backgroundColor: '#f0f5ff', borderRadius: '4px', border: '1px solid #d6e4ff' }}>
-                            <Vertical style={{ gap: '12px' }}>
+                            <Vertical gap={12}>
                                 <div>
                                     <Texto category="p2" weight="600" style={{ marginBottom: '4px', display: 'block' }}>
                                         1. Create Template with Placeholders
@@ -1739,7 +1739,7 @@ export function FormulaTemplates() {
                             Example:
                         </Texto>
                         <div style={{ padding: '16px', backgroundColor: '#fafafa', borderRadius: '4px', border: '1px solid #f0f0f0' }}>
-                            <Vertical style={{ gap: '12px' }}>
+                            <Vertical gap={12}>
                                 <div>
                                     <Texto category="p2" appearance="medium" style={{ fontSize: '12px', color: '#8c8c8c' }}>
                                         Template Formula:

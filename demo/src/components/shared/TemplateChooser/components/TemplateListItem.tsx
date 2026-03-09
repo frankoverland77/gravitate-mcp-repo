@@ -48,7 +48,7 @@ export function TemplateListItem({
       {/* List Card Header */}
       <div className="template-list-item-header">
         <Vertical flex="1">
-          <Horizontal verticalCenter className="gap-12 mb-1">
+          <Horizontal verticalCenter className="mb-1" gap={12}>
             <Texto className="template-list-item-name">{template.name}</Texto>
             {hasPlaceholders && (
               <Tag className="template-list-item-placeholder-tag">PLACEHOLDERS</Tag>
@@ -58,7 +58,7 @@ export function TemplateListItem({
             {template.contractType} • {template.usedInLocations?.join(', ') || 'N/A'}
           </Texto>
         </Vertical>
-        <Horizontal verticalCenter className="gap-16">
+        <Horizontal verticalCenter gap={16}>
           <Texto className="template-list-item-selected-count">
             {getSelectedCount()} components selected
           </Texto>

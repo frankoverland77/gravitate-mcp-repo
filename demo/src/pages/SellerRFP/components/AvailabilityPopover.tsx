@@ -20,9 +20,9 @@ export function AvailabilityPopover({ detail, avail, children }: AvailabilityPop
   const netColor = getAvailabilityColor(avail.netPerMonth, detail.volume)
 
   const content = (
-    <Vertical style={{ width: 340, gap: '16px' }} className={styles.popover}>
+    <Vertical gap={16} style={{ width: 340 }} className={styles.popover}>
       {/* Header */}
-      <Vertical style={{ gap: '2px' }}>
+      <Vertical gap={2}>
         <Texto category="p2" weight="600">Supply Availability</Texto>
         <Texto category="p3" appearance="medium">
           {detail.product} @ {detail.terminal}
@@ -30,12 +30,12 @@ export function AvailabilityPopover({ detail, avail, children }: AvailabilityPop
       </Vertical>
 
       {/* Sources */}
-      <Vertical style={{ gap: '10px' }}>
+      <Vertical gap={10}>
         <Texto category="p3" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '10px', color: '#8c8c8c' }}>
           Supply Sources
         </Texto>
         {avail.sources.length > 0 ? (
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             {avail.sources.map((src, i) => {
               const pct = src.capacityPerMonth > 0
                 ? Math.round((src.availablePerMonth / src.capacityPerMonth) * 100)
@@ -47,7 +47,7 @@ export function AvailabilityPopover({ detail, avail, children }: AvailabilityPop
                     <Texto category="p2" weight="600">{formatVolume(src.availablePerMonth)}</Texto>
                   </Horizontal>
                   {detail.costType === 'contract' && (
-                    <Horizontal alignItems="center" style={{ gap: '6px' }}>
+                    <Horizontal gap={6} alignItems="center">
                       <div className={styles.capacityBar}>
                         <div className={styles.capacityFill} style={{ width: `${Math.min(pct, 100)}%` }} />
                       </div>
@@ -67,7 +67,7 @@ export function AvailabilityPopover({ detail, avail, children }: AvailabilityPop
 
       {/* Summary */}
       {avail.sources.length > 0 && (
-        <Vertical style={{ gap: '8px', paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
+        <Vertical gap={8} style={{ paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
           <Horizontal alignItems="center" justifyContent="space-between">
             <Texto category="p3" appearance="medium">Aggregate Available</Texto>
             <Texto category="p2" weight="500">{formatVolume(avail.availablePerMonth)}</Texto>
@@ -85,7 +85,7 @@ export function AvailabilityPopover({ detail, avail, children }: AvailabilityPop
               <div className={styles.divider} />
 
               <Horizontal alignItems="center" justifyContent="space-between">
-                <Horizontal alignItems="center" style={{ gap: '6px' }}>
+                <Horizontal gap={6} alignItems="center">
                   <Texto category="p2" weight="600">Net Available/mo</Texto>
                   {avail.netPerMonth !== null && avail.netPerMonth > 0 && (
                     <CheckCircleFilled style={{ fontSize: 12, color: '#52c41a' }} />
@@ -113,7 +113,7 @@ export function AvailabilityPopover({ detail, avail, children }: AvailabilityPop
           )}
 
           {!avail.hasVolume && (
-            <Horizontal alignItems="center" style={{ gap: '6px', paddingTop: '4px' }}>
+            <Horizontal alignItems="center" gap={6} style={{ paddingTop: '4px' }}>
               <WarningFilled style={{ fontSize: 12, color: '#faad14' }} />
               <Texto category="p3" appearance="medium">Set volume to see net availability.</Texto>
             </Horizontal>

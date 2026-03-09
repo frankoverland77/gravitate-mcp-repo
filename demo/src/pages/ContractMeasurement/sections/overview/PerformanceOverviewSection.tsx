@@ -31,7 +31,7 @@ const cardStyle = {
 
 export function PerformanceOverviewSection() {
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Section Header */}
       <div>
         <Texto category="h4" weight="600">Performance Overview</Texto>
@@ -42,14 +42,14 @@ export function PerformanceOverviewSection() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', alignItems: 'stretch' }}>
         {/* Card 1: Volume Progress */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <LineChartOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Volume Progress
               </Texto>
             </Horizontal>
-            <Horizontal style={{ alignItems: 'baseline', gap: '8px' }}>
+            <Horizontal gap={8} style={{ alignItems: 'baseline' }}>
               <Texto category="h3" weight="600">
                 {METRICS.volumeProgress}%
               </Texto>
@@ -57,7 +57,7 @@ export function PerformanceOverviewSection() {
             <Texto category="p2" appearance="medium">
               {METRICS.currentVolume.toLocaleString()} / {METRICS.totalVolume.toLocaleString()} units
             </Texto>
-            <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
+            <Horizontal gap={4} style={{ alignItems: 'center' }}>
               <ArrowUpOutlined style={{ fontSize: '12px', color: '#52c41a' }} />
               <Texto category="p2" style={{ color: '#52c41a' }}>
                 +{METRICS.volumeTrend}% vs target pace
@@ -68,8 +68,8 @@ export function PerformanceOverviewSection() {
 
         {/* Card 2: Days Remaining */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <ClockCircleOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Days Remaining
@@ -86,8 +86,8 @@ export function PerformanceOverviewSection() {
 
         {/* Card 3: Financial Impact */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Financial Impact
@@ -99,7 +99,7 @@ export function PerformanceOverviewSection() {
             <Texto category="p2" appearance="medium">
               Savings impact
             </Texto>
-            <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
+            <Horizontal gap={4} style={{ alignItems: 'center' }}>
               <ArrowUpOutlined style={{ fontSize: '12px', color: '#52c41a' }} />
               <Texto category="p2" style={{ color: '#52c41a' }}>
                 +{METRICS.financialTrend}% vs last month
@@ -110,14 +110,14 @@ export function PerformanceOverviewSection() {
 
         {/* Card 4: Risk Assessment */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <WarningOutlined style={{ fontSize: '16px', color: '#cf1322' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Risk Assessment
               </Texto>
             </Horizontal>
-            <Horizontal style={{ alignItems: 'center', gap: '12px' }}>
+            <Horizontal gap={12} style={{ alignItems: 'center' }}>
               <Texto category="h3" weight="600">
                 {METRICS.riskScore}
               </Texto>

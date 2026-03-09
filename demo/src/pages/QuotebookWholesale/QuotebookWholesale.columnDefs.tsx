@@ -147,7 +147,7 @@ export function getQuotebookWholesaleColumnDefs(): ColDef[] {
             if (symbol === 'M') color = 'var(--theme-error)'
             if (symbol === 'O') color = 'var(--theme-warning)'
             return (
-              <Horizontal verticalCenter style={{ gap: '4px' }}>
+              <Horizontal gap={4} verticalCenter>
                 <Texto>{currency(params.data.Cost)}</Texto>
                 {symbol && <Texto style={{ color }}>({symbol})</Texto>}
               </Horizontal>

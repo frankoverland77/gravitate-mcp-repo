@@ -25,7 +25,7 @@ export function GraviButtonExample() {
       {/* Theme Variations */}
       <Texto category="h5">Theme Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <GraviButton buttonText="Theme1" theme1/>
           <GraviButton buttonText="Theme2" theme2 />
           <GraviButton buttonText="Theme3" theme3 />
@@ -39,16 +39,16 @@ export function GraviButtonExample() {
       {/* Appearance Variations */}
       <Texto category="h5">Appearance Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <GraviButton buttonText="Filled" />
-          <GraviButton buttonText="Outline" appearance="outline" />
+          <GraviButton buttonText="Outline" appearance="outlined" />
         </Horizontal>
       </Vertical>
 
       {/* Special Classes */}
       <Texto category="h5">Special Classes</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <Texto category="p2">Ghost Button</Texto>
           <GraviButton
             className="ghost-gravi-button"
@@ -61,7 +61,7 @@ export function GraviButtonExample() {
       {/* Size Variations */}
       <Texto category="h5">Size Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <GraviButton buttonText="Small" size="small" />
           <GraviButton buttonText="Middle" />
           <GraviButton buttonText="Large" size="large" />
@@ -71,26 +71,26 @@ export function GraviButtonExample() {
       {/* State Variations */}
       <Texto category="h5">State Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <GraviButton buttonText="Normal" />
           <GraviButton buttonText="Disabled" disabled />
           <GraviButton buttonText="Loading" loading />
         </Horizontal>
       </Vertical>
 
-      {/* HTML Type Variations */}
-      <Texto category="h5">HTML Type Variations</Texto>
+      {/* Form Actions (v5: use onClick with form.submit() instead of htmlType) */}
+      <Texto category="h5">Form Actions</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }}>
-          <GraviButton buttonText="Submit" htmlType="submit" />
-          <GraviButton buttonText="Reset" htmlType="reset" />
+        <Horizontal gap={10}>
+          <GraviButton buttonText="Submit" success onClick={() => console.log('form.submit()')} />
+          <GraviButton buttonText="Reset" appearance="outlined" onClick={() => console.log('form.resetFields()')} />
         </Horizontal>
       </Vertical>
 
       {/* Icon Variations */}
       <Texto category="h5">Icon Variations</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <GraviButton buttonText="Save" icon={<SaveOutlined />} />
           <GraviButton icon={<EditOutlined />} />
           <GraviButton
@@ -108,7 +108,7 @@ export function GraviButtonExample() {
       {/* Combination Examples */}
       <Texto category="h5">Combination Examples</Texto>
       <Vertical className="mb-3">
-        <Horizontal style={{ gap: "10px" }} verticalCenter>
+        <Horizontal gap={10} verticalCenter>
           <GraviButton
             buttonText="Complete"
             success
@@ -122,7 +122,7 @@ export function GraviButtonExample() {
             buttonText="Error"
             error
             size="small"
-            appearance="outline"
+            appearance="outlined"
           />
         </Horizontal>
       </Vertical>

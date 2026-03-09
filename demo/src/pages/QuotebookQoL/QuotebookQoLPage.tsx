@@ -1,7 +1,7 @@
 import { EyeOutlined } from '@ant-design/icons';
 import { GraviButton, GraviGrid, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { ColDef } from 'ag-grid-community';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ValuationDrawer } from './components/ValuationDrawer';
@@ -41,14 +41,14 @@ function getColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       field: 'EffectiveFromDateTime',
       width: 140,
       valueFormatter: ({ value }: { value: string }) =>
-        value ? moment(value).format('MM/DD/YYYY') : '',
+        value ? dayjs(value).format('MM/DD/YYYY') : '',
     },
     {
       headerName: 'To Date',
       field: 'EffectiveToDateTime',
       width: 140,
       valueFormatter: ({ value }: { value: string }) =>
-        value ? moment(value).format('MM/DD/YYYY') : '',
+        value ? dayjs(value).format('MM/DD/YYYY') : '',
     },
     {
       headerName: 'Price',
@@ -70,7 +70,7 @@ function getColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       field: 'UpdatedDateTime',
       width: 170,
       valueFormatter: ({ value }: { value: string }) =>
-        value ? moment(value).format('MM/DD/YYYY hh:mm A') : '',
+        value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '',
     },
     {
       headerName: 'Actions',
@@ -81,7 +81,7 @@ function getColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       cellRenderer: ({ data }: { data: ContractValuesRow }) => {
         if (!data) return null;
         return (
-          <Horizontal horizontalCenter>
+          <Horizontal horizontalCenter verticalCenter height="100%">
             <GraviButton
               icon={<EyeOutlined />}
               buttonText="View Buildup"
@@ -146,7 +146,7 @@ export function QuotebookQoLPage() {
         rowData={mockContractValuesRows}
       />
       <ValuationDrawer
-        visible={isDrawerOpen}
+        open={isDrawerOpen}
         onClose={handleCloseDrawer}
         selectedValuationId={selectedValuationId}
       />

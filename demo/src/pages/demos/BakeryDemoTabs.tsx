@@ -17,37 +17,22 @@ export function BakeryDemoTabs() {
   /* End MCP Theme Script */
 
   return (
-    <Tabs style={{ minWidth: "100%" }}>
-      <Tabs.TabPane
-        tab={
-          <span>
-            <ShoppingCartOutlined /> Products
-          </span>
-        }
-        key="products"
-      >
-        <Horizontal><ProductGrid /></Horizontal>
-      </Tabs.TabPane>
-      <Tabs.TabPane
-        tab={
-          <span>
-            <CalculatorOutlined /> Formula Manager
-          </span>
-        }
-        key="formulas"
-      >
-        <Horizontal><FormulaManager /></Horizontal>
-      </Tabs.TabPane>
-      <Tabs.TabPane
-        tab={
-          <span>
-            <TruckOutlined /> Deliveries
-          </span>
-        }
-        key="deliveries"
-      >
-        <Horizontal><DeliveryManager /></Horizontal>
-      </Tabs.TabPane>
-    </Tabs>
+    <Tabs style={{ minWidth: "100%" }} items={[
+      {
+        key: 'products',
+        label: <span><ShoppingCartOutlined /> Products</span>,
+        children: <Horizontal><ProductGrid /></Horizontal>,
+      },
+      {
+        key: 'formulas',
+        label: <span><CalculatorOutlined /> Formula Manager</span>,
+        children: <Horizontal><FormulaManager /></Horizontal>,
+      },
+      {
+        key: 'deliveries',
+        label: <span><TruckOutlined /> Deliveries</span>,
+        children: <Horizontal><DeliveryManager /></Horizontal>,
+      },
+    ]} />
   );
 }

@@ -43,7 +43,7 @@ export function HistoryEntry({ edit, onRevert, compact = false }: HistoryEntryPr
   return (
     <div className={`${styles.historyEntry} ${isReverted ? styles.reverted : ''} ${compact ? styles.compact : ''}`}>
       <Horizontal justifyContent='space-between' alignItems='flex-start'>
-        <Vertical style={{ gap: '4px', flex: 1 }}>
+        <Vertical gap={4} style={{ flex: 1 }}>
           {/* Cell identifier */}
           <Texto weight='600' className={isReverted ? styles.strikethrough : ''}>
             {edit.productName} / {edit.locationName}
@@ -53,7 +53,7 @@ export function HistoryEntry({ edit, onRevert, compact = false }: HistoryEntryPr
           </Texto>
 
           {/* Value change */}
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <Texto category='p2' className={isReverted ? styles.strikethrough : ''}>
               <span className={styles.oldValue}>{formatPrice(edit.previousValue)}</span>
               <span className={styles.arrow}> → </span>
@@ -62,7 +62,7 @@ export function HistoryEntry({ edit, onRevert, compact = false }: HistoryEntryPr
           </Horizontal>
 
           {/* Metadata */}
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <span className={styles.sourceIcon}>{sourceIcon}</span>
             <Texto category='p2' appearance='medium'>
               {sourceLabel}

@@ -36,7 +36,7 @@ function PathCard({ icon, label, subtitle, onClick }: PathCardProps) {
   return (
     <button className={styles['path-card']} onClick={onClick}>
       <span className={styles['path-icon']}>{icon}</span>
-      <Vertical style={{ gap: '2px', flex: 1, textAlign: 'left' }}>
+      <Vertical gap={2} style={{ flex: 1, textAlign: 'left' }}>
         <Texto category="p1" weight="600">{label}</Texto>
         <Texto category="p3" appearance="medium">{subtitle}</Texto>
       </Vertical>
@@ -47,7 +47,7 @@ function PathCard({ icon, label, subtitle, onClick }: PathCardProps) {
 export function EntryPathModal({ visible, onClose, onSelect }: EntryPathModalProps) {
   return (
     <Modal
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={null}
       width={480}
@@ -55,15 +55,15 @@ export function EntryPathModal({ visible, onClose, onSelect }: EntryPathModalPro
       title={null}
       closable
     >
-      <Vertical style={{ gap: '20px', padding: '8px 0' }}>
-        <Vertical style={{ gap: '4px' }}>
+      <Vertical gap={20} style={{ padding: '8px 0' }}>
+        <Vertical gap={4}>
           <Texto category="h4" weight="600">New RFP Response</Texto>
           <Texto category="p2" appearance="medium">
             Choose how to build your detail rows
           </Texto>
         </Vertical>
 
-        <Vertical style={{ gap: '10px' }}>
+        <Vertical gap={10}>
           <PathCard
             icon={<AppstoreOutlined />}
             label="Build from Matrix"

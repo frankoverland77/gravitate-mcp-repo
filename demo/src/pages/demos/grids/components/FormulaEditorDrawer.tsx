@@ -67,18 +67,18 @@ export function FormulaEditorDrawer({
             <Drawer
             placement="bottom"
             height="70%"
-            visible={drawerOpen}
+            open={drawerOpen}
             onClose={() => setDrawerOpen(false)}
             closable={false}
             title={null}
             headerStyle={{ display: 'none' }}
-            bodyStyle={{
+            styles={{ body: {
                 backgroundColor: '#f5f5f5',
                 padding: 0,
                 display: 'flex',
                 flexDirection: 'column',
                 height: '100%'
-            }}
+            } }}
         >
             {/* Custom Header with Green Background */}
             <div style={{
@@ -87,8 +87,8 @@ export function FormulaEditorDrawer({
                 flexShrink: 0
             }}>
                 <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Vertical style={{ gap: '4px' }}>
-                        <Horizontal style={{ alignItems: 'center', gap: '12px' }}>
+                    <Vertical gap={4}>
+                        <Horizontal gap={12} style={{ alignItems: 'center' }}>
                             <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
                                 Edit Price Formula
                             </Texto>
@@ -270,7 +270,7 @@ export function FormulaEditorDrawer({
                             backgroundColor: '#ffffff',
                             zIndex: 10
                         }}>
-                            <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
+                            <Horizontal gap={16} style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
                                 <Button
                                     size="large"
                                     onClick={() => setDrawerOpen(false)}

@@ -107,7 +107,7 @@ export function GroupPanelCreateView({ onCreateGroup, onCancel }: GroupPanelCrea
           <>
             {/* Manual Entry Form */}
             <div className={styles['form-section']}>
-              <Texto category='h6' appearance='medium' weight='600' className={styles['section-label']}>
+              <Texto category='h5' appearance='medium' weight='600' className={styles['section-label']}>
                 Group Settings
               </Texto>
 
@@ -159,7 +159,7 @@ export function GroupPanelCreateView({ onCreateGroup, onCancel }: GroupPanelCrea
 
             {/* Thresholds */}
             <div className={styles['form-section']}>
-              <Texto category='h6' appearance='medium' weight='600' className={styles['section-label']}>
+              <Texto category='h5' appearance='medium' weight='600' className={styles['section-label']}>
                 Thresholds
               </Texto>
 
@@ -192,7 +192,7 @@ export function GroupPanelCreateView({ onCreateGroup, onCancel }: GroupPanelCrea
           <>
             {/* External Source */}
             <div className={styles['form-section']}>
-              <Texto category='h6' appearance='medium' weight='600' className={styles['section-label']}>
+              <Texto category='h5' appearance='medium' weight='600' className={styles['section-label']}>
                 Source System
               </Texto>
 

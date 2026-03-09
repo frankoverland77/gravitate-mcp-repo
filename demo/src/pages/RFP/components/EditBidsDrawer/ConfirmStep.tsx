@@ -87,8 +87,8 @@ export function ConfirmStep({ changes, updatedDetails, onApply, onBack }: Confir
         showIcon
         message='Summary of Changes'
         description={
-          <Vertical style={{ gap: '8px' }}>
-            <Horizontal style={{ gap: '24px' }}>
+          <Vertical gap={8}>
+            <Horizontal gap={24}>
               <Texto category='p2'>
                 <strong>{summary.totalChanges}</strong> total changes
               </Texto>
@@ -121,7 +121,7 @@ export function ConfirmStep({ changes, updatedDetails, onApply, onBack }: Confir
         showIcon
         message='What will happen'
         description={
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category='p2'>1. Bid prices will be updated in the comparison grid</Texto>
             <Texto category='p2'>2. Supplier rankings may change based on new prices</Texto>
             <Texto category='p2'>3. Metrics will be recalculated (avg price, score, etc.)</Texto>

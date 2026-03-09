@@ -37,11 +37,11 @@ export function QuoteBookHistoryDrawer({ visible, onClose }: QuoteBookHistoryDra
   return (
     <Drawer
       title="Quote History — Diesel #2 / Houston Term."
-      visible={visible}
+      open={visible}
       placement="bottom"
       height="70vh"
       onClose={onClose}
-      bodyStyle={{ padding: 0, display: 'flex', height: '100%' }}
+      styles={{ body: { padding: 0, display: 'flex', height: '100%' } }}
     >
       <Horizontal style={{ height: '100%' }}>
         <Vertical flex="2" style={{ padding: 16, borderRight: '1px solid var(--gray-200)' }}>

@@ -56,12 +56,9 @@ function RankingItem({ factor, rank, totalRanks, onMoveUp, onMoveDown }: Ranking
   return (
     <Horizontal
       alignItems="center"
-      style={{
-        padding: '8px 12px',
+      gap={12} style={{ padding: '8px 12px',
         backgroundColor: 'var(--theme-bg-elevated)',
-        borderRadius: '4px',
-        gap: '12px',
-      }}
+        borderRadius: '4px' }}
     >
       <MenuOutlined style={{ color: 'var(--theme-color-4)', cursor: 'grab' }} />
       <Texto category="p2" weight="500" style={{ minWidth: '24px' }}>
@@ -88,7 +85,7 @@ function RankingItem({ factor, rank, totalRanks, onMoveUp, onMoveDown }: Ranking
           }}
         />
       </Horizontal>
-      <Horizontal style={{ gap: '4px' }}>
+      <Horizontal gap={4}>
         <GraviButton
           type="text"
           icon={<span style={{ fontSize: '10px' }}>▲</span>}
@@ -187,217 +184,224 @@ export function ThresholdsModal({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Parameters"
       onCancel={onClose}
       width={480}
       footer={
         <Horizontal justifyContent="space-between">
           <GraviButton type="link" buttonText="Reset to Defaults" onClick={handleReset} />
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText="Cancel" onClick={onClose} />
             <GraviButton buttonText="Save" success onClick={handleSave} />
           </Horizontal>
         </Horizontal>
       }
     >
-      <Tabs defaultActiveKey="parameters">
-        <Tabs.TabPane tab="Parameters" key="parameters">
-          <Vertical style={{ gap: '24px', paddingTop: '16px' }}>
-            {/* Price History Section */}
-            <Vertical style={{ gap: '12px' }}>
-              <Texto category="p2" weight="600">
-                Price History
-              </Texto>
-              <Vertical style={{ gap: '8px' }}>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Lookback:
-                  </Texto>
-                  <Select
-                    value={localParameters.priceHistoryLookback}
-                    onChange={(value: HistoryLookback) =>
-                      setLocalParameters((prev) => ({ ...prev, priceHistoryLookback: value }))
-                    }
-                    options={HISTORY_LOOKBACK_OPTIONS}
-                    style={{ width: '140px' }}
-                  />
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Aggregation:
-                  </Texto>
-                  <Select
-                    value={localParameters.priceAggregation}
-                    onChange={(value: AggregationMethod) =>
-                      setLocalParameters((prev) => ({ ...prev, priceAggregation: value }))
-                    }
-                    options={AGGREGATION_METHOD_OPTIONS}
-                    style={{ width: '140px' }}
-                  />
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Method:
-                  </Texto>
-                  <Select
-                    value={localParameters.priceMethod}
-                    onChange={(value: PriceMethod) =>
-                      setLocalParameters((prev) => ({ ...prev, priceMethod: value }))
-                    }
-                    options={PRICE_METHOD_OPTIONS}
-                    style={{ width: '140px' }}
-                  />
-                </Horizontal>
+      <Tabs defaultActiveKey="parameters" items={[
+        {
+          key: 'parameters',
+          label: 'Parameters',
+          children: (
+            <Vertical gap={24} style={{ paddingTop: '16px' }}>
+              {/* Price History Section */}
+              <Vertical gap={12}>
+                <Texto category="p2" weight="600">
+                  Price History
+                </Texto>
+                <Vertical gap={8}>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Lookback:
+                    </Texto>
+                    <Select
+                      value={localParameters.priceHistoryLookback}
+                      onChange={(value: HistoryLookback) =>
+                        setLocalParameters((prev) => ({ ...prev, priceHistoryLookback: value }))
+                      }
+                      options={HISTORY_LOOKBACK_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Aggregation:
+                    </Texto>
+                    <Select
+                      value={localParameters.priceAggregation}
+                      onChange={(value: AggregationMethod) =>
+                        setLocalParameters((prev) => ({ ...prev, priceAggregation: value }))
+                      }
+                      options={AGGREGATION_METHOD_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Method:
+                    </Texto>
+                    <Select
+                      value={localParameters.priceMethod}
+                      onChange={(value: PriceMethod) =>
+                        setLocalParameters((prev) => ({ ...prev, priceMethod: value }))
+                      }
+                      options={PRICE_METHOD_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                </Vertical>
+              </Vertical>
+
+              {/* Volume History Section */}
+              <Vertical gap={12}>
+                <Texto category="p2" weight="600">
+                  Volume History
+                </Texto>
+                <Vertical gap={8}>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Lookback:
+                    </Texto>
+                    <Select
+                      value={localParameters.volumeHistoryLookback}
+                      onChange={(value: HistoryLookback) =>
+                        setLocalParameters((prev) => ({ ...prev, volumeHistoryLookback: value }))
+                      }
+                      options={HISTORY_LOOKBACK_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Granularity:
+                    </Texto>
+                    <Select
+                      value={localParameters.volumeGranularity}
+                      onChange={(value: VolumeGranularity) =>
+                        setLocalParameters((prev) => ({ ...prev, volumeGranularity: value }))
+                      }
+                      options={VOLUME_GRANULARITY_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Calculation:
+                    </Texto>
+                    <Select
+                      value={localParameters.volumeCalculation}
+                      onChange={(value: VolumeCalculation) =>
+                        setLocalParameters((prev) => ({ ...prev, volumeCalculation: value }))
+                      }
+                      options={VOLUME_CALCULATION_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                </Vertical>
+              </Vertical>
+
+              {/* Threshold Rules Section */}
+              <Vertical gap={12}>
+                <Texto category="p2" weight="600">
+                  Threshold Rules
+                </Texto>
+                <Vertical gap={8}>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Ratability Min:
+                    </Texto>
+                    <Horizontal alignItems="center" justifyContent="flex-end" gap={4} style={{ width: '140px' }}>
+                      <InputNumber
+                        value={localThresholds.ratabilityMin}
+                        onChange={(value) => setLocalThresholds((prev) => ({ ...prev, ratabilityMin: value || 0 }))}
+                        min={0}
+                        max={100}
+                        style={{ width: '70px' }}
+                      />
+                      <Texto category="p2" appearance="medium">
+                        %
+                      </Texto>
+                    </Horizontal>
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Ratability Max:
+                    </Texto>
+                    <Horizontal alignItems="center" justifyContent="flex-end" gap={4} style={{ width: '140px' }}>
+                      <InputNumber
+                        value={localThresholds.ratabilityMax}
+                        onChange={(value) => setLocalThresholds((prev) => ({ ...prev, ratabilityMax: value || 100 }))}
+                        min={0}
+                        max={200}
+                        style={{ width: '70px' }}
+                      />
+                      <Texto category="p2" appearance="medium">
+                        %
+                      </Texto>
+                    </Horizontal>
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Allocation:
+                    </Texto>
+                    <Select
+                      value={localThresholds.allocationMin}
+                      onChange={(value) => setLocalThresholds((prev) => ({ ...prev, allocationMin: value }))}
+                      options={ALLOCATION_PERIOD_OPTIONS}
+                      style={{ width: '140px' }}
+                    />
+                  </Horizontal>
+                  <Horizontal justifyContent="space-between" alignItems="center">
+                    <Texto category="p2" appearance="medium">
+                      Max Penalties:
+                    </Texto>
+                    <Horizontal alignItems="center" justifyContent="flex-end" gap={4} style={{ width: '140px' }}>
+                      <InputNumber
+                        value={localThresholds.penaltyMax}
+                        onChange={(value) => setLocalThresholds((prev) => ({ ...prev, penaltyMax: value || 0 }))}
+                        min={0}
+                        max={10}
+                        style={{ width: '70px' }}
+                      />
+                      <Texto category="p2" appearance="medium">
+                        cents/gal
+                      </Texto>
+                    </Horizontal>
+                  </Horizontal>
+                </Vertical>
               </Vertical>
             </Vertical>
-
-            {/* Volume History Section */}
-            <Vertical style={{ gap: '12px' }}>
+          ),
+        },
+        {
+          key: 'importance',
+          label: 'Issue Importance',
+          children: (
+            <Vertical gap={12} style={{ paddingTop: '16px' }}>
               <Texto category="p2" weight="600">
-                Volume History
+                Issue Importance
               </Texto>
-              <Vertical style={{ gap: '8px' }}>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Lookback:
-                  </Texto>
-                  <Select
-                    value={localParameters.volumeHistoryLookback}
-                    onChange={(value: HistoryLookback) =>
-                      setLocalParameters((prev) => ({ ...prev, volumeHistoryLookback: value }))
-                    }
-                    options={HISTORY_LOOKBACK_OPTIONS}
-                    style={{ width: '140px' }}
+              <Texto category="p2" appearance="medium">
+                Reorder by importance for AI recommendations
+              </Texto>
+
+              {/* Ranking list */}
+              <Vertical gap={8}>
+                {getSortedFactors().map((factor) => (
+                  <RankingItem
+                    key={factor}
+                    factor={factor}
+                    rank={localImportance[factor]}
+                    totalRanks={5}
+                    onMoveUp={() => handleMoveUp(factor)}
+                    onMoveDown={() => handleMoveDown(factor)}
                   />
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Granularity:
-                  </Texto>
-                  <Select
-                    value={localParameters.volumeGranularity}
-                    onChange={(value: VolumeGranularity) =>
-                      setLocalParameters((prev) => ({ ...prev, volumeGranularity: value }))
-                    }
-                    options={VOLUME_GRANULARITY_OPTIONS}
-                    style={{ width: '140px' }}
-                  />
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Calculation:
-                  </Texto>
-                  <Select
-                    value={localParameters.volumeCalculation}
-                    onChange={(value: VolumeCalculation) =>
-                      setLocalParameters((prev) => ({ ...prev, volumeCalculation: value }))
-                    }
-                    options={VOLUME_CALCULATION_OPTIONS}
-                    style={{ width: '140px' }}
-                  />
-                </Horizontal>
+                ))}
               </Vertical>
             </Vertical>
-
-            {/* Threshold Rules Section */}
-            <Vertical style={{ gap: '12px' }}>
-              <Texto category="p2" weight="600">
-                Threshold Rules
-              </Texto>
-              <Vertical style={{ gap: '8px' }}>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Ratability Min:
-                  </Texto>
-                  <Horizontal alignItems="center" justifyContent="flex-end" style={{ width: '140px', gap: '4px' }}>
-                    <InputNumber
-                      value={localThresholds.ratabilityMin}
-                      onChange={(value) => setLocalThresholds((prev) => ({ ...prev, ratabilityMin: value || 0 }))}
-                      min={0}
-                      max={100}
-                      style={{ width: '70px' }}
-                    />
-                    <Texto category="p2" appearance="medium">
-                      %
-                    </Texto>
-                  </Horizontal>
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Ratability Max:
-                  </Texto>
-                  <Horizontal alignItems="center" justifyContent="flex-end" style={{ width: '140px', gap: '4px' }}>
-                    <InputNumber
-                      value={localThresholds.ratabilityMax}
-                      onChange={(value) => setLocalThresholds((prev) => ({ ...prev, ratabilityMax: value || 100 }))}
-                      min={0}
-                      max={200}
-                      style={{ width: '70px' }}
-                    />
-                    <Texto category="p2" appearance="medium">
-                      %
-                    </Texto>
-                  </Horizontal>
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Allocation:
-                  </Texto>
-                  <Select
-                    value={localThresholds.allocationMin}
-                    onChange={(value) => setLocalThresholds((prev) => ({ ...prev, allocationMin: value }))}
-                    options={ALLOCATION_PERIOD_OPTIONS}
-                    style={{ width: '140px' }}
-                  />
-                </Horizontal>
-                <Horizontal justifyContent="space-between" alignItems="center">
-                  <Texto category="p2" appearance="medium">
-                    Max Penalties:
-                  </Texto>
-                  <Horizontal alignItems="center" justifyContent="flex-end" style={{ width: '140px', gap: '4px' }}>
-                    <InputNumber
-                      value={localThresholds.penaltyMax}
-                      onChange={(value) => setLocalThresholds((prev) => ({ ...prev, penaltyMax: value || 0 }))}
-                      min={0}
-                      max={10}
-                      style={{ width: '70px' }}
-                    />
-                    <Texto category="p2" appearance="medium">
-                      cents/gal
-                    </Texto>
-                  </Horizontal>
-                </Horizontal>
-              </Vertical>
-            </Vertical>
-          </Vertical>
-        </Tabs.TabPane>
-
-        <Tabs.TabPane tab="Issue Importance" key="importance">
-          <Vertical style={{ gap: '12px', paddingTop: '16px' }}>
-            <Texto category="p2" weight="600">
-              Issue Importance
-            </Texto>
-            <Texto category="p2" appearance="medium">
-              Reorder by importance for AI recommendations
-            </Texto>
-
-            {/* Ranking list */}
-            <Vertical style={{ gap: '8px' }}>
-              {getSortedFactors().map((factor) => (
-                <RankingItem
-                  key={factor}
-                  factor={factor}
-                  rank={localImportance[factor]}
-                  totalRanks={5}
-                  onMoveUp={() => handleMoveUp(factor)}
-                  onMoveDown={() => handleMoveDown(factor)}
-                />
-              ))}
-            </Vertical>
-          </Vertical>
-        </Tabs.TabPane>
-      </Tabs>
+          ),
+        },
+      ]} />
     </Modal>
   )
 }

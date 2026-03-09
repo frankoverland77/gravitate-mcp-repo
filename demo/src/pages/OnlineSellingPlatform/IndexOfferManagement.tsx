@@ -1525,167 +1525,174 @@ export function IndexOfferManagement() {
             onChange={setActiveTab}
             style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
             className="index-offer-tabs"
-          >
-            <Tabs.TabPane tab="Offer Management" key="offer-management" style={{ height: '100%' }}>
-              {/* Main Offer Grid - Full Height */}
-              <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <GraviGrid
-                  key="offer-management-grid"
-                  storageKey="index-offer-management-grid"
-                  rowData={rowData}
-                  columnDefs={columnDefs}
-                  agPropOverrides={agPropOverrides}
-                  controlBarProps={controlBarProps}
-                  updateEP={updateEP}
-                />
-              </div>
-            </Tabs.TabPane>
-
-            <Tabs.TabPane tab="Offer Pricing" key="offer-pricing" style={{ height: '100%' }}>
-              <div
-                style={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  padding: '16px',
-                }}
-              >
-                {/* Competitive Analysis Grid - Hidden during bulk change mode, collapses when empty */}
-                {!isBulkChangeVisible && selectedPricingRow ? (
-                  <div style={{ height: '400px' }}>
+            items={[
+              {
+                key: 'offer-management',
+                label: 'Offer Management',
+                children: (
+                  <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <GraviGrid
-                      storageKey="offer-pricing-competitive-grid"
-                      rowData={analyticsRowData}
-                      columnDefs={analyticsColumnDefs}
-                      agPropOverrides={{
-                        getRowId: (params: any) => params.data.id,
-                        domLayout: 'normal',
-                        headerHeight: 40,
-                        rowHeight: 48,
-                        suppressRowClickSelection: true,
-                        enableCellTextSelection: true,
-                        rowGroupPanelShow: 'never',
-                        suppressDragLeaveHidesColumns: true,
-                      }}
-                      controlBarProps={{
-                        title: (
-                          <Horizontal style={{ gap: '16px', alignItems: 'baseline' }}>
-                            <Texto category="h6" weight="600">
-                              Competitive Analysis
-                            </Texto>
-                            <Texto category="p1" appearance="medium">
-                              Selected: {selectedPricingRow?.product} -{' '}
-                              {selectedPricingRow?.location}
-                            </Texto>
-                          </Horizontal>
-                        ),
-                        hideActiveFilters: true,
-                        hideFilterRow: true,
-                        actionButtons: (
-                          <Button size="small" onClick={() => setSelectedPricingRow(null)}>
-                            Close
-                          </Button>
-                        ),
-                      }}
+                      key="offer-management-grid"
+                      storageKey="index-offer-management-grid"
+                      rowData={rowData}
+                      columnDefs={columnDefs}
+                      agPropOverrides={agPropOverrides}
+                      controlBarProps={controlBarProps}
+                      updateEP={updateEP}
                     />
                   </div>
-                ) : !isBulkChangeVisible ? (
+                ),
+              },
+              {
+                key: 'offer-pricing',
+                label: 'Offer Pricing',
+                children: (
                   <div
                     style={{
-                      height: '80px',
-                      backgroundColor: '#fafafa',
-                      border: '1px dashed #d9d9d9',
-                      borderRadius: '8px',
+                      height: '100%',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      flexDirection: 'column',
+                      gap: '16px',
                       padding: '16px',
                     }}
                   >
-                    <Horizontal style={{ gap: '12px', alignItems: 'center' }}>
-                      <EyeOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
-                      <Texto category="p2" appearance="medium">
-                        Click any row in the Price Offers table below to view competitive analysis
-                      </Texto>
-                    </Horizontal>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      height: '80px',
-                      backgroundColor: '#f5f5f5',
-                      border: '1px dashed #d9d9d9',
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '16px',
-                      opacity: 0.7,
-                    }}
-                  >
-                    <Horizontal style={{ gap: '12px', alignItems: 'center' }}>
-                      <EyeInvisibleOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
-                      <Texto category="p2" appearance="medium">
-                        Competitive analysis disabled while in Bulk Change mode
-                      </Texto>
-                    </Horizontal>
-                  </div>
-                )}
-
-                {/* Price Offers Grid with Built-in Bulk Change Mode */}
-                <div style={{ flex: 1, minHeight: '300px' }}>
-                  <GraviGrid
-                    externalRef={pricingGridApiRef}
-                    rowData={samplePricingRowData}
-                    columnDefs={samplePricingColumnDefs}
-                    agPropOverrides={pricingGridAgPropOverrides}
-                    controlBarProps={{
-                      title: 'Price Offers',
-                      hideActiveFilters: false,
-                      actionButtons: (
-                        <GraviButton
-                          buttonText="Publish"
-                          icon={<SendOutlined />}
-                          appearance="solid"
-                          onClick={() => {
-                            if (isBulkChangeVisible) {
-                              // In bulk change mode: publish only selected rows
-                              const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
-                              const selectedRows = gridApi?.getSelectedRows?.() || [];
-                              setSelectedRowsToPublish(selectedRows);
-                            } else {
-                              // Not in bulk change mode: publish all rows
-                              setSelectedRowsToPublish(samplePricingRowData);
-                            }
-                            setPublishDrawerVisible(true);
+                    {/* Competitive Analysis Grid - Hidden during bulk change mode, collapses when empty */}
+                    {!isBulkChangeVisible && selectedPricingRow ? (
+                      <div style={{ height: '400px' }}>
+                        <GraviGrid
+                          storageKey="offer-pricing-competitive-grid"
+                          rowData={analyticsRowData}
+                          columnDefs={analyticsColumnDefs}
+                          agPropOverrides={{
+                            getRowId: (params: any) => params.data.id,
+                            domLayout: 'normal',
+                            headerHeight: 40,
+                            rowHeight: 48,
+                            suppressRowClickSelection: true,
+                            enableCellTextSelection: true,
+                            rowGroupPanelShow: 'never',
+                            suppressDragLeaveHidesColumns: true,
                           }}
-                          style={{ backgroundColor: '#51b073', color: 'white', borderColor: '#51b073' }}
+                          controlBarProps={{
+                            title: (
+                              <Horizontal gap={16} style={{ alignItems: 'baseline' }}>
+                                <Texto category="h5" weight="600">
+                                  Competitive Analysis
+                                </Texto>
+                                <Texto category="p1" appearance="medium">
+                                  Selected: {selectedPricingRow?.product} -{' '}
+                                  {selectedPricingRow?.location}
+                                </Texto>
+                              </Horizontal>
+                            ),
+                            hideActiveFilters: true,
+                            hideFilterRow: true,
+                            actionButtons: (
+                              <Button size="small" onClick={() => setSelectedPricingRow(null)}>
+                                Close
+                              </Button>
+                            ),
+                          }}
                         />
-                      ),
-                    }}
-                    isBulkChangeVisible={isBulkChangeVisible}
-                    setIsBulkChangeVisible={setIsBulkChangeVisible}
-                    isBulkChangeCompactMode
-                    hideSaveDisplay
-                    hideBulkSaveButtons
-                    updateEP={async (changes: any) => {
-                      // Handle bulk changes - update the state
-                      if (Array.isArray(changes)) {
-                        setSamplePricingRowData((prevData: any[]) => {
-                          return prevData.map((row: any) => {
-                            const updatedRow = changes.find((c: any) => c.id === row.id);
-                            return updatedRow || row;
-                          });
-                        });
-                      }
-                      return Promise.resolve();
-                    }}
-                  />
-                </div>
-              </div>
-            </Tabs.TabPane>
-          </Tabs>
+                      </div>
+                    ) : !isBulkChangeVisible ? (
+                      <div
+                        style={{
+                          height: '80px',
+                          backgroundColor: '#fafafa',
+                          border: '1px dashed #d9d9d9',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '16px',
+                        }}
+                      >
+                        <Horizontal gap={12} style={{ alignItems: 'center' }}>
+                          <EyeOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
+                          <Texto category="p2" appearance="medium">
+                            Click any row in the Price Offers table below to view competitive analysis
+                          </Texto>
+                        </Horizontal>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          height: '80px',
+                          backgroundColor: '#f5f5f5',
+                          border: '1px dashed #d9d9d9',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '16px',
+                          opacity: 0.7,
+                        }}
+                      >
+                        <Horizontal gap={12} style={{ alignItems: 'center' }}>
+                          <EyeInvisibleOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
+                          <Texto category="p2" appearance="medium">
+                            Competitive analysis disabled while in Bulk Change mode
+                          </Texto>
+                        </Horizontal>
+                      </div>
+                    )}
+
+                    {/* Price Offers Grid with Built-in Bulk Change Mode */}
+                    <div style={{ flex: 1, minHeight: '300px' }}>
+                      <GraviGrid
+                        externalRef={pricingGridApiRef}
+                        rowData={samplePricingRowData}
+                        columnDefs={samplePricingColumnDefs}
+                        agPropOverrides={pricingGridAgPropOverrides}
+                        controlBarProps={{
+                          title: 'Price Offers',
+                          hideActiveFilters: false,
+                          actionButtons: (
+                            <GraviButton
+                              buttonText="Publish"
+                              icon={<SendOutlined />}
+                              appearance="solid"
+                              onClick={() => {
+                                if (isBulkChangeVisible) {
+                                  // In bulk change mode: publish only selected rows
+                                  const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
+                                  const selectedRows = gridApi?.getSelectedRows?.() || [];
+                                  setSelectedRowsToPublish(selectedRows);
+                                } else {
+                                  // Not in bulk change mode: publish all rows
+                                  setSelectedRowsToPublish(samplePricingRowData);
+                                }
+                                setPublishDrawerVisible(true);
+                              }}
+                              style={{ backgroundColor: '#51b073', color: 'white', borderColor: '#51b073' }}
+                            />
+                          ),
+                        }}
+                        isBulkChangeVisible={isBulkChangeVisible}
+                        setIsBulkChangeVisible={setIsBulkChangeVisible}
+                        isBulkChangeCompactMode
+                        hideSaveDisplay
+                        hideBulkSaveButtons
+                        updateEP={async (changes: any) => {
+                          // Handle bulk changes - update the state
+                          if (Array.isArray(changes)) {
+                            setSamplePricingRowData((prevData: any[]) => {
+                              return prevData.map((row: any) => {
+                                const updatedRow = changes.find((c: any) => c.id === row.id);
+                                return updatedRow || row;
+                              });
+                            });
+                          }
+                          return Promise.resolve();
+                        }}
+                      />
+                    </div>
+                  </div>
+                ),
+              },
+            ]}
+          />
         </>
       ) : (
         /* MVP Mode: Just show main grid without tabs */
@@ -1729,11 +1736,11 @@ export function IndexOfferManagement() {
         placement="bottom"
         height="80vh"
         onClose={() => setOfferDrawerVisible(false)}
-        visible={offerDrawerVisible}
+        open={offerDrawerVisible}
         mask={true}
         closable={false}
-        destroyOnClose
-        bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
+        destroyOnHidden
+        styles={{ body: { padding: 0, height: '100%', display: 'flex', flexDirection: 'column' } }}
       >
         {/* Header */}
         <div
@@ -1744,8 +1751,8 @@ export function IndexOfferManagement() {
           }}
         >
           <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Vertical style={{ gap: '4px' }}>
-              <Horizontal style={{ alignItems: 'center', gap: '12px' }}>
+            <Vertical gap={4}>
+              <Horizontal gap={12} style={{ alignItems: 'center' }}>
                 <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
                   {isEditMode ? 'Edit Index Offer' : 'Create Index Offer'}
                 </Texto>
@@ -1805,7 +1812,7 @@ export function IndexOfferManagement() {
         ) : (
           /* Main Form View */
           <Vertical
-            style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '24px', gap: '24px' }}
+            gap={24} style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '24px' }}
           >
             {/* SECTION 1: Reference Data */}
             <div>
@@ -1822,7 +1829,7 @@ export function IndexOfferManagement() {
               >
                 Reference Data
               </Texto>
-              <Horizontal style={{ gap: '16px' }}>
+              <Horizontal gap={16}>
                 <div style={{ width: '25%' }}>
                   <Texto
                     style={{
@@ -2318,8 +2325,8 @@ export function IndexOfferManagement() {
             zIndex: 100,
           }}
         >
-          <Horizontal style={{ justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Horizontal gap={16} style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <Texto style={{ fontSize: '14px', fontWeight: 500 }}>Make Active</Texto>
               <Switch checked={isActive} onChange={setIsActive} />
             </Horizontal>
@@ -2348,11 +2355,11 @@ export function IndexOfferManagement() {
         placement="right"
         width={450}
         onClose={() => setSettingsDrawerVisible(false)}
-        visible={settingsDrawerVisible}
+        open={settingsDrawerVisible}
         zIndex={2000}
         maskClosable={true}
       >
-        <Vertical style={{ gap: '24px' }}>
+        <Vertical gap={24}>
           {/* Feature Prioritization Section */}
           <div>
             <Texto category="p1" weight="600" style={{ marginBottom: '12px', display: 'block' }}>
@@ -2371,7 +2378,7 @@ export function IndexOfferManagement() {
               onChange={(e) => setFeatureMode(e.target.value)}
               style={{ width: '100%' }}
             >
-              <Vertical style={{ gap: '12px' }}>
+              <Vertical gap={12}>
                 {/* MVP Mode */}
                 <div
                   style={{
@@ -2470,7 +2477,7 @@ export function IndexOfferManagement() {
                 onChange={(e) => setViewMode(e.target.value)}
                 style={{ width: '100%' }}
               >
-                <Vertical style={{ gap: '12px' }}>
+                <Vertical gap={12}>
                   {/* Panel Mode */}
                   <div
                     style={{
@@ -2647,11 +2654,11 @@ export function IndexOfferManagement() {
           setPublishSearchText('');
           setPublishDateTime(null);
         }}
-        visible={publishDrawerVisible}
+        open={publishDrawerVisible}
         mask={true}
         closable={false}
-        destroyOnClose
-        bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
+        destroyOnHidden
+        styles={{ body: { padding: 0, height: '100%', display: 'flex', flexDirection: 'column' } }}
       >
         {/* Header */}
         <div
@@ -2662,7 +2669,7 @@ export function IndexOfferManagement() {
           }}
         >
           <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Vertical style={{ gap: '4px' }}>
+            <Vertical gap={4}>
               <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
                 Publish Index Offers
               </Texto>
@@ -2736,7 +2743,7 @@ export function IndexOfferManagement() {
           }}
         >
           {/* Left side - Publisher label and date picker */}
-          <Horizontal style={{ alignItems: 'center', gap: '16px' }}>
+          <Horizontal gap={16} style={{ alignItems: 'center' }}>
             <Texto style={{ color: '#1890ff', fontWeight: 600 }}>Publisher</Texto>
             <DatePicker
               showTime
@@ -2749,7 +2756,7 @@ export function IndexOfferManagement() {
           </Horizontal>
 
           {/* Right side - Action buttons */}
-          <Horizontal style={{ gap: '12px' }}>
+          <Horizontal gap={12}>
             <Button
               onClick={() => {
                 setPublishDrawerVisible(false);

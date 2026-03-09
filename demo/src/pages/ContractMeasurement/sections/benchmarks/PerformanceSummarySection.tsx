@@ -20,8 +20,8 @@ export function PerformanceSummarySection() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
         {/* Tile 1: Total Contract Value vs Benchmark */}
         <div style={cardStyle}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Total Contract Value vs Benchmark
@@ -41,8 +41,8 @@ export function PerformanceSummarySection() {
 
         {/* Tile 2: Average $/gallon difference */}
         <div style={cardStyle}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <BarChartOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Average $/gallon difference

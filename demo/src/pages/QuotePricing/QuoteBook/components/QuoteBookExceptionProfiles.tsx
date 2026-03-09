@@ -159,7 +159,7 @@ export function QuoteBookExceptionProfiles({
         {/* Scrollable profile list */}
         <div style={{ flex: 1, overflow: 'auto', padding: '8px' }}>
           {/* Organization section */}
-          <Horizontal alignItems="center" style={{ gap: '6px', padding: '8px 8px 4px' }}>
+          <Horizontal alignItems="center" gap={6} style={{ padding: '8px 8px 4px' }}>
             <LockOutlined style={{ fontSize: 11, color: 'var(--gray-400)' }} />
             <Texto appearance="medium" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Organization
@@ -178,7 +178,7 @@ export function QuoteBookExceptionProfiles({
           ))}
 
           {/* Personal section */}
-          <Horizontal alignItems="center" style={{ gap: '6px', padding: '16px 8px 4px' }}>
+          <Horizontal alignItems="center" gap={6} style={{ padding: '16px 8px 4px' }}>
             <UserOutlined style={{ fontSize: 11, color: 'var(--gray-400)' }} />
             <Texto appearance="medium" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Personal
@@ -292,7 +292,7 @@ function ProfileViewMode({
         }}
       >
         <Vertical>
-          <Horizontal alignItems="center" style={{ gap: '8px' }}>
+          <Horizontal alignItems="center" gap={8}>
             <Texto category="h5" weight="600">{profile.name}</Texto>
             <span style={{
               padding: '2px 8px',
@@ -313,7 +313,7 @@ function ProfileViewMode({
             {profile.description}
           </Texto>
         </Vertical>
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           {profile.tier === 'org' && (
             <GraviButton buttonText="Duplicate as Personal" onClick={onDuplicate} />
           )}
@@ -391,7 +391,7 @@ function ThresholdSummaryCard({ threshold }: { threshold: ThresholdComponent }) 
       borderRadius: 6,
     }}>
       <Horizontal alignItems="center" justifyContent="space-between" style={{ marginBottom: 6 }}>
-        <Horizontal alignItems="center" style={{ gap: '6px' }}>
+        <Horizontal alignItems="center" gap={6}>
           <span style={{
             width: 8,
             height: 8,
@@ -490,7 +490,7 @@ function ProfileEditMode({
         {/* Ownership toggle */}
         <div style={{ marginBottom: 16 }}>
           <Texto style={{ fontSize: 12, fontWeight: 500, marginBottom: 4 }}>Ownership</Texto>
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <span style={{
               padding: '6px 12px',
               borderRadius: 6,
@@ -563,7 +563,7 @@ function ProfileEditMode({
         {/* Scope */}
         <div style={{ marginTop: 20, marginBottom: 16, maxWidth: 400 }}>
           <Texto style={{ fontSize: 12, fontWeight: 500, marginBottom: 8 }}>Scope</Texto>
-          <Horizontal style={{ gap: '12px', marginBottom: 8 }}>
+          <Horizontal gap={12} style={{ marginBottom: 8 }}>
             <div style={{ flex: 1 }}>
               <Texto appearance="medium" style={{ fontSize: 11, marginBottom: 4 }}>Terminal</Texto>
               <Select
@@ -606,11 +606,11 @@ function ProfileEditMode({
       <Horizontal
         justifyContent="flex-end"
         alignItems="center"
+        gap={8}
         style={{
           padding: '12px 20px',
           borderTop: '1px solid var(--gray-200)',
           flexShrink: 0,
-          gap: '8px',
         }}
       >
         <GraviButton buttonText="Cancel" onClick={onCancel} />
@@ -635,7 +635,7 @@ function ThresholdEditorCard({
   const isAbsolute = threshold.component === 'Market Move' || threshold.component === 'Bench Delta'
 
   const boundaryRow = (field: string, label: string, color: string, value: number | null, orgValue: number | null, disabled?: boolean) => (
-    <Horizontal alignItems="center" style={{ gap: '6px', marginBottom: 4 }}>
+    <Horizontal alignItems="center" gap={6} style={{ marginBottom: 4 }}>
       <span style={{
         width: 100,
         fontSize: 11,
@@ -671,7 +671,7 @@ function ThresholdEditorCard({
     }}>
       {/* Header: dot + name + derived status */}
       <Horizontal alignItems="center" justifyContent="space-between" style={{ marginBottom: 8 }}>
-        <Horizontal alignItems="center" style={{ gap: '6px' }}>
+        <Horizontal alignItems="center" gap={6}>
           <span style={{
             width: 8,
             height: 8,
@@ -754,7 +754,7 @@ function ProfileCard({
       onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'var(--gray-50)' }}
       onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
     >
-      <Horizontal alignItems="center" style={{ gap: '6px', marginBottom: 2 }}>
+      <Horizontal alignItems="center" gap={6} style={{ marginBottom: 2 }}>
         <Texto weight="500" style={{ fontSize: 13 }}>{name}</Texto>
         {badge && (
           <span style={{

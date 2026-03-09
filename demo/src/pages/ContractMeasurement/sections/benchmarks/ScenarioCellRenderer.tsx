@@ -33,7 +33,7 @@ export function ScenarioCellRenderer({
   return (
     <div className={cellClassName}>
       <Vertical gap="4px" alignItems="flex-start">
-        <Horizontal alignItems="center" style={{ gap: '14px' }} justifyContent="flex-start">
+        <Horizontal gap={14} alignItems="center" justifyContent="flex-start">
           <Texto weight="600">${cellData.price.toFixed(4)}/gal</Texto>
           {showRowStar && (
             <Tooltip title="Reference">

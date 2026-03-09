@@ -42,19 +42,19 @@ export function CreateContractModal({ visible, rfp, onClose, onConfirm }: Create
   return (
     <Modal
       title={
-        <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+        <Horizontal gap={8} style={{ alignItems: 'center' }}>
           <FileTextOutlined style={{ color: '#1677ff' }} />
           <span>Create Contract from RFP</span>
         </Horizontal>
       }
-      visible={visible}
+      open={visible}
       onOk={() => onConfirm(wonDetails)}
       onCancel={onClose}
       okText="Create Contract"
       cancelText="Cancel"
       width={580}
     >
-      <Vertical style={{ gap: '20px', paddingTop: '8px' }}>
+      <Vertical gap={20} style={{ paddingTop: '8px' }}>
         {/* Intro */}
         <div className={styles['intro-box']}>
           <Texto category="p2" appearance="medium">
@@ -65,7 +65,7 @@ export function CreateContractModal({ visible, rfp, onClose, onConfirm }: Create
         </div>
 
         {/* Header mapping */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Texto category="p2" weight="600">Contract Header</Texto>
           <div className={styles['mapping-table']}>
             <MappingRow label="Contract Name" value={`${rfp.buyerName} — ${rfp.name}`} />
@@ -77,8 +77,8 @@ export function CreateContractModal({ visible, rfp, onClose, onConfirm }: Create
         </Vertical>
 
         {/* Won details preview */}
-        <Vertical style={{ gap: '8px' }}>
-          <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+        <Vertical gap={8}>
+          <Horizontal gap={8} style={{ alignItems: 'center' }}>
             <Texto category="p2" weight="600">Contract Details</Texto>
             {rfp.status === 'partial-win' && (
               <Tag color="orange" style={{ margin: 0, fontSize: '11px' }}>Won only</Tag>
@@ -111,7 +111,7 @@ export function CreateContractModal({ visible, rfp, onClose, onConfirm }: Create
         </Vertical>
 
         {/* What gets created */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Texto category="p2" weight="600">What will be pre-populated</Texto>
           <div className={styles['checklist']}>
             <ChecklistItem text="Contract header with counterparty, dates, and payment terms" />
@@ -124,7 +124,7 @@ export function CreateContractModal({ visible, rfp, onClose, onConfirm }: Create
 
         {/* Navigation hint */}
         <div className={styles['nav-hint']}>
-          <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center' }}>
             <ArrowRightOutlined style={{ color: '#1677ff' }} />
             <Texto category="p3" appearance="medium">
               You'll be taken to the <strong>Create Contract</strong> page with all fields pre-filled. Review and adjust before saving.
@@ -147,7 +147,7 @@ function MappingRow({ label, value }: { label: string; value: string }) {
 
 function ChecklistItem({ text }: { text: string }) {
   return (
-    <Horizontal style={{ gap: '8px', alignItems: 'flex-start' }}>
+    <Horizontal gap={8} style={{ alignItems: 'flex-start' }}>
       <CheckCircleFilled style={{ color: '#52c41a', fontSize: '14px', marginTop: '2px' }} />
       <Texto category="p2" appearance="medium">{text}</Texto>
     </Horizontal>

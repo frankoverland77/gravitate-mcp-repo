@@ -17,14 +17,14 @@ import {
 } from './benchmark/benchmark.utils'
 
 interface BenchmarkScenarioDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onSave?: (scenario: Scenario) => void
   editingScenario?: Scenario
 }
 
 export function BenchmarkScenarioDrawer({
-  visible,
+  open,
   onClose,
   onSave,
   editingScenario,
@@ -41,12 +41,12 @@ export function BenchmarkScenarioDrawer({
   const isEditMode = !!editingScenario
 
   // Reset form when drawer opens, or populate with editing data.
-  // Only depend on `visible` — editingScenario is set by the parent in the
-  // same React batch before visible changes, so it's available when this fires.
+  // Only depend on `open` — editingScenario is set by the parent in the
+  // same React batch before open changes, so it's available when this fires.
   // Including editingScenario caused the effect to re-fire on parent re-renders
   // (new object reference), resetting selectedBenchmark and keeping the button disabled.
   useEffect(() => {
-    if (visible) {
+    if (open) {
       if (editingScenario) {
         // Edit mode - populate from priceConfig
         setName(editingScenario.name)
@@ -75,7 +75,7 @@ export function BenchmarkScenarioDrawer({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible])
+  }, [open])
 
   // Compute preview data reactively from selected benchmark
   const hasFullBenchmark =
@@ -160,20 +160,20 @@ export function BenchmarkScenarioDrawer({
     <Drawer
       placement='bottom'
       height='70%'
-      visible={visible}
+      open={open}
       onClose={onClose}
       closable={false}
       title={null}
       headerStyle={{ display: 'none' }}
-      bodyStyle={{
+      styles={{ body: {
         backgroundColor: '#f5f5f5',
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-      }}
+      } }}
       zIndex={2000}
-      destroyOnClose
+      destroyOnHidden
     >
       {/* Header */}
       <div
@@ -184,7 +184,7 @@ export function BenchmarkScenarioDrawer({
         }}
       >
         <Horizontal justifyContent='space-between' alignItems='flex-start'>
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
               {isEditMode ? 'Edit Benchmark Scenario' : 'Add Benchmark Scenario'}
             </Texto>
@@ -332,7 +332,7 @@ export function BenchmarkScenarioDrawer({
           zIndex: 100,
         }}
       >
-        <Horizontal justifyContent='flex-end' alignItems='center' style={{ gap: '16px' }}>
+        <Horizontal gap={16} justifyContent='flex-end' alignItems='center'>
           <GraviButton
             buttonText='Cancel'
             size='large'

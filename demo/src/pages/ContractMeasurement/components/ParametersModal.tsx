@@ -4,31 +4,31 @@ import { Texto, Vertical, Horizontal, GraviButton } from '@gravitate-js/excalibr
 import type { AnalysisParameters } from '../types/scenario.types'
 
 interface ParametersModalProps {
-  visible: boolean
+  open: boolean
   parameters: AnalysisParameters
   onClose: () => void
   onApply: (params: AnalysisParameters) => void
 }
 
-export function ParametersModal({ visible, parameters, onClose, onApply }: ParametersModalProps) {
+export function ParametersModal({ open, parameters, onClose, onApply }: ParametersModalProps) {
   const [localParams, setLocalParams] = useState<AnalysisParameters>(parameters)
 
   // Reset local state when modal opens
   useEffect(() => {
-    if (visible) {
+    if (open) {
       setLocalParams(parameters)
     }
-  }, [visible, parameters])
+  }, [open, parameters])
 
   const handleApply = () => {
     onApply(localParams)
   }
 
   return (
-    <Modal title="Parameters" visible={visible} onCancel={onClose} footer={null} width={400}>
-      <Vertical style={{ gap: '24px' }}>
+    <Modal title="Parameters" open={open} onCancel={onClose} footer={null} width={400}>
+      <Vertical gap={24}>
         {/* Price History Section */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Horizontal justifyContent="space-between" alignItems="center">
             <Texto category="p2" appearance="medium">
               Lookback Period:
@@ -74,7 +74,7 @@ export function ParametersModal({ visible, parameters, onClose, onApply }: Param
         </Vertical>
 
         {/* Footer buttons */}
-        <Horizontal justifyContent="flex-end" style={{ gap: '12px', marginTop: '8px' }}>
+        <Horizontal justifyContent="flex-end" gap={12} style={{ marginTop: '8px' }}>
           <GraviButton buttonText="Cancel" appearance="outlined" onClick={onClose} />
           <GraviButton buttonText="Apply" success onClick={handleApply} />
         </Horizontal>

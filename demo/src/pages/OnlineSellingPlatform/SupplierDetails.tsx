@@ -99,11 +99,11 @@ export function SupplierDetails() {
     };
 
     return (
-        <Vertical style={{ padding: '32px', gap: '24px', minHeight: '100%' }}>
+        <Vertical gap={24} style={{ padding: '32px', minHeight: '100%' }}>
 
             {/* Back Link */}
             <Horizontal
-                style={{ alignItems: 'center', gap: '6px', cursor: 'pointer', color: '#1890ff', width: 'fit-content' }}
+                gap={6} style={{ alignItems: 'center', cursor: 'pointer', color: '#1890ff', width: 'fit-content' }}
                 onClick={handleBackClick}
             >
                 <LeftOutlined style={{ fontSize: '12px' }} />
@@ -116,7 +116,7 @@ export function SupplierDetails() {
             </Texto>
 
             {/* Section Label */}
-            <Texto category="h6" weight="600">
+            <Texto category="h5" weight="600">
                 Behavioral Profile
             </Texto>
 
@@ -125,8 +125,8 @@ export function SupplierDetails() {
 
                 {/* Card 1: Strategy */}
                 <div style={cardStyle}>
-                    <Vertical style={{ gap: '8px' }}>
-                        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                    <Vertical gap={8}>
+                        <Horizontal gap={8} style={{ alignItems: 'center' }}>
                             <AimOutlined style={{ fontSize: '16px', color: '#722ed1' }} />
                             <Texto category="p2" appearance="medium">Strategy</Texto>
                         </Horizontal>
@@ -138,8 +138,8 @@ export function SupplierDetails() {
 
                 {/* Card 2: Up Market Capture */}
                 <div style={cardStyle}>
-                    <Vertical style={{ gap: '8px' }}>
-                        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                    <Vertical gap={8}>
+                        <Horizontal gap={8} style={{ alignItems: 'center' }}>
                             <ArrowUpOutlined style={{ fontSize: '16px', color: '#51B073' }} />
                             <Texto category="p2" appearance="medium">Up Market Capture</Texto>
                         </Horizontal>
@@ -150,8 +150,8 @@ export function SupplierDetails() {
 
                 {/* Card 3: Down Market Capture */}
                 <div style={cardStyle}>
-                    <Vertical style={{ gap: '8px' }}>
-                        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                    <Vertical gap={8}>
+                        <Horizontal gap={8} style={{ alignItems: 'center' }}>
                             <ArrowDownOutlined style={{ fontSize: '16px', color: '#ff4d4f' }} />
                             <Texto category="p2" appearance="medium">Down Market Capture</Texto>
                         </Horizontal>
@@ -162,8 +162,8 @@ export function SupplierDetails() {
 
                 {/* Card 4: Intraday Changes */}
                 <div style={cardStyle}>
-                    <Vertical style={{ gap: '8px' }}>
-                        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                    <Vertical gap={8}>
+                        <Horizontal gap={8} style={{ alignItems: 'center' }}>
                             <ClockCircleOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                             <Texto category="p2" appearance="medium">Intraday Changes</Texto>
                         </Horizontal>
@@ -174,7 +174,7 @@ export function SupplierDetails() {
             </div>
 
             {/* Time Period Toggle */}
-            <Horizontal style={{ gap: '8px', overflow: 'visible' }}>
+            <Horizontal gap={8} style={{ overflow: 'visible' }}>
                 <GraviButton
                     buttonText="30 Days"
                     appearance={period === '30' ? 'filled' : 'outlined'}
@@ -196,18 +196,18 @@ export function SupplierDetails() {
             </Horizontal>
 
             {/* Two Charts Side by Side */}
-            <Horizontal style={{ gap: '24px', flexShrink: 0 }}>
+            <Horizontal gap={24} style={{ flexShrink: 0 }}>
 
                 {/* Chart 1: Price Change vs Market - with red/green dots */}
                 <div style={{ flex: 1, minHeight: '420px', ...cardStyle }}>
-                    <Vertical style={{ gap: '8px' }}>
-                        <Texto category="h6" weight="600">Price Change vs Market</Texto>
-                        <Horizontal style={{ justifyContent: 'center', gap: '24px' }}>
-                            <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+                    <Vertical gap={8}>
+                        <Texto category="h5" weight="600">Price Change vs Market</Texto>
+                        <Horizontal gap={24} style={{ justifyContent: 'center' }}>
+                            <Horizontal gap={6} style={{ alignItems: 'center' }}>
                                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#51B073' }} />
                                 <Texto category="p2" appearance="medium">Up Market</Texto>
                             </Horizontal>
-                            <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+                            <Horizontal gap={6} style={{ alignItems: 'center' }}>
                                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ff4d4f' }} />
                                 <Texto category="p2" appearance="medium">Down Market</Texto>
                             </Horizontal>
@@ -244,8 +244,8 @@ export function SupplierDetails() {
 
                 {/* Chart 2: Capture Rate vs Size */}
                 <div style={{ flex: 1, minHeight: '420px', ...cardStyle }}>
-                    <Vertical style={{ gap: '16px' }}>
-                        <Texto category="h6" weight="600">Capture Rate vs Size</Texto>
+                    <Vertical gap={16}>
+                        <Texto category="h5" weight="600">Capture Rate vs Size</Texto>
                         <div style={{ height: '350px', minHeight: '350px', width: '100%' }}>
                             <ResponsiveScatterPlot
                                 data={chartData.captureRate}
@@ -278,14 +278,14 @@ export function SupplierDetails() {
 
             {/* Full Width Line Chart */}
             <div style={{ minHeight: '420px', flexShrink: 0, ...cardStyle }}>
-                <Vertical style={{ gap: '8px' }}>
-                    <Texto category="h6" weight="600">Consistency Over Time</Texto>
-                    <Horizontal style={{ justifyContent: 'center', gap: '24px' }}>
-                        <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+                <Vertical gap={8}>
+                    <Texto category="h5" weight="600">Consistency Over Time</Texto>
+                    <Horizontal gap={24} style={{ justifyContent: 'center' }}>
+                        <Horizontal gap={6} style={{ alignItems: 'center' }}>
                             <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#51B073' }} />
                             <Texto category="p2" appearance="medium">7-Day Average</Texto>
                         </Horizontal>
-                        <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+                        <Horizontal gap={6} style={{ alignItems: 'center' }}>
                             <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#bfbfbf' }} />
                             <Texto category="p2" appearance="medium">Daily Capture Rate</Texto>
                         </Horizontal>

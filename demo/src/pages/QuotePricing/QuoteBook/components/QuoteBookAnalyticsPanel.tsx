@@ -22,7 +22,7 @@ type AnalyticsData = {
 }
 
 interface QuoteBookAnalyticsPanelProps {
-  visible: boolean
+  open: boolean
   selectedRow?: any
   analyticsData: AnalyticsData
   onSelectRow?: (id: number) => void
@@ -42,7 +42,7 @@ function SeverityCard({ label, count, color }: { label: string; count: number; c
   )
 }
 
-export function QuoteBookAnalyticsPanel({ visible, selectedRow, analyticsData, onSelectRow }: QuoteBookAnalyticsPanelProps) {
+export function QuoteBookAnalyticsPanel({ open, selectedRow, analyticsData, onSelectRow }: QuoteBookAnalyticsPanelProps) {
   const [selectedView, setSelectedView] = useState('liftings_vs_benchmark')
 
   const isExceptions = selectedView === 'exceptions'
@@ -51,10 +51,10 @@ export function QuoteBookAnalyticsPanel({ visible, selectedRow, analyticsData, o
 
   return (
     <div style={{
-      height: visible ? (isExceptions ? '310px' : '280px') : '0px',
+      height: open ? (isExceptions ? '310px' : '280px') : '0px',
       overflow: 'hidden',
       transition: 'height 300ms ease',
-      borderBottom: visible ? '1px solid var(--gray-200)' : 'none',
+      borderBottom: open ? '1px solid var(--gray-200)' : 'none',
     }}>
       <Vertical style={{ padding: '12px 16px', height: '100%' }}>
         <Horizontal justifyContent="space-between" alignItems="center" style={{ marginBottom: 8 }}>
@@ -107,7 +107,7 @@ export function QuoteBookAnalyticsPanel({ visible, selectedRow, analyticsData, o
                   {/* Flagged components */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {flaggedComponents.slice(0, 5).map(c => (
-                      <Horizontal key={c.name} alignItems="center" style={{ gap: '6px' }}>
+                      <Horizontal key={c.name} alignItems="center" gap={6}>
                         <span style={{
                           width: 6,
                           height: 6,

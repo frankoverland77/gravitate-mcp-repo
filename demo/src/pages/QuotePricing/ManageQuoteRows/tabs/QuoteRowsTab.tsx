@@ -50,7 +50,7 @@ export function QuoteRowsTab() {
           title: 'Manage Quote Rows',
           hideActiveFilters: true,
           actionButtons: (
-            <Horizontal className="gap-8">
+            <Horizontal gap={8}>
               <GraviButton
                 buttonText="Manage Groups"
                 icon={<AppstoreOutlined />}
@@ -75,7 +75,7 @@ export function QuoteRowsTab() {
 
       <Drawer
         title="Manage Quote Groups"
-        visible={isGroupsDrawerOpen}
+        open={isGroupsDrawerOpen}
         placement="right"
         width={420}
         onClose={() => setIsGroupsDrawerOpen(false)}
@@ -85,7 +85,7 @@ export function QuoteRowsTab() {
             <Horizontal
               key={g.id}
               alignItems="center"
-              className="gap-8"
+              gap={8}
               style={{
                 padding: '10px 0',
                 borderBottom: '1px solid var(--gray-100)',

@@ -2,7 +2,7 @@ import React from 'react'
 import { Texto } from '@gravitate-js/excalibrr'
 import { ShowcaseShell, SpecimenCard, SectionDivider } from './ShowcaseShell'
 
-const categories = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p1', 'p2', 'heading', 'heading-small'] as const
+const categories = ['h1', 'h2', 'h3', 'h4', 'h5', 'p1', 'p2', 'heading', 'heading-small'] as const
 
 const appearances = ['primary', 'secondary', 'medium', 'light', 'error', 'success', 'warning'] as const
 
@@ -41,9 +41,9 @@ export function TypographyShowcase() {
       ))}
 
       <SectionDivider title="Common Patterns" />
-      <SpecimenCard label="Section Header (uppercase)" props='category="h6" appearance="medium" weight="600"'>
+      <SpecimenCard label="Section Header (uppercase)" props='category="h5" appearance="medium" weight="600"'>
         <Texto
-          category="h6"
+          category="h5"
           appearance="medium"
           weight="600"
           style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}

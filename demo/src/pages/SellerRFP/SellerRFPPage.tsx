@@ -3,7 +3,6 @@ import { Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@
 import { LeftOutlined, SaveOutlined, SendOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
 
-const { TabPane } = Tabs
 import type {
   SellerRFP,
   SellerRFPDetail,
@@ -449,37 +448,45 @@ export function SellerRFPPage() {
           <Tabs
             activeKey={state.activeTab}
             onChange={handleTabChange}
-          >
-            <TabPane tab="Details & Formulas" key="details">
-              <DetailsFormulasTab
-                rfp={rfp}
-                rfps={state.rfps}
-                onDetailUpdate={handleDetailUpdate}
-                onDetailsReplace={handleDetailsReplace}
-                onOpenSaleFormula={handleOpenSaleFormula}
-                onCloseSaleFormula={handleCloseSaleFormula}
-                saleFormulaDrawerOpen={state.saleFormulaDrawerOpen}
-                activeDetail={activeDetail}
-              />
-            </TabPane>
-            <TabPane tab="Terms" key="terms">
-              <TermsTab
-                rfp={rfp}
-                onTermsUpdate={handleTermsUpdate}
-              />
-            </TabPane>
-            <TabPane tab="Summary & Export" key="summary">
-              <SummaryExportTab rfp={rfp} />
-            </TabPane>
-            <TabPane tab="Analysis" key="analysis">
-              <AnalysisTab rfp={rfp} />
-            </TabPane>
-          </Tabs>
+            items={[
+              {
+                key: 'details',
+                label: 'Details & Formulas',
+                children: (
+                  <DetailsFormulasTab
+                    rfp={rfp}
+                    rfps={state.rfps}
+                    onDetailUpdate={handleDetailUpdate}
+                    onDetailsReplace={handleDetailsReplace}
+                    onOpenSaleFormula={handleOpenSaleFormula}
+                    onCloseSaleFormula={handleCloseSaleFormula}
+                    saleFormulaDrawerOpen={state.saleFormulaDrawerOpen}
+                    activeDetail={activeDetail}
+                  />
+                ),
+              },
+              {
+                key: 'terms',
+                label: 'Terms',
+                children: <TermsTab rfp={rfp} onTermsUpdate={handleTermsUpdate} />,
+              },
+              {
+                key: 'summary',
+                label: 'Summary & Export',
+                children: <SummaryExportTab rfp={rfp} />,
+              },
+              {
+                key: 'analysis',
+                label: 'Analysis',
+                children: <AnalysisTab rfp={rfp} />,
+              },
+            ]}
+          />
         </div>
 
         {/* Adjudication Modal */}
         <AdjudicationModal
-          visible={state.adjudicationModalOpen}
+          open={state.adjudicationModalOpen}
           rfp={rfp}
           onClose={handleCloseAdjudication}
           onResult={handleAdjudicate}
@@ -487,7 +494,7 @@ export function SellerRFPPage() {
 
         {/* Create Contract Modal */}
         <CreateContractModal
-          visible={state.createContractModalOpen}
+          open={state.createContractModalOpen}
           rfp={rfp}
           onClose={handleCloseCreateContract}
           onConfirm={handleCreateContract}
@@ -495,7 +502,7 @@ export function SellerRFPPage() {
 
         {/* Parameters Modal */}
         <SellerParametersModal
-          visible={state.parametersModalOpen}
+          open={state.parametersModalOpen}
           parameters={state.parameters}
           onClose={handleCloseParameters}
           onSave={handleSaveParameters}
@@ -516,14 +523,14 @@ export function SellerRFPPage() {
 
           {/* Entry Path Selection Modal */}
           <EntryPathModal
-            visible={state.entryPathModalOpen}
+            open={state.entryPathModalOpen}
             onClose={handleCloseEntryPath}
             onSelect={handleSelectEntryPath}
           />
 
           {/* Path 1: Build from Matrix */}
           <IntakeDrawer
-            visible={state.intakeDrawerOpen}
+            open={state.intakeDrawerOpen}
             onClose={handleCloseIntake}
             onCreate={handleCreateRFP}
             onDecline={handleDeclineRFP}
@@ -532,14 +539,14 @@ export function SellerRFPPage() {
 
           {/* Path 2: Upload Buyer's RFP */}
           <UploadRFPModal
-            visible={state.activeEntryPath === 'upload'}
+            open={state.activeEntryPath === 'upload'}
             onClose={handleCloseUpload}
             onCreate={handleCreateRFP}
           />
 
           {/* Path 3: Copy Previous Response */}
           <CopyResponseModal
-            visible={state.activeEntryPath === 'copy'}
+            open={state.activeEntryPath === 'copy'}
             onClose={handleCloseCopy}
             onCreate={handleCreateRFP}
             rfps={state.rfps}
@@ -547,7 +554,7 @@ export function SellerRFPPage() {
 
           {/* Path 4: Add Rows Manually */}
           <ManualEntryDrawer
-            visible={state.activeEntryPath === 'manual'}
+            open={state.activeEntryPath === 'manual'}
             onClose={handleCloseManual}
             onCreate={handleCreateRFP}
           />

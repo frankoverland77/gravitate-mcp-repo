@@ -150,7 +150,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
       {status === 'idle' && (
         <>
           <Upload.Dragger {...uploadProps} className={styles.uploadArea}>
-            <Vertical alignItems="center" style={{ gap: '12px', padding: '24px' }}>
+            <Vertical alignItems="center" gap={12} style={{ padding: '24px' }}>
               <UploadOutlined style={{ fontSize: '48px', color: 'var(--theme-color-2)' }} />
               <Texto category="p1">Drag Excel file here or click to browse</Texto>
               <Texto category="p2" appearance="medium">
@@ -186,7 +186,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
 
       {status === 'success' && parseResult && (
         <Vertical className={styles.uploadSuccess}>
-          <Horizontal alignItems="center" style={{ gap: '12px' }} className="mb-3">
+          <Horizontal gap={12} alignItems="center" className="mb-3">
             <CheckCircleOutlined
               style={{ fontSize: '24px', color: 'var(--theme-success-color)' }}
             />
@@ -204,7 +204,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
             type="success"
             message="Parse Summary"
             description={
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <Texto category="p2">
                   <strong>{parseResult.details.length}</strong> bid records found
                 </Texto>
@@ -216,7 +216,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
             className="mb-3"
           />
 
-          <Horizontal style={{ gap: '12px' }}>
+          <Horizontal gap={12}>
             <GraviButton
               buttonText="Choose Different File"
               appearance="outlined"
@@ -229,7 +229,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
 
       {status === 'error' && (
         <Vertical className={styles.uploadError}>
-          <Horizontal alignItems="center" style={{ gap: '12px' }} className="mb-3">
+          <Horizontal gap={12} alignItems="center" className="mb-3">
             <CloseCircleOutlined style={{ fontSize: '24px', color: 'var(--theme-error-color)' }} />
             <Vertical>
               <Texto category="p1" weight="600">
@@ -246,7 +246,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
             message={errorMessage || 'Unknown error'}
             description={
               parseResult?.errors && parseResult.errors.length > 0 ? (
-                <Vertical style={{ gap: '4px', maxHeight: '200px', overflow: 'auto' }}>
+                <Vertical gap={4} style={{ maxHeight: '200px', overflow: 'auto' }}>
                   {parseResult.errors.slice(0, 10).map((err, idx) => (
                     <Texto key={idx} category="p2">
                       Row {err.row}: {err.message}
@@ -263,7 +263,7 @@ export function UploadStep({ onParsed, onBack }: UploadStepProps) {
             className="mb-3"
           />
 
-          <Horizontal style={{ gap: '12px' }}>
+          <Horizontal gap={12}>
             <GraviButton
               buttonText="Try Different File"
               appearance="outlined"

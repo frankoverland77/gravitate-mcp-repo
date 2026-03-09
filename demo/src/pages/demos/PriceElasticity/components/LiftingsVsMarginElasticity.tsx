@@ -150,16 +150,13 @@ export function LiftingsVsMarginElasticity() {
     <Horizontal style={{ height: '100%' }}>
       {/* Detail table panel */}
       <Vertical
-        style={{
-          width: '320px',
+        gap={8} style={{ width: '320px',
           minWidth: '280px',
           maxWidth: '350px',
           borderRight: '1px solid #e8e8e8',
-          padding: '12px',
-          gap: '8px',
-        }}
+          padding: '12px' }}
       >
-        <Texto category="h6" weight="600">
+        <Texto category="h5" weight="600">
           Period Details
         </Texto>
         <div style={{ flex: 1, overflow: 'auto' }}>
@@ -181,17 +178,17 @@ export function LiftingsVsMarginElasticity() {
       </Vertical>
 
       {/* Chart area */}
-      <Vertical flex="1" style={{ padding: '12px', gap: '8px' }}>
+      <Vertical flex="1" gap={8} style={{ padding: '12px' }}>
         <Horizontal justifyContent="space-between" alignItems="center">
-          <Vertical style={{ gap: '2px' }}>
-            <Texto category="h6" weight="600">
+          <Vertical gap={2}>
+            <Texto category="h5" weight="600">
               Volume vs Margin with Elasticity Zones
             </Texto>
             <Texto category="p2" appearance="medium">
               Each point colored by zone position on elasticity curve
             </Texto>
           </Vertical>
-          <Horizontal style={{ gap: '8px' }} alignItems="center">
+          <Horizontal gap={8} alignItems="center">
             <Select
               value={segmentation}
               onChange={setSegmentation}
@@ -270,16 +267,16 @@ export function LiftingsVsMarginElasticity() {
         </div>
 
         {/* Zone legend */}
-        <Horizontal style={{ gap: '16px' }} justifyContent="center">
-          <Horizontal style={{ gap: '4px' }} alignItems="center">
+        <Horizontal gap={16} justifyContent="center">
+          <Horizontal gap={4} alignItems="center">
             <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#52c41a' }} />
             <Texto category="p2" appearance="medium">Optimal Zone</Texto>
           </Horizontal>
-          <Horizontal style={{ gap: '4px' }} alignItems="center">
+          <Horizontal gap={4} alignItems="center">
             <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#faad14' }} />
             <Texto category="p2" appearance="medium">Caution</Texto>
           </Horizontal>
-          <Horizontal style={{ gap: '4px' }} alignItems="center">
+          <Horizontal gap={4} alignItems="center">
             <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ff4d4f' }} />
             <Texto category="p2" appearance="medium">Danger Zone</Texto>
           </Horizontal>

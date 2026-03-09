@@ -48,11 +48,10 @@ export function FooterBar({
   const buttonText = createButtonText || (mode === 'edit' ? 'Update Contract' : 'Create Contract');
 
   return (
-    <Horizontal
+    <Horizontal gap={12}
       className={styles.container}
       justifyContent="flex-end"
       alignItems="center"
-      style={{ gap: '12px' }}
     >
       {validationMessage && (
         <Texto category="p2" appearance="warning" style={{ marginRight: 'auto' }}>

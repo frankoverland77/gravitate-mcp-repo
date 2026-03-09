@@ -48,7 +48,7 @@ export function DogGroomingColumnDefs({ onDelete, onEdit }: ColumnDefsProps): Co
       minWidth: 100,
       maxWidth: 120,
       cellRenderer: (params: { data: DogGroomingData }) => (
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           {onEdit && (
             <GraviButton
               type="text"

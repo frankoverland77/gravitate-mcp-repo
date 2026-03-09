@@ -10,8 +10,8 @@ interface ConsistencyTrendChartProps {
 export function ConsistencyTrendChart({ data }: ConsistencyTrendChartProps) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <Vertical style={{ gap: '4px' }}>
-                <Texto category="h6" weight="600">
+            <Vertical gap={4}>
+                <Texto category="h5" weight="600">
                     Consistency Over Time
                 </Texto>
                 <Texto category="p2" appearance="medium">

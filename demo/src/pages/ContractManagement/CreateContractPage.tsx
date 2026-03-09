@@ -107,7 +107,7 @@ export function CreateContractPage() {
     <Vertical className={styles.page}>
       {/* Header */}
       <Vertical className={styles.header} flex="0 0 auto" height="auto" alignItems="flex-start">
-        <Horizontal alignItems="center" style={{ gap: '16px' }}>
+        <Horizontal gap={16} alignItems="center">
           <GraviButton
             icon={<ArrowLeftOutlined />}
             onClick={handleBack}

@@ -61,7 +61,7 @@ import { GraviGrid } from '@gravitate-js/excalibrr';
 {
   field: 'createdAt',
   headerName: 'Created',
-  valueFormatter: ({ value }) => moment(value).format(dateFormat.DATE_SLASH),
+  valueFormatter: ({ value }) => dayjs(value).format(dateFormat.DATE_SLASH),
   filter: 'agDateColumnFilter'
 }
 \`\`\`
@@ -190,7 +190,7 @@ const columnDefs = [
   {
     field: 'createdAt',
     headerName: 'Created',
-    valueFormatter: ({ value }) => moment(value).format('MM/DD/YYYY'),
+    valueFormatter: ({ value }) => dayjs(value).format('MM/DD/YYYY'),
     filter: 'agDateColumnFilter',
   },
 ];

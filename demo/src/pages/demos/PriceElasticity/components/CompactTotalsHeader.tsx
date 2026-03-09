@@ -10,13 +10,10 @@ export function CompactTotalsHeader({ totals }: CompactTotalsHeaderProps) {
   return (
     <Horizontal
       alignItems="center"
-      style={{
-        gap: '20px',
-        padding: '6px 12px',
+      gap={20} style={{ padding: '6px 12px',
         backgroundColor: '#fafafa',
         borderRadius: '6px',
-        border: '1px solid #f0f0f0',
-      }}
+        border: '1px solid #f0f0f0' }}
     >
       <CompactMetric label="Volume" value={`${numberToShortString(totals.totalVolume)} gal`} />
       <Divider />
@@ -35,7 +32,7 @@ export function CompactTotalsHeader({ totals }: CompactTotalsHeaderProps) {
 
 function CompactMetric({ label, value, negative }: { label: string; value: string; negative?: boolean }) {
   return (
-    <Horizontal alignItems="center" style={{ gap: '6px' }}>
+    <Horizontal gap={6} alignItems="center">
       <Texto category="p2" appearance="medium" style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
         {label}
       </Texto>

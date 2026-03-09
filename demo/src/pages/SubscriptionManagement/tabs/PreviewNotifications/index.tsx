@@ -134,7 +134,7 @@ export function PreviewNotificationsTab() {
         onSelectionChanged={onSelectionChanged}
       />
       <NotificationMethodModal
-        visible={isShowingMethodModal}
+        open={isShowingMethodModal}
         onClose={() => setIsShowingMethodModal(false)}
         onSelect={handleMethodSelect}
         selectedCount={selectedRows.length}

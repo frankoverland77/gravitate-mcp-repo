@@ -78,13 +78,14 @@ export function SimulationControl({ compact = false, showProgressBars = false }:
           onChange={setSimulationSpeed}
           style={{ width: 60 }}
           disabled={!simulationState.isRunning}
-        >
-          <Select.Option value={0.5}>0.5x</Select.Option>
-          <Select.Option value={1}>1x</Select.Option>
-          <Select.Option value={2}>2x</Select.Option>
-          <Select.Option value={5}>5x</Select.Option>
-          <Select.Option value={10}>10x</Select.Option>
-        </Select>
+          options={[
+            { label: '0.5x', value: 0.5 },
+            { label: '1x', value: 1 },
+            { label: '2x', value: 2 },
+            { label: '5x', value: 5 },
+            { label: '10x', value: 10 },
+          ]}
+        />
 
         {simulationState.alerts.length > 0 && (
           <Badge count={simulationState.alerts.length} size="small">
@@ -153,13 +154,14 @@ export function SimulationControl({ compact = false, showProgressBars = false }:
               value={simulationState.speed}
               onChange={setSimulationSpeed}
               style={{ width: 80 }}
-            >
-              <Select.Option value={0.5}>0.5x</Select.Option>
-              <Select.Option value={1}>1x</Select.Option>
-              <Select.Option value={2}>2x</Select.Option>
-              <Select.Option value={5}>5x</Select.Option>
-              <Select.Option value={10}>10x</Select.Option>
-            </Select>
+              options={[
+                { label: '0.5x', value: 0.5 },
+                { label: '1x', value: 1 },
+                { label: '2x', value: 2 },
+                { label: '5x', value: 5 },
+                { label: '10x', value: 10 },
+              ]}
+            />
           </div>
 
           {simulationState.isRunning && (

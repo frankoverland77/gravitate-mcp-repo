@@ -67,7 +67,7 @@ function LocationsRenderer({ value }: { value: string[] }) {
   }
 
   const content = (
-    <Vertical style={{ gap: '4px' }}>
+    <Vertical gap={4}>
       {value.map((loc, idx) => (
         <Texto key={idx} category='p2'>
           {loc}
@@ -96,7 +96,7 @@ function ProductsRenderer({ value }: { value: string[] }) {
   }
 
   const content = (
-    <Vertical style={{ gap: '4px' }}>
+    <Vertical gap={4}>
       {value.map((prod, idx) => (
         <Texto key={idx} category='p2'>
           {prod}

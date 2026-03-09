@@ -37,11 +37,11 @@ export function CopyConfigModal({ visible, targetConfig, allConfigs, onClose, on
   return (
     <Modal
       title='Copy Configuration'
-      visible={visible}
+      open={visible}
       onCancel={handleClose}
       width={500}
       footer={
-        <Horizontal justifyContent='flex-end' style={{ gap: '8px' }}>
+        <Horizontal gap={8} justifyContent='flex-end'>
           <GraviButton buttonText='Cancel' onClick={handleClose} />
           <GraviButton
             buttonText='Copy'
@@ -52,12 +52,12 @@ export function CopyConfigModal({ visible, targetConfig, allConfigs, onClose, on
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         <Texto>
           Copy content configuration to <strong>{targetConfig.QuoteConfigName}</strong> from another quote configuration.
         </Texto>
 
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             Copy From
           </Texto>
@@ -75,12 +75,9 @@ export function CopyConfigModal({ visible, targetConfig, allConfigs, onClose, on
 
         {selectedSourceId !== null && (
           <Vertical
-            style={{
-              backgroundColor: 'var(--theme-bg-elevated)',
+            gap={4} style={{ backgroundColor: 'var(--theme-bg-elevated)',
               padding: '12px',
-              borderRadius: '4px',
-              gap: '4px',
-            }}
+              borderRadius: '4px' }}
           >
             <Texto category='p2' appearance='medium'>
               This will overwrite the current configuration for {targetConfig.QuoteConfigName}.

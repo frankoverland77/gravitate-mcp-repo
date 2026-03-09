@@ -46,24 +46,24 @@ export function EditConfigModal({ visible, config, onClose, onSave }: EditConfig
   return (
     <Modal
       title={`Edit Content Configuration - ${formData.QuoteConfigName}`}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       width={800}
       footer={
-        <Horizontal justifyContent='flex-end' style={{ gap: '8px' }}>
+        <Horizontal gap={8} justifyContent='flex-end'>
           <GraviButton buttonText='Cancel' onClick={onClose} />
           <GraviButton buttonText='Save' success onClick={handleSave} />
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '16px', maxHeight: '70vh', overflowY: 'auto' }}>
+      <Vertical gap={16} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         {/* Template Section */}
-        <Vertical style={{ gap: '12px' }}>
-          <Texto category='h6' weight='600'>
+        <Vertical gap={12}>
+          <Texto category='h5' weight='600'>
             Email Templates
           </Texto>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Subject
             </Texto>
@@ -77,7 +77,7 @@ export function EditConfigModal({ visible, config, onClose, onSave }: EditConfig
             </Texto>
           </Vertical>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Body
             </Texto>
@@ -94,17 +94,17 @@ export function EditConfigModal({ visible, config, onClose, onSave }: EditConfig
         <Divider style={{ margin: '8px 0' }} />
 
         {/* Content Configuration Fields Section */}
-        <Vertical style={{ gap: '12px' }}>
-          <Texto category='h6' weight='600'>
+        <Vertical gap={12}>
+          <Texto category='h5' weight='600'>
             Content Configuration Fields
           </Texto>
           <Texto category='p2' appearance='medium'>
             Select which fields to include in notifications for this quote configuration.
           </Texto>
 
-          <Horizontal style={{ gap: '32px' }}>
+          <Horizontal gap={32}>
             {/* Left Column */}
-            <Vertical flex='1' style={{ gap: '8px', minWidth: '140px' }}>
+            <Vertical flex='1' gap={8} style={{ minWidth: '140px' }}>
               {leftColumnFields.map((fieldConfig) => (
                 <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
                   <Checkbox
@@ -118,7 +118,7 @@ export function EditConfigModal({ visible, config, onClose, onSave }: EditConfig
             </Vertical>
 
             {/* Right Column */}
-            <Vertical flex='1' style={{ gap: '8px', minWidth: '160px' }}>
+            <Vertical flex='1' gap={8} style={{ minWidth: '160px' }}>
               {rightColumnFields.map((fieldConfig) => (
                 <div key={fieldConfig.field} style={{ height: '24px', display: 'flex', alignItems: 'center' }}>
                   <Checkbox

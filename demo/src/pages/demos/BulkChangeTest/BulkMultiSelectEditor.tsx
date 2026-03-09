@@ -66,8 +66,8 @@ export const BulkMultiSelectEditor = forwardRef<
   };
 
   return (
-    <Vertical style={{ gap: '12px', minWidth: 300 }}>
-      <Horizontal alignItems="center" style={{ gap: '8px' }}>
+    <Vertical gap={12} style={{ minWidth: 300 }}>
+      <Horizontal gap={8} alignItems="center">
         <Texto category="p2" appearance="medium" weight="600">
           Mode:
         </Texto>

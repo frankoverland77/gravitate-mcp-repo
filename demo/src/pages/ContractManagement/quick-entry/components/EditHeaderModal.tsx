@@ -10,7 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, Select, DatePicker, Input, Switch, Collapse, Divider } from 'antd';
 import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import type { ContractHeader } from '../../types/contract.types';
 import {
@@ -28,7 +28,7 @@ const { TextArea } = Input;
 const { Panel } = Collapse;
 
 interface EditHeaderModalProps {
-  visible: boolean;
+  open: boolean;
   header: ContractHeader;
   onClose: () => void;
   onSave: (header: ContractHeader) => void;
@@ -64,15 +64,15 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeaderModalProps) {
+export function EditHeaderModal({ open, header, onClose, onSave }: EditHeaderModalProps) {
   const [formData, setFormData] = useState<ContractHeader>(header);
 
   // Sync form data when header changes or modal opens
   useEffect(() => {
-    if (visible) {
+    if (open) {
       setFormData(header);
     }
-  }, [visible, header]);
+  }, [open, header]);
 
   const handleFieldChange = (
     field: keyof ContractHeader,
@@ -88,14 +88,14 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="Edit Contract Details"
       onCancel={onClose}
       onOk={handleSave}
       okText="Save Changes"
       width={680}
     >
-      <Vertical style={{ gap: '20px' }} className={styles.formContainer}>
+      <Vertical gap={20} className={styles.formContainer}>
         {/* ── Required Legend ── */}
         <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic' }}>
           <span style={{ color: 'var(--theme-color-error, #ff4d4f)' }}>*</span> Required
@@ -104,7 +104,7 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
         {/* ── Required Fields ── */}
 
         {/* Row 1: Parties */}
-        <Horizontal style={{ gap: '16px' }}>
+        <Horizontal gap={16}>
           <Vertical flex="1">
             <FormLabel required>Internal Party</FormLabel>
             <Select
@@ -133,11 +133,11 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
         </Horizontal>
 
         {/* Row 2: Dates */}
-        <Horizontal style={{ gap: '16px' }}>
+        <Horizontal gap={16}>
           <Vertical flex="1">
             <FormLabel required>Start Date</FormLabel>
             <DatePicker
-              value={formData.startDate ? moment(formData.startDate) : null}
+              value={formData.startDate ? dayjs(formData.startDate) : null}
               onChange={(date) => handleFieldChange('startDate', date?.toDate() || new Date())}
               style={{ width: '100%' }}
               format="MMM D, YYYY"
@@ -147,7 +147,7 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
           <Vertical flex="1">
             <FormLabel required>End Date</FormLabel>
             <DatePicker
-              value={formData.endDate ? moment(formData.endDate) : null}
+              value={formData.endDate ? dayjs(formData.endDate) : null}
               onChange={(date) => handleFieldChange('endDate', date?.toDate() || new Date())}
               style={{ width: '100%' }}
               format="MMM D, YYYY"
@@ -156,7 +156,7 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
         </Horizontal>
 
         {/* Row 3: Currency and UOM */}
-        <Horizontal style={{ gap: '16px' }}>
+        <Horizontal gap={16}>
           <Vertical flex="1">
             <FormLabel required>Currency</FormLabel>
             <Select
@@ -184,16 +184,16 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
         <Collapse ghost defaultActiveKey={[]} className={styles.collapseSection}>
           <Panel
             header={
-              <Texto category="h6" weight="600" style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+              <Texto category="h5" weight="600" style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                 Optional Fields
               </Texto>
             }
             key="optional"
           >
-            <Vertical style={{ gap: '16px' }}>
+            <Vertical gap={16}>
               {/* Sub-section: Contacts */}
               <SectionHeader>Contacts</SectionHeader>
-              <Horizontal style={{ gap: '16px' }}>
+              <Horizontal gap={16}>
                 <Vertical flex="1">
                   <FormLabel>Internal Contact</FormLabel>
                   <Select
@@ -223,7 +223,7 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
               <SectionHeader>Contract Settings</SectionHeader>
 
               {/* Row 1: Contract Type + Effective Time */}
-              <Horizontal style={{ gap: '16px' }}>
+              <Horizontal gap={16}>
                 <Vertical flex="1">
                   <FormLabel>Contract Type</FormLabel>
                   <Select
@@ -247,11 +247,11 @@ export function EditHeaderModal({ visible, header, onClose, onSave }: EditHeader
               </Horizontal>
 
               {/* Row 2: Contract Date + Contract Calendar */}
-              <Horizontal style={{ gap: '16px' }}>
+              <Horizontal gap={16}>
                 <Vertical flex="1">
                   <FormLabel>Contract Date</FormLabel>
                   <DatePicker
-                    value={formData.contractDate ? moment(formData.contractDate) : null}
+                    value={formData.contractDate ? dayjs(formData.contractDate) : null}
                     onChange={(date) => handleFieldChange('contractDate', date?.toDate() || null)}
                     style={{ width: '100%' }}
                     format="MMM D, YYYY"

@@ -217,47 +217,51 @@ export function ContractMeasurementGrid() {
         cellRenderer: (params: any) => {
           const isArchivedRow = params.data.isArchived;
           const menuContent = (
-            <Menu style={{ border: 'none', boxShadow: 'none' }}>
-              {!isArchivedRow && (
-                <Menu.Item key="edit" onClick={() => console.log('Edit', params.data)}>
-                  Edit Contract
-                </Menu.Item>
-              )}
-              <Menu.Item
-                key='open-contract'
-                icon={<LinkOutlined />}
-                onClick={() =>
-                  navigate(`/ContractFormulas/ContractDetails/${params.data.contractId}`, {
-                    state: { id: params.data.contractId, externalCompany: params.data.externalCounterparty },
-                  })
-                }
-              >
-                Open Contract
-              </Menu.Item>
-              <Menu.Item key="download" onClick={() => console.log('Download', params.data)}>
-                Download Report
-              </Menu.Item>
-              {isFutureMode && <Menu.Divider />}
-              {isFutureMode && !isArchivedRow && !isReadOnly && (
-                <Menu.Item key="archive" onClick={() => handleArchive(params.data.id)}>
-                  Archive
-                </Menu.Item>
-              )}
-              {isFutureMode && isArchivedRow && !isReadOnly && (
-                <Menu.Item key="restore" onClick={() => handleRestore(params.data.id)}>
-                  Restore
-                </Menu.Item>
-              )}
-              {isFutureMode && (
-                <Menu.Item key="delete" danger onClick={() => console.log('Delete', params.data)}>
-                  Delete
-                </Menu.Item>
-              )}
-            </Menu>
+            <Menu
+              style={{ border: 'none', boxShadow: 'none' }}
+              items={[
+                ...(!isArchivedRow ? [{
+                  key: 'edit',
+                  label: 'Edit Contract',
+                  onClick: () => console.log('Edit', params.data),
+                }] : []),
+                {
+                  key: 'open-contract',
+                  icon: <LinkOutlined />,
+                  label: 'Open Contract',
+                  onClick: () =>
+                    navigate(`/ContractFormulas/ContractDetails/${params.data.contractId}`, {
+                      state: { id: params.data.contractId, externalCompany: params.data.externalCounterparty },
+                    }),
+                },
+                {
+                  key: 'download',
+                  label: 'Download Report',
+                  onClick: () => console.log('Download', params.data),
+                },
+                ...(isFutureMode ? [{ type: 'divider' as const }] : []),
+                ...(isFutureMode && !isArchivedRow && !isReadOnly ? [{
+                  key: 'archive',
+                  label: 'Archive',
+                  onClick: () => handleArchive(params.data.id),
+                }] : []),
+                ...(isFutureMode && isArchivedRow && !isReadOnly ? [{
+                  key: 'restore',
+                  label: 'Restore',
+                  onClick: () => handleRestore(params.data.id),
+                }] : []),
+                ...(isFutureMode ? [{
+                  key: 'delete',
+                  label: 'Delete',
+                  danger: true,
+                  onClick: () => console.log('Delete', params.data),
+                }] : []),
+              ]}
+            />
           );
 
           return (
-            <Horizontal style={{ justifyContent: 'center', alignItems: 'center', height: '100%', gap: '12px' }}>
+            <Horizontal gap={12} style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <Popover content={menuContent} trigger="click" placement="bottomRight">
                 <MoreOutlined style={{ fontSize: '16px', color: '#595959', cursor: 'pointer' }} />
               </Popover>
@@ -326,8 +330,8 @@ export function ContractMeasurementGrid() {
           padding: '24px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
         }}>
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <FileTextOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Total Contracts
@@ -351,14 +355,14 @@ export function ContractMeasurementGrid() {
             padding: '24px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
           }}>
-            <Vertical style={{ gap: '12px' }}>
-              <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+            <Vertical gap={12}>
+              <Horizontal gap={8} style={{ alignItems: 'center' }}>
                 <LineChartOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
                 <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Total Volume
                 </Texto>
               </Horizontal>
-              <Horizontal style={{ alignItems: 'baseline', gap: '12px' }}>
+              <Horizontal gap={12} style={{ alignItems: 'baseline' }}>
                 <Texto category="h3" weight="600">
                   650,000
                 </Texto>
@@ -382,14 +386,14 @@ export function ContractMeasurementGrid() {
             padding: '24px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
           }}>
-            <Vertical style={{ gap: '12px' }}>
-              <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+            <Vertical gap={12}>
+              <Horizontal gap={8} style={{ alignItems: 'center' }}>
                 <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
                 <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Benchmark Impact
                 </Texto>
               </Horizontal>
-              <Horizontal style={{ alignItems: 'baseline', gap: '12px' }}>
+              <Horizontal gap={12} style={{ alignItems: 'baseline' }}>
                 <Texto category="h3" weight="600" style={{ color: '#52c41a' }}>
                   +$14,832
                 </Texto>
@@ -433,7 +437,7 @@ export function ContractMeasurementGrid() {
 
       {/* Ratability Settings Drawer */}
       <RatabilitySettingsDrawer
-        visible={isRatabilitySettingsOpen}
+        open={isRatabilitySettingsOpen}
         onClose={() => setIsRatabilitySettingsOpen(false)}
         onSettingsChange={(settings) => console.log('Ratability settings updated:', settings)}
       />
@@ -458,7 +462,7 @@ export function ContractMeasurementGrid() {
 
       {/* View Settings Drawer */}
       <CMViewSettingsDrawer
-        visible={settingsDrawerVisible}
+        open={settingsDrawerVisible}
         onClose={() => setSettingsDrawerVisible(false)}
         isReadOnly={isReadOnly}
         onReadOnlyChange={setIsReadOnly}

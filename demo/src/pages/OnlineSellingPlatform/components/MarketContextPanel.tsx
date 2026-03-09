@@ -67,7 +67,7 @@ export function MarketContextPanel({ marketData, onClose }: MarketContextPanelPr
                 justifyContent: 'space-between',
                 alignItems: 'center'
             }}>
-                <Horizontal style={{ alignItems: 'center', gap: '12px' }}>
+                <Horizontal gap={12} style={{ alignItems: 'center' }}>
                     <LineChartOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
                     <div>
                         <Texto style={{ fontSize: '16px', fontWeight: 600, color: '#333', display: 'block' }}>

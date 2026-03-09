@@ -237,7 +237,7 @@ function MarginSparkline({ data, currentMargin }: { data: MarginHistoryPoint[]; 
 function BidCard({ bid }: { bid: PastBidReference }) {
   return (
     <div className={styles['bid-card']}>
-      <Horizontal alignItems="center" style={{ gap: '5px' }}>
+      <Horizontal gap={5} alignItems="center">
         <span className={`${styles['outcome-badge']} ${bid.outcome === 'won' ? styles['outcome-won'] : styles['outcome-lost']}`}>
           {bid.outcome === 'won' ? 'W' : 'L'}
         </span>
@@ -245,7 +245,7 @@ function BidCard({ bid }: { bid: PastBidReference }) {
           {bid.saleFormulaDisplay.length > 45 ? bid.saleFormulaDisplay.slice(0, 42) + '...' : bid.saleFormulaDisplay}
         </Texto>
       </Horizontal>
-      <Horizontal alignItems="center" style={{ gap: '4px', paddingLeft: '21px' }}>
+      <Horizontal alignItems="center" gap={4} style={{ paddingLeft: '21px' }}>
         <Texto category="p3" weight="500" style={{ fontSize: '11px' }}>{bid.marginCpg.toFixed(1)}¢</Texto>
         <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>&middot;</Texto>
         <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>
@@ -264,7 +264,7 @@ function BidCard({ bid }: { bid: PastBidReference }) {
 function WinRateBar({ stats }: { stats: TerminalProductStats }) {
   const lostCount = stats.totalBids - stats.wonCount
   return (
-    <Vertical style={{ gap: '4px' }}>
+    <Vertical gap={4}>
       <Texto category="p3" weight="500" style={{ fontSize: '11px' }}>
         {stats.wonCount}W / {lostCount}L ({stats.winRate}%)
       </Texto>
@@ -474,15 +474,15 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     <Drawer
       placement="bottom"
       height={720}
-      visible={visible}
+      open={visible}
       closable={false}
       headerStyle={{ display: 'none' }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       className={styles.drawer}
     >
       {/* Header — now includes product, terminal, volume */}
       <Horizontal className={styles.header} alignItems="center" justifyContent="space-between">
-        <Horizontal alignItems="center" style={{ gap: '12px', minWidth: 0 }}>
+        <Horizontal alignItems="center" gap={12} style={{ minWidth: 0 }}>
           <button className={styles['collapse-toggle']} onClick={onClose}>
             <CaretDownOutlined />
           </button>
@@ -519,16 +519,16 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
         <div className={styles.body}>
           {/* Left Panel - Pricing + Intelligence */}
           <Vertical className={styles['left-panel']}>
-            <Vertical style={{ gap: '16px' }}>
+            <Vertical gap={16}>
 
               {/* §1 — Consolidated Pricing Summary */}
-              <Vertical style={{ gap: '10px' }}>
+              <Vertical gap={10}>
                 <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
                   Pricing
                 </Texto>
-                <Horizontal style={{ gap: '1px', backgroundColor: '#e8e8e8', borderRadius: '6px', overflow: 'hidden' }}>
+                <Horizontal gap={1} style={{ backgroundColor: '#e8e8e8', borderRadius: '6px', overflow: 'hidden' }}>
                   {/* Cost */}
-                  <Vertical style={{ flex: 1, padding: '8px', backgroundColor: '#fff', gap: '2px' }}>
+                  <Vertical gap={2} style={{ flex: 1, padding: '8px', backgroundColor: '#fff' }}>
                     <Texto category="p3" appearance="medium" style={{ fontSize: '10px' }}>Cost</Texto>
                     <Texto category="p1" weight="600">{formatPrice(detail.costPrice)}</Texto>
                     {detail.costType && (
@@ -544,14 +544,14 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                     )}
                   </Vertical>
                   {/* Sale */}
-                  <Vertical style={{ flex: 1, padding: '8px', backgroundColor: '#fff', gap: '2px' }}>
+                  <Vertical gap={2} style={{ flex: 1, padding: '8px', backgroundColor: '#fff' }}>
                     <Texto category="p3" appearance="medium" style={{ fontSize: '10px' }}>Sale</Texto>
                     <Texto category="p1" weight="600">
                       {effectiveSalePrice !== null ? formatPrice(effectiveSalePrice) : '—'}
                     </Texto>
                   </Vertical>
                   {/* Margin */}
-                  <Vertical style={{ flex: 1, padding: '8px', backgroundColor: '#fff', gap: '2px' }}>
+                  <Vertical gap={2} style={{ flex: 1, padding: '8px', backgroundColor: '#fff' }}>
                     <Texto category="p3" appearance="medium" style={{ fontSize: '10px' }}>Margin</Texto>
                     <Texto category="p1" weight="600" style={{ color: marginColorValue }}>
                       {formatMarginCpg(currentMargin)}
@@ -561,18 +561,18 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
               </Vertical>
 
               {/* §3 + §4 — Intelligence Section */}
-              <Vertical style={{ gap: '12px', paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
+              <Vertical gap={12} style={{ paddingTop: '8px', borderTop: '1px solid #e8e8e8' }}>
                 <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
                   Intelligence
                 </Texto>
 
                 {/* Past Bids as Stacked Cards */}
-                <Vertical style={{ gap: '6px' }}>
+                <Vertical gap={6}>
                   <Texto category="p3" weight="500" appearance="medium">
                     Past Bids — {detail.terminal.replace(' Terminal', '')}, {detail.product}
                   </Texto>
                   {pastBids.length > 0 ? (
-                    <Vertical style={{ gap: '4px' }}>
+                    <Vertical gap={4}>
                       {visibleBids.map((bid) => (
                         <BidCard key={`${bid.rfpId}-${bid.buyerName}`} bid={bid} />
                       ))}
@@ -602,7 +602,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
 
                 {/* Win Rate Visual + Outcome Stats */}
                 {outcomeStats && outcomeStats.totalBids >= 2 && (
-                  <Vertical style={{ gap: '8px' }}>
+                  <Vertical gap={8}>
                     <WinRateBar stats={outcomeStats} />
 
                     {outcomeStats.winningDifferentialRange && (
@@ -613,7 +613,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                       </div>
                     )}
 
-                    <Horizontal alignItems="center" style={{ gap: '4px', flexWrap: 'wrap' }}>
+                    <Horizontal alignItems="center" gap={4} style={{ flexWrap: 'wrap' }}>
                       {outcomeStats.avgWinningMarginCpg !== null && (
                         <Texto category="p3" style={{ color: '#52c41a', fontSize: '11px' }}>
                           Avg win: {outcomeStats.avgWinningMarginCpg.toFixed(1)}¢/gal
@@ -632,7 +632,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                 )}
 
                 {/* §5 — Enlarged Sparkline with Current Margin Reference */}
-                <Vertical style={{ gap: '4px' }}>
+                <Vertical gap={4}>
                   <Texto category="p3" weight="500" appearance="medium">Historical Margin (6mo)</Texto>
                   {!detail.costFormula ? (
                     <Texto category="p3" appearance="medium">Set cost to see historical margin.</Texto>
@@ -642,8 +642,8 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                     <>
                       <MarginSparkline data={marginHistory} currentMargin={currentMargin} />
                       {marginHistoryStats && (
-                        <Vertical style={{ gap: '2px' }}>
-                          <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                        <Vertical gap={2}>
+                          <Horizontal gap={4} alignItems="center">
                             <Texto category="p3" style={{ fontSize: '11px' }}>6mo avg: {marginHistoryStats.avgMarginCpg.toFixed(1)}¢/gal</Texto>
                             <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>&middot;</Texto>
                             <Texto category="p3" style={{ fontSize: '11px' }}>
@@ -675,7 +675,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
           </Vertical>
 
           {/* Right Panel - Formula Editor */}
-          <Vertical className={styles['right-panel']} style={{ gap: '16px' }}>
+          <Vertical gap={16} className={styles['right-panel']}>
             {/* Mode selector + action buttons */}
             <Horizontal alignItems="center" justifyContent="space-between">
               <Segmented
@@ -684,7 +684,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                 options={MODE_OPTIONS}
                 size="small"
               />
-              <Horizontal style={{ gap: '8px' }}>
+              <Horizontal gap={8}>
                 {detail.costFormula && (
                   <GraviButton
                     buttonText="Copy from Cost"
@@ -701,8 +701,8 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
             </Horizontal>
 
             {/* Display Name Override */}
-            <Vertical style={{ gap: '4px' }}>
-              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+            <Vertical gap={4}>
+              <Horizontal gap={6} alignItems="center">
                 <Texto category="p3" appearance="medium">Display Name</Texto>
                 <Texto category="p3" appearance="medium" style={{ fontSize: '10px', color: '#bfbfbf' }}>
                   Optional
@@ -726,7 +726,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
               onRemoveVariable={handleRemoveVariable}
             />
 
-            <Horizontal style={{ gap: '8px' }}>
+            <Horizontal gap={8}>
               <GraviButton
                 buttonText="Add Variable"
                 onClick={() => handleAddVariable(1)}
@@ -740,7 +740,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
             </Horizontal>
 
             {/* Formula Preview */}
-            <Vertical style={{ gap: '4px', padding: '12px', backgroundColor: '#fafafa', borderRadius: '6px' }}>
+            <Vertical gap={4} style={{ padding: '12px', backgroundColor: '#fafafa', borderRadius: '6px' }}>
               <Horizontal alignItems="center" justifyContent="space-between">
                 <Texto category="p3" appearance="medium">Formula Expression</Texto>
                 {displayNameOverride && (
@@ -750,7 +750,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                 )}
               </Horizontal>
               {displayNameOverride ? (
-                <Vertical style={{ gap: '2px' }}>
+                <Vertical gap={2}>
                   <Texto category="p2" weight="600">{displayNameOverride}</Texto>
                   <Texto category="p3" appearance="medium" style={{ fontFamily: 'monospace', fontSize: '11px' }}>
                     {buildFormulaExpression(variables, mode) || 'Configure variables above'}
@@ -764,8 +764,8 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
             </Vertical>
 
             {/* Formula Diff Input */}
-            <Vertical style={{ gap: '4px' }}>
-              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+            <Vertical gap={4}>
+              <Horizontal gap={6} alignItems="center">
                 <Texto category="p3" appearance="medium">Formula Diff</Texto>
                 <Texto category="p3" appearance="medium" style={{ fontSize: '10px', color: '#bfbfbf' }}>
                   Applied to resolved formula price
@@ -788,7 +788,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
 
       {/* Footer */}
       <Horizontal className={styles.footer} justifyContent="space-between" alignItems="center">
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton buttonText="Copy" icon={<CopyOutlined />} />
           <GraviButton buttonText="Paste" icon={<SnippetsOutlined />} />
         </Horizontal>

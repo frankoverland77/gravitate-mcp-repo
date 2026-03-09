@@ -728,12 +728,9 @@ export function FormulaManager() {
         }
       `}</style>
       
-      <Horizontal style={{ 
-        minHeight: '100vh', 
-        gap: '0',
+      <Horizontal gap={0} style={{ minHeight: '100vh',
         padding: '0',
-        backgroundColor: '#f5f5f5'
-      }}>
+        backgroundColor: '#f5f5f5' }}>
         {/* Left Column - 20% */}
         <Vertical style={{ 
           width: '20%',
@@ -757,7 +754,7 @@ export function FormulaManager() {
           </Texto>
           
           {/* Add Buttons */}
-          <Horizontal style={{ marginBottom: '16px', gap: '8px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <Horizontal gap={8} style={{ marginBottom: '16px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
             <Popover
               content={
                 <div style={{ padding: '8px' }}>
@@ -770,7 +767,7 @@ export function FormulaManager() {
                     style={{ marginBottom: '8px', width: '200px' }}
                     autoFocus
                   />
-                  <Horizontal style={{ gap: '8px', justifyContent: 'flex-end' }}>
+                  <Horizontal gap={8} style={{ justifyContent: 'flex-end' }}>
                     <GraviButton 
                       buttonText="Cancel" 
                       appearance="outlined" 
@@ -792,8 +789,8 @@ export function FormulaManager() {
               }
               title={null}
               trigger="click"
-              visible={addFolderVisible}
-              onVisibleChange={setAddFolderVisible}
+              open={addFolderVisible}
+              onOpenChange={setAddFolderVisible}
               placement="bottomLeft"
             >
               <GraviButton 
@@ -814,7 +811,7 @@ export function FormulaManager() {
           </Horizontal>
           
           {/* Formula List */}
-          <Vertical style={{ gap: '0' }}>
+          <Vertical gap={0}>
             {getFoldersWithFormulas().map((folder, folderIndex) => (
               <div key={folderIndex} className="folder-item mb-1">
                 <div 
@@ -830,8 +827,8 @@ export function FormulaManager() {
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, folder.name)}
                 >
-                  <Horizontal style={{ alignItems: 'center', gap: '6px', justifyContent: 'space-between', width: '100%' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+                  <Horizontal gap={6} style={{ alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <Horizontal gap={6} style={{ alignItems: 'center' }}>
                       {collapsedFolders.includes(folder.name) ? (
                         <RightOutlined style={{ color: '#666', fontSize: '10px' }} />
                       ) : (
@@ -860,7 +857,7 @@ export function FormulaManager() {
                 </div>
                 
                 {!collapsedFolders.includes(folder.name) && (
-                  <Vertical style={{ paddingLeft: '12px', gap: '2px' }}>
+                  <Vertical gap={2} style={{ paddingLeft: '12px' }}>
                     {folder.isEmpty ? (
                       <div style={{ 
                         padding: '8px 12px', 
@@ -895,13 +892,13 @@ export function FormulaManager() {
                           alignItems: 'center', 
                           justifyContent: 'space-between' 
                         }}>
-                          <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
+                          <Horizontal gap={4} style={{ alignItems: 'center' }}>
                             <FunctionOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
                             <Texto category="p2" style={{ fontSize: '12px' }}>{formula.name}</Texto>
                           </Horizontal>
                           
                           <div className="formula-actions">
-                            <Horizontal style={{ gap: '4px' }}>
+                            <Horizontal gap={4}>
                               <EditOutlined 
                                 style={{ 
                                   color: '#1890ff', 
@@ -958,7 +955,7 @@ export function FormulaManager() {
           {/* Formula Header Row */}
           <Vertical style={{ marginBottom: '24px', width: '100%' }}>
             {/* Formula Name Input and Folder Selection */}
-            <Horizontal style={{ marginBottom: '16px', gap: '12px', width: '100%' }}>
+            <Horizontal gap={12} style={{ marginBottom: '16px', width: '100%' }}>
               {/* Formula Name - 50% */}
               <Vertical style={{ flex: 1 }}>
                 <div className="eyebrow-label">Formula Name</div>
@@ -998,7 +995,7 @@ export function FormulaManager() {
               {/* Status Section */}
               <Vertical style={{ alignItems: 'flex-start' }}>
                 <div className="eyebrow-label">Status</div>
-                <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                <Horizontal gap={8} style={{ alignItems: 'center' }}>
                   {formulaValidation.isValid ? (
                     <>
                       <CheckOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
@@ -1030,11 +1027,11 @@ export function FormulaManager() {
 
           {/* Operator Buttons Panel and Template Dropdown (Side by Side for Version B) */}
           {versionMode === 'B' ? (
-            <Horizontal style={{ marginBottom: '16px', gap: '24px', alignItems: 'flex-start' }}>
+            <Horizontal gap={24} style={{ marginBottom: '16px', alignItems: 'flex-start' }}>
               {/* Operators Section */}
               <Vertical style={{ flex: 1 }}>
                 <div className="eyebrow-label mb-1">Quick Operators</div>
-                <Horizontal style={{ gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <Horizontal gap={6} style={{ flexWrap: 'wrap', alignItems: 'center' }}>
                   {['+', '-', '*', '/', '(', ')', '%', '^', '.'].map((operator, index) => (
                     <GraviButton
                       key={index}
@@ -1068,7 +1065,7 @@ export function FormulaManager() {
               {/* Template Dropdown Section */}
               <Vertical style={{ flex: 1 }}>
                 <div className="eyebrow-label mb-1">Formula Templates</div>
-                <Horizontal style={{ gap: '12px', alignItems: 'flex-end' }}>
+                <Horizontal gap={12} style={{ alignItems: 'flex-end' }}>
                   <Vertical style={{ flex: 1 }}>
                     <Select
                       placeholder="Choose a template to apply..."
@@ -1080,32 +1077,33 @@ export function FormulaManager() {
                       style={{ width: '100%' }}
                       allowClear
                       onClear={() => setSelectedTemplateB(null)}
-                    >
-                      {/* Group templates by category */}
-                      {['Basic', 'Advanced', 'Promotions', 'Custom'].map((category) => {
-                        const categoryTemplates = [...templates, ...customTemplates].filter(t => t.category === category);
-                        if (categoryTemplates.length === 0) return null;
-                        
-                        return (
-                          <Select.OptGroup key={category} label={
-                            <span style={{ 
-                              fontWeight: '600', 
-                              color: category === 'Custom' ? '#389e0d' : '#666',
-                              fontSize: '12px'
-                            }}>
-                              {category} Templates
-                            </span>
-                          }>
-                            {categoryTemplates.map((template) => (
-                              <Select.Option key={template.id} value={template.id}>
-                                <Horizontal style={{ 
-                                  alignItems: 'center', 
+                      options={['Basic', 'Advanced', 'Promotions', 'Custom']
+                        .map((category) => {
+                          const categoryTemplates = [...templates, ...customTemplates].filter(t => t.category === category);
+                          if (categoryTemplates.length === 0) return null;
+
+                          return {
+                            label: (
+                              <span style={{
+                                fontWeight: '600',
+                                color: category === 'Custom' ? '#389e0d' : '#666',
+                                fontSize: '12px'
+                              }}>
+                                {category} Templates
+                              </span>
+                            ),
+                            options: categoryTemplates.map((template) => ({
+                              key: template.id,
+                              value: template.id,
+                              label: (
+                                <Horizontal style={{
+                                  alignItems: 'center',
                                   justifyContent: 'space-between',
                                   width: '100%'
                                 }}>
-                                  <Horizontal style={{ alignItems: 'center', gap: '8px', flex: 1 }}>
+                                  <Horizontal gap={8} style={{ alignItems: 'center', flex: 1 }}>
                                     <span style={{ fontWeight: '500' }}>{template.name}</span>
-                                    <span style={{ 
+                                    <span style={{
                                       backgroundColor: template.category === 'Custom' ? '#f6ffed' : '#fff7e6',
                                       color: template.category === 'Custom' ? '#389e0d' : '#d48806',
                                       padding: '1px 4px',
@@ -1118,10 +1116,10 @@ export function FormulaManager() {
                                   </Horizontal>
                                   {/* Show edit/delete icons for custom templates only */}
                                   {template.category === 'Custom' && (
-                                    <Horizontal style={{ gap: '4px', alignItems: 'center' }}>
-                                      <EditOutlined 
-                                        style={{ 
-                                          color: '#1890ff', 
+                                    <Horizontal gap={4} style={{ alignItems: 'center' }}>
+                                      <EditOutlined
+                                        style={{
+                                          color: '#1890ff',
                                           cursor: 'pointer',
                                           fontSize: '12px',
                                           padding: '2px'
@@ -1142,9 +1140,9 @@ export function FormulaManager() {
                                         cancelText="Cancel"
                                         okButtonProps={{ danger: true }}
                                       >
-                                        <DeleteOutlined 
-                                          style={{ 
-                                            color: '#ff4d4f', 
+                                        <DeleteOutlined
+                                          style={{
+                                            color: '#ff4d4f',
                                             cursor: 'pointer',
                                             fontSize: '12px',
                                             padding: '2px'
@@ -1156,12 +1154,12 @@ export function FormulaManager() {
                                     </Horizontal>
                                   )}
                                 </Horizontal>
-                              </Select.Option>
-                            ))}
-                          </Select.OptGroup>
-                        );
-                      })}
-                    </Select>
+                              ),
+                            })),
+                          };
+                        })
+                        .filter(Boolean)}
+                    />
                   </Vertical>
                   <GraviButton
                     buttonText="Apply"
@@ -1215,7 +1213,7 @@ export function FormulaManager() {
             /* Version A: Operators Only */
             <Vertical className="mb-2">
               <div className="eyebrow-label mb-1">Quick Operators</div>
-              <Horizontal style={{ gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Horizontal gap={6} style={{ flexWrap: 'wrap', alignItems: 'center' }}>
                 {['+', '-', '*', '/', '(', ')', '%', '^', '.'].map((operator, index) => (
                   <GraviButton
                     key={index}
@@ -1254,12 +1252,12 @@ export function FormulaManager() {
                 placement="right"
                 size="default"
                 onClose={cancelEditingTemplate}
-                visible={templateEditModalVisible}
+                open={templateEditModalVisible}
                 width={450}
-                bodyStyle={{ padding: '24px' }}
+                styles={{ body: { padding: '24px' } }}
                 footerStyle={{ textAlign: 'right' }}
                 footer={
-                  <Horizontal style={{ gap: '8px', justifyContent: 'flex-end' }}>
+                  <Horizontal gap={8} style={{ justifyContent: 'flex-end' }}>
                     <GraviButton 
                       buttonText="Cancel" 
                       appearance="outlined" 
@@ -1276,7 +1274,7 @@ export function FormulaManager() {
                   </Horizontal>
                 }
               >
-                <Vertical style={{ gap: '16px' }}>
+                <Vertical gap={16}>
                   <div>
                     <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Template Name</div>
                     <Input
@@ -1398,7 +1396,7 @@ export function FormulaManager() {
           )}
 
           {/* Live Price Toggle */}
-          <Horizontal style={{ alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+          <Horizontal gap={12} style={{ alignItems: 'center', marginBottom: '32px' }}>
             <Switch 
               checked={livePrice}
               onChange={setLivePrice}
@@ -1424,7 +1422,7 @@ export function FormulaManager() {
                 <div style={{ padding: '8px', width: '300px' }}>
                   <div style={{ marginBottom: '12px', fontSize: '14px', fontWeight: '500' }}>Add New Variable</div>
                   
-                  <Vertical style={{ gap: '8px' }}>
+                  <Vertical gap={8}>
                     <div>
                       <div style={{ marginBottom: '4px', fontSize: '12px', fontWeight: '500' }}>Name</div>
                       <Input
@@ -1470,7 +1468,7 @@ export function FormulaManager() {
                     </div>
                   </Vertical>
                   
-                  <Horizontal style={{ gap: '8px', justifyContent: 'flex-end', marginTop: '12px' }}>
+                  <Horizontal gap={8} style={{ justifyContent: 'flex-end', marginTop: '12px' }}>
                     <GraviButton 
                       buttonText="Cancel" 
                       appearance="outlined" 
@@ -1492,8 +1490,8 @@ export function FormulaManager() {
               }
               title={null}
               trigger="click"
-              visible={addVariableVisible}
-              onVisibleChange={setAddVariableVisible}
+              open={addVariableVisible}
+              onOpenChange={setAddVariableVisible}
               placement="bottomLeft"
             >
               <GraviButton 
@@ -1552,7 +1550,7 @@ export function FormulaManager() {
                   headerName: 'Actions',
                   width: 100,
                   cellRenderer: (params: any) => (
-                    <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                    <Horizontal gap={8} style={{ alignItems: 'center' }}>
                       <EditOutlined 
                         style={{ 
                           color: '#1890ff', 
@@ -1595,7 +1593,7 @@ export function FormulaManager() {
             </Texto>
             
             {/* Save as Template Button */}
-            <Horizontal style={{ gap: '8px', alignItems: 'center', marginBottom: '16px' }}>
+            <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '16px' }}>
               <GraviButton 
                 buttonText="Save as Template"
                 theme2
@@ -1763,7 +1761,7 @@ export function FormulaManager() {
                     
                     if (isEditing) {
                       return (
-                        <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                        <Horizontal gap={8} style={{ alignItems: 'center' }}>
                           <CheckOutlined 
                             style={{ 
                               color: '#52c41a', 
@@ -1787,7 +1785,7 @@ export function FormulaManager() {
                     }
                     
                     return (
-                      <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                      <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         {params.data.category === 'Custom' && (
                           <>
                             <EditOutlined 
@@ -1857,7 +1855,7 @@ export function FormulaManager() {
           </Texto>
           
           {/* Product Count and Create Mapping Button */}
-          <Horizontal style={{ marginBottom: '16px', gap: '8px', alignItems: 'center' }}>
+          <Horizontal gap={8} style={{ marginBottom: '16px', alignItems: 'center' }}>
             <Texto category="p2" style={{ color: '#666' }}>
               {appliedProducts.length} Product{appliedProducts.length !== 1 ? 's' : ''}
             </Texto>
@@ -1899,7 +1897,7 @@ export function FormulaManager() {
                       </Texto>
                     )}
                   </div>
-                  <Horizontal style={{ gap: '8px', justifyContent: 'flex-end' }}>
+                  <Horizontal gap={8} style={{ justifyContent: 'flex-end' }}>
                     <GraviButton 
                       buttonText="Cancel"
                       size="small"
@@ -1920,8 +1918,8 @@ export function FormulaManager() {
               }
               title="Add Product"
               trigger="click"
-              visible={popoverVisible}
-              onVisibleChange={setPopoverVisible}
+              open={popoverVisible}
+              onOpenChange={setPopoverVisible}
             >
               <GraviButton 
                 buttonText="Create Mapping"
@@ -1963,7 +1961,7 @@ export function FormulaManager() {
                     alignItems: 'center'
                   }}
                 >
-                  <Vertical style={{ flex: 1, gap: '2px' }}>
+                  <Vertical gap={2} style={{ flex: 1 }}>
                     <Texto category="p2" style={{ 
                       fontWeight: 'bold', 
                       fontSize: '12px',
@@ -1971,7 +1969,7 @@ export function FormulaManager() {
                     }}>
                       {product.Name}
                     </Texto>
-                    <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                    <Horizontal gap={8} style={{ alignItems: 'center' }}>
                       <Texto category="p2" style={{ 
                         color: '#666', 
                         fontSize: '10px' 

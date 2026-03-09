@@ -6,7 +6,7 @@
  */
 
 import { Horizontal } from '@gravitate-js/excalibrr';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import type { ContractHeader } from '../../types/contract.types';
 import styles from './ContractHeaderSection.module.css';
@@ -18,8 +18,8 @@ interface ContractHeaderSectionProps {
 }
 
 function formatDateRange(start: Date, end: Date): string {
-  const startStr = moment(start).format('MMM D, YYYY');
-  const endStr = moment(end).format('MMM D, YYYY');
+  const startStr = dayjs(start).format('MMM D, YYYY');
+  const endStr = dayjs(end).format('MMM D, YYYY');
   return `${startStr} - ${endStr}`;
 }
 
@@ -32,7 +32,7 @@ export function ContractHeaderSection({
   const hasExternalParty = !!header.externalParty;
 
   return (
-    <Horizontal className={styles.container} alignItems="center" style={{ gap: '24px' }}>
+    <Horizontal gap={24} className={styles.container} alignItems="center">
       {/* Internal Party */}
       <div className={styles.infoItem}>
         <span className={styles.infoLabel}>Internal:</span>

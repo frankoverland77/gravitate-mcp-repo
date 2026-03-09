@@ -83,7 +83,7 @@ export function TerminalComparisonView() {
           if (!params.data) return null
           const { label, color } = getConfidenceBadge(params.data.confidenceLevel)
           return (
-            <Horizontal alignItems="center" style={{ gap: '4px' }}>
+            <Horizontal gap={4} alignItems="center">
               <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: color }} />
               <Texto category="p2" style={{ color, fontSize: '12px' }}>
                 {label}
@@ -120,10 +120,10 @@ export function TerminalComparisonView() {
   )
 
   return (
-    <Vertical height="100%" style={{ gap: '12px' }}>
+    <Vertical gap={12} height="100%">
       {/* Header */}
       <Horizontal justifyContent="space-between" alignItems="center" style={{ padding: '0 4px' }}>
-        <Vertical style={{ gap: '2px' }}>
+        <Vertical gap={2}>
           <Texto category="h5" weight="600">
             Cross-Terminal Elasticity Comparison
           </Texto>

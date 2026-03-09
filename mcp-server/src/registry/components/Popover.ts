@@ -35,16 +35,16 @@ export const popoverComponent: ComponentMetadata = {
       description: "Popover placement relative to trigger"
     },
     {
-      name: "visible",
+      name: "open",
       type: "boolean",
       required: false,
-      description: "Controlled visibility (optional)"
+      description: "Controlled open state (optional)"
     },
     {
-      name: "onVisibleChange",
-      type: "(visible: boolean) => void",
+      name: "onOpenChange",
+      type: "(open: boolean) => void",
       required: false,
-      description: "Handler for visibility changes"
+      description: "Handler for open state changes"
     },
     {
       name: "trigger",

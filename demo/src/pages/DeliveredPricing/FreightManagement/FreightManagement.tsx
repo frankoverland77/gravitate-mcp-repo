@@ -45,8 +45,8 @@ export function FreightManagement() {
       subtitle: 'Manage carrier freight rates by lane and commodity.',
       hideActiveFilters: false,
       actionButtons: (
-        <Horizontal verticalCenter style={{ gap: '0.75rem' }}>
-          <Horizontal verticalCenter style={{ gap: 6 }}>
+        <Horizontal gap="0.75rem" verticalCenter>
+          <Horizontal gap={6} verticalCenter>
             <span
               style={{
                 fontSize: 11,

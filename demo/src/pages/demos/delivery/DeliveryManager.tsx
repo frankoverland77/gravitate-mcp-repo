@@ -66,109 +66,85 @@ function DeliveryTabs() {
 
   return (
     <div style={{ position: 'relative' }}>
-      <Tabs 
+      <Tabs
         style={{ minWidth: "100%" }}
         activeKey={getTabKey(currentView)}
         onChange={handleTabChange}
-      >
-      <Tabs.TabPane
-        tab={
-          <span>
-            <UnorderedListOutlined /> Order Queue
-          </span>
-        }
-        key="order-queue"
-      >
-        <div style={{ height: 'calc(100vh - 200px)', padding: '16px' }}>
-          <OrderQueue />
-        </div>
-      </Tabs.TabPane>
-
-      <Tabs.TabPane
-        tab={
-          <span>
-            <TeamOutlined /> Driver Management
-          </span>
-        }
-        key="driver-management"
-      >
-        <div style={{ height: 'calc(100vh - 200px)', padding: '16px' }}>
-          <DriverManagement />
-        </div>
-      </Tabs.TabPane>
-
-      <Tabs.TabPane
-        tab={
-          <span>
-            <AimOutlined /> Route Planning
-          </span>
-        }
-        key="route-planning"
-      >
-        <DeliveryRouteTab />
-      </Tabs.TabPane>
-
-      <Tabs.TabPane
-        tab={
-          <span>
-            <DashboardOutlined /> Real-time Tracking
-          </span>
-        }
-        key="real-time-tracking"
-      >
-        <div style={{ height: 'calc(100vh - 200px)' }}>
-          <RealTimeTracking />
-        </div>
-      </Tabs.TabPane>
-
-      <Tabs.TabPane
-        tab={
-          <span>
-            <BarChartOutlined /> Analytics
-          </span>
-        }
-        key="analytics"
-      >
-        <div style={{ height: 'calc(100vh - 200px)', padding: '16px' }}>
-          <Analytics />
-        </div>
-      </Tabs.TabPane>
-
-      <Tabs.TabPane
-        tab={
-          <span>
-            <SettingOutlined /> Settings
-          </span>
-        }
-        key="settings"
-      >
-        <Horizontal>
-          <div className="p-3">
-            <Vertical gap={20}>
-              <Texto variant="h2">⚙️ Delivery System Settings</Texto>
-              <Texto variant="body1">
-                Configure delivery zones, pricing, notification preferences, 
-                and system-wide settings for optimal operations.
-              </Texto>
-              <div style={{ 
-                padding: '20px', 
-                backgroundColor: '#f6f6f6', 
-                borderRadius: '8px'
-              }}>
-                <Texto variant="body2">
-                  🏗️ This section will include:
-                  <br />• Delivery zone configuration
-                  <br />• Pricing and fee settings
-                  <br />• Notification preferences
-                  <br />• User permissions and roles
-                  <br />• Integration settings
-                </Texto>
+        items={[
+        {
+          key: 'order-queue',
+          label: <span><UnorderedListOutlined /> Order Queue</span>,
+          children: (
+            <div style={{ height: 'calc(100vh - 200px)', padding: '16px' }}>
+              <OrderQueue />
+            </div>
+          ),
+        },
+        {
+          key: 'driver-management',
+          label: <span><TeamOutlined /> Driver Management</span>,
+          children: (
+            <div style={{ height: 'calc(100vh - 200px)', padding: '16px' }}>
+              <DriverManagement />
+            </div>
+          ),
+        },
+        {
+          key: 'route-planning',
+          label: <span><AimOutlined /> Route Planning</span>,
+          children: <DeliveryRouteTab />,
+        },
+        {
+          key: 'real-time-tracking',
+          label: <span><DashboardOutlined /> Real-time Tracking</span>,
+          children: (
+            <div style={{ height: 'calc(100vh - 200px)' }}>
+              <RealTimeTracking />
+            </div>
+          ),
+        },
+        {
+          key: 'analytics',
+          label: <span><BarChartOutlined /> Analytics</span>,
+          children: (
+            <div style={{ height: 'calc(100vh - 200px)', padding: '16px' }}>
+              <Analytics />
+            </div>
+          ),
+        },
+        {
+          key: 'settings',
+          label: <span><SettingOutlined /> Settings</span>,
+          children: (
+            <Horizontal>
+              <div className="p-3">
+                <Vertical gap={20}>
+                  <Texto variant="h2">⚙️ Delivery System Settings</Texto>
+                  <Texto variant="body1">
+                    Configure delivery zones, pricing, notification preferences,
+                    and system-wide settings for optimal operations.
+                  </Texto>
+                  <div style={{
+                    padding: '20px',
+                    backgroundColor: '#f6f6f6',
+                    borderRadius: '8px'
+                  }}>
+                    <Texto variant="body2">
+                      🏗️ This section will include:
+                      <br />• Delivery zone configuration
+                      <br />• Pricing and fee settings
+                      <br />• Notification preferences
+                      <br />• User permissions and roles
+                      <br />• Integration settings
+                    </Texto>
+                  </div>
+                </Vertical>
               </div>
-            </Vertical>
-          </div>
-        </Horizontal>
-      </Tabs.TabPane>
-    </Tabs>
+            </Horizontal>
+          ),
+        },
+      ]}
+    />
     
     {/* Global Simulation Control Drawer */}
     <SimulationControlDrawer />

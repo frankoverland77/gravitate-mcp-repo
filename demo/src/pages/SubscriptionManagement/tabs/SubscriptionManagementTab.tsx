@@ -209,7 +209,7 @@ export function SubscriptionManagementTab() {
       showSelectedCount: true,
       hideActiveFilters: false,
       actionButtons: isBulkEditMode ? (
-        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems="center">
           <GraviButton
             buttonText="Bulk Change"
             theme1
@@ -222,7 +222,7 @@ export function SubscriptionManagementTab() {
           <GraviButton buttonText="Cancel" size="small" onClick={handleCancel} />
         </Horizontal>
       ) : (
-        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems="center">
           <GraviButton
             buttonText={isContentConfigLocked ? 'Unlock Content Config' : 'Lock Content Config'}
             size="small"
@@ -255,7 +255,7 @@ export function SubscriptionManagementTab() {
         />
       </Vertical>
       <BulkChangeDrawer
-        visible={isBulkChangeDrawerOpen}
+        open={isBulkChangeDrawerOpen}
         selectedRows={bulkEditRows}
         onClose={() => setIsBulkChangeDrawerOpen(false)}
         onApply={handleApplyBulkChanges}

@@ -157,12 +157,9 @@ export function LiftingsVsBenchmarkElasticity() {
     <Horizontal style={{ height: '100%' }}>
       {/* Quick Metrics panel */}
       <Vertical
-        style={{
-          width: '140px',
+        gap={16} style={{ width: '140px',
           borderRight: '1px solid #e8e8e8',
-          padding: '16px 12px',
-          gap: '16px',
-        }}
+          padding: '16px 12px' }}
       >
         <QuickMetric icon="$" label="Avg Delta" value={formatPricePosition(avgDelta)} />
         <QuickMetric icon="V" label="Avg Lifting" value={`${avgLifting.toFixed(1)}%`} />
@@ -170,10 +167,10 @@ export function LiftingsVsBenchmarkElasticity() {
       </Vertical>
 
       {/* Chart area */}
-      <Vertical flex="1" style={{ padding: '12px', gap: '8px' }}>
+      <Vertical flex="1" gap={8} style={{ padding: '12px' }}>
         {/* Controls header */}
         <Horizontal justifyContent="space-between" alignItems="center">
-          <Horizontal style={{ gap: '12px' }} alignItems="center">
+          <Horizontal gap={12} alignItems="center">
             <Radio.Group
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
@@ -186,7 +183,7 @@ export function LiftingsVsBenchmarkElasticity() {
             </Radio.Group>
 
             {viewMode === 'histogram' && (
-              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+              <Horizontal gap={6} alignItems="center">
                 <input
                   type="checkbox"
                   checked={showOverlay}
@@ -202,7 +199,7 @@ export function LiftingsVsBenchmarkElasticity() {
             )}
           </Horizontal>
 
-          <Horizontal style={{ gap: '8px' }} alignItems="center">
+          <Horizontal gap={8} alignItems="center">
             <Select
               value={segmentation}
               onChange={setSegmentation}
@@ -323,7 +320,7 @@ export function LiftingsVsBenchmarkElasticity() {
 
         {/* Legend for elasticity mode */}
         {(viewMode === 'elasticity' || showOverlay) && (
-          <Horizontal style={{ gap: '16px' }} justifyContent="center">
+          <Horizontal gap={16} justifyContent="center">
             <LegendItem color="#52c41a" label="Optimal Zone" />
             <LegendItem color="#faad14" label="Caution" />
             <LegendItem color="#ff4d4f" label="Cliff / Danger" />
@@ -342,8 +339,8 @@ export function LiftingsVsBenchmarkElasticity() {
 
 function QuickMetric({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <Vertical style={{ gap: '4px' }}>
-      <Horizontal alignItems="center" style={{ gap: '6px' }}>
+    <Vertical gap={4}>
+      <Horizontal gap={6} alignItems="center">
         <div
           style={{
             width: 24,
@@ -373,7 +370,7 @@ function QuickMetric({ icon, label, value }: { icon: string; label: string; valu
 
 function LegendItem({ color, label, shape = 'circle' }: { color: string; label: string; shape?: 'circle' | 'line' | 'rect' }) {
   return (
-    <Horizontal style={{ gap: '4px' }} alignItems="center">
+    <Horizontal gap={4} alignItems="center">
       {shape === 'circle' && <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color }} />}
       {shape === 'line' && <div style={{ width: 14, height: 3, backgroundColor: color }} />}
       {shape === 'rect' && <div style={{ width: 14, height: 10, backgroundColor: color, borderRadius: 2 }} />}

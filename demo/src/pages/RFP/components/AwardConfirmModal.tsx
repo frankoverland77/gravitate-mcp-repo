@@ -19,17 +19,17 @@ export function AwardConfirmModal({
 }: AwardConfirmModalProps) {
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Create Contract"
       onCancel={onClose}
       footer={
-        <Horizontal justifyContent="flex-end" style={{ gap: '8px' }}>
+        <Horizontal gap={8} justifyContent="flex-end">
           <GraviButton buttonText="Cancel" onClick={onClose} />
           <GraviButton buttonText="Create Contract" success onClick={onConfirm} />
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         <Texto>
           This will create a new contract in the Pricing Engine with all the terms from{' '}
           <strong>{winner?.name}'s</strong> winning bid.
@@ -37,12 +37,9 @@ export function AwardConfirmModal({
 
         {contractPreview && (
           <Vertical
-            style={{
-              gap: '8px',
-              padding: '16px',
+            gap={8} style={{ padding: '16px',
               backgroundColor: '#fafafa',
-              borderRadius: '8px',
-            }}
+              borderRadius: '8px' }}
           >
             <Texto category="p2" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Contract Preview

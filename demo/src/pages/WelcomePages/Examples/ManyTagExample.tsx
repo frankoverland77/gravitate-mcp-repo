@@ -70,7 +70,7 @@ export function ManyTagExample() {
       {/* Basic Usage */}
       <Texto category="h5">Basic Usage</Texto>
       <Vertical className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card title="Skills (maxCount=3)" size="small" style={{ width: 300 }}>
             <ManyTag tagItems={skills} maxCount={3} />
           </Card>
@@ -89,7 +89,7 @@ export function ManyTagExample() {
       <Texto category="h5">MaxCount Variations</Texto>
       <Vertical className="mb-4">
         <Texto category="p2" className="mb-2">Same data with different maxCount values:</Texto>
-        <Vertical style={{ gap: "12px" }}>
+        <Vertical gap={12}>
           <Horizontal verticalCenter>
             <Texto category="p2" style={{ minWidth: "120px" }}>maxCount=1:</Texto>
             <ManyTag tagItems={skills} maxCount={1} />
@@ -114,7 +114,7 @@ export function ManyTagExample() {
       <Vertical className="mb-4">
         <Card title="Add/Remove Tags" style={{ maxWidth: "600px" }}>
           <ManyTag tagItems={dynamicTags} maxCount={4} />
-          <Horizontal className="mt-3" style={{ gap: "10px" }}>
+          <Horizontal gap={10} className="mt-3">
             <Input
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
@@ -127,7 +127,7 @@ export function ManyTagExample() {
           <Texto category="p2" className="mt-2" style={{ color: "var(--theme-color-3)" }}>
             Current tags can be managed. Try adding: "Vue", "Angular", "Svelte"
           </Texto>
-          <Horizontal style={{ gap: "5px", marginTop: "10px", flexWrap: "wrap" }}>
+          <Horizontal gap={5} style={{ marginTop: "10px", flexWrap: "wrap" }}>
             {dynamicTags.map(tag => (
               <Button
                 key={tag}
@@ -171,7 +171,7 @@ export function ManyTagExample() {
       {/* Object Array Transformation */}
       <Texto category="h5">Object Array Transformation</Texto>
       <Vertical className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card title="User Names" size="small" style={{ width: 280 }}>
             <ManyTag tagItems={users.map(user => user.name)} maxCount={2} />
           </Card>
@@ -221,7 +221,7 @@ export function ManyTagExample() {
       {/* Categorized Display */}
       <Texto category="h5">Categorized Tags</Texto>
       <Vertical className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card title="Frontend Technologies" size="small" style={{ width: 300 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <CodeOutlined style={{ color: "var(--theme-success)" }} />
@@ -272,7 +272,7 @@ export function ManyTagExample() {
       {/* Real-world Examples */}
       <Texto category="h5">Real-world Examples</Texto>
       <Vertical className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           {/* User Profile Simulation */}
           <Card title="User Profile" size="small" style={{ width: 300 }}>
             <Horizontal className="mb-2" verticalCenter>

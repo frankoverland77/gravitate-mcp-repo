@@ -71,7 +71,7 @@ import React from 'react';
 
 function QuickMetricsDisplay({ quickMetrics, QuickMetric }) {
   return (
-    <Vertical style={{ gap: '0.5rem' }} justifyContent='space-evenly'>
+    <Vertical gap="0.5rem" justifyContent='space-evenly'>
       <QuickMetric
         icon={DollarOutlined}
         label='Average Benchmark Diff'
@@ -110,7 +110,7 @@ import React from 'react';
 
 function RadioButtonGroup({ subTypes, selectedSubtype, onChange }) {
   return (
-    <Vertical flex={2} style={{ gap: 16 }}>
+    <Vertical flex={2} gap={16}>
       <Texto
         className='pb-1'
         category='h5'
@@ -190,7 +190,7 @@ function TwoColumnLayout({
   return (
     <Horizontal 
       className='p-3' 
-      style={{ gap: spacing }} 
+      gap={spacing}
       fullHeight
     >
       <Vertical flex={leftFlex}>
@@ -332,13 +332,15 @@ function ComplexFormSection({ metadata, title }) {
         <Vertical flex={1} className='my-2 mx-4'>
           <Texto className='py-2'>Movement Type</Texto>
           <Form.Item hasFeedback name='MovementTypeCvId'>
-            <Select allowClear showSearch>
-              {metadata?.MovementTypes?.map((item) => (
-                <Select.Option key={item.Value} value={Number(item.Value)}>
-                  {item.Text}
-                </Select.Option>
-              ))}
-            </Select>
+            <Select
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              options={metadata?.MovementTypes?.map((item) => ({
+                value: Number(item.Value),
+                label: item.Text,
+              }))}
+            />
           </Form.Item>
         </Vertical>
       </Horizontal>
@@ -365,7 +367,7 @@ function MultiRowHeaderDisplay({ orderDetails, getStatus }) {
 
   return (
     <Horizontal className='secondary-gradient-background py-2 px-4' width='100%' flex={1}>
-      <Vertical className='py-2' style={{ gap: 2 }}>
+      <Vertical className='py-2' gap={2}>
         <Horizontal className='justify-sb' width='100%' verticalCenter>
           <Texto appearance='white' category='h4'>
             Order# {orderDetails?.TradeEntryId}
@@ -419,7 +421,7 @@ function SplitPaneModalLayout({
     <Horizontal fullHeight>
       <Vertical className='mx-4' flex={5.5}>
         <div style={{ overflowY: 'auto' }}>
-          <Horizontal className='mx-4 pb-2' style={{ gap: 20 }}>
+          <Horizontal className='mx-4 pb-2' gap={20}>
             <PricingInformation 
               form={form} 
               orderEntryInfo={orderEntryInfo} 
@@ -471,7 +473,7 @@ function ConditionalErrorDisplay({ error }) {
         verticalCenter
       >
         <Vertical verticalCenter flex={0}>
-          <Horizontal verticalCenter style={{ gap: 10 }}>
+          <Horizontal verticalCenter gap={10}>
             <ClockCircleFilled style={{ color: 'var(--theme-error)', fontSize: 12 }} />
             <Texto category='p2' appearance='error'>
               VOLUME ERROR
@@ -608,7 +610,7 @@ function ComplexConditionalForm({
       <Texto category='h5' className='my-3' appearance='secondary'>
         Counterparty Info
       </Texto>
-      <Horizontal style={{ gap: 20 }}>
+      <Horizontal gap={20}>
         {currentCounterParty && (
           <Vertical style={{ width: 100 }}>
             <Texto category='p2'>COUNTERPARTY</Texto>

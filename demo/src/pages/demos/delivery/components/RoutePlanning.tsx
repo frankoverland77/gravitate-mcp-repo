@@ -8,8 +8,6 @@ import { MapView } from './MapView';
 import { optimizeRoute, calculateRouteCosts, calculateRouteDistance, calculateRouteTime, generateOptimizationRecommendations, checkCapacityConstraints, type Coordinates, type OptimizationResult, type RouteMetrics } from '../utils/route-optimization';
 import { formatCurrency, formatDuration, formatDistance } from '../utils/data-mappers';
 
-const { Option } = Select;
-
 interface RoutePlanningProps {
   onBackToRoutes: () => void;
 }
@@ -495,28 +493,27 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                 </Form.Item>
                 
                 <Form.Item label="Priority Level" name="priority">
-                  <Select placeholder="Select priority">
-                    <Option value="high">High Priority</Option>
-                    <Option value="medium">Medium Priority</Option>
-                    <Option value="low">Low Priority</Option>
-                  </Select>
+                  <Select placeholder="Select priority" options={[
+                    { label: 'High Priority', value: 'high' },
+                    { label: 'Medium Priority', value: 'medium' },
+                    { label: 'Low Priority', value: 'low' },
+                  ]} />
                 </Form.Item>
                 
                 <Form.Item label="Assigned Driver" name="driverId">
-                  <Select 
+                  <Select
                     placeholder="Select driver"
                     showSearch
-                    filterOption={(input, option) =>
-                      (option?.children as unknown as string)?.toLowerCase()?.includes(input.toLowerCase())
-                    }
+                    optionFilterProp="searchLabel"
                     notFoundContent={availableDrivers.length === 0 ? "No drivers available" : "No matching drivers"}
-                  >
-                    {availableDrivers.map(driver => (
-                      <Option key={driver.id} value={driver.id}>
+                    options={availableDrivers.map(driver => ({
+                      value: driver.id,
+                      searchLabel: driver.name,
+                      label: (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span>{driver.name}</span>
                           <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                            <BBDTag style={{ 
+                            <BBDTag style={{
                               fontSize: '10px',
                               color: driver.status === 'AVAILABLE' ? '#52c41a' : '#fa8c16',
                               backgroundColor: driver.status === 'AVAILABLE' ? '#f6ffed' : '#fff7e6',
@@ -528,26 +525,25 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                             <span style={{ fontSize: '10px', color: '#666' }}>⭐{driver.rating}</span>
                           </div>
                         </div>
-                      </Option>
-                    ))}
-                  </Select>
+                      ),
+                    }))}
+                  />
                 </Form.Item>
                 
                 <Form.Item label="Vehicle" name="vehicleId">
-                  <Select 
+                  <Select
                     placeholder="Select vehicle"
                     showSearch
-                    filterOption={(input, option) =>
-                      (option?.children as unknown as string)?.toLowerCase()?.includes(input.toLowerCase())
-                    }
+                    optionFilterProp="searchLabel"
                     notFoundContent={availableVehicles.length === 0 ? "No vehicles available" : "No matching vehicles"}
-                  >
-                    {availableVehicles.map(vehicle => (
-                      <Option key={vehicle.id} value={vehicle.id}>
+                    options={availableVehicles.map(vehicle => ({
+                      value: vehicle.id,
+                      searchLabel: vehicle.name,
+                      label: (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span>{vehicle.name}</span>
                           <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                            <BBDTag style={{ 
+                            <BBDTag style={{
                               fontSize: '10px',
                               color: vehicle.type === 'TRUCK' ? '#722ed1' : vehicle.type === 'VAN' ? '#1890ff' : '#52c41a',
                               backgroundColor: vehicle.type === 'TRUCK' ? '#f9f0ff' : vehicle.type === 'VAN' ? '#e6f7ff' : '#f6ffed',
@@ -562,9 +558,9 @@ export function RoutePlanning({ onBackToRoutes }: RoutePlanningProps) {
                             )}
                           </div>
                         </div>
-                      </Option>
-                    ))}
-                  </Select>
+                      ),
+                    }))}
+                  />
                 </Form.Item>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

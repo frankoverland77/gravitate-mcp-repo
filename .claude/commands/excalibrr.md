@@ -45,14 +45,16 @@ These patterns will FAIL validation:
 | Mistake | Correct |
 |---------|---------|
 | `<Vertical style={{ flex: 1 }}>` | `<Vertical flex="1">` |
-| `<Horizontal gap={12}>` | `<Horizontal className="gap-12">` |
-| `<Modal open={isOpen}>` | `<Modal visible={isOpen}>` |
-| `<Drawer open={isOpen}>` | `<Drawer visible={isOpen}>` |
+| `<Horizontal style={{ gap: '12px' }}>` | `<Horizontal gap={12}>` |
+| `<Modal visible={isOpen}>` | `<Modal open={isOpen}>` |
+| `<Drawer visible={isOpen}>` | `<Drawer open={isOpen}>` |
 | `<GraviButton theme="success">` | `<GraviButton success>` |
-| `<GraviButton htmlType="submit">` | `<GraviButton type="submit">` |
+| `<GraviButton htmlType="submit">` | `<GraviButton onClick={() => form.submit()}>` |
 | `<Texto appearance="secondary">` (for gray) | `<Texto appearance="medium">` |
 | `<div style={{ display: 'flex' }}>` | `<Vertical>` or `<Horizontal>` |
-| `style={{ gap: '12px' }}` | `className="gap-12"` |
+| `destroyOnClose` | `destroyOnHidden` |
+| `onVisibleChange` | `onOpenChange` |
+| `appearance='outline'` | `appearance='outlined'` |
 
 ---
 
@@ -114,11 +116,11 @@ import { Vertical, Horizontal } from '@gravitate-js/excalibrr';
   {children}
 </Vertical>
 
-// Use className for gap, props for alignment
+// Use gap prop (v5), props for alignment
 <Horizontal
   justifyContent="space-between"
   alignItems="center"
-  className="gap-12"
+  gap={12}
 >
   {children}
 </Horizontal>
@@ -150,12 +152,12 @@ import { Texto } from '@gravitate-js/excalibrr';
 
 ### Modal & Drawer (CRITICAL)
 ```typescript
-// Use "visible" NOT "open"!
-<Modal visible={isOpen} onCancel={handleClose}>
+// Use "open" NOT "visible" (antd v5)!
+<Modal open={isOpen} onCancel={handleClose} destroyOnHidden>
   {content}
 </Modal>
 
-<Drawer visible={isOpen} onClose={handleClose}>
+<Drawer open={isOpen} onClose={handleClose} destroyOnHidden>
   {content}
 </Drawer>
 ```

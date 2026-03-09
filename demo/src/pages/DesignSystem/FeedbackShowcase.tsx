@@ -18,7 +18,7 @@ export function FeedbackShowcase() {
       <SpecimenCard label="Overlay (inline demo)" props='visible={true}'>
         <div style={{ position: 'relative', height: '100px', width: '100%', background: '#fafafa', borderRadius: '4px' }}>
           <div style={{ padding: '16px', fontSize: '14px', color: '#595959' }}>Content underneath the overlay</div>
-          <Overlay visible={true} />
+          <Overlay open={true} />
         </div>
       </SpecimenCard>
 

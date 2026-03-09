@@ -232,9 +232,9 @@ export function SaveTemplateModal({
             onCancel={handleCancel}
             width={1200}
             footer={null}
-            destroyOnClose
+            destroyOnHidden
         >
-            <Vertical style={{ gap: '20px', padding: '20px 0' }}>
+            <Vertical gap={20} style={{ padding: '20px 0' }}>
                 {/* Template Information Section */}
                 <div>
                     <Texto style={{
@@ -247,7 +247,7 @@ export function SaveTemplateModal({
                         Template Information
                     </Texto>
 
-                    <Horizontal style={{ gap: '16px', flexWrap: 'wrap' }}>
+                    <Horizontal gap={16} style={{ flexWrap: 'wrap' }}>
                         <div style={{ flex: 1, minWidth: '200px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                                 Template Name *
@@ -302,7 +302,7 @@ export function SaveTemplateModal({
                         </div>
                     </Horizontal>
 
-                    <Horizontal style={{ gap: '16px', flexWrap: 'wrap', marginTop: '16px' }}>
+                    <Horizontal gap={16} style={{ flexWrap: 'wrap', marginTop: '16px' }}>
                         <div style={{ flex: 1, minWidth: '200px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
                                 Category *
@@ -433,7 +433,7 @@ export function SaveTemplateModal({
                 </div>
 
                 {/* Footer Buttons */}
-                <Horizontal style={{ justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
+                <Horizontal gap={12} style={{ justifyContent: 'flex-end', marginTop: '8px' }}>
                     <GraviButton
                         buttonText="Cancel"
                         appearance="outlined"

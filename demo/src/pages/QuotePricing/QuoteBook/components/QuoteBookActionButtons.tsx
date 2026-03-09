@@ -27,9 +27,9 @@ export function QuoteBookActionButtons({
   const { isFutureMode: _isFutureMode } = useFeatureMode()
 
   return (
-    <Horizontal style={{ gap: '16px' }} alignItems="center">
+    <Horizontal gap={16} alignItems="center">
       {publicationMode !== 'IntraDay' && (
-        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems="center">
           <Texto>Publishing For</Texto>
           <Select
             options={[

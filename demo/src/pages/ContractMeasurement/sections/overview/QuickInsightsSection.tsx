@@ -32,7 +32,7 @@ export function QuickInsightsSection() {
   const statusText = INTERVAL_DATA.status === 'onTrack' ? 'On Track' : 'Behind';
 
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Section Header */}
       <div>
         <Texto category="h4" weight="600">Quick Insights</Texto>
@@ -43,12 +43,12 @@ export function QuickInsightsSection() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
         {/* Widget 1: Interval Progress */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <CalendarOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">{INTERVAL_DATA.type} Progress</Texto>
           </Horizontal>
 
-          <Vertical style={{ gap: '16px' }}>
+          <Vertical gap={16}>
             {/* Progress Bar */}
             <div>
               <Horizontal style={{ justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -89,12 +89,12 @@ export function QuickInsightsSection() {
 
         {/* Widget 2: Benchmark Performance */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <BarChartOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">Benchmark Performance</Texto>
           </Horizontal>
 
-          <Vertical style={{ gap: '16px' }}>
+          <Vertical gap={16}>
             {/* Current Spread */}
             <div>
               <Texto
@@ -108,13 +108,13 @@ export function QuickInsightsSection() {
             </div>
 
             {/* Performance Badge */}
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <BBDTag
                 success={BENCHMARK_DATA.isOutperforming}
                 error={!BENCHMARK_DATA.isOutperforming}
                 style={{ fontSize: '12px', padding: '2px 8px' }}
               >
-                <Horizontal style={{ alignItems: 'center', gap: '4px' }}>
+                <Horizontal gap={4} style={{ alignItems: 'center' }}>
                   <ArrowUpOutlined style={{ fontSize: '12px' }} />
                   {BENCHMARK_DATA.isOutperforming ? 'Outperforming' : 'Underperforming'}
                 </Horizontal>
@@ -126,7 +126,7 @@ export function QuickInsightsSection() {
               <Texto category="p2" appearance="medium" style={{ marginBottom: '8px', display: 'block' }}>
                 7-Day Trend
               </Texto>
-              <Horizontal style={{ alignItems: 'flex-end', gap: '4px', height: '40px' }}>
+              <Horizontal gap={4} style={{ alignItems: 'flex-end', height: '40px' }}>
                 {BENCHMARK_DATA.sparklineData.map((value, index) => {
                   const height = (value / 0.02) * 100; // Normalize to max of 0.02
                   return (

@@ -170,8 +170,8 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
     switch (stage) {
       case 'upload':
         return (
-          <Vertical style={{ gap: '20px' }}>
-            <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={20}>
+            <Vertical gap={4}>
               <Texto category="h5" weight="600">Upload Buyer's RFP</Texto>
               <Texto category="p2" appearance="medium">
                 Drop a spreadsheet or PDF. We'll parse products, terminals, and volumes.
@@ -192,7 +192,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
 
       case 'validating':
         return (
-          <Vertical alignItems="center" justifyContent="center" style={{ gap: '16px', padding: '40px 0' }}>
+          <Vertical alignItems="center" justifyContent="center" gap={16} style={{ padding: '40px 0' }}>
             <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
             <Texto category="p1" weight="500">Parsing {fileName}...</Texto>
             <Texto category="p3" appearance="medium">
@@ -203,9 +203,9 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
 
       case 'review':
         return (
-          <Vertical style={{ gap: '20px' }}>
+          <Vertical gap={20}>
             {/* Parse summary */}
-            <Horizontal style={{ gap: '12px' }} alignItems="center">
+            <Horizontal gap={12} alignItems="center">
               <span className={styles['status-pill-ok']}>
                 <CheckCircleFilled /> {validCount} rows parsed
               </span>
@@ -261,12 +261,12 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
             )}
 
             {/* Metadata section */}
-            <Vertical style={{ gap: '12px', borderTop: '1px solid #f0f0f0', paddingTop: '16px' }}>
-              <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+            <Vertical gap={12} style={{ borderTop: '1px solid #f0f0f0', paddingTop: '16px' }}>
+              <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
                 RFP Information
               </Texto>
 
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <Texto category="p2" weight="500">RFP Name</Texto>
                 <Input
                   value={rfpName}
@@ -275,8 +275,8 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
                 />
               </Vertical>
 
-              <Horizontal style={{ gap: '12px' }}>
-                <Vertical style={{ gap: '4px', flex: 1 }}>
+              <Horizontal gap={12}>
+                <Vertical gap={4} style={{ flex: 1 }}>
                   <Texto category="p2" weight="500">Buyer</Texto>
                   <Select
                     placeholder="Select buyer..."
@@ -291,7 +291,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
                   />
                 </Vertical>
 
-                <Vertical style={{ gap: '4px', flex: 1 }}>
+                <Vertical gap={4} style={{ flex: 1 }}>
                   <Texto category="p2" weight="500">Response Deadline</Texto>
                   <DatePicker
                     style={{ width: '100%' }}
@@ -305,7 +305,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
 
       case 'creating':
         return (
-          <Vertical alignItems="center" justifyContent="center" style={{ gap: '16px', padding: '40px 0' }}>
+          <Vertical alignItems="center" justifyContent="center" gap={16} style={{ padding: '40px 0' }}>
             <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
             <Texto category="p1" weight="500">Creating RFP Response...</Texto>
             <Texto category="p3" appearance="medium">
@@ -318,7 +318,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       onCancel={handleClose}
       width={600}
       centered
@@ -327,7 +327,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
       maskClosable={stage === 'upload'}
       footer={
         stage === 'review' ? (
-          <Horizontal justifyContent="flex-end" style={{ gap: '8px' }}>
+          <Horizontal gap={8} justifyContent="flex-end">
             <GraviButton buttonText="Cancel" onClick={handleClose} />
             <GraviButton
               buttonText={`Create with ${validCount} Rows`}

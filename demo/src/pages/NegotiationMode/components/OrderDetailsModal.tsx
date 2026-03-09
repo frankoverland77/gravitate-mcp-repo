@@ -123,19 +123,19 @@ export function OrderDetailsModal({ visible, order, onClose }: OrderDetailsModal
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       width={800}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       title='VIEW DETAILS'
     >
       <Form style={{ width: '100%' }}>
         <Vertical className='bg-2'>
           {/* ── Header (mirrors Header.tsx) ───────────────────────── */}
           <Horizontal className='secondary-gradient-background py-2 px-4' width='100%' flex={1}>
-            <Vertical className='py-2' style={{ gap: 2 }}>
+            <Vertical gap={2} className='py-2'>
               <Horizontal className='justify-sb' width='100%' verticalCenter>
                 <Texto appearance='white' category='h4'>
                   Order# {order.tradeEntryId}
@@ -178,10 +178,7 @@ export function OrderDetailsModal({ visible, order, onClose }: OrderDetailsModal
             <Horizontal
               className='px-4 py-2'
               verticalCenter
-              style={{
-                backgroundColor: 'var(--theme-color-2-trans, rgba(24,144,255,0.06))',
-                gap: 8,
-              }}
+              gap={8} style={{ backgroundColor: 'var(--theme-color-2-trans, rgba(24,144,255,0.06))' }}
             >
               <DownloadOutlined style={{ color: 'var(--theme-color-2, #1890ff)' }} />
               <Texto category='p2' weight={600} appearance='primary'>
@@ -530,13 +527,13 @@ export function OrderDetailsModal({ visible, order, onClose }: OrderDetailsModal
                   </Button>
                 )}
               </Horizontal>
-              <Horizontal style={{ gap: 25 }}>
+              <Horizontal gap={25}>
                 {isBid && (
                   <GraviButton theme1 buttonText='Save Changes' onClick={() => {}} disabled />
                 )}
 
                 {!canAcceptRejectOrder && order.areSetupsStillValid && (
-                  <Horizontal verticalCenter style={{ gap: 10 }}>
+                  <Horizontal gap={10} verticalCenter>
                     <GraviButton
                       style={{
                         border: '1px solid var(--theme-error, #ff4d4f)',
@@ -553,7 +550,7 @@ export function OrderDetailsModal({ visible, order, onClose }: OrderDetailsModal
                 )}
 
                 {canAcceptRejectOrder && order.areSetupsStillValid && (
-                  <Horizontal verticalCenter style={{ gap: 20 }}>
+                  <Horizontal gap={20} verticalCenter>
                     <GraviButton
                       buttonText='Reject'
                       onClick={() => {}}

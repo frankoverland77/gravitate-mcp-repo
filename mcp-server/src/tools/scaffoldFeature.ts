@@ -375,7 +375,7 @@ export function ${pascalName}Page() {
       />
       ${includeForm ? `
       <${pascalName}FormModal
-        visible={isModalOpen}
+        open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         initialValues={editingItem}
@@ -467,7 +467,7 @@ ${columnDefs},
       minWidth: 100,
       maxWidth: 120,
       cellRenderer: (params: { data: ${pascalName}Data }) => (
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           {onEdit && (
             <GraviButton
               type='text'
@@ -499,10 +499,7 @@ function generateFormModal(pascalName: string, fields: ScaffoldFeatureArgs['fiel
       
       if (f.name.toLowerCase() === 'status') {
         return `        <Form.Item name='${f.name}' label='${label}'${f.required ? " rules={[{ required: true, message: '${label} is required' }]}" : ''}>
-          <Select placeholder='Select ${label.toLowerCase()}'>
-            <Select.Option value='Active'>Active</Select.Option>
-            <Select.Option value='Inactive'>Inactive</Select.Option>
-          </Select>
+          <Select placeholder='Select ${label.toLowerCase()}' options={[{ value: 'Active', label: 'Active' }, { value: 'Inactive', label: 'Inactive' }]} />
         </Form.Item>`
       }
       
@@ -535,7 +532,7 @@ import { GraviButton, Horizontal } from '@gravitate-js/excalibrr'
 import { ${pascalName}Data } from '../api/types.schema'
 
 interface ${pascalName}FormModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onSubmit: (values: any) => void
   initialValues?: ${pascalName}Data
@@ -543,7 +540,7 @@ interface ${pascalName}FormModalProps {
 }
 
 export function ${pascalName}FormModal({
-  visible,
+  open,
   onClose,
   onSubmit,
   initialValues,
@@ -553,14 +550,14 @@ export function ${pascalName}FormModal({
   const isEdit = !!initialValues?.Id
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       if (initialValues) {
         form.setFieldsValue(initialValues)
       } else {
         form.resetFields()
       }
     }
-  }, [visible, initialValues, form])
+  }, [open, initialValues, form])
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -574,17 +571,17 @@ export function ${pascalName}FormModal({
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title={isEdit ? 'Edit ${pascalName.replace(/([A-Z])/g, ' $1').trim()}' : 'Create ${pascalName.replace(/([A-Z])/g, ' $1').trim()}'}
       onCancel={handleCancel}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       width={500}
     >
       <Form form={form} layout='vertical'>
 ${formFields}
 
-        <Horizontal justifyContent='flex-end' style={{ gap: '12px', marginTop: '24px' }}>
+        <Horizontal justifyContent='flex-end' gap={12} style={{ marginTop: '24px' }}>
           <GraviButton buttonText='Cancel' onClick={handleCancel} />
           <GraviButton
             buttonText={isEdit ? 'Update' : 'Create'}

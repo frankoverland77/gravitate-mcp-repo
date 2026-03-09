@@ -96,13 +96,13 @@ export function CostTypePopover({ detail, onUpdate, children }: CostTypePopoverP
   const agreements = getMatchingSupplyAgreements(detail.terminal, detail.product)
 
   const content = (
-    <Vertical style={{ width: 320, gap: '16px' }} className={styles.popover}>
+    <Vertical gap={16} style={{ width: 320 }} className={styles.popover}>
       <Texto category="p2" weight="600">Cost Type</Texto>
 
       <Radio.Group value={selectedType} onChange={handleTypeChange}>
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           <Radio value="inventory">
-            <Vertical style={{ gap: '2px' }}>
+            <Vertical gap={2}>
               <Texto category="p2" weight="500">Inventory</Texto>
               <Texto category="p3" appearance="medium">
                 Auto-lookup replacement cost formula
@@ -111,7 +111,7 @@ export function CostTypePopover({ detail, onUpdate, children }: CostTypePopoverP
           </Radio>
 
           <Radio value="contract">
-            <Vertical style={{ gap: '2px' }}>
+            <Vertical gap={2}>
               <Texto category="p2" weight="500">Contract</Texto>
               <Texto category="p3" appearance="medium">
                 {agreements.length > 0
@@ -122,7 +122,7 @@ export function CostTypePopover({ detail, onUpdate, children }: CostTypePopoverP
           </Radio>
 
           <Radio value="estimated">
-            <Vertical style={{ gap: '2px' }}>
+            <Vertical gap={2}>
               <Texto category="p2" weight="500">Estimated</Texto>
               <Texto category="p3" appearance="medium">
                 Configure benchmark price estimate
@@ -159,9 +159,9 @@ function EstimatedSelector({ onApply }: { onApply: (publisher: string, priceType
   const [differential, setDifferential] = useState<number>(0)
 
   return (
-    <Vertical style={{ gap: '8px', paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
-      <Horizontal style={{ gap: '8px' }}>
-        <Vertical style={{ flex: 1, gap: '4px' }}>
+    <Vertical gap={8} style={{ paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
+      <Horizontal gap={8}>
+        <Vertical gap={4} style={{ flex: 1 }}>
           <Texto category="p3" appearance="medium">Publisher</Texto>
           <Select
             size="small"
@@ -171,7 +171,7 @@ function EstimatedSelector({ onApply }: { onApply: (publisher: string, priceType
             style={{ width: '100%' }}
           />
         </Vertical>
-        <Vertical style={{ flex: 1, gap: '4px' }}>
+        <Vertical gap={4} style={{ flex: 1 }}>
           <Texto category="p3" appearance="medium">Price Type</Texto>
           <Select
             size="small"
@@ -183,7 +183,7 @@ function EstimatedSelector({ onApply }: { onApply: (publisher: string, priceType
         </Vertical>
       </Horizontal>
 
-      <Vertical style={{ gap: '4px' }}>
+      <Vertical gap={4}>
         <Texto category="p3" appearance="medium">Differential ($/gal)</Texto>
         <InputNumber
           size="small"

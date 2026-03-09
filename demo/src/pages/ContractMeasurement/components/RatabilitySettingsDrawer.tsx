@@ -21,13 +21,13 @@ import {
 const STORAGE_KEY = 'contract-measurement-ratability-settings';
 
 interface RatabilitySettingsDrawerProps {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   onSettingsChange?: (settings: RatabilitySettings) => void;
 }
 
 export function RatabilitySettingsDrawer({
-  visible,
+  open,
   onClose,
   onSettingsChange,
 }: RatabilitySettingsDrawerProps) {
@@ -107,7 +107,7 @@ export function RatabilitySettingsDrawer({
   return (
     <Drawer
       title={
-        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+        <Horizontal gap={8} style={{ alignItems: 'center' }}>
           <SettingOutlined style={{ fontSize: '18px' }} />
           <span>Ratability Settings</span>
         </Horizontal>
@@ -115,10 +115,10 @@ export function RatabilitySettingsDrawer({
       placement="right"
       width={500}
       onClose={onClose}
-      visible={visible}
+      open={open}
       zIndex={2000}
       maskClosable={true}
-      bodyStyle={{ overflowY: 'auto', height: 'calc(100vh - 110px)' }}
+      styles={{ body: { overflowY: 'auto', height: 'calc(100vh - 110px)' } }}
       footer={
         <Horizontal style={{ justifyContent: 'space-between', padding: '12px 0' }}>
           <GraviButton
@@ -135,7 +135,7 @@ export function RatabilitySettingsDrawer({
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Header Description */}
         <div>
           <Texto category="p2" appearance="medium" style={{ marginBottom: '12px', display: 'block' }}>
@@ -161,7 +161,7 @@ export function RatabilitySettingsDrawer({
 
         {/* Measurement Period Section */}
         <div>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '8px' }}>
             <CalendarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
             <Texto category="p1" weight="600">
               Measurement Period
@@ -175,7 +175,7 @@ export function RatabilitySettingsDrawer({
             How frequently should ratability be analyzed?
           </Texto>
 
-          <Vertical style={{ gap: '16px' }}>
+          <Vertical gap={16}>
             <div>
               <Texto
                 category="p2"
@@ -232,7 +232,7 @@ export function RatabilitySettingsDrawer({
 
         {/* Variance Threshold Section */}
         <div>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '8px' }}>
             <PercentageOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
             <Texto category="p1" weight="600">
               Variance Threshold
@@ -251,7 +251,7 @@ export function RatabilitySettingsDrawer({
             onChange={(e) => updateSetting('varianceThreshold', e.target.value as VarianceThreshold)}
             style={{ width: '100%' }}
           >
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               {VARIANCE_OPTIONS.map((option) => (
                 <div
                   key={option.value}
@@ -316,7 +316,7 @@ export function RatabilitySettingsDrawer({
 
         {/* Calculation Method Section */}
         <div>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '8px' }}>
             <CalculatorOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
             <Texto category="p1" weight="600">
               Calculation Method
@@ -335,7 +335,7 @@ export function RatabilitySettingsDrawer({
             onChange={(e) => updateSetting('calculationMethod', e.target.value as CalculationMethod)}
             style={{ width: '100%' }}
           >
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               {CALCULATION_OPTIONS.map((option) => (
                 <div
                   key={option.value}
@@ -406,7 +406,7 @@ export function RatabilitySettingsDrawer({
 
         {/* Advanced Options Section */}
         <div>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '16px' }}>
             <SettingOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
             <Texto category="p1" weight="600">
               Advanced Options

@@ -75,18 +75,6 @@
 .gap-8 {
   gap: 8px;
 }
-@media only screen and (max-width: 1440px) {
-  body {
-    font-size: 10px !important;
-  }
-}
-
-@media only screen and (max-width: 1960px) {
-  body {
-    font-size: 11px !important;
-  }
-}
-
 /* Scenario Drawer Header Input Styling */
 .scenario-name-input::placeholder {
   color: rgba(255, 255, 255, 0.5) !important;

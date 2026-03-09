@@ -117,7 +117,7 @@ export function CustomerList() {
   const ActionsCellRenderer = (params: ICellRendererParams<Customer>) => {
     if (!params.data) return null;
     return (
-      <Horizontal alignItems="center" className="gap-8">
+      <Horizontal alignItems="center" gap={8}>
         <GraviButton icon={<EditOutlined />} onClick={() => handleEdit(params.data!)} />
         <GraviButton icon={<DeleteOutlined />} danger onClick={() => handleDelete(params.data!)} />
       </Horizontal>
@@ -158,17 +158,17 @@ export function CustomerList() {
 
       <Modal
         title={editingRecord ? 'Edit Customer' : 'Add Customer'}
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={handleModalClose}
         footer={
-          <Horizontal justifyContent="flex-end" className="gap-12">
+          <Horizontal justifyContent="flex-end" gap={12}>
             <GraviButton buttonText="Cancel" onClick={handleModalClose} />
             <GraviButton buttonText="Save" success onClick={handleSave} />
           </Horizontal>
         }
       >
         <Form form={form} layout="vertical">
-          <Vertical className="gap-16">
+          <Vertical gap={16}>
             <Form.Item
               name="name"
               label={

@@ -373,7 +373,7 @@ export function BenchmarksTab() {
 
       {/* Scenario Drawer */}
       <ScenarioDrawer
-        visible={drawerVisible}
+        open={drawerVisible}
         onClose={handleCloseDrawer}
         scenario={editingScenario}
         onSave={handleSaveScenario}

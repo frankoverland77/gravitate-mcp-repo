@@ -166,7 +166,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
       title="Add Rows Manually"
       placement="right"
       width={520}
-      visible={visible}
+      open={visible}
       onClose={handleClose}
       footer={
         <Horizontal justifyContent="space-between" alignItems="center">
@@ -175,7 +175,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
               ? `${validRows.length} detail row${validRows.length !== 1 ? 's' : ''}`
               : 'Add at least one row'}
           </Texto>
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText="Cancel" onClick={handleClose} />
             <GraviButton
               buttonText="Create RFP Response"
@@ -187,14 +187,14 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Metadata */}
-        <Vertical style={{ gap: '16px' }}>
-          <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+        <Vertical gap={16}>
+          <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
             RFP Information
           </Texto>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">RFP Name</Texto>
             <Input
               placeholder="e.g., Gulf Coast Gasoline Supply 2026"
@@ -203,7 +203,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
             />
           </Vertical>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Buyer</Texto>
             <Select
               placeholder="Select buyer..."
@@ -218,7 +218,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
             />
           </Vertical>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Response Deadline</Texto>
             <DatePicker
               style={{ width: '100%' }}
@@ -228,9 +228,9 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
         </Vertical>
 
         {/* Rows */}
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           <Horizontal justifyContent="space-between" alignItems="center">
-            <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+            <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
               Detail Rows
             </Texto>
             <GraviButton
@@ -241,7 +241,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
           </Horizontal>
 
           {duplicates.size > 0 && (
-            <Horizontal alignItems="center" style={{ gap: '6px', padding: '6px 10px', backgroundColor: '#fff7e6', borderRadius: '6px', border: '1px solid #ffd591' }}>
+            <Horizontal alignItems="center" gap={6} style={{ padding: '6px 10px', backgroundColor: '#fff7e6', borderRadius: '6px', border: '1px solid #ffd591' }}>
               <WarningFilled style={{ color: '#fa8c16', fontSize: '13px' }} />
               <Texto category="p3" style={{ color: '#d46b08' }}>
                 Duplicate rows detected — duplicates will be merged on creation
@@ -249,7 +249,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
             </Horizontal>
           )}
 
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             {rows.map((row, idx) => {
               const isDuplicate = row.product && row.terminal && duplicates.has(`${row.product}|${row.terminal}`)
               return (

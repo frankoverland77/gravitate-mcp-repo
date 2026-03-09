@@ -106,7 +106,7 @@ export function FullEntryFlow({
             <Texto category='h4' weight='600' className='mb-4'>
               Contract Header
             </Texto>
-            <Vertical style={{ gap: '2rem' }}>
+            <Vertical gap="2rem">
               <CounterpartySection header={header} onChange={handleHeaderChange} disabled={isExpired} lockExternalParty={isActive} />
               <TradeInfoSection header={header} onChange={handleHeaderChange} disabled={isExpired} />
               <AdditionalInfoSection header={header} onChange={handleHeaderChange} disabled={isExpired} />
@@ -144,7 +144,7 @@ export function FullEntryFlow({
           </Vertical>
 
           <FormulaEditorDrawer
-            visible={formulaDrawerOpen}
+            open={formulaDrawerOpen}
             detail={activeDetail}
             onClose={() => {
               setFormulaDrawerOpen(false)

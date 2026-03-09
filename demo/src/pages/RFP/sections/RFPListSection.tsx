@@ -142,7 +142,7 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
   }, [])
 
   return (
-    <Vertical style={{ gap: '24px' }}>
+    <Vertical gap={24}>
       {/* Header */}
       <Horizontal justifyContent="space-between" alignItems="center">
         <Texto category="h3" weight="600">
@@ -157,7 +157,7 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
       </Horizontal>
 
       {/* Stats Cards */}
-      <Horizontal style={{ gap: '16px' }}>
+      <Horizontal gap={16}>
         <StatCard label="Active RFPs" value={RFP_LIST_STATS.activeRFPs} highlight />
         <StatCard label="In Round 2" value={RFP_LIST_STATS.inRound2} />
         <StatCard label="Awarded This Year" value={RFP_LIST_STATS.awardedThisYear} />

@@ -81,9 +81,9 @@ Field types: text, email, number, select, date, dateRange, switch, checkbox
 | Mistake | Correct |
 |---------|---------|
 | `<Vertical style={{ flex: 1 }}>` | `<Vertical flex="1">` |
-| `<Horizontal gap={12}>` | `<Horizontal className="gap-12">` |
-| `<Modal open={isOpen}>` | `<Modal visible={isOpen}>` |
-| `<Drawer open={isOpen}>` | `<Drawer visible={isOpen}>` |
+| `<Horizontal style={{ gap: '12px' }}>` | `<Horizontal gap={12}>` |
+| `<Modal visible={isOpen}>` | `<Modal open={isOpen}>` |
+| `<Drawer visible={isOpen}>` | `<Drawer open={isOpen}>` |
 | `<GraviButton theme="success">` | `<GraviButton success>` |
 | `<Texto appearance="secondary">` (for gray) | `<Texto appearance="medium">` |
 

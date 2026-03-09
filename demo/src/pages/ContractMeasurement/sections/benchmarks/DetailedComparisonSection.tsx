@@ -184,33 +184,42 @@ export function DetailedComparisonSection() {
   // Benchmark header with REFERENCE badge and menu
   const renderBenchmarkHeader = (benchmark: Benchmark) => {
     const menuContent = (
-      <Menu style={{ border: 'none', boxShadow: 'none' }}>
-        {!benchmark.isReference && (
-          <Menu.Item key="reference" onClick={() => handleSetReference(benchmark.id)}>
-            <StarOutlined style={{ marginRight: '8px' }} />
-            Set as Reference
-          </Menu.Item>
-        )}
-        <Menu.Item key="details">
-          <Popover
-            content={renderDetailsContent(benchmark)}
-            trigger="click"
-            placement="right"
-            visible={detailsPopoverOpen === benchmark.id}
-            onVisibleChange={(visible: boolean) => setDetailsPopoverOpen(visible ? benchmark.id : null)}
-          >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <InfoCircleOutlined style={{ marginRight: '8px' }} />
-              More Details
-            </div>
-          </Popover>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="remove" danger onClick={() => handleRemove(benchmark.id)}>
-          <DeleteOutlined style={{ marginRight: '8px' }} />
-          Remove Benchmark
-        </Menu.Item>
-      </Menu>
+      <Menu
+        style={{ border: 'none', boxShadow: 'none' }}
+        items={[
+          ...(!benchmark.isReference ? [{
+            key: 'reference',
+            icon: <StarOutlined />,
+            label: 'Set as Reference',
+            onClick: () => handleSetReference(benchmark.id),
+          }] : []),
+          {
+            key: 'details',
+            label: (
+              <Popover
+                content={renderDetailsContent(benchmark)}
+                trigger="click"
+                placement="right"
+                open={detailsPopoverOpen === benchmark.id}
+                onOpenChange={(open: boolean) => setDetailsPopoverOpen(open ? benchmark.id : null)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <InfoCircleOutlined style={{ marginRight: '8px' }} />
+                  More Details
+                </div>
+              </Popover>
+            ),
+          },
+          { type: 'divider' as const },
+          {
+            key: 'remove',
+            icon: <DeleteOutlined />,
+            label: 'Remove Benchmark',
+            danger: true,
+            onClick: () => handleRemove(benchmark.id),
+          },
+        ]}
+      />
     );
 
     return (
@@ -373,7 +382,7 @@ export function DetailedComparisonSection() {
           <Texto category="h4" weight="600">Detailed Comparison</Texto>
           <Texto category="p2" appearance="medium">Compare contract pricing against multiple industry benchmarks</Texto>
         </div>
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           {nonReferenceCount > 0 && (
             <Popover
               content={
@@ -384,7 +393,7 @@ export function DetailedComparisonSection() {
                   <Texto category="p2" appearance="medium" style={{ marginBottom: '16px', display: 'block' }}>
                     This will remove {nonReferenceCount} benchmark{nonReferenceCount !== 1 ? 's' : ''} from the comparison table. The reference benchmark will be kept.
                   </Texto>
-                  <Horizontal style={{ justifyContent: 'flex-end', gap: '8px' }}>
+                  <Horizontal gap={8} style={{ justifyContent: 'flex-end' }}>
                     <GraviButton
                       buttonText="Cancel"
                       appearance="outlined"
@@ -402,8 +411,8 @@ export function DetailedComparisonSection() {
               }
               trigger="click"
               placement="bottomRight"
-              visible={clearConfirmOpen}
-              onVisibleChange={(visible: boolean) => setClearConfirmOpen(visible)}
+              open={clearConfirmOpen}
+              onOpenChange={(visible: boolean) => setClearConfirmOpen(visible)}
             >
               <GraviButton
                 icon={<ClearOutlined />}
@@ -513,7 +522,7 @@ export function DetailedComparisonSection() {
 
       {/* Add Benchmark Drawer */}
       <AddBenchmarkDrawer
-        visible={isAddDrawerOpen}
+        open={isAddDrawerOpen}
         onClose={() => setIsAddDrawerOpen(false)}
         onAddBenchmark={handleAddBenchmark}
         currentCount={benchmarks.length}

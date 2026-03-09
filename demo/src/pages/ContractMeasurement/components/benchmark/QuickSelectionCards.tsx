@@ -53,7 +53,7 @@ export function ReferenceLegendCards({ selectedType, onTypeSelect }: ReferenceLe
       >
         Common Benchmarks
       </Texto>
-      <Vertical style={{ gap: '10px' }}>
+      <Vertical gap={10}>
         {BENCHMARK_OPTIONS.map((option) => (
           <div
             key={option.type}
@@ -66,9 +66,9 @@ export function ReferenceLegendCards({ selectedType, onTypeSelect }: ReferenceLe
               .join(' ')}
             onClick={() => onTypeSelect?.(option.type, option.title)}
           >
-            <Horizontal alignItems='flex-start' style={{ gap: '12px' }}>
+            <Horizontal gap={12} alignItems='flex-start'>
               {option.icon}
-              <Vertical style={{ gap: '4px', flex: 1 }}>
+              <Vertical gap={4} style={{ flex: 1 }}>
                 <Texto weight='600'>{option.title}</Texto>
                 <Texto category='p2' appearance='medium' className={styles.optionDescription}>
                   {option.description}

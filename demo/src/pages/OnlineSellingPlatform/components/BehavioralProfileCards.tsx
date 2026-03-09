@@ -35,8 +35,8 @@ export function BehavioralProfileCards({ metrics }: BehavioralProfileCardsProps)
                 padding: '24px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}>
-                <Vertical style={{ gap: '12px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                <Vertical gap={12}>
+                    <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         <AimOutlined style={{ fontSize: '20px', color: '#722ed1' }} />
                         <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Strategy
@@ -62,8 +62,8 @@ export function BehavioralProfileCards({ metrics }: BehavioralProfileCardsProps)
                 padding: '24px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}>
-                <Vertical style={{ gap: '12px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                <Vertical gap={12}>
+                    <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         <ArrowUpOutlined style={{ fontSize: '20px', color: '#52c41a' }} />
                         <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Up Market Capture
@@ -86,8 +86,8 @@ export function BehavioralProfileCards({ metrics }: BehavioralProfileCardsProps)
                 padding: '24px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}>
-                <Vertical style={{ gap: '12px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                <Vertical gap={12}>
+                    <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         <ArrowDownOutlined style={{ fontSize: '20px', color: '#ff4d4f' }} />
                         <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Down Market Capture
@@ -110,8 +110,8 @@ export function BehavioralProfileCards({ metrics }: BehavioralProfileCardsProps)
                 padding: '24px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}>
-                <Vertical style={{ gap: '12px' }}>
-                    <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                <Vertical gap={12}>
+                    <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         <ClockCircleOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
                         <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Intraday Changes

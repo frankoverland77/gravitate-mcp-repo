@@ -109,7 +109,7 @@ export function FormulaEditorPanel({
         >
           Generated Formula
         </Texto>
-        <Horizontal alignItems='center' style={{ gap: '12px' }}>
+        <Horizontal gap={12} alignItems='center'>
           <div className={styles.formulaDisplay}>
             {isAdvanced ? (
               <Input.TextArea
@@ -151,7 +151,7 @@ export function FormulaEditorPanel({
 
         {/* Operator toolbar - only in advanced mode */}
         {isAdvanced && (
-          <Horizontal alignItems='center' style={{ gap: '16px' }}>
+          <Horizontal gap={16} alignItems='center'>
             <OperatorToolbar onInsert={handleOperatorInsert} />
           </Horizontal>
         )}
@@ -192,7 +192,7 @@ export function FormulaEditorPanel({
                     <Texto category='p1' weight='600' style={{ fontSize: '13px' }}>
                       Formula {groupNum}
                     </Texto>
-                    <Horizontal style={{ gap: '8px' }}>
+                    <Horizontal gap={8}>
                       <GraviButton
                         buttonText='Add Variable'
                         icon={<PlusOutlined />}
@@ -216,7 +216,7 @@ export function FormulaEditorPanel({
               <Texto category='p1' weight='600' style={{ fontSize: '13px' }}>
                 Formula Variables
               </Texto>
-              <Horizontal style={{ gap: '8px' }}>
+              <Horizontal gap={8}>
                 <GraviButton buttonText='Add Variable' icon={<PlusOutlined />} onClick={() => onAddVariable()} />
                 <GraviButton buttonText='Use Template' icon={<FileTextOutlined />} onClick={onUseTemplate} />
               </Horizontal>

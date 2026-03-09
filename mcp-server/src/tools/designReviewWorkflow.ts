@@ -184,15 +184,15 @@ function reviewFile(content: string, filePath: string, focus: string): ReviewFin
       }
     })
 
-    // Check for Modal open prop
+    // Check for Modal visible prop (should use open in antd v5)
     lines.forEach((line, idx) => {
-      if (/<Modal[^>]*\sopen=/i.test(line)) {
+      if (/<Modal[^>]*\svisible=/i.test(line)) {
         findings.push({
           category: 'components',
           severity: 'error',
-          message: 'Use "visible" prop instead of "open" for Modal',
+          message: 'Use "open" prop instead of "visible" for Modal (antd v5)',
           line: idx + 1,
-          suggestion: 'Change open={...} to visible={...}',
+          suggestion: 'Change visible={...} to open={...}',
           autoFixable: true,
         })
       }

@@ -12,11 +12,11 @@ const COLORS = {
 }
 
 interface QuoteBookViewSettingsDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
 }
 
-export function QuoteBookViewSettingsDrawer({ visible, onClose }: QuoteBookViewSettingsDrawerProps) {
+export function QuoteBookViewSettingsDrawer({ open, onClose }: QuoteBookViewSettingsDrawerProps) {
   const { featureMode, setFeatureMode } = useFeatureMode()
 
   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({
@@ -34,11 +34,11 @@ export function QuoteBookViewSettingsDrawer({ visible, onClose }: QuoteBookViewS
       placement="right"
       width={400}
       onClose={onClose}
-      visible={visible}
+      open={open}
       zIndex={2000}
       maskClosable={true}
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         <div>
           <Texto category="p1" weight="600" style={{ marginBottom: '12px', display: 'block' }}>
             Feature Prioritization
@@ -52,7 +52,7 @@ export function QuoteBookViewSettingsDrawer({ visible, onClose }: QuoteBookViewS
           </Texto>
 
           <Radio.Group value={featureMode} onChange={(e) => setFeatureMode(e.target.value)} style={{ width: '100%' }}>
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               <div style={getOptionCardStyle(featureMode === 'mvp')} onClick={() => setFeatureMode('mvp')}>
                 <Radio value="mvp" style={{ marginBottom: '8px' }}>
                   <Texto style={{ fontSize: '14px', fontWeight: 600, color: COLORS.DARK_TEXT }}>MVP Mode</Texto>

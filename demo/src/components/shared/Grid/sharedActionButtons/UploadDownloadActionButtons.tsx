@@ -91,7 +91,7 @@ export function UploadDownloadActionButtons({
         icon={isLoading ? <LoadingOutlined /> : <DownloadOutlined />}
         buttonText='Download Template'
         onClick={handleExport}
-        appearance='outline'
+        appearance='outlined'
       />
 
       {canWrite && (
@@ -99,7 +99,7 @@ export function UploadDownloadActionButtons({
           icon={<CloudUploadOutlined />}
           buttonText='Upload File'
           onClick={() => handleClick(hiddenFileInput)}
-          appearance='outline'
+          appearance='outlined'
         />
       )}
       <input type='file' onChange={handleUpload} ref={hiddenFileInput} style={{ display: 'none' }} />

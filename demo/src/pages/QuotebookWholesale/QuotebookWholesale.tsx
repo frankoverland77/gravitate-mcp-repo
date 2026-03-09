@@ -8,7 +8,7 @@ export function QuotebookWholesale() {
   const columnDefs = useMemo(() => getQuotebookWholesaleColumnDefs(), [])
 
   return (
-    <Vertical style={{ height: '100%', gap: 0 }}>
+    <Vertical gap={0} style={{ height: '100%' }}>
       <GraviGrid
         storageKey="quotebook-wholesale-grid"
         rowData={rowData}

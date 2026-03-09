@@ -48,7 +48,7 @@ function Field({ label, value }: FieldProps) {
 
 export function ContractDetailsSection() {
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Section Header */}
       <div>
         <Texto category="h4" weight="600">Contract Details</Texto>
@@ -59,7 +59,7 @@ export function ContractDetailsSection() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
         {/* Card A: Contract Information */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <FileTextOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">Contract Information</Texto>
           </Horizontal>
@@ -79,12 +79,12 @@ export function ContractDetailsSection() {
 
         {/* Card B: Performance Summary */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <DashboardOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">Performance Summary</Texto>
           </Horizontal>
 
-          <Vertical style={{ gap: '20px' }}>
+          <Vertical gap={20}>
             {/* Progress Bar */}
             <div>
               <Horizontal style={{ justifyContent: 'space-between', marginBottom: '8px' }}>

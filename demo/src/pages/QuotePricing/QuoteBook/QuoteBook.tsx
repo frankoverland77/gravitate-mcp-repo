@@ -299,7 +299,7 @@ export function QuoteBook() {
       <QuoteBookGroupTabs activeTab={activeGroupTab} onTabChange={setActiveGroupTab} />
 
       {/* Analytics panel (quote-level + exceptions) */}
-      <QuoteBookAnalyticsPanel visible={showAnalytics} selectedRow={selectedRow} analyticsData={analyticsData} onSelectRow={handleSelectRowById} />
+      <QuoteBookAnalyticsPanel open={showAnalytics} selectedRow={selectedRow} analyticsData={analyticsData} onSelectRow={handleSelectRowById} />
 
       {/* Main content area — fills remaining space */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -331,7 +331,7 @@ export function QuoteBook() {
                 title: 'Quote Book — EOD',
                 hideActiveFilters: true,
                 actionButtons: (
-                  <Horizontal alignItems="center" style={{ gap: '8px' }}>
+                  <Horizontal alignItems="center" gap={8}>
                     {isFutureMode && <QuoteBookProfileChip profileName={mostCommonProfileName} />}
                     <QuoteBookActionButtons
                       publicationMode={publicationMode}
@@ -377,14 +377,14 @@ export function QuoteBook() {
         hardExceptionCount={hardExceptionCount}
       />
       <QuoteBookHistoryDrawer
-        visible={isHistoryDrawerOpen}
+        open={isHistoryDrawerOpen}
         onClose={() => setIsHistoryDrawerOpen(false)}
       />
 
       {/* Task 7: Publish blocking modal */}
       <Modal
         title={<span style={{ color: '#dc2626' }}>Cannot Publish — Hard Exceptions</span>}
-        visible={publishModalVisible}
+        open={publishModalVisible}
         onCancel={() => setPublishModalVisible(false)}
         footer={[
           <span key="cancel" onClick={() => setPublishModalVisible(false)} style={{ cursor: 'pointer', marginRight: 12, color: 'var(--gray-600)' }}>Cancel</span>,
@@ -443,7 +443,7 @@ export function QuoteBook() {
       />
 
       <QuoteBookViewSettingsDrawer
-        visible={settingsDrawerVisible}
+        open={settingsDrawerVisible}
         onClose={() => setSettingsDrawerVisible(false)}
       />
     </Vertical>

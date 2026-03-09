@@ -47,7 +47,7 @@ export function FormulaTemplateDetails() {
     // If template not found, show error
     if (!initialTemplate) {
         return (
-            <Vertical className="p-6" style={{ height: '100%', gap: '24px' }}>
+            <Vertical className="p-6" gap={24} style={{ height: '100%' }}>
                 <div style={{
                     padding: '48px',
                     textAlign: 'center',
@@ -304,7 +304,7 @@ export function FormulaTemplateDetails() {
     }), [components]);
 
     return (
-        <Vertical className="p-6" style={{ height: '100%', gap: '20px', overflow: 'auto' }}>
+        <Vertical className="p-6" gap={20} style={{ height: '100%', overflow: 'auto' }}>
             {/* Header with Back and Save buttons */}
             <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <GraviButton
@@ -361,7 +361,7 @@ export function FormulaTemplateDetails() {
                 }}>
                     Editable Information
                 </Texto>
-                <Horizontal style={{ gap: '16px' }}>
+                <Horizontal gap={16}>
                     <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '8px', fontSize: '12px', color: '#8c8c8c' }}>
                             Products (where used)

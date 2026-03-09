@@ -23,7 +23,7 @@ import type { ContractDetail } from '../../types/contract.types'
 import styles from './ImportFileModal.module.css'
 
 interface ImportFileModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onImport: (details: ContractDetail[]) => void
   headerDates: { startDate: Date; endDate: Date }
@@ -97,7 +97,7 @@ function simulateValidation(headerDates: { startDate: Date; endDate: Date }): Pr
 }
 
 export function ImportFileModal({
-  visible,
+  open,
   onClose,
   onImport,
   headerDates,
@@ -183,11 +183,11 @@ export function ImportFileModal({
 
       case 'review':
         return (
-          <Vertical style={{ gap: '16px' }}>
+          <Vertical gap={16}>
             {/* Summary */}
-            <Horizontal style={{ gap: '24px' }}>
+            <Horizontal gap={24}>
               <Vertical className={styles.summaryCard}>
-                <Horizontal alignItems='center' style={{ gap: '8px' }}>
+                <Horizontal gap={8} alignItems='center'>
                   <CheckCircleOutlined style={{ color: 'var(--theme-color-success)', fontSize: 20 }} />
                   <Texto category='h4' weight='600'>
                     {validationResult?.validCount}
@@ -199,7 +199,7 @@ export function ImportFileModal({
               </Vertical>
 
               <Vertical className={styles.summaryCard}>
-                <Horizontal alignItems='center' style={{ gap: '8px' }}>
+                <Horizontal gap={8} alignItems='center'>
                   <ExclamationCircleOutlined style={{ color: 'var(--theme-color-error)', fontSize: 20 }} />
                   <Texto category='h4' weight='600'>
                     {validationResult?.errorCount}
@@ -270,7 +270,7 @@ export function ImportFileModal({
     return (
       <Horizontal justifyContent='space-between' alignItems='center'>
         <GraviButton buttonText='Back' onClick={() => setStage('upload')} />
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton buttonText='Cancel' onClick={handleClose} />
           <GraviButton
             buttonText={`Import ${validationResult?.validCount} Rows`}
@@ -286,7 +286,7 @@ export function ImportFileModal({
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       onCancel={handleClose}
       title='Import from File'
       footer={renderFooter()}

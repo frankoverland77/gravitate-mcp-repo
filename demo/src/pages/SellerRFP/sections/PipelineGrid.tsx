@@ -260,7 +260,7 @@ export function PipelineGrid({ rfps, onRFPClick, onNewRFP }: PipelineGridProps) 
   )
 
   return (
-    <Vertical style={{ gap: '24px' }}>
+    <Vertical gap={24}>
       {/* Header */}
       <Horizontal justifyContent="space-between" alignItems="center">
         <Texto category="h3" weight="600">
@@ -275,7 +275,7 @@ export function PipelineGrid({ rfps, onRFPClick, onNewRFP }: PipelineGridProps) 
       </Horizontal>
 
       {/* Stat Cards */}
-      <Horizontal style={{ gap: '16px' }}>
+      <Horizontal gap={16}>
         <StatCard label="Active RFPs" value={getActiveCount(nonDeclinedRfps)} highlight />
         <StatCard label="Due This Week" value={getDueThisWeekCount(nonDeclinedRfps)} />
         <StatCard label="Awaiting Adjudication" value={getAwaitingAdjudicationCount(nonDeclinedRfps)} />
@@ -283,7 +283,7 @@ export function PipelineGrid({ rfps, onRFPClick, onNewRFP }: PipelineGridProps) 
       </Horizontal>
 
       {/* Pipeline Grid */}
-      <Horizontal justifyContent="flex-end" alignItems="center" style={{ gap: '8px' }}>
+      <Horizontal gap={8} justifyContent="flex-end" alignItems="center">
         <Texto category="p3" appearance="medium">Show declined</Texto>
         <Switch size="small" checked={showDeclined} onChange={setShowDeclined} />
       </Horizontal>

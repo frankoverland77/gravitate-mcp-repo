@@ -64,21 +64,10 @@ export function WelcomePage() {
   ];
 
   return (
-    <Tabs style={{ minWidth: "100%" }}>
-      {tabs?.map((tab) => {
-        return (
-          <Tabs.TabPane
-            tab={
-              <span>
-                {tab.icon} {tab.label}
-              </span>
-            }
-            key={tab.key}
-          >
-            <Horizontal>{tab.component}</Horizontal>
-          </Tabs.TabPane>
-        );
-      })}
-    </Tabs>
+    <Tabs style={{ minWidth: "100%" }} items={tabs?.map((tab) => ({
+      key: tab.key,
+      label: <span>{tab.icon} {tab.label}</span>,
+      children: <Horizontal>{tab.component}</Horizontal>,
+    }))} />
   );
 }

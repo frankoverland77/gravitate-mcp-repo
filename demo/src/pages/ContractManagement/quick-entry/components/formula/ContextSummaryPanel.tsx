@@ -55,7 +55,7 @@ export function ContextSummaryPanel({ detail }: ContextSummaryPanelProps) {
         Detail Summary
       </Texto>
 
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         <FieldDisplay label='Product' value={detail.product} />
         <FieldDisplay label='Location' value={detail.location} />
         {detail.destination && (

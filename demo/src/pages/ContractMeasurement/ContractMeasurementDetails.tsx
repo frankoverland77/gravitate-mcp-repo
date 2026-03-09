@@ -35,7 +35,7 @@ export function ContractMeasurementDetails() {
   return (
     <div className={styles.detailsPage}>
       {/* Page Header with Back Button - flexShrink: 0 prevents compression */}
-      <Horizontal alignItems="center" className={styles.pageHeader} style={{ gap: '12px', background: 'transparent' }}>
+      <Horizontal alignItems="center" className={styles.pageHeader} gap={12} style={{ background: 'transparent' }}>
         <GraviButton
           type="text"
           icon={<LeftOutlined />}
@@ -79,7 +79,7 @@ export function ContractMeasurementDetails() {
       />
 
       {/* View Settings Drawer */}
-      <CMViewSettingsDrawer visible={settingsDrawerVisible} onClose={() => setSettingsDrawerVisible(false)} />
+      <CMViewSettingsDrawer open={settingsDrawerVisible} onClose={() => setSettingsDrawerVisible(false)} />
     </div>
   );
 }

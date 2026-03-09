@@ -46,8 +46,6 @@ import {
 } from './sections';
 import { HISTORICAL_BID_DATA } from './rfp.data';
 
-const { TabPane } = Tabs;
-
 // Supplier disposition type for round management
 type SupplierDisposition = 'advance' | 'eliminate' | 'pending';
 
@@ -887,7 +885,7 @@ export function RFPTab() {
       <div className={styles.roundPage}>
         {/* Header - won't shrink */}
         <Horizontal alignItems="center" justifyContent="space-between" className={styles.pageHeader}>
-          <Horizontal alignItems="center" style={{ gap: '12px' }}>
+          <Horizontal gap={12} alignItems="center">
             <GraviButton
               type="text"
               icon={<LeftOutlined />}
@@ -900,18 +898,19 @@ export function RFPTab() {
               </Texto>
               <Dropdown
                 overlay={
-                  <Menu onClick={({ key }) => handleViewHistoricalRound(Number(key))}>
-                    {Array.from({ length: state.currentRound }, (_, i) => (
-                      <Menu.Item key={i + 1} disabled={i + 1 === displayRound}>
-                        Round {i + 1}
-                      </Menu.Item>
-                    ))}
-                  </Menu>
+                  <Menu
+                    onClick={({ key }) => handleViewHistoricalRound(Number(key))}
+                    items={Array.from({ length: state.currentRound }, (_, i) => ({
+                      key: i + 1,
+                      label: `Round ${i + 1}`,
+                      disabled: i + 1 === displayRound,
+                    }))}
+                  />
                 }
                 trigger={['click']}
               >
                 <span style={{ cursor: 'pointer' }}>
-                  <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                  <Horizontal gap={4} alignItems="center">
                     <Texto category="p2" appearance="medium">
                       Round {displayRound} - {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
                       {state.isViewingHistory && ' (Read-Only)'}
@@ -947,7 +946,7 @@ export function RFPTab() {
           <Alert
             className={styles.contentSection}
             message={
-              <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems="center">
                 <GraviButton
                   type="link"
                   buttonText={`Go to Round ${state.currentRound}`}
@@ -984,10 +983,11 @@ export function RFPTab() {
             onChange={(key) =>
               setState((prev) => ({ ...prev, viewTab: key as 'comparison' | 'historical' }))
             }
-          >
-            <TabPane tab="Comparison" key="comparison" />
-            <TabPane tab="Historical" key="historical" />
-          </Tabs>
+            items={[
+              { key: 'comparison', label: 'Comparison' },
+              { key: 'historical', label: 'Historical' },
+            ]}
+          />
         </div>
 
         {/* Conditionally render based on viewTab */}
@@ -1105,7 +1105,7 @@ export function RFPTab() {
       const winner = getWinnerSupplier();
       if (!state.selectedRFP || !winner) {
         return (
-          <Vertical style={{ gap: '24px', padding: '24px' }}>
+          <Vertical gap={24} style={{ padding: '24px' }}>
             <Texto>No RFP or winner selected.</Texto>
             <GraviButton buttonText="Back to List" onClick={handleBackToList} />
           </Vertical>
@@ -1132,7 +1132,7 @@ export function RFPTab() {
       const winner = getWinnerSupplier();
       if (!state.selectedRFP || !winner) {
         return (
-          <Vertical style={{ gap: '24px', padding: '24px' }}>
+          <Vertical gap={24} style={{ padding: '24px' }}>
             <Texto>No RFP or winner selected.</Texto>
             <GraviButton buttonText="Back to List" onClick={handleBackToList} />
           </Vertical>
@@ -1157,7 +1157,7 @@ export function RFPTab() {
     <div style={{ height: '100%' }}>
       {renderScreen()}
       <ThresholdsModal
-        visible={state.isThresholdsModalOpen}
+        open={state.isThresholdsModalOpen}
         thresholds={state.thresholds}
         parameters={state.parameters}
         importanceRanking={state.importanceRanking}
@@ -1165,13 +1165,13 @@ export function RFPTab() {
         onSave={handleSaveThresholds}
       />
       <EliminationModal
-        visible={state.isEliminationModalOpen}
+        open={state.isEliminationModalOpen}
         supplierNames={getSelectedSupplierNames()}
         onConfirm={handleConfirmElimination}
         onCancel={handleCloseEliminationModal}
       />
       <EditBidsDrawer
-        visible={state.isEditBidsDrawerOpen}
+        open={state.isEditBidsDrawerOpen}
         onClose={handleCloseEditBids}
         rfp={state.selectedRFP}
         round={state.currentRound}
@@ -1180,7 +1180,7 @@ export function RFPTab() {
         onSave={handleSaveEditedBids}
       />
       <BidLogDrawer
-        visible={state.isBidLogOpen}
+        open={state.isBidLogOpen}
         onClose={handleCloseBidLog}
         bidEdits={state.bidEdits}
         onRevert={handleRevert}
@@ -1189,27 +1189,27 @@ export function RFPTab() {
         title="Key Insights"
         placement="right"
         width={400}
-        visible={state.isInsightsPanelOpen}
+        open={state.isInsightsPanelOpen}
         onClose={handleCloseInsightsPanel}
         mask={false}
       >
-        <Vertical className="p-3" style={{ gap: '24px' }}>
+        <Vertical gap={24} className="p-3">
           {/* Top Recommendation Section */}
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} alignItems="center">
               <StarFilled style={{ color: '#faad14', fontSize: '16px' }} />
               <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Top Recommendation
               </Texto>
             </Horizontal>
-            <Vertical style={{ gap: '8px' }}>
+            <Vertical gap={8}>
               <Texto category="h4" weight="600">
                 {AI_RECOMMENDATIONS[0]?.supplierName}
               </Texto>
               <Texto category="p1" appearance="medium">
                 {AI_RECOMMENDATIONS[0]?.price}
               </Texto>
-              <Horizontal style={{ gap: '6px', flexWrap: 'wrap' }}>
+              <Horizontal gap={6} style={{ flexWrap: 'wrap' }}>
                 {AI_RECOMMENDATIONS[0]?.tags.map((tag) => (
                   <span
                     key={tag}
@@ -1233,16 +1233,16 @@ export function RFPTab() {
           <div style={{ borderTop: '1px solid #e8e8e8' }} />
 
           {/* Supplier Rankings Section */}
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} alignItems="center">
               <TrophyOutlined style={{ color: '#722ed1', fontSize: '16px' }} />
               <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Supplier Rankings
               </Texto>
             </Horizontal>
-            <Vertical style={{ gap: '10px' }}>
+            <Vertical gap={10}>
               {AI_RECOMMENDATIONS.map((rec) => (
-                <Horizontal key={rec.supplierId} alignItems="center" style={{ gap: '12px' }}>
+                <Horizontal gap={12} key={rec.supplierId} alignItems="center">
                   <div
                     style={{
                       display: 'flex',

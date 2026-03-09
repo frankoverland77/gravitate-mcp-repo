@@ -14,18 +14,18 @@ Modals are dialog overlays for displaying content that requires user attention o
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `visible` | `boolean` | Controls modal visibility |
+| `open` | `boolean` | Controls modal visibility |
 | `onCancel` | `() => void` | Handler for closing the modal |
 | `title` | `ReactNode` | Modal title content |
 | `footer` | `ReactNode` | Custom footer content |
 | `width` | `number \| string` | Modal width |
-| `destroyOnClose` | `boolean` | Destroy content when modal closes |
+| `destroyOnHidden` | `boolean` | Destroy content when modal closes |
 
 ### Basic Usage
 
 ```tsx
 <Modal
-  visible={isVisible}
+  open={isVisible}
   onCancel={onCancel}
   title="Basic Modal"
   footer={
@@ -42,16 +42,16 @@ Modals are dialog overlays for displaying content that requires user attention o
 ### Confirmation Modal
 ```tsx
 <Modal
-  visible={isVisible}
+  open={isVisible}
   onCancel={onCancel}
   title={
     <Horizontal alignItems='center'>
       <ExclamationCircleOutlined className='mr-2' style={{ color: 'var(--theme-error)' }} />
-      <Texto category='h6'>Confirm Revaluation</Texto>
+      <Texto category='h5'>Confirm Revaluation</Texto>
     </Horizontal>
   }
   footer={
-    <Horizontal justifyContent='flex-end' style={{ gap: 10 }}>
+    <Horizontal justifyContent='flex-end' gap={10}>
       <GraviButton buttonText='Cancel' onClick={onCancel} />
       <GraviButton buttonText='Confirm Revaluation' theme1 onClick={() => onConfirm()} />
     </Horizontal>
@@ -68,15 +68,15 @@ Modals are dialog overlays for displaying content that requires user attention o
 
 ### Form Modal
 ```tsx
-const FormModal = ({ visible, onCancel, onSubmit }) => {
+const FormModal = ({ open, onCancel, onSubmit }) => {
   const [form] = Form.useForm()
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       onCancel={onCancel}
       title="Create New Item"
-      destroyOnClose
+      destroyOnHidden
       footer={
         <div>
           <Button onClick={onCancel}>Cancel</Button>
@@ -117,7 +117,7 @@ Popovers display rich content in a floating container, triggered by click or hov
 | `title` | `ReactNode` | Popover title |
 | `trigger` | `'hover' \| 'click' \| 'focus'` | Trigger method |
 | `placement` | `string` | Positioning (top, bottom, left, right, etc.) |
-| `visible` | `boolean` | Controlled visibility |
+| `open` | `boolean` | Controlled visibility |
 
 ### Basic Usage
 
@@ -139,22 +139,22 @@ Popovers display rich content in a floating container, triggered by click or hov
 
 ### Interactive Popover with Menu
 ```tsx
-const [popoverVisible, setPopoverVisible] = useState(false)
+const [popoverOpen, setPopoverOpen] = useState(false)
 
 const menu = (
-  <Menu>
-    <Menu.Item onClick={() => handleEdit()}>Edit</Menu.Item>
-    <Menu.Item onClick={() => handleDelete()}>Delete</Menu.Item>
-    <Menu.Item onClick={() => handleDuplicate()}>Duplicate</Menu.Item>
-  </Menu>
+  <Menu items={[
+    { key: 'edit', label: 'Edit', onClick: () => handleEdit() },
+    { key: 'delete', label: 'Delete', onClick: () => handleDelete() },
+    { key: 'duplicate', label: 'Duplicate', onClick: () => handleDuplicate() },
+  ]} />
 )
 
 <Popover
   content={menu}
   title="Actions"
   trigger="click"
-  visible={popoverVisible}
-  onVisibleChange={setPopoverVisible}
+  open={popoverOpen}
+  onOpenChange={setPopoverOpen}
   placement="bottomRight"
 >
   <Button icon={<MoreOutlined />} />
@@ -244,19 +244,19 @@ Popconfirm provides a confirmation dialog in a popover-style overlay.
 
 ### Controlled Confirmation
 ```tsx
-const [confirmVisible, setConfirmVisible] = useState(false)
+const [confirmOpen, setConfirmOpen] = useState(false)
 
 <Popconfirm
   title="Are you sure you want to clear this field?"
-  visible={confirmVisible}
+  open={confirmOpen}
   onConfirm={() => {
     setSelected([])
-    setConfirmVisible(false)
+    setConfirmOpen(false)
   }}
-  onCancel={() => setConfirmVisible(false)}
+  onCancel={() => setConfirmOpen(false)}
 >
   <CloseOutlined
-    onClick={() => setConfirmVisible(true)}
+    onClick={() => setConfirmOpen(true)}
   />
 </Popconfirm>
 ```
@@ -366,10 +366,10 @@ Tooltips provide contextual information on hover or focus.
 
 ### Modal with Confirmation
 ```tsx
-const DeleteModal = ({ visible, item, onCancel, onConfirm }) => {
+const DeleteModal = ({ open, item, onCancel, onConfirm }) => {
   return (
     <Modal
-      visible={visible}
+      open={open}
       onCancel={onCancel}
       title="Confirm Deletion"
       footer={
@@ -395,13 +395,13 @@ const DeleteModal = ({ visible, item, onCancel, onConfirm }) => {
 
 ### Nested Overlays
 ```tsx
-<Modal visible={modalVisible} onCancel={() => setModalVisible(false)}>
+<Modal open={modalOpen} onCancel={() => setModalOpen(false)}>
   <div>
     <Tooltip title="Additional information">
       <InfoCircleOutlined />
     </Tooltip>
     <Popover
-      content={<Menu>...</Menu>}
+      content={<Menu items={[...]} />}
       trigger="click"
     >
       <Button>Actions</Button>
@@ -417,7 +417,7 @@ const DeleteModal = ({ visible, item, onCancel, onConfirm }) => {
 - Always provide a clear way to close (onCancel)
 - Use appropriate sizing for content
 - Consider mobile responsiveness
-- Use `destroyOnClose` for forms to reset state
+- Use `destroyOnHidden` for forms to reset state
 
 ### Popover
 - Use for contextual information that doesn't require full attention

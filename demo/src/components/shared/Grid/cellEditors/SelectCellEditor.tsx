@@ -136,7 +136,7 @@ export const SearchableSelect: React.FC<SelectEditorParams> = forwardRef((props,
       clearIcon={
         <Popconfirm
           title='Are you sure you want to clear this field?'
-          visible={isPopConfirmVisible}
+          open={isPopConfirmVisible}
           onConfirm={() => {
             setSelected([])
             setIsPopConfirmVisible(false)
@@ -157,32 +157,42 @@ export const SearchableSelect: React.FC<SelectEditorParams> = forwardRef((props,
         </Popconfirm>
       }
       // filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-    >
-      {props?.enableSelectAllFromSearch && filteredOptions.length > 0 && (
-        <>
-          <Select.Option key='__select_all__' value='__select_all__'>
-            <div style={{ pointerEvents: 'none' }}>
-              <strong>Select All ({filteredOptions.length})</strong>
-            </div>
-          </Select.Option>
-
-          <Select.Option key='__deselect_all__' value='__deselect_all__'>
-            <div style={{ pointerEvents: 'none' }}>
-              <strong>Deselect All ({filteredOptions.length})</strong>
-            </div>
-          </Select.Option>
-        </>
-      )}
-      {props?.options?.filter(optionFilter).map((option) => (
-        <Select.Option key={option.value} value={option.value}>
-          <Horizontal alignItems='center' style={{ gap: '0.5rem' }}>
-            {props.showSelectedValue && props?.value === option.label && <CheckOutlined />}
-            {option.icon}
-            {option.label}
-            {props?.matchOptionId && props?.matchOptionId === option.value && <Texto>(Default)</Texto>}
-          </Horizontal>
-        </Select.Option>
-      ))}
-    </Select>
+      options={[
+        ...(props?.enableSelectAllFromSearch && filteredOptions.length > 0
+          ? [
+              {
+                key: '__select_all__',
+                value: '__select_all__',
+                label: (
+                  <div style={{ pointerEvents: 'none' as const }}>
+                    <strong>Select All ({filteredOptions.length})</strong>
+                  </div>
+                ),
+              },
+              {
+                key: '__deselect_all__',
+                value: '__deselect_all__',
+                label: (
+                  <div style={{ pointerEvents: 'none' as const }}>
+                    <strong>Deselect All ({filteredOptions.length})</strong>
+                  </div>
+                ),
+              },
+            ]
+          : []),
+        ...(props?.options?.filter(optionFilter).map((option) => ({
+          key: option.value,
+          value: option.value,
+          label: (
+            <Horizontal gap="0.5rem" alignItems='center'>
+              {props.showSelectedValue && props?.value === option.label && <CheckOutlined />}
+              {option.icon}
+              {option.label}
+              {props?.matchOptionId && props?.matchOptionId === option.value && <Texto>(Default)</Texto>}
+            </Horizontal>
+          ),
+        })) || []),
+      ]}
+    />
   )
 })

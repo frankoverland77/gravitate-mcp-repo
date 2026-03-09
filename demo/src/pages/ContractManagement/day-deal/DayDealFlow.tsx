@@ -251,21 +251,21 @@ export function DayDealFlow({
 
       {/* Bulk Create Drawer */}
       <BulkCreateDrawer
-        visible={bulkCreateDrawerOpen}
+        open={bulkCreateDrawerOpen}
         onClose={() => setBulkCreateDrawerOpen(false)}
         onCreate={handleBulkCreate}
       />
 
       {/* Import File Modal */}
       <ImportFileModal
-        visible={importFileModalOpen}
+        open={importFileModalOpen}
         onClose={() => setImportFileModalOpen(false)}
         onImport={handleImportComplete}
         headerDates={{ startDate: header.startDate, endDate: header.endDate }}
       />
 
       {/* Copy Deal Modal */}
-      <CopyDealModal visible={copyDealModalOpen} onClose={() => setCopyDealModalOpen(false)} onCopy={handleCopyDeal} />
+      <CopyDealModal open={copyDealModalOpen} onClose={() => setCopyDealModalOpen(false)} onCopy={handleCopyDeal} />
     </Vertical>
   )
 }

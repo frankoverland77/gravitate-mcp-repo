@@ -1,6 +1,6 @@
 import { GridApi, ICellEditorParams } from 'ag-grid-community'
 import { DatePicker } from 'antd'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 export type DropdownOption = {
@@ -25,13 +25,13 @@ export type IProps = ICellEditorParams & {
 
 export const DateEditor: React.FC<IProps> = forwardRef((props, ref) => {
   const refInput = useRef(null)
-  const [selectedDate, setSelectedDate] = useState(moment(props?.defaultValue))
+  const [selectedDate, setSelectedDate] = useState(dayjs(props?.defaultValue))
   useEffect(() => {
     // focus on the input
     refInput.current.focus()
   }, [])
 
-  const [date, setDate] = useState(moment(props.value))
+  const [date, setDate] = useState(dayjs(props.value))
   const [editing, setEditing] = useState(true)
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export const DateEditor: React.FC<IProps> = forwardRef((props, ref) => {
         return (
           typeof selectedDate === 'undefined' ||
           selectedDate === null ||
-          selectedDate?.isSame(moment(props?.data?.effective_from))
+          selectedDate?.isSame(dayjs(props?.data?.effective_from))
         )
       },
     }

@@ -332,8 +332,8 @@ export function OfferPricingTab({
             agPropOverrides={analyticsGridAgProps}
             controlBarProps={{
               title: (
-                <Horizontal style={{ gap: '16px', alignItems: 'baseline' }}>
-                  <Texto category="h6" weight="600">
+                <Horizontal gap={16} style={{ alignItems: 'baseline' }}>
+                  <Texto category="h5" weight="600">
                     Competitive Analysis
                   </Texto>
                   <Texto category="p1" appearance="medium">
@@ -362,7 +362,7 @@ export function OfferPricingTab({
           justifyContent: 'center',
           padding: '16px'
         }}>
-          <Horizontal style={{ gap: '12px', alignItems: 'center' }}>
+          <Horizontal gap={12} style={{ alignItems: 'center' }}>
             <EyeOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
             <Texto category="p2" appearance="medium">
               Click any row in the Price Offers table below to view competitive analysis

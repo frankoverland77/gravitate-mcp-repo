@@ -13,7 +13,7 @@ export function getCustomerElasticityColDefs(): ColDef<CustomerElasticityRow>[] 
       cellRenderer: (params: ICellRendererParams<CustomerElasticityRow>) => {
         if (!params.data) return null
         return (
-          <Horizontal alignItems="center" style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems="center">
             <div
               style={{
                 width: 22,
@@ -71,7 +71,7 @@ export function getCustomerElasticityColDefs(): ColDef<CustomerElasticityRow>[] 
       cellRenderer: (params: ICellRendererParams<CustomerElasticityRow>) => {
         if (params.value === null || params.value === undefined) return null
         return (
-          <Horizontal alignItems="center" style={{ gap: '6px', width: '100%' }}>
+          <Horizontal alignItems="center" gap={6} style={{ width: '100%' }}>
             <div
               style={{
                 flex: 1,
@@ -105,7 +105,7 @@ export function getCustomerElasticityColDefs(): ColDef<CustomerElasticityRow>[] 
         if (!params.data) return null
         const color = getSensitivityColor(params.data.sensitivityRating)
         return (
-          <Horizontal alignItems="center" style={{ gap: '6px' }}>
+          <Horizontal gap={6} alignItems="center">
             <div
               style={{
                 width: 8,

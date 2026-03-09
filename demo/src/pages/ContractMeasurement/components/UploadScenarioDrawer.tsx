@@ -11,7 +11,7 @@ import type { Scenario } from '../types/scenario.types'
 import { generateScenarioId } from '../types/scenario.types'
 
 interface UploadScenarioDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onSave?: (scenario: Scenario) => void
   editingScenario?: Scenario
@@ -38,7 +38,7 @@ const MOCK_PREVIEW = [
 ]
 
 export function UploadScenarioDrawer({
-  visible,
+  open,
   onClose,
   onSave,
   editingScenario,
@@ -53,7 +53,7 @@ export function UploadScenarioDrawer({
 
   // Reset form when drawer opens
   useEffect(() => {
-    if (visible) {
+    if (open) {
       if (editingScenario) {
         // Edit mode - skip to step 3 (confirm/preview) with existing data
         setStep(3)
@@ -67,7 +67,7 @@ export function UploadScenarioDrawer({
       }
       setIsProcessing(false)
     }
-  }, [visible, editingScenario])
+  }, [open, editingScenario])
 
   // Simulate file processing
   const handleFileSelect = (selectedFileName: string) => {
@@ -170,7 +170,7 @@ export function UploadScenarioDrawer({
       dataIndex: 'target',
       key: 'target',
       render: (text: string, record: { matched: boolean }) => (
-        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems="center">
           {record.matched && <CheckCircleFilled style={{ color: '#52c41a' }} />}
           <span style={{ color: record.matched ? '#262626' : '#8c8c8c' }}>{text}</span>
         </Horizontal>
@@ -190,20 +190,20 @@ export function UploadScenarioDrawer({
     <Drawer
       placement="bottom"
       height="70%"
-      visible={visible}
+      open={open}
       onClose={onClose}
       closable={false}
       title={null}
       headerStyle={{ display: 'none' }}
-      bodyStyle={{
+      styles={{ body: {
         backgroundColor: '#f5f5f5',
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-      }}
+      } }}
       zIndex={2000}
-      destroyOnClose
+      destroyOnHidden
     >
       {/* Header */}
       <div
@@ -214,7 +214,7 @@ export function UploadScenarioDrawer({
         }}
       >
         <Horizontal justifyContent="space-between" alignItems="flex-start">
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>
               {isEditMode ? 'Edit Upload Scenario' : 'Add Upload Scenario'}
             </Texto>
@@ -241,9 +241,9 @@ export function UploadScenarioDrawer({
           flexShrink: 0,
         }}
       >
-        <Horizontal alignItems="center" style={{ gap: '24px' }}>
+        <Horizontal gap={24} alignItems="center">
           {[1, 2, 3].map((s) => (
-            <Horizontal key={s} alignItems="center" style={{ gap: '8px' }}>
+            <Horizontal gap={8} key={s} alignItems="center">
               <div
                 style={{
                   width: '28px',
@@ -284,7 +284,7 @@ export function UploadScenarioDrawer({
       >
         {/* STEP 1: File Selection */}
         {step === 1 && (
-          <Vertical style={{ gap: '24px' }}>
+          <Vertical gap={24}>
             {/* Scenario Name */}
             <div>
               <Texto
@@ -339,14 +339,14 @@ export function UploadScenarioDrawer({
                 }}
               >
                 {isProcessing ? (
-                  <Vertical alignItems="center" style={{ gap: '16px' }}>
+                  <Vertical gap={16} alignItems="center">
                     <Progress type="circle" percent={75} width={60} />
                     <Texto category="p1">Processing {fileName}...</Texto>
                   </Vertical>
                 ) : (
-                  <Vertical alignItems="center" style={{ gap: '16px' }}>
+                  <Vertical gap={16} alignItems="center">
                     <CloudUploadOutlined style={{ fontSize: '48px', color: '#8c8c8c' }} />
-                    <Vertical alignItems="center" style={{ gap: '4px' }}>
+                    <Vertical gap={4} alignItems="center">
                       <Texto category="p1" weight="600">
                         Click to upload or drag file here
                       </Texto>
@@ -380,7 +380,7 @@ export function UploadScenarioDrawer({
 
         {/* STEP 2: Column Mapping */}
         {step === 2 && (
-          <Vertical style={{ gap: '24px' }}>
+          <Vertical gap={24}>
             {/* File info */}
             <div
               style={{
@@ -390,9 +390,9 @@ export function UploadScenarioDrawer({
                 padding: '16px',
               }}
             >
-              <Horizontal alignItems="center" style={{ gap: '12px' }}>
+              <Horizontal gap={12} alignItems="center">
                 <FileExcelOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
-                <Vertical style={{ gap: '2px' }}>
+                <Vertical gap={2}>
                   <Texto category="p1" weight="600">
                     {fileName}
                   </Texto>
@@ -431,7 +431,7 @@ export function UploadScenarioDrawer({
             </div>
 
             {/* Mapping Summary */}
-            <Horizontal style={{ gap: '24px' }}>
+            <Horizontal gap={24}>
               <div
                 style={{
                   backgroundColor: '#f6ffed',
@@ -441,7 +441,7 @@ export function UploadScenarioDrawer({
                   flex: 1,
                 }}
               >
-                <Horizontal alignItems="center" style={{ gap: '8px' }}>
+                <Horizontal gap={8} alignItems="center">
                   <CheckCircleFilled style={{ color: '#52c41a', fontSize: '20px' }} />
                   <Texto category="p2">
                     <strong>4 columns</strong> successfully mapped
@@ -454,7 +454,7 @@ export function UploadScenarioDrawer({
 
         {/* STEP 3: Data Preview */}
         {step === 3 && (
-          <Vertical style={{ gap: '24px' }}>
+          <Vertical gap={24}>
             {/* Ready to import banner */}
             <div
               style={{
@@ -465,9 +465,9 @@ export function UploadScenarioDrawer({
               }}
             >
               <Horizontal justifyContent="space-between" alignItems="center">
-                <Horizontal alignItems="center" style={{ gap: '12px' }}>
+                <Horizontal gap={12} alignItems="center">
                   <CheckCircleFilled style={{ fontSize: '24px', color: '#52c41a' }} />
-                  <Vertical style={{ gap: '2px' }}>
+                  <Vertical gap={2}>
                     <Texto category="p1" weight="600">
                       {isEditMode ? 'Data Loaded' : 'Ready to Import'}
                     </Texto>
@@ -554,7 +554,7 @@ export function UploadScenarioDrawer({
               <GraviButton buttonText="Back" appearance="outlined" onClick={handleBack} />
             )}
           </div>
-          <Horizontal style={{ gap: '16px' }}>
+          <Horizontal gap={16}>
             <GraviButton
               buttonText="Cancel"
               size="large"

@@ -79,7 +79,7 @@ export function GroupPanelEditView({
       <div className={styles['form-content']}>
         {/* Group Settings */}
         <div className={styles['form-section']}>
-          <Texto category='h6' appearance='medium' weight='600' className={styles['section-label']}>
+          <Texto category='h5' appearance='medium' weight='600' className={styles['section-label']}>
             Group Settings
           </Texto>
 
@@ -126,7 +126,7 @@ export function GroupPanelEditView({
 
         {/* Thresholds */}
         <div className={styles['form-section']}>
-          <Texto category='h6' appearance='medium' weight='600' className={styles['section-label']}>
+          <Texto category='h5' appearance='medium' weight='600' className={styles['section-label']}>
             Thresholds
           </Texto>
 
@@ -163,7 +163,7 @@ export function GroupPanelEditView({
 
         {/* Assigned Details */}
         <div className={styles['form-section']}>
-          <Texto category='h6' appearance='medium' weight='600' className={styles['section-label']}>
+          <Texto category='h5' appearance='medium' weight='600' className={styles['section-label']}>
             Assigned Details
           </Texto>
 

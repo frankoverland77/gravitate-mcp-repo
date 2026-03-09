@@ -92,7 +92,7 @@ export function BulkChangeDrawer({ visible, selectedRows, onClose, onApply }: Bu
       title='Bulk Change Content Configuration'
       placement='right'
       width={450}
-      visible={visible}
+      open={visible}
       onClose={handleClose}
       footer={
         <Horizontal justifyContent='space-between' alignItems='center'>
@@ -100,22 +100,22 @@ export function BulkChangeDrawer({ visible, selectedRows, onClose, onApply }: Bu
             {changesCount} field{changesCount !== 1 ? 's' : ''} will be changed for {selectedRows.length} row
             {selectedRows.length !== 1 ? 's' : ''}
           </Texto>
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText='Cancel' onClick={handleClose} />
             <GraviButton buttonText='Apply Changes' success disabled={changesCount === 0} onClick={handleApply} />
           </Horizontal>
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '16px' }}>
-        <Vertical style={{ gap: '8px' }}>
+      <Vertical gap={16}>
+        <Vertical gap={8}>
           <Texto category='p2' appearance='medium'>
             Select fields to change for the {selectedRows.length} selected subscription
             {selectedRows.length !== 1 ? 's' : ''}. Click a field multiple times to cycle through: Include → Exclude →
             No Change.
           </Texto>
 
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText='Include All' size='small' theme1 onClick={setAllChecked} />
             <GraviButton buttonText='Exclude All' size='small' onClick={setAllUnchecked} />
             <GraviButton buttonText='Clear All' size='small' onClick={clearAll} />
@@ -124,7 +124,7 @@ export function BulkChangeDrawer({ visible, selectedRows, onClose, onApply }: Bu
 
         <Divider style={{ margin: '8px 0' }} />
 
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           {fieldSelections.map((fieldSelection) => (
             <Horizontal
               key={fieldSelection.field}
@@ -150,14 +150,14 @@ export function BulkChangeDrawer({ visible, selectedRows, onClose, onApply }: Bu
               onClick={() => handleFieldChange(fieldSelection.field, cycleState(fieldSelection.state))}
             >
               <Texto>{fieldSelection.headerName}</Texto>
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems='center'>
                 {fieldSelection.state === 'unchanged' && (
                   <Texto appearance='medium' category='p2'>
                     No Change
                   </Texto>
                 )}
                 {fieldSelection.state === 'checked' && (
-                  <Horizontal alignItems='center' style={{ gap: '4px' }}>
+                  <Horizontal gap={4} alignItems='center'>
                     <Checkbox checked disabled />
                     <Texto appearance='success' category='p2'>
                       Include
@@ -165,7 +165,7 @@ export function BulkChangeDrawer({ visible, selectedRows, onClose, onApply }: Bu
                   </Horizontal>
                 )}
                 {fieldSelection.state === 'unchecked' && (
-                  <Horizontal alignItems='center' style={{ gap: '4px' }}>
+                  <Horizontal gap={4} alignItems='center'>
                     <Checkbox checked={false} disabled />
                     <Texto appearance='error' category='p2'>
                       Exclude

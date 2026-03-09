@@ -79,11 +79,11 @@ export function ProjectHubActivityLog({ entries, onAddEntry }: ProjectHubActivit
               borderBottom: '1px solid var(--gray-100)',
             }}
           >
-            <Horizontal alignItems="flex-start" style={{ gap: 8 }}>
+            <Horizontal alignItems="flex-start" gap={8}>
               <ClockCircleOutlined style={{ fontSize: 12, color: 'var(--gray-400)', marginTop: 3, flexShrink: 0 }} />
               <div style={{ minWidth: 0, flex: 1 }}>
                 <Texto category="label">{entry.message}</Texto>
-                <Horizontal alignItems="center" style={{ gap: 6, marginTop: 2 }}>
+                <Horizontal alignItems="center" gap={6} style={{ marginTop: 2 }}>
                   <Texto appearance="medium" category="label" style={{ fontSize: 11 }}>
                     {formatDateTime(entry.timestamp)}
                   </Texto>

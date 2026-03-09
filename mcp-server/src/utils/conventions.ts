@@ -110,16 +110,94 @@ export const CONVENTIONS: ConventionRule[] = [
   },
 
   {
-    id: 'modal-drawer-visible-not-open',
-    name: 'Modal/Drawer Use visible Prop',
+    id: 'modal-drawer-open-not-visible',
+    name: 'Modal/Drawer Use open Prop',
     severity: 'error',
     category: 'component',
-    description: 'AntD Modal and Drawer in this codebase use "visible" prop, not "open".',
-    antiPattern: /<(Modal|Drawer)[^>]*\sopen\s*=/gi,
-    fix: 'Change open={...} to visible={...}',
+    description: 'AntD v5 Modal and Drawer use "open" prop, not "visible".',
+    antiPattern: /<(Modal|Drawer)[^>]*\svisible\s*=/gi,
+    fix: 'Change visible={...} to open={...}',
     examples: {
-      bad: `<Modal open={isOpen}>\n<Drawer open={isOpen}>`,
-      good: `<Modal visible={isOpen}>\n<Drawer visible={isOpen}>`
+      bad: `<Modal visible={isOpen}>\n<Drawer visible={isOpen}>`,
+      good: `<Modal open={isOpen}>\n<Drawer open={isOpen}>`
+    }
+  },
+  {
+    id: 'no-destroy-on-close',
+    name: 'Use destroyOnHidden Not destroyOnClose',
+    severity: 'error',
+    category: 'component',
+    description: 'AntD v5 renamed destroyOnClose to destroyOnHidden.',
+    antiPattern: /destroyOnClose/gi,
+    fix: 'Change destroyOnClose to destroyOnHidden',
+    examples: {
+      bad: `<Modal destroyOnClose>`,
+      good: `<Modal destroyOnHidden>`
+    }
+  },
+  {
+    id: 'no-on-visible-change',
+    name: 'Use onOpenChange Not onVisibleChange',
+    severity: 'error',
+    category: 'component',
+    description: 'AntD v5 renamed onVisibleChange to onOpenChange.',
+    antiPattern: /onVisibleChange/gi,
+    fix: 'Change onVisibleChange to onOpenChange',
+    examples: {
+      bad: `<Popover onVisibleChange={handler}>`,
+      good: `<Popover onOpenChange={handler}>`
+    }
+  },
+  {
+    id: 'no-tabs-tabpane-children',
+    name: 'Tabs Use items Prop',
+    severity: 'error',
+    category: 'component',
+    description: 'AntD v5 Tabs uses items prop instead of Tabs.TabPane children.',
+    antiPattern: /Tabs\.TabPane|<TabPane/gi,
+    fix: 'Use <Tabs items={[{ key, label, children }]} /> instead of Tabs.TabPane children',
+    examples: {
+      bad: `<Tabs><Tabs.TabPane tab="Tab 1" key="1">Content</Tabs.TabPane></Tabs>`,
+      good: `<Tabs items={[{ key: '1', label: 'Tab 1', children: <div>Content</div> }]} />`
+    }
+  },
+  {
+    id: 'no-menu-item-children',
+    name: 'Menu Use items Prop',
+    severity: 'error',
+    category: 'component',
+    description: 'AntD v5 Menu uses items prop instead of Menu.Item children.',
+    antiPattern: /Menu\.Item|Menu\.SubMenu|<MenuItem/gi,
+    fix: 'Use <Menu items={[{ key, label }]} /> instead of Menu.Item children',
+    examples: {
+      bad: `<Menu><Menu.Item key="1">Option</Menu.Item></Menu>`,
+      good: `<Menu items={[{ key: '1', label: 'Option' }]} />`
+    }
+  },
+  {
+    id: 'no-select-option-children',
+    name: 'Select Use options Prop',
+    severity: 'error',
+    category: 'component',
+    description: 'AntD v5 Select uses options prop instead of Select.Option children.',
+    antiPattern: /Select\.Option|<Option/gi,
+    fix: 'Use <Select options={[{ value, label }]} /> instead of Select.Option children',
+    examples: {
+      bad: `<Select><Select.Option value="a">A</Select.Option></Select>`,
+      good: `<Select options={[{ value: 'a', label: 'A' }]} />`
+    }
+  },
+  {
+    id: 'no-appearance-outline',
+    name: 'GraviButton Use outlined Not outline',
+    severity: 'error',
+    category: 'component',
+    description: 'Excalibrr v5 renamed appearance="outline" to appearance="outlined".',
+    antiPattern: /appearance\s*=\s*['"]outline['"]/gi,
+    fix: 'Change appearance="outline" to appearance="outlined"',
+    examples: {
+      bad: `<GraviButton appearance='outline'>`,
+      good: `<GraviButton appearance='outlined'>`
     }
   },
   {
@@ -152,16 +230,16 @@ export const CONVENTIONS: ConventionRule[] = [
     }
   },
   {
-    id: 'no-horizontal-gap-prop',
-    name: 'No Gap Prop on Horizontal/Vertical',
-    severity: 'error',
+    id: 'prefer-gap-prop',
+    name: 'Prefer gap Prop on Horizontal/Vertical',
+    severity: 'warning',
     category: 'styling',
-    description: 'Horizontal/Vertical do not have a gap prop. Use style={{ gap: "Xpx" }} or className="gap-X".',
-    antiPattern: /<(Horizontal|Vertical)[^>]*\sgap\s*=/gi,
-    fix: 'Use style={{ gap: "12px" }} or className="gap-12"',
+    description: 'Horizontal/Vertical have a gap prop in v5. Use gap={12} instead of style={{ gap }} or className.',
+    antiPattern: /<(Horizontal|Vertical)[^>]*style\s*=\s*\{[^}]*gap\s*:/gi,
+    fix: 'Use <Horizontal gap={12}> instead of style={{ gap: "12px" }}',
     examples: {
-      bad: `<Horizontal gap={12}>`,
-      good: `<Horizontal style={{ gap: '12px' }}>`
+      bad: `<Horizontal style={{ gap: '12px' }}>`,
+      good: `<Horizontal gap={12}>`
     }
   },
   {
@@ -178,16 +256,15 @@ export const CONVENTIONS: ConventionRule[] = [
     }
   },
   {
-    id: 'use-gap-utility-class',
-    name: 'Use Gap Utility Class',
-    severity: 'warning',
+    id: 'use-gap-prop-not-class',
+    name: 'Use gap Prop Instead of Utility Class',
+    severity: 'info',
     category: 'styling',
-    description: 'Use gap utility classes (gap-4, gap-8, gap-12, gap-16) instead of style={{ gap }}.',
-    antiPattern: /style\s*=\s*\{\{[^}]*gap\s*:/gi,
-    fix: 'Use className="gap-8" or "gap-12" or "gap-16" instead of style={{ gap: "Xpx" }}',
+    description: 'Horizontal/Vertical now support a gap prop directly. Prefer gap={12} over className="gap-12".',
+    fix: 'Use <Horizontal gap={12}> instead of className="gap-12"',
     examples: {
-      bad: `<Horizontal style={{ gap: '12px' }}>\n<Vertical style={{ gap: '8px' }}>`,
-      good: `<Horizontal className="gap-12">\n<Vertical className="gap-8">`
+      bad: `<Horizontal className="gap-12">\n<Vertical className="gap-8">`,
+      good: `<Horizontal gap={12}>\n<Vertical gap={8}>`
     }
   },
   {

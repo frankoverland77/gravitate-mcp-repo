@@ -65,9 +65,9 @@ This document describes how to recreate the Gravitate OSP (Online Selling Platfo
   title="Create New Order"
   placement="right"
   width={600}
-  destroyOnClose
+  destroyOnHidden
   onClose={handleClose}
-  visible={drawerVisible}
+  open={drawerVisible}
   className="buy-now-drawer"
 >
   <Vertical style={{ width: '100%', margin: 0 }}>
@@ -85,7 +85,7 @@ This document describes how to recreate the Gravitate OSP (Online Selling Platfo
 ```
 
 **Key Props**:
-- `destroyOnClose`: Clears form state when closed
+- `destroyOnHidden`: Clears form state when closed
 - `width={600}`: Standard width for order creation
 - `placement="right"`: Slides in from right side
 - Confirm navigation if there are unsaved changes
@@ -513,7 +513,7 @@ import { BarChartOutlined, LineChartOutlined } from '@ant-design/icons'
 
 const { Panel } = Collapse
 
-export function CreateOrderDrawer({ visible, onClose, selectedOffer, form }) {
+export function CreateOrderDrawer({ open, onClose, selectedOffer, form }) {
   const [pendingChanges, setPendingChanges] = useState(false)
 
   const handleClose = () => {
@@ -538,9 +538,9 @@ export function CreateOrderDrawer({ visible, onClose, selectedOffer, form }) {
       title="Create New Order"
       placement="right"
       width={600}
-      visible={visible}
+      open={open}
       onClose={handleClose}
-      destroyOnClose
+      destroyOnHidden
     >
       <Vertical style={{ width: '100%' }}>
         <Form form={form} onFieldsChange={() => setPendingChanges(true)}>

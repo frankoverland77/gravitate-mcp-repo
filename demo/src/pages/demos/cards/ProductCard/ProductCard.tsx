@@ -43,7 +43,7 @@ export function ProductCard({ product, onAddToCart, onViewDetails }: ProductCard
             ${product.price.toFixed(2)}
           </Texto>
 
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton
               buttonText="Details"
               appearance="secondary"

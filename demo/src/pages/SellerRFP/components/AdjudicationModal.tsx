@@ -84,14 +84,14 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
   return (
     <Modal
       title={`Round ${rfp.currentRound} Result`}
-      visible={visible}
+      open={visible}
       onOk={handleOk}
       onCancel={handleCancel}
       okText="Confirm"
       okButtonProps={{ disabled: confirmDisabled }}
       width={splitAward && isFinalDisposition ? 700 : 480}
     >
-      <Vertical style={{ gap: '20px', paddingTop: '8px' }}>
+      <Vertical gap={20} style={{ paddingTop: '8px' }}>
         <Radio.Group
           value={result}
           onChange={(e) => {
@@ -103,9 +103,9 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
             }
           }}
         >
-          <Vertical style={{ gap: '12px' }}>
+          <Vertical gap={12}>
             <Radio value="won">
-              <Vertical style={{ gap: '2px' }}>
+              <Vertical gap={2}>
                 <Texto category="p2" weight="500">Won</Texto>
                 <Texto category="p3" appearance="medium">
                   RFP awarded to your organization
@@ -113,7 +113,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
               </Vertical>
             </Radio>
             <Radio value="lost">
-              <Vertical style={{ gap: '2px' }}>
+              <Vertical gap={2}>
                 <Texto category="p2" weight="500">Lost</Texto>
                 <Texto category="p3" appearance="medium">
                   Another supplier was selected
@@ -121,7 +121,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
               </Vertical>
             </Radio>
             <Radio value="advanced">
-              <Vertical style={{ gap: '2px' }}>
+              <Vertical gap={2}>
                 <Texto category="p2" weight="500">Advanced to Next Round</Texto>
                 <Texto category="p3" appearance="medium">
                   Invited to submit Round {rfp.currentRound + 1} response
@@ -133,7 +133,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
 
         {/* Win reason — required */}
         {result === 'won' && (
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             <Texto category="p2" weight="500">Win Reason <span style={{ color: '#ff4d4f' }}>*</span></Texto>
             <Select
               placeholder="Select reason..."
@@ -147,7 +147,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
 
         {/* Loss reason — required */}
         {result === 'lost' && (
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             <Texto category="p2" weight="500">Loss Reason <span style={{ color: '#ff4d4f' }}>*</span></Texto>
             <Select
               placeholder="Select reason..."
@@ -161,7 +161,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
 
         {/* Notes — optional */}
         {result && (
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             <Texto category="p2" weight="500">Notes (optional)</Texto>
             <TextArea
               placeholder="Additional context about the outcome..."
@@ -174,8 +174,8 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
 
         {/* Split award toggle — only for won/lost */}
         {isFinalDisposition && (
-          <Vertical style={{ gap: '12px' }}>
-            <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+          <Vertical gap={12}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               <Switch
                 size="small"
                 checked={splitAward}
@@ -191,7 +191,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
             </Horizontal>
 
             {splitAward && (
-              <Vertical style={{ gap: '8px' }}>
+              <Vertical gap={8}>
                 {derivedStatus === 'partial-win' && (
                   <div className={styles['partial-win-banner']}>
                     <Texto category="p2" weight="500" style={{ color: '#d48806' }}>

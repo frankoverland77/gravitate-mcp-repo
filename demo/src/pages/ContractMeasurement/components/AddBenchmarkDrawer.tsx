@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Benchmark } from '../types/benchmark.types';
 
 interface AddBenchmarkDrawerProps {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   onAddBenchmark: (benchmark: Benchmark) => void;
   currentCount: number;
@@ -46,7 +46,7 @@ const getBenchmarkDisplayName = (type: string): string => {
 };
 
 export function AddBenchmarkDrawer({
-  visible,
+  open,
   onClose,
   onAddBenchmark,
   currentCount,
@@ -83,7 +83,7 @@ export function AddBenchmarkDrawer({
   return (
     <Drawer
       title={
-        <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+        <Horizontal gap={8} style={{ alignItems: 'center' }}>
           <PlusOutlined style={{ fontSize: '18px' }} />
           <span>Add Benchmark</span>
         </Horizontal>
@@ -91,17 +91,17 @@ export function AddBenchmarkDrawer({
       placement="right"
       width={500}
       onClose={handleClose}
-      visible={visible}
+      open={open}
       zIndex={2000}
       maskClosable={true}
       footer={
-        <Horizontal style={{ justifyContent: 'flex-end', gap: '12px', padding: '12px 0' }}>
+        <Horizontal gap={12} style={{ justifyContent: 'flex-end', padding: '12px 0' }}>
           <GraviButton buttonText="Cancel" appearance="outlined" onClick={handleClose} />
           <GraviButton buttonText="Add Benchmark" success onClick={handleAdd} />
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Header Description */}
         <div>
           <Texto category="p2" appearance="medium" style={{ marginBottom: '12px', display: 'block' }}>
@@ -194,7 +194,7 @@ export function AddBenchmarkDrawer({
           <Texto category="p2" weight="600" style={{ marginBottom: '8px', display: 'block' }}>
             Matching Summary
           </Texto>
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" appearance="medium">
               Publisher: <strong>{publisherOptions.find((o) => o.value === publisher)?.label}</strong>
             </Texto>

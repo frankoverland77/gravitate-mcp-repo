@@ -13,7 +13,6 @@ import type { BidEdit, BidEditFilter } from '../../rfp.types'
 import { HistoryEntry } from './HistoryEntry'
 import styles from './BidLogDrawer.module.css'
 
-const { TabPane } = Tabs
 
 interface BidLogDrawerProps {
   visible: boolean
@@ -139,14 +138,14 @@ export function BidLogDrawer({ visible, onClose, bidEdits, onRevert }: BidLogDra
   return (
     <>
       <Drawer
-        visible={visible}
+        open={visible}
         onClose={onClose}
         placement='right'
         width={420}
         title={null}
         closable={false}
         className={styles.drawer}
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: { padding: 0 } }}
       >
         <Vertical height='100%'>
           {/* Header */}
@@ -164,11 +163,11 @@ export function BidLogDrawer({ visible, onClose, bidEdits, onRevert }: BidLogDra
 
           {/* Filter tabs */}
           <div className={styles.tabsWrapper}>
-            <Tabs activeKey={filter} onChange={(key) => setFilter(key as BidEditFilter)} size='small'>
-              <TabPane tab='All' key='all' />
-              <TabPane tab='Inline' key='inline' />
-              <TabPane tab='Bulk Upload' key='bulk-upload' />
-            </Tabs>
+            <Tabs activeKey={filter} onChange={(key) => setFilter(key as BidEditFilter)} size='small' items={[
+              { key: 'all', label: 'All' },
+              { key: 'inline', label: 'Inline' },
+              { key: 'bulk-upload', label: 'Bulk Upload' },
+            ]} />
           </div>
 
           {/* Entry list */}
@@ -233,7 +232,7 @@ export function BidLogDrawer({ visible, onClose, bidEdits, onRevert }: BidLogDra
 
       {/* Cascade warning modal */}
       <Modal
-        visible={cascadeWarning !== null}
+        open={cascadeWarning !== null}
         title='Revert Multiple Edits?'
         onOk={handleConfirmCascadeRevert}
         onCancel={() => setCascadeWarning(null)}

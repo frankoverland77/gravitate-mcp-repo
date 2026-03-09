@@ -112,14 +112,14 @@ export function EditBidsDrawer({
 
   return (
     <Drawer
-      visible={visible}
+      open={visible}
       onClose={handleClose}
       placement='bottom'
       height='80vh'
       title={null}
       closable={false}
       className={styles.drawer}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
     >
       <Vertical height='100%'>
         {/* Header */}

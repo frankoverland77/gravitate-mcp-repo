@@ -20,7 +20,7 @@ export function UserControlPanel() {
       <div onClick={showDrawer} style={{ minWidth: 180 }} className='flex px-3 items-center control-panel-trigger'>
         <UserSummary />
       </div>
-      <ControlPanel onClose={onClose} visible={visible} />
+      <ControlPanel onClose={onClose} open={visible} />
     </>
   )
 }

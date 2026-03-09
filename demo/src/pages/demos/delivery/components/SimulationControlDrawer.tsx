@@ -121,13 +121,14 @@ export function SimulationControlDrawer({ className = '' }: SimulationControlDra
                   onChange={handleSpeedChange}
                   size="small"
                   style={{ width: '80px' }}
-                >
-                  <Select.Option value="0.5">0.5x</Select.Option>
-                  <Select.Option value="1">1x</Select.Option>
-                  <Select.Option value="2">2x</Select.Option>
-                  <Select.Option value="5">5x</Select.Option>
-                  <Select.Option value="10">10x</Select.Option>
-                </Select>
+                  options={[
+                    { label: '0.5x', value: '0.5' },
+                    { label: '1x', value: '1' },
+                    { label: '2x', value: '2' },
+                    { label: '5x', value: '5' },
+                    { label: '10x', value: '10' },
+                  ]}
+                />
               </div>
             </div>
 

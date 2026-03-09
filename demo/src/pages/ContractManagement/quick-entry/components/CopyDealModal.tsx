@@ -14,7 +14,7 @@ import type { ContractDetail } from '../../types/contract.types'
 import styles from './CopyDealModal.module.css'
 
 interface CopyDealModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onCopy: (details: ContractDetail[]) => void
 }
@@ -28,7 +28,7 @@ function formatDate(date: Date): string {
   }).format(date)
 }
 
-export function CopyDealModal({ visible, onClose, onCopy }: CopyDealModalProps) {
+export function CopyDealModal({ open, onClose, onCopy }: CopyDealModalProps) {
   const [searchText, setSearchText] = useState('')
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null)
   const [includeFormulas, setIncludeFormulas] = useState(true)
@@ -76,16 +76,16 @@ export function CopyDealModal({ visible, onClose, onCopy }: CopyDealModalProps) 
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       onCancel={handleClose}
       title='Copy from Existing Contract'
       footer={
         <Horizontal justifyContent='space-between' alignItems='center'>
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <Switch checked={includeFormulas} onChange={setIncludeFormulas} size='small' />
             <Texto category='p2'>Include formulas</Texto>
           </Horizontal>
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText='Cancel' onClick={handleClose} />
             <GraviButton
               buttonText='Copy Details'
@@ -99,7 +99,7 @@ export function CopyDealModal({ visible, onClose, onCopy }: CopyDealModalProps) 
       }
       width={600}
     >
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         {/* Search */}
         <Input
           placeholder='Search contracts by name or counterparty...'
@@ -122,7 +122,7 @@ export function CopyDealModal({ visible, onClose, onCopy }: CopyDealModalProps) 
                   <Texto category='p1' weight='500'>
                     {contract.name}
                   </Texto>
-                  <Horizontal style={{ gap: '16px' }}>
+                  <Horizontal gap={16}>
                     <Texto category='p2' appearance='medium'>
                       {contract.externalParty}
                     </Texto>

@@ -97,7 +97,7 @@ export function ComparisonTable({
             <td className='field-name'>Expiration</td>
             <td className='original-value'>{originalBid.expiration}</td>
             <td className='proposed-value'>
-              <Horizontal verticalCenter style={{ gap: 8 }}>
+              <Horizontal gap={8} verticalCenter>
                 <select
                   className='expiration-select'
                   value={selectedExpiration}

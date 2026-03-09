@@ -78,9 +78,9 @@ export function WhatIfPanel({ curveParams, currentPricePosition, whatIfPricePosi
   }
 
   return (
-    <Vertical style={{ gap: '16px', padding: '16px', backgroundColor: '#fafafa', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
-      <Vertical style={{ gap: '2px' }}>
-        <Texto category="h6" weight="600">
+    <Vertical gap={16} style={{ padding: '16px', backgroundColor: '#fafafa', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
+      <Vertical gap={2}>
+        <Texto category="h5" weight="600">
           What-If Simulation
         </Texto>
         <Texto category="p2" appearance="medium">
@@ -89,7 +89,7 @@ export function WhatIfPanel({ curveParams, currentPricePosition, whatIfPricePosi
       </Vertical>
 
       {/* Slider */}
-      <Vertical style={{ gap: '4px', padding: '0 4px' }}>
+      <Vertical gap={4} style={{ padding: '0 4px' }}>
         <Texto
           category="p2"
           appearance="medium"
@@ -111,21 +111,18 @@ export function WhatIfPanel({ curveParams, currentPricePosition, whatIfPricePosi
       </Vertical>
 
       {/* Three-column comparison */}
-      <Vertical style={{ gap: '12px' }}>
-        <Horizontal style={{ gap: '8px' }}>
+      <Vertical gap={12}>
+        <Horizontal gap={8}>
           {columns.map((col) => (
             <Vertical
               key={col.label}
               flex="1"
-              style={{
-                padding: '12px',
+              gap={8} style={{ padding: '12px',
                 borderRadius: '6px',
                 backgroundColor: col.highlight ? '#f9f0ff' : '#ffffff',
-                border: col.highlight ? '1px solid #d3adf7' : '1px solid #e8e8e8',
-                gap: '8px',
-              }}
+                border: col.highlight ? '1px solid #d3adf7' : '1px solid #e8e8e8' }}
             >
-              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+              <Horizontal gap={6} alignItems="center">
                 <div
                   style={{
                     width: 8,
@@ -139,7 +136,7 @@ export function WhatIfPanel({ curveParams, currentPricePosition, whatIfPricePosi
                 </Texto>
               </Horizontal>
 
-              <Vertical style={{ gap: '6px' }}>
+              <Vertical gap={6}>
                 <MetricRow label="Price" value={formatPricePosition(col.pricePosition)} />
                 <MetricRow label="Volume" value={`${col.volume.toFixed(1)}%`} />
                 <MetricRow label="Margin" value={formatCents(col.margin)} />
@@ -151,21 +148,21 @@ export function WhatIfPanel({ curveParams, currentPricePosition, whatIfPricePosi
 
         {/* Delta indicators */}
         <Horizontal justifyContent="space-between" style={{ padding: '8px 12px', backgroundColor: '#ffffff', borderRadius: '6px', border: '1px solid #e8e8e8' }}>
-          <Vertical style={{ gap: '2px' }} alignItems="center" flex="1">
+          <Vertical gap={2} alignItems="center" flex="1">
             <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
               vs Current
             </Texto>
             <DeltaValue value={columns[2].revenue - columns[0].revenue} prefix="$" />
           </Vertical>
           <div style={{ width: 1, backgroundColor: '#e8e8e8' }} />
-          <Vertical style={{ gap: '2px' }} alignItems="center" flex="1">
+          <Vertical gap={2} alignItems="center" flex="1">
             <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
               vs Optimal
             </Texto>
             <DeltaValue value={columns[2].revenue - columns[1].revenue} prefix="$" />
           </Vertical>
           <div style={{ width: 1, backgroundColor: '#e8e8e8' }} />
-          <Vertical style={{ gap: '2px' }} alignItems="center" flex="1">
+          <Vertical gap={2} alignItems="center" flex="1">
             <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
               Volume Change
             </Texto>

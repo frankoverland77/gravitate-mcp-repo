@@ -71,7 +71,7 @@ export const GRAVIBUTTON_EXAMPLES: ComponentExample[] = [
 // Outline appearance
 <GraviButton 
   buttonText='View Conflicts' 
-  appearance='outline' 
+  appearance='outlined' 
   onClick={() => console.log('Show conflicts')}
 />`,
   },
@@ -205,7 +205,7 @@ import { Horizontal } from '@gravitate-js/excalibrr'
 />
 
 // Button group with different sizes
-<Horizontal style={{ gap: '8px' }}>
+<Horizontal gap={8}>
   <GraviButton buttonText='Activate All' success size='small' onClick={() => console.log('Activate all')} />
   <GraviButton buttonText='Deactivate All' size='small' onClick={() => console.log('Deactivate all')} />
   <GraviButton buttonText='Edit Products' theme1 size='small' onClick={() => console.log('Edit products')} />
@@ -308,15 +308,13 @@ const isFetching = false
 </Tooltip>
 
 // Dropdown menu button
-const menu = (
-  <Menu>
-    <Menu.Item key="edit" onClick={() => console.log('Edit')}>Edit</Menu.Item>
-    <Menu.Item key="duplicate" onClick={() => console.log('Duplicate')}>Duplicate</Menu.Item>
-    <Menu.Item key="delete" danger onClick={() => console.log('Delete')}>Delete</Menu.Item>
-  </Menu>
-)
+const menuItems = [
+  { key: 'edit', label: 'Edit', onClick: () => console.log('Edit') },
+  { key: 'duplicate', label: 'Duplicate', onClick: () => console.log('Duplicate') },
+  { key: 'delete', label: 'Delete', danger: true, onClick: () => console.log('Delete') },
+]
 
-<Dropdown overlay={menu} trigger={['click']}>
+<Dropdown menu={{ items: menuItems }} trigger={['click']}>
   <GraviButton icon={<MoreOutlined />} />
 </Dropdown>`,
   },
@@ -349,7 +347,7 @@ const canWrite = true
 
 // Conditional button rendering
 {isBulkEditMode ? (
-  <Horizontal style={{ gap: 2 }}>
+  <Horizontal gap={2}>
     <GraviButton buttonText='Activate All' success size='small' onClick={() => console.log('Activate all')} />
     <GraviButton buttonText='Deactivate All' size='small' onClick={() => console.log('Deactivate all')} />
     <GraviButton buttonText='Cancel' size='small' onClick={() => console.log('Cancel')} />
@@ -367,7 +365,7 @@ const canWrite = true
 <GraviButton
   buttonText={\`View \${conflictCount} Conflict\${conflictCount !== 1 ? 's' : ''}\`}
   onClick={() => console.log('Show conflicts:', conflicts)}
-  appearance='outline'
+  appearance='outlined'
   size='small'
 />
 
@@ -473,31 +471,35 @@ function ContractManagementActions({
   const clearSelection = () => console.log('Clear selection')
   const showValidationErrors = (contracts) => console.log('Show validation errors:', contracts)
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="duplicate">
-        <GraviButton 
-          buttonText="Duplicate Selected" 
-          size="small" 
+  const menuItems = [
+    {
+      key: 'duplicate',
+      label: (
+        <GraviButton
+          buttonText="Duplicate Selected"
+          size="small"
           onClick={() => handleDuplicate(selectedContracts)}
         />
-      </Menu.Item>
-      <Menu.Item key="archive">
-        <GraviButton 
-          buttonText="Archive Selected" 
-          size="small" 
+      ),
+    },
+    {
+      key: 'archive',
+      label: (
+        <GraviButton
+          buttonText="Archive Selected"
+          size="small"
           onClick={() => handleArchive(selectedContracts)}
         />
-      </Menu.Item>
-    </Menu>
-  )
+      ),
+    },
+  ]
 
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Primary Actions Row */}
-      <Horizontal style={{ gap: '8px', justifyContent: 'space-between' }}>
+      <Horizontal gap={8} justifyContent="space-between">
         {/* Left side - Create and Edit */}
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton
             buttonText="Create Contract"
             success
@@ -518,7 +520,7 @@ function ContractManagementActions({
         </Horizontal>
 
         {/* Right side - Utility Actions */}
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton
             buttonText="Export CSV"
             icon={<DownloadOutlined />}
@@ -534,9 +536,9 @@ function ContractManagementActions({
             aria-label="Open grid settings"
           />
           
-          <Dropdown overlay={menu} trigger={['click']}>
-            <GraviButton 
-              icon={<MoreOutlined />} 
+          <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+            <GraviButton
+              icon={<MoreOutlined />}
               className="ghost-gravi-button"
             />
           </Dropdown>
@@ -545,7 +547,7 @@ function ContractManagementActions({
 
       {/* Secondary Actions Row - Bulk Operations */}
       {selectedContracts?.length > 0 && (
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <Popconfirm
             title={\`Are you sure you want to delete \${selectedContracts.length} contract(s)?\`}
             okText="Delete"
@@ -573,7 +575,7 @@ function ContractManagementActions({
 
       {/* Save/Cancel Row - Conditional */}
       {hasUnsavedChanges && (
-        <Horizontal style={{ gap: '8px', justifyContent: 'flex-end' }}>
+        <Horizontal gap={8} justifyContent="flex-end">
           <GraviButton
             buttonText="Cancel Changes"
             ghost
@@ -593,7 +595,7 @@ function ContractManagementActions({
       )}
 
       {/* Status Actions Row */}
-      <Horizontal style={{ gap: '8px' }}>
+      <Horizontal gap={8}>
         <Tooltip title={hasUnsavedChanges ? 'Save changes before refreshing data' : ''}>
           <GraviButton
             buttonText="Refresh Data"
@@ -609,7 +611,7 @@ function ContractManagementActions({
         {selectedContracts?.some(c => c.hasValidationErrors) && (
           <GraviButton
             buttonText={\`View \${selectedContracts.filter(c => c.hasValidationErrors).length} Error(s)\`}
-            appearance="outline"
+            appearance="outlined"
             icon={<WarningOutlined />}
             onClick={() => showValidationErrors(selectedContracts)}
             size="small"

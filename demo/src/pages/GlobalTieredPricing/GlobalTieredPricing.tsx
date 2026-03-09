@@ -403,11 +403,11 @@ export function GlobalTieredPricing() {
             subtitle: 'Tier 2 and Tier 3 auto-calculate with 25-point (0.0025) spreads. Click any calculated cell to override manually.',
             hideActiveFilters: false,
             actionButtons: (
-                <Horizontal style={{ gap: '8px' }}>
+                <Horizontal gap={8}>
                     <GraviButton
                         buttonText="Undo"
                         icon={<UndoOutlined />}
-                        appearance="outline"
+                        appearance="outlined"
                         disabled={historyIndex <= 0}
                         onClick={handleUndo}
                         style={{ fontWeight: 'normal' }}
@@ -415,7 +415,7 @@ export function GlobalTieredPricing() {
                     <GraviButton
                         buttonText="Redo"
                         icon={<RedoOutlined />}
-                        appearance="outline"
+                        appearance="outlined"
                         disabled={historyIndex >= history.length - 1}
                         onClick={handleRedo}
                         style={{ fontWeight: 'normal' }}
@@ -538,12 +538,12 @@ export function GlobalTieredPricing() {
                 marginBottom: '16px',
                 flexShrink: 0
             }}>
-                <Horizontal style={{ gap: '32px', alignItems: 'center' }}>
+                <Horizontal gap={32} style={{ alignItems: 'center' }}>
                     <Texto style={{ fontSize: '12px', fontWeight: 700, color: '#595959', textTransform: 'uppercase', letterSpacing: '1px' }}>
                         Default Tier Spreads
                     </Texto>
 
-                    <Horizontal style={{ gap: '16px', alignItems: 'center' }}>
+                    <Horizontal gap={16} style={{ alignItems: 'center' }}>
                         <Checkbox
                             checked={autoCalculate}
                             onChange={(e) => handleAutoCalculateToggle(e.target.checked)}
@@ -555,7 +555,7 @@ export function GlobalTieredPricing() {
 
                         {autoCalculate && (
                             <>
-                                <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                                <Horizontal gap={8} style={{ alignItems: 'center' }}>
                                     <Texto style={{ fontSize: '11px', color: '#8c8c8c' }}>
                                         Tier 2 Spread:
                                     </Texto>
@@ -569,7 +569,7 @@ export function GlobalTieredPricing() {
                                     />
                                 </Horizontal>
 
-                                <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                                <Horizontal gap={8} style={{ alignItems: 'center' }}>
                                     <Texto style={{ fontSize: '11px', color: '#8c8c8c' }}>
                                         Tier 3 Spread:
                                     </Texto>
@@ -604,7 +604,6 @@ export function GlobalTieredPricing() {
             <Modal
                 title="Bulk Edit Tier 1"
                 open={bulkEditModalOpen}
-                visible={bulkEditModalOpen}
                 onOk={handleBulkEditApply}
                 onCancel={() => {
                     setBulkEditModalOpen(false);
@@ -614,9 +613,9 @@ export function GlobalTieredPricing() {
                 cancelText="Cancel"
                 width={500}
                 centered
-                destroyOnClose
+                destroyOnHidden
             >
-                <Vertical style={{ gap: '20px' }}>
+                <Vertical gap={20}>
                     <Texto style={{ fontSize: '14px', color: '#595959' }}>
                         Updating Tier 1 for <strong>{selectedRows.length}</strong> selected row{selectedRows.length !== 1 ? 's' : ''}
                     </Texto>

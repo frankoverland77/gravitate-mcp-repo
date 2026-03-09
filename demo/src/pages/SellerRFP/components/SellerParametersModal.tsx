@@ -59,27 +59,27 @@ export function SellerParametersModal({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Parameters"
       onCancel={onClose}
       width={480}
       footer={
         <Horizontal justifyContent="space-between">
           <GraviButton type="link" buttonText="Reset to Defaults" onClick={handleReset} />
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText="Cancel" onClick={onClose} />
             <GraviButton buttonText="Save" success onClick={handleSave} />
           </Horizontal>
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '24px', paddingTop: '8px' }}>
+      <Vertical gap={24} style={{ paddingTop: '8px' }}>
         {/* Price History Section */}
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           <Texto category="p2" weight="600">
             Price History
           </Texto>
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             <Horizontal justifyContent="space-between" alignItems="center">
               <Texto category="p2" appearance="medium">
                 Lookback:
@@ -123,11 +123,11 @@ export function SellerParametersModal({
         </Vertical>
 
         {/* Volume History Section */}
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           <Texto category="p2" weight="600">
             Volume History
           </Texto>
-          <Vertical style={{ gap: '8px' }}>
+          <Vertical gap={8}>
             <Horizontal justifyContent="space-between" alignItems="center">
               <Texto category="p2" appearance="medium">
                 Lookback:

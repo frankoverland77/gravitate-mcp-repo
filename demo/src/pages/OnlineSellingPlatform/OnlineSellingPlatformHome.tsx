@@ -6,7 +6,6 @@ import type { Dayjs } from 'dayjs';
 import { useFeatureMode } from '../../contexts/FeatureModeContext';
 import { generateBuyPromptsData, generateBuyForwardsData, generateHomeIndexOffersData } from '../../shared/data';
 
-const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
 export function OnlineSellingPlatformHome() {
@@ -292,11 +291,11 @@ export function OnlineSellingPlatformHome() {
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
             {/* Tabs */}
             <div style={{ padding: '0 24px', borderBottom: '1px solid #d9d9d9' }}>
-                <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                    <TabPane tab="Buy Prompts" key="buy-prompts" />
-                    <TabPane tab="Buy Forwards" key="buy-forwards" />
-                    <TabPane tab="Index Offers" key="index-offers" />
-                </Tabs>
+                <Tabs activeKey={activeTab} onChange={setActiveTab} items={[
+                    { key: 'buy-prompts', label: 'Buy Prompts' },
+                    { key: 'buy-forwards', label: 'Buy Forwards' },
+                    { key: 'index-offers', label: 'Index Offers' },
+                ]} />
             </div>
 
             {/* Grid */}
@@ -336,7 +335,7 @@ export function OnlineSellingPlatformHome() {
                 placement="right"
                 width={400}
                 onClose={() => setDrawerVisible(false)}
-                visible={drawerVisible}
+                open={drawerVisible}
             >
                 {/* Feature Prioritization Section */}
                 <div style={{ marginBottom: '24px' }}>
@@ -407,15 +406,15 @@ export function OnlineSellingPlatformHome() {
                     placement="right"
                     width={600}
                     onClose={() => setOrderDrawerVisible(false)}
-                    visible={orderDrawerVisible}
+                    open={orderDrawerVisible}
                     mask={false}
-                    destroyOnClose
+                    destroyOnHidden
                     headerStyle={{
                         backgroundColor: '#2C3E50',
                         borderBottom: 'none'
                     }}
                     closeIcon={<span style={{ color: '#ffffff', fontSize: '20px' }}>×</span>}
-                    bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
+                    styles={{ body: { padding: 0, height: '100%', display: 'flex', flexDirection: 'column' } }}
                 >
                     {/* Volume Input - Sticky Header */}
                     <Horizontal
@@ -621,11 +620,11 @@ export function OnlineSellingPlatformHome() {
                                             Counterparty
                                         </Texto>
                                         <Form.Item name="counterparty" style={{ margin: 0 }}>
-                                            <Select placeholder="Gravitate Purchasing">
-                                                <Select.Option value="gravitate">Gravitate Purchasing</Select.Option>
-                                                <Select.Option value="acme">ACME Corporation</Select.Option>
-                                                <Select.Option value="globex">Globex Industries</Select.Option>
-                                            </Select>
+                                            <Select placeholder="Gravitate Purchasing" options={[
+                                                { label: 'Gravitate Purchasing', value: 'gravitate' },
+                                                { label: 'ACME Corporation', value: 'acme' },
+                                                { label: 'Globex Industries', value: 'globex' },
+                                            ]} />
                                         </Form.Item>
                                     </div>
 
@@ -635,11 +634,11 @@ export function OnlineSellingPlatformHome() {
                                             Contact
                                         </Texto>
                                         <Form.Item name="contact" style={{ margin: 0 }}>
-                                            <Select placeholder="Select contact">
-                                                <Select.Option value="john">John Smith</Select.Option>
-                                                <Select.Option value="jane">Jane Doe</Select.Option>
-                                                <Select.Option value="bob">Bob Johnson</Select.Option>
-                                            </Select>
+                                            <Select placeholder="Select contact" options={[
+                                                { label: 'John Smith', value: 'john' },
+                                                { label: 'Jane Doe', value: 'jane' },
+                                                { label: 'Bob Johnson', value: 'bob' },
+                                            ]} />
                                         </Form.Item>
                                     </div>
 
@@ -649,10 +648,10 @@ export function OnlineSellingPlatformHome() {
                                             Internal Counterparty
                                         </Texto>
                                         <Form.Item name="internalCounterparty" style={{ margin: 0 }}>
-                                            <Select placeholder="Select internal counterparty">
-                                                <Select.Option value="dept1">Department 1</Select.Option>
-                                                <Select.Option value="dept2">Department 2</Select.Option>
-                                            </Select>
+                                            <Select placeholder="Select internal counterparty" options={[
+                                                { label: 'Department 1', value: 'dept1' },
+                                                { label: 'Department 2', value: 'dept2' },
+                                            ]} />
                                         </Form.Item>
                                     </div>
 
@@ -671,7 +670,7 @@ export function OnlineSellingPlatformHome() {
                         backgroundColor: '#ffffff',
                         flexShrink: 0
                     }}>
-                        <Horizontal style={{ justifyContent: 'space-between', gap: '12px' }}>
+                        <Horizontal gap={12} style={{ justifyContent: 'space-between' }}>
                             <Button
                                 size="large"
                                 onClick={() => setOrderDrawerVisible(false)}
@@ -711,11 +710,11 @@ export function OnlineSellingPlatformHome() {
                     placement="bottom"
                     height="75vh"
                     onClose={() => setOrderDrawerVisible(false)}
-                    visible={orderDrawerVisible}
+                    open={orderDrawerVisible}
                     mask={true}
                     closable={false}
-                    destroyOnClose
-                    bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
+                    destroyOnHidden
+                    styles={{ body: { padding: 0, height: '100%', display: 'flex', flexDirection: 'column' } }}
                 >
                     {/* Custom Header */}
                     <div style={{
@@ -724,7 +723,7 @@ export function OnlineSellingPlatformHome() {
                         flexShrink: 0
                     }}>
                         <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <Vertical style={{ gap: '4px' }}>
+                            <Vertical gap={4}>
                                 <Tag style={{ margin: 0, marginBottom: '4px', backgroundColor: '#1890ff', color: '#ffffff', border: 'none', fontSize: '12px', fontWeight: 600, width: 'fit-content' }}>
                                     Index Purchase
                                 </Tag>
@@ -993,16 +992,17 @@ export function OnlineSellingPlatformHome() {
                                                     mode="multiple"
                                                     showSearch
                                                     placeholder="Select loading numbers"
-                                                    optionFilterProp="children"
+                                                    optionFilterProp="label"
                                                     filterOption={(input, option) =>
-                                                        (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                                                        (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
                                                     }
-                                                >
-                                                    <Select.Option value="L001">Loading #001 - Rack A</Select.Option>
-                                                    <Select.Option value="L002">Loading #002 - Rack B</Select.Option>
-                                                    <Select.Option value="L003">Loading #003 - Rack C</Select.Option>
-                                                    <Select.Option value="L004">Loading #004 - Rack D</Select.Option>
-                                                </Select>
+                                                    options={[
+                                                        { label: 'Loading #001 - Rack A', value: 'L001' },
+                                                        { label: 'Loading #002 - Rack B', value: 'L002' },
+                                                        { label: 'Loading #003 - Rack C', value: 'L003' },
+                                                        { label: 'Loading #004 - Rack D', value: 'L004' },
+                                                    ]}
+                                                />
                                             </Form.Item>
                                         </div>
                                     </div>
@@ -1105,7 +1105,7 @@ export function OnlineSellingPlatformHome() {
                                                     <Texto category="p1" weight="600" style={{ width: '60px', color: '#ff4d4f' }}>-10%</Texto>
                                                     <Texto category="p1" style={{ flex: 1 }}>OPIS Current Year RIN</Texto>
                                                 </Horizontal>
-                                                <Horizontal style={{ padding: '10px 12px', alignItems: 'center', backgroundColor: '#fafafa', gap: '8px' }}>
+                                                <Horizontal gap={8} style={{ padding: '10px 12px', alignItems: 'center', backgroundColor: '#fafafa' }}>
                                                     <Texto category="p1" weight="600">Differential</Texto>
                                                     <Texto category="p1" weight="600" style={{ color: (() => {
                                                         const diff = selectedOrderData?.diff || '+0.10';

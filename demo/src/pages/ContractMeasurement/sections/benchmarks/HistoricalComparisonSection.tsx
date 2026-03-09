@@ -22,7 +22,14 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+import isoWeek from 'dayjs/plugin/isoWeek'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+
+dayjs.extend(quarterOfYear)
+dayjs.extend(isoWeek)
+dayjs.extend(isSameOrBefore)
 import type { Scenario } from '../../types/scenario.types'
 import { SAMPLE_DETAILS, type ContractDetail } from '../../ContractMeasurement.data'
 
@@ -71,7 +78,7 @@ function seededNoise(index: number, offset: number): number {
 }
 
 const generatePerDetailDailyData = (details: ContractDetail[]): DetailDailyData[] => {
-  const endDate = moment('2024-12-04')
+  const endDate = dayjs('2024-12-04')
   const startDate = endDate.clone().subtract(12, 'months')
 
   return details.map((detail, detailIndex) => {
@@ -81,7 +88,7 @@ const generatePerDetailDailyData = (details: ContractDetail[]): DetailDailyData[
     const baseSpot = baseContract + 0.10
     const baseVolume = detail.volume / 12 // approximate daily from monthly
 
-    const current = startDate.clone()
+    let current = startDate.clone()
     let dayIndex = 0
     const seedOffset = detailIndex * 1000 + 7919
 
@@ -120,7 +127,7 @@ const generatePerDetailDailyData = (details: ContractDetail[]): DetailDailyData[
         spotDiff: Number((contractPrice - spotPrice).toFixed(4)),
       })
 
-      current.add(1, 'day')
+      current = current.add(1, 'day')
       dayIndex++
     }
 
@@ -194,7 +201,7 @@ function averageByMethod(prices: number[], volumes: number[], method: Method): n
 }
 
 function bucketKey(date: Date, aggregation: Aggregation): string {
-  const m = moment(date)
+  const m = dayjs(date)
   switch (aggregation) {
     case 'daily':
       return m.format('YYYY-MM-DD')
@@ -208,7 +215,7 @@ function bucketKey(date: Date, aggregation: Aggregation): string {
 }
 
 function bucketLabel(date: Date, aggregation: Aggregation): string {
-  const m = moment(date)
+  const m = dayjs(date)
   switch (aggregation) {
     case 'daily':
       return m.format('MMM D')
@@ -222,7 +229,7 @@ function bucketLabel(date: Date, aggregation: Aggregation): string {
 }
 
 function tooltipLabel(date: Date, aggregation: Aggregation): string {
-  const m = moment(date)
+  const m = dayjs(date)
   switch (aggregation) {
     case 'daily':
       return m.format('MMM. D, YYYY')
@@ -640,13 +647,10 @@ export function HistoricalComparisonSection({
       <div style={cardStyle}>
         {/* Controls Row */}
         <Horizontal
-          style={{
-            justifyContent: 'space-between',
+          gap={12} style={{ justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '16px',
-            flexWrap: 'wrap',
-            gap: '12px',
-          }}
+            flexWrap: 'wrap' }}
         >
           {/* Left: View Toggle */}
           <Button.Group>
@@ -669,7 +673,7 @@ export function HistoricalComparisonSection({
           </Button.Group>
 
           {/* Effective Date Range */}
-          <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center' }}>
             <Texto category='p2' appearance='medium'>Effective date:</Texto>
             <DatePicker.RangePicker
               value={effectiveDateRange ?? undefined}
@@ -679,7 +683,7 @@ export function HistoricalComparisonSection({
           </Horizontal>
 
           {/* Granularity Selector */}
-          <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center' }}>
             <Texto category='p2' appearance='medium'>
               Granularity:
             </Texto>
@@ -697,7 +701,7 @@ export function HistoricalComparisonSection({
           </Horizontal>
 
           {/* Multi-select View */}
-          <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center' }}>
             <Texto category='p2' appearance='medium'>
               View:
             </Texto>
@@ -715,7 +719,7 @@ export function HistoricalComparisonSection({
         </Horizontal>
 
         {/* Legend Controls */}
-        <Horizontal style={{ gap: '16px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <Horizontal gap={16} style={{ marginBottom: '16px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
           {/* Per-detail contract price groups */}
           {allAggregatedSeries.map(({ key, label }, detailIdx) => {
             const color = DETAIL_COLORS[detailIdx % DETAIL_COLORS.length]
@@ -789,7 +793,7 @@ export function HistoricalComparisonSection({
 
           {/* Reference line toggles */}
           <Horizontal
-            style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+            gap={8} style={{ alignItems: 'center', cursor: 'pointer' }}
             onClick={() => toggleSeries('rackAverage')}
           >
             {visibleSeries.rackAverage ? (
@@ -823,7 +827,7 @@ export function HistoricalComparisonSection({
           </Horizontal>
 
           <Horizontal
-            style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+            gap={8} style={{ alignItems: 'center', cursor: 'pointer' }}
             onClick={() => toggleSeries('spotPrice')}
           >
             {visibleSeries.spotPrice ? (
@@ -851,7 +855,7 @@ export function HistoricalComparisonSection({
             return (
               <Horizontal
                 key={s.id}
-                style={{ alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                gap={8} style={{ alignItems: 'center', cursor: 'pointer' }}
                 onClick={() => toggleScenarioVisibility(s.id)}
               >
                 {visible ? (

@@ -96,8 +96,8 @@ function generateFormField(field: FormField): string {
       break;
       
     case 'select':
-      const optionsString = options ? options.map(opt => `<Option value="${opt}">${opt}</Option>`).join('\n        ') : '';
-      fieldComponent = `<Select ${placeholder ? `placeholder="${placeholder}"` : ''}>\n        ${optionsString}\n      </Select>`;
+      const optionsArray = options ? `[${options.map(opt => `{ value: '${opt}', label: '${opt}' }`).join(', ')}]` : '[]';
+      fieldComponent = `<Select ${placeholder ? `placeholder="${placeholder}" ` : ''}options={${optionsArray}} />`;
       break;
       
     case 'date':
@@ -162,7 +162,7 @@ function generateActions(actions: FormAction[] = []): string {
   }).join('\n');
   
   return `        <Form.Item>
-          <Horizontal className="gap-10" style={{ justifyContent: "flex-end" }}>
+          <Horizontal gap={10} justifyContent="flex-end">
 ${buttons}
           </Horizontal>
         </Form.Item>`;
@@ -213,14 +213,10 @@ function generateFormComponent(params: CreateFormDemoParams): string {
   const datePickerDestructure = fields.some(f => f.type === 'dateRange') ? 
     '\nconst { RangePicker } = DatePicker;' : '';
     
-  // Need Option destructure for Select
-  const selectDestructure = fields.some(f => f.type === 'select') ? 
-    '\nconst { Option } = Select;' : '';
-  
   return `import { ${Array.from(imports).join(', ')} } from '@gravitate-js/excalibrr';
 import { ${Array.from(antdImports).join(', ')} } from 'antd';
 import React from 'react';
-${datePickerDestructure}${selectDestructure}
+${datePickerDestructure}
 
 export function ${name}() {
   const [form] = Form.useForm();

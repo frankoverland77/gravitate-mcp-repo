@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { Horizontal, Texto, Vertical } from '@gravitate-js/excalibrr'
 import { CheckCircleFilled, EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { Button, Tag, Collapse, Divider } from 'antd'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 import type { ContractHeader, ContractStatus } from '../../types/contract.types'
 import styles from './ContractHeaderSidebar.module.css'
@@ -41,7 +41,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
       style={{ border: '1px solid var(--gray-200)', borderRadius: 8, backgroundColor: 'white' }}
     >
       <Horizontal className={styles.sectionCardHeader}>
-        <Texto category='h6' weight='600'>
+        <Texto category='h5' weight='600'>
           {title}
         </Texto>
       </Horizontal>
@@ -58,7 +58,7 @@ function FieldRow({ label, value, primary }: { label: string; value: string; pri
       </Texto>
       <Texto
         appearance='primary'
-        category={primary ? 'h6' : 'p2'}
+        category={primary ? 'h5' : 'p2'}
         weight={primary ? '600' : undefined}
         style={{ textAlign: 'right' }}
       >
@@ -106,11 +106,11 @@ export function ContractHeaderSidebar({
               {contractName || 'New Contract'}
             </Texto>
             <Texto category='p2' appearance='medium'>
-              {createdAt ? `Created: ${moment(createdAt).format('MM-DD-YYYY h:mm A')}` : 'New'}
+              {createdAt ? `Created: ${dayjs(createdAt).format('MM-DD-YYYY h:mm A')}` : 'New'}
             </Texto>
           </Vertical>
           {statusInfo && (
-            <Vertical alignItems='flex-end' style={{ gap: '4px' }}>
+            <Vertical gap={4} alignItems='flex-end'>
               <Texto
                 category='h5'
                 appearance={
@@ -162,7 +162,7 @@ export function ContractHeaderSidebar({
         >
           <Collapse.Panel
             header={
-              <Texto category='h6' weight='600' style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+              <Texto category='h5' weight='600' style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
                 Optional Fields
               </Texto>
             }
@@ -186,12 +186,12 @@ export function ContractHeaderSidebar({
             <SectionCard title='Contract Dates'>
               <FieldRow
                 label='Effective Dates'
-                value={`${moment(header.startDate).format('MM/DD/YYYY')} - ${moment(header.endDate).format('MM/DD/YYYY')}`}
+                value={`${dayjs(header.startDate).format('MM/DD/YYYY')} - ${dayjs(header.endDate).format('MM/DD/YYYY')}`}
                 primary
               />
               <FieldRow
                 label='Contract Date'
-                value={header.contractDate ? moment(header.contractDate).format('MM/DD/YYYY') : ''}
+                value={header.contractDate ? dayjs(header.contractDate).format('MM/DD/YYYY') : ''}
               />
               <FieldRow label='Contract Calendar' value={header.contractCalendar || ''} />
             </SectionCard>

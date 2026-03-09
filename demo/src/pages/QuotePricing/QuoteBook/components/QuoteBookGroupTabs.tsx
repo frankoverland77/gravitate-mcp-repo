@@ -8,7 +8,7 @@ interface QuoteBookGroupTabsProps {
 
 export function QuoteBookGroupTabs({ activeTab, onTabChange }: QuoteBookGroupTabsProps) {
   return (
-    <Horizontal style={{ gap: '4px', padding: '8px 16px', borderBottom: '1px solid var(--gray-200)' }}>
+    <Horizontal gap={4} style={{ padding: '8px 16px', borderBottom: '1px solid var(--gray-200)' }}>
       {quoteGroups.map(group => (
         <div
           key={group.id}

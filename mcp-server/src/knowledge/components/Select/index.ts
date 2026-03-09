@@ -40,28 +40,27 @@ export const SelectExamples: SelectExample[] = [
     placeholder="Select contact"
     style={{ minWidth: "100%" }}
     className="test-Contact"
-    filterOption={(value, option) => {
-      return option?.children?.toLowerCase().includes(value.toLowerCase())
+    options={selectedItemMeta?.ExternalColleagueOverride.map((item) => ({
+      value: item.key,
+      label: item.value,
+    }))}
+    filterOption={(input, option) => {
+      return (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
     }}
-  >
-    {selectedItemMeta?.ExternalColleagueOverride.map((item) => (
-      <Option key={item.key} value={item.key}>
-        {item.value}
-      </Option>
-    ))}
-  </Select>
+  />
 </Form.Item>`,
     props: {
       showSearch: 'enables search functionality',
       placeholder: '"Select contact"',
       className: '"test-Contact"',
-      filterOption: 'custom search filtering by children text',
+      options: 'dynamic options array mapped from data',
+      filterOption: 'custom search filtering by label text',
       rules: 'form validation with required field',
     },
     dependencies: ['react', 'antd', '@gravitate-js/excalibrr'],
     sourceFile: '/src/modules/SellingPlatform/BuyNow/Prompt/components/CreateOrder/components/ContactSelect.tsx',
     notes:
-      'Perfect for simple dropdown selection with search. Uses Form.Item wrapper for validation and Option children pattern for dynamic data.',
+      'Perfect for simple dropdown selection with search. Uses Form.Item wrapper for validation and options prop for dynamic data.',
   },
   {
     id: 'select_simple_02',
@@ -147,21 +146,23 @@ export const SelectExamples: SelectExample[] = [
     category: 'form-input',
     tags: ['modal', 'multiple-selects', 'icons', 'configuration', 'dynamic-updates'],
     code: `<Form.Item label="Default Cost Source" name="DefaultCostSourceMarkerId">
-  <Select allowClear showSearch optionFilterProp="children">
-    {metadata?.CostSources?.filter((cst) => cst.IsMarker).map((option) => (
-      <Select.Option key={option.Value} value={option.Value}>
-        <FunctionOutlined /> {option.Text}
-      </Select.Option>
-    ))}
-  </Select>
+  <Select
+    allowClear
+    showSearch
+    optionFilterProp="label"
+    options={metadata?.CostSources?.filter((cst) => cst.IsMarker).map((option) => ({
+      value: option.Value,
+      label: <span><FunctionOutlined /> {option.Text}</span>,
+    }))}
+  />
 </Form.Item>
 
 <Form.Item label="Calendar" name="CalendarId">
-  <Select 
-    allowClear 
-    showSearch 
-    optionFilterProp="children" 
-    options={metadata?.Calendars?.map(toAntOption)} 
+  <Select
+    allowClear
+    showSearch
+    optionFilterProp="label"
+    options={metadata?.Calendars?.map(toAntOption)}
   />
 </Form.Item>
 
@@ -169,20 +170,20 @@ export const SelectExamples: SelectExample[] = [
   <Select
     allowClear
     showSearch
-    optionFilterProp="children"
+    optionFilterProp="label"
     options={metadata?.CounterPartyComparisonTypes?.map(toAntOption)}
   />
 </Form.Item>`,
     props: {
       allowClear: 'enables clearing selections',
       showSearch: 'search functionality',
-      optionFilterProp: '"children" for filtering by displayed text',
+      optionFilterProp: '"label" for filtering by displayed text',
       options: 'metadata-driven options with toAntOption transformation',
     },
     dependencies: ['react', 'antd', '@ant-design/icons', '@utils/index'],
     sourceFile: '/src/modules/Admin/ManageQuoteConfigs/components/CreateConfigurationModal.tsx',
     notes:
-      'Perfect for configuration forms with multiple related dropdowns. Shows both Option children and options prop patterns.',
+      'Perfect for configuration forms with multiple related dropdowns. Uses options prop consistently across all selects.',
   },
   {
     id: 'select_medium_03',
@@ -325,7 +326,7 @@ cellRenderer: ({ value }) => {
     category: 'advanced-config',
     tags: ['confirmation', 'custom-clear', 'advanced-search', 'grid-integration', 'refs', 'popup-confirm'],
     code: `const [selected, setSelected] = useState(null)
-const [isPopConfirmVisible, setIsPopConfirmVisible] = useState(false)
+const [isPopConfirmOpen, setIsPopConfirmOpen] = useState(false)
 const [searchQuery, setSearchQuery] = useState("")
 const refInput = useRef(null)
 
@@ -360,19 +361,19 @@ const handleSelectChange = useCallback((value, option) => {
   clearIcon={
     <Popconfirm
       title="Are you sure you want to clear this field?"
-      visible={isPopConfirmVisible}
+      open={isPopConfirmOpen}
       onConfirm={() => {
         setSelected([])
-        setIsPopConfirmVisible(false)
+        setIsPopConfirmOpen(false)
       }}
       onCancel={() => {
-        setIsPopConfirmVisible(false)
+        setIsPopConfirmOpen(false)
       }}
     >
       <CloseOutlined
         onClick={() => {
           if (props.showPopConfirmOnClear) {
-            setIsPopConfirmVisible(true)
+            setIsPopConfirmOpen(true)
           } else {
             setSelected(null)
           }

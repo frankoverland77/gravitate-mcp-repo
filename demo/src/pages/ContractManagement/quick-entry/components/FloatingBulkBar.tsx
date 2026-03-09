@@ -78,7 +78,7 @@ export function FloatingBulkBar({ visible, selectedCount, volumeGroups, onClear,
           <Texto category='p2'>Clear</Texto>
         </span>
       </Horizontal>
-      <Horizontal alignItems='center' className='gap-10'>
+      <Horizontal alignItems='center' gap={10}>
         <Select
           value={column}
           onChange={handleColumnChange}

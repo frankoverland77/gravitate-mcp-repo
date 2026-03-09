@@ -23,7 +23,7 @@ import type { Formula, FormulaVariable, FormulaMode, ProvisionType } from '../..
 import styles from './FormulaEditorDrawer.module.css'
 
 interface FormulaEditorDrawerProps {
-  visible: boolean
+  open: boolean
   detail: ContractDetail | null
   onClose: () => void
   onSave: (detail: ContractDetail) => void
@@ -49,7 +49,7 @@ function modeToProvisionType(mode: FormulaMode): ProvisionType {
   return 'Formula'
 }
 
-export function FormulaEditorDrawer({ visible, detail, onClose, onSave }: FormulaEditorDrawerProps) {
+export function FormulaEditorDrawer({ open, detail, onClose, onSave }: FormulaEditorDrawerProps) {
   // Local state for editing
   const [formula, setFormula] = useState<Formula>(createEmptyFormula())
   const [mode, setMode] = useState<FormulaMode>('formula')
@@ -236,23 +236,23 @@ export function FormulaEditorDrawer({ visible, detail, onClose, onSave }: Formul
 
   return (
     <Drawer
-      visible={visible}
+      open={open}
       onClose={onClose}
       placement='bottom'
       height={820}
       title={null}
       closable={false}
       className={styles.drawer}
-      bodyStyle={{
+      styles={{ body: {
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-      }}
+      } }}
     >
       {/* Header - matches wireframe */}
       <Horizontal className={styles.header} justifyContent='space-between' alignItems='center'>
-        <Horizontal alignItems='center' style={{ gap: '16px' }}>
+        <Horizontal gap={16} alignItems='center'>
           <button className={styles.collapseToggle} onClick={onClose} title='Close drawer'>
             <CaretDownOutlined />
           </button>
@@ -308,11 +308,11 @@ export function FormulaEditorDrawer({ visible, detail, onClose, onSave }: Formul
 
       {/* Sticky Footer */}
       <Horizontal className={styles.footer} justifyContent='space-between' alignItems='center'>
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton buttonText='Copy' icon={<CopyOutlined />} onClick={handleCopyFormula} />
           <GraviButton buttonText='Paste' icon={<SnippetsOutlined />} onClick={handlePasteFormula} />
         </Horizontal>
-        <Horizontal alignItems='center' style={{ gap: '12px' }}>
+        <Horizontal gap={12} alignItems='center'>
           {hasPlaceholders && (
             <Texto category='p2' style={{ color: '#722ed1', fontSize: '12px' }}>
               Fill all placeholder fields before applying

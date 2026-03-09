@@ -43,7 +43,7 @@ export function BulkEditControls({ onApply }: BulkEditControlsProps) {
     };
 
     return (
-        <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+        <Horizontal gap={8} style={{ alignItems: 'center' }}>
             <Select
                 value={selectedProperty}
                 onChange={setSelectedProperty}

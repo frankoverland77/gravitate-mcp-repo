@@ -10,7 +10,7 @@ import { BBDTag, GraviButton, GraviGrid, Horizontal, Texto, Vertical } from '@gr
 import { Alert, Drawer, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import { FormulaBreakdownDetail, ResultComponent, mockFormulaBreakdowns } from '../data/mockData';
 
@@ -19,7 +19,7 @@ import { FormulaBreakdownDetail, ResultComponent, mockFormulaBreakdowns } from '
 type RevalueState = 'idle' | 'loading' | 'success' | 'error' | 'cooldown';
 
 interface ValuationDrawerProps {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   selectedValuationId: number | null;
 }
@@ -153,7 +153,7 @@ function getVariablesColumnDefs(isLoading: boolean): ColDef[] {
       headerName: 'As of Date',
       width: 170,
       cellRenderer: ({ value }: { value: string }) =>
-        value ? moment(value).format('MM/DD/YYYY hh:mm A') : '',
+        value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '',
     },
   ];
 }
@@ -259,7 +259,7 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
       {/* ── HEADER BAR ─────────────────────────────────────────── */}
       <Horizontal className="p-4 bg-2 bordered">
         {/* Left: Product, Location, Counterparty */}
-        <Vertical flex="5" style={{ gap: 10 }}>
+        <Vertical gap={10} flex="5">
           <Horizontal verticalCenter>
             <Tooltip title="Product">
               <BBDTag className="py-1" style={{ whiteSpace: 'normal' }} success>
@@ -267,7 +267,7 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
                   <ExperimentFilled
                     style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }}
                   />
-                  <Texto category="h6">{data.ForProductName}</Texto>
+                  <Texto category="h5">{data.ForProductName}</Texto>
                 </Horizontal>
               </BBDTag>
             </Tooltip>
@@ -280,19 +280,19 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
                   <EnvironmentFilled
                     style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }}
                   />
-                  <Texto category="h6">{data.ForLocationName}</Texto>
+                  <Texto category="h5">{data.ForLocationName}</Texto>
                 </Horizontal>
               </BBDTag>
             </Tooltip>
           </Horizontal>
           <Horizontal verticalCenter>
             <Texto className="mr-3 mt-1">COUNTERPARTY: </Texto>
-            <Texto category="h6">{data.ForCounterPartyName}</Texto>
+            <Texto category="h5">{data.ForCounterPartyName}</Texto>
           </Horizontal>
         </Vertical>
 
         {/* Right: Price, As Of Date, REVALUE BUTTON */}
-        <Vertical flex="2" style={{ gap: 8 }}>
+        <Vertical gap={8} flex="2">
           <Horizontal verticalCenter justifyContent="flex-end">
             <Texto category="p2" className="px-3">
               PRICE:
@@ -323,7 +323,7 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
               AS OF DATE:
             </Texto>
             <Texto
-              category="h6"
+              category="h5"
               style={{
                 transition: 'color 0.3s ease',
                 ...(showSuccessTimestamp ? { color: 'var(--theme-success)' } : {}),
@@ -335,7 +335,7 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
                   : {}),
               }}
             >
-              {showSuccessTimestamp ? 'Revalued just now' : moment(displayDate).format('MM/DD/YYYY hh:mm A')}
+              {showSuccessTimestamp ? 'Revalued just now' : dayjs(displayDate).format('MM/DD/YYYY hh:mm A')}
             </Texto>
           </Horizontal>
 
@@ -364,7 +364,7 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
       {/* ── FORMULA NAME ───────────────────────────────────────── */}
       <Horizontal className="px-4 py-2" verticalCenter>
         <Texto className="mr-4">Formula Name:</Texto>
-        <Texto category="h6">{data.CalculationName}</Texto>
+        <Texto category="h5">{data.CalculationName}</Texto>
       </Horizontal>
 
       {/* ── FORMULA EDITOR (simplified for demo) ───────────────── */}
@@ -416,7 +416,7 @@ function DrawerContent({ data }: { data: FormulaBreakdownDetail }) {
 
 // ─── Main Drawer Component ──────────────────────────────────────────────────
 
-export function ValuationDrawer({ visible, onClose, selectedValuationId }: ValuationDrawerProps) {
+export function ValuationDrawer({ open, onClose, selectedValuationId }: ValuationDrawerProps) {
   const data = selectedValuationId ? mockFormulaBreakdowns[selectedValuationId] : null;
 
   return (
@@ -426,7 +426,7 @@ export function ValuationDrawer({ visible, onClose, selectedValuationId }: Valua
       placement="right"
       onClose={onClose}
       width="50vw"
-      visible={visible}
+      open={open}
     >
       {!data ? (
         <Horizontal fullHeight horizontalCenter verticalCenter>

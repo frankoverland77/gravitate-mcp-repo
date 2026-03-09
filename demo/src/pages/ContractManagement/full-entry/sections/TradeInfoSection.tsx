@@ -7,7 +7,7 @@
 
 import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { Select, DatePicker, Switch } from 'antd'
-import moment, { type Moment } from 'moment'
+import dayjs, { type Dayjs } from 'dayjs'
 import type { FullEntryHeader } from '../fullentry.types'
 import { CALENDAR_OPTIONS } from '../fullentry.defaults'
 import styles from '../FullEntryFlow.module.css'
@@ -25,7 +25,7 @@ export function TradeInfoSection({ header, onChange, disabled }: TradeInfoSectio
     <Vertical className='bg-1 bordered pb-4' style={{ borderRadius: 8, overflow: 'hidden' }} flex='none' height='auto'>
       {/* Header Bar */}
       <Horizontal className='p-4 bg-2 border-bottom'>
-        <Texto category='h6' className='ml-3 font-weight-normal'>
+        <Texto category='h5' className='ml-3 font-weight-normal'>
           Trade Info
         </Texto>
       </Horizontal>
@@ -49,8 +49,8 @@ export function TradeInfoSection({ header, onChange, disabled }: TradeInfoSectio
           <Vertical className='mb-3'>
             <Texto className='py-2'>Contract Date</Texto>
             <DatePicker
-              value={header.contractDate ? moment(header.contractDate) : undefined}
-              onChange={(date: Moment | null) => onChange({ contractDate: date?.toDate() || null })}
+              value={header.contractDate ? dayjs(header.contractDate) : undefined}
+              onChange={(date: Dayjs | null) => onChange({ contractDate: date?.toDate() || null })}
               style={{ width: '100%' }}
               placeholder='Select date'
               disabled={disabled}
@@ -62,7 +62,7 @@ export function TradeInfoSection({ header, onChange, disabled }: TradeInfoSectio
             <RangePicker
               value={
                 header.effectiveDates
-                  ? [moment(header.effectiveDates[0]), moment(header.effectiveDates[1])]
+                  ? [dayjs(header.effectiveDates[0]), dayjs(header.effectiveDates[1])]
                   : undefined
               }
               onChange={(dates) => {

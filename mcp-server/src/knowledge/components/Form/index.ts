@@ -129,7 +129,7 @@ export function BasicForm() {
 import { Form, Input, Select, Button, Checkbox, Switch } from 'antd'
 import { Vertical, Horizontal, Texto, NotificationMessage } from '@gravitate-js/excalibrr'
 
-const { Option } = Select
+// Use options prop instead of Select.Option children in antd v5
 
 export function UserCreationForm({ metadata, onUserCreated }) {
   const [form] = Form.useForm()
@@ -249,11 +249,7 @@ export function UserCreationForm({ metadata, onUserCreated }) {
           name="department"
           rules={[{ required: true, message: 'Please select a department' }]}
         >
-          <Select placeholder="Select department">
-            {departmentOptions.map(dept => (
-              <Option key={dept.value} value={dept.value}>{dept.label}</Option>
-            ))}
-          </Select>
+          <Select placeholder="Select department" options={departmentOptions} />
         </Form.Item>
 
         <Form.Item
@@ -264,14 +260,11 @@ export function UserCreationForm({ metadata, onUserCreated }) {
           <Select
             mode="multiple"
             placeholder="Select user roles"
+            options={roleOptions}
             filterOption={(input, option) =>
-              option?.children?.toLowerCase().includes(input.toLowerCase())
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
-          >
-            {roleOptions.map(role => (
-              <Option key={role.value} value={role.value}>{role.label}</Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
 
         {/* Conditional Admin Fields */}
@@ -548,7 +541,7 @@ import { Form, Select, Input, DatePicker, InputNumber, Button } from 'antd'
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import { Vertical, Horizontal, Texto, NotificationMessage } from '@gravitate-js/excalibrr'
 
-const { Option } = Select
+// Use options prop instead of Select.Option children in antd v5
 const { RangePicker } = DatePicker
 
 export function DynamicFilterForm({ onFiltersChange, availableFields }) {
@@ -633,13 +626,7 @@ export function DynamicFilterForm({ onFiltersChange, availableFields }) {
                     name={[name, 'field']}
                     style={{ flex: 1 }}
                   >
-                    <Select placeholder="Select field">
-                      {fieldOptions.map(field => (
-                        <Option key={field.value} value={field.value}>
-                          {field.label}
-                        </Option>
-                      ))}
-                    </Select>
+                    <Select placeholder="Select field" options={fieldOptions} />
                   </Form.Item>
 
                   <Form.Item
@@ -647,13 +634,10 @@ export function DynamicFilterForm({ onFiltersChange, availableFields }) {
                     name={[name, 'operator']}
                     style={{ flex: 1 }}
                   >
-                    <Select placeholder="Select operator">
-                      {filterTypes.map(type => (
-                        <Option key={type.value} value={type.value}>
-                          {type.label}
-                        </Option>
-                      ))}
-                    </Select>
+                    <Select
+                      placeholder="Select operator"
+                      options={filterTypes.map(type => ({ value: type.value, label: type.label }))}
+                    />
                   </Form.Item>
 
                   <Form.Item
@@ -767,7 +751,7 @@ import { UploadOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Vertical, Horizontal, Texto, NotificationMessage } from '@gravitate-js/excalibrr'
 
 const { TextArea } = Input
-const { Option } = Select
+// Use options prop instead of Select.Option children in antd v5
 
 export function AdvancedForm() {
   const [form] = Form.useForm()
@@ -890,12 +874,15 @@ export function AdvancedForm() {
           name="category"
           rules={[{ required: true, message: 'Please select a category' }]}
         >
-          <Select placeholder="Select project category">
-            <Option value="development">Development</Option>
-            <Option value="design">Design</Option>
-            <Option value="marketing">Marketing</Option>
-            <Option value="research">Research</Option>
-          </Select>
+          <Select
+            placeholder="Select project category"
+            options={[
+              { value: 'development', label: 'Development' },
+              { value: 'design', label: 'Design' },
+              { value: 'marketing', label: 'Marketing' },
+              { value: 'research', label: 'Research' },
+            ]}
+          />
         </Form.Item>
 
         <Form.Item
@@ -919,12 +906,15 @@ export function AdvancedForm() {
           name="budget"
           rules={[{ required: true, message: 'Please select a budget range' }]}
         >
-          <Select placeholder="Select budget range">
-            <Option value="0-1000">$0 - $1,000</Option>
-            <Option value="1000-5000">$1,000 - $5,000</Option>
-            <Option value="5000-10000">$5,000 - $10,000</Option>
-            <Option value="10000+">$10,000+</Option>
-          </Select>
+          <Select
+            placeholder="Select budget range"
+            options={[
+              { value: '0-1000', label: '$0 - $1,000' },
+              { value: '1000-5000', label: '$1,000 - $5,000' },
+              { value: '5000-10000', label: '$5,000 - $10,000' },
+              { value: '10000+', label: '$10,000+' },
+            ]}
+          />
         </Form.Item>
 
         {/* File Upload Section */}

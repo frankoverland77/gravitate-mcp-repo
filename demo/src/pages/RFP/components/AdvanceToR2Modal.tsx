@@ -21,17 +21,17 @@ export function AdvanceToR2Modal({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Advance to Round 2"
       onCancel={onClose}
       footer={
-        <Horizontal justifyContent="flex-end" style={{ gap: '8px' }}>
+        <Horizontal gap={8} justifyContent="flex-end">
           <GraviButton buttonText="Cancel" onClick={onClose} />
           <GraviButton buttonText="Confirm & Advance" success onClick={onConfirm} />
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         <Texto>
           You're advancing <strong>{selectedCount} suppliers</strong> to Round 2. The remaining{' '}
           <strong>{eliminatedCount} suppliers</strong> will be marked as eliminated but can be restored if needed.

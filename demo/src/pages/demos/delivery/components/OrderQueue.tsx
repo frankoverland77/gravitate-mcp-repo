@@ -235,7 +235,7 @@ export function OrderQueue() {
   };
 
   return (
-    <Horizontal style={{ height: '100%', gap: 16 }}>
+    <Horizontal gap={16} style={{ height: '100%' }}>
       <div style={{ flex: 2 }}>
         
         <GraviGrid

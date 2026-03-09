@@ -9,7 +9,7 @@ interface ParametersSectionProps {
 
 export function ParametersSection({ parameters, onUpdateParameters }: ParametersSectionProps) {
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Section Header - styled like Scenario Comparison */}
       <div>
         <Texto category="h4" weight="600">
@@ -29,8 +29,8 @@ export function ParametersSection({ parameters, onUpdateParameters }: Parameters
           borderRadius: '8px',
         }}
       >
-        <Horizontal style={{ gap: '24px' }} alignItems="center">
-          <Horizontal style={{ gap: '4px' }} alignItems="center">
+        <Horizontal gap={24} alignItems="center">
+          <Horizontal gap={4} alignItems="center">
             <Texto category="p2" appearance="medium">
               Lookback Period:
             </Texto>
@@ -50,7 +50,7 @@ export function ParametersSection({ parameters, onUpdateParameters }: Parameters
               style={{ width: '200px' }}
             />
           </Horizontal>
-          <Horizontal style={{ gap: '4px' }} alignItems="center">
+          <Horizontal gap={4} alignItems="center">
             <Texto category="p2" appearance="medium">
               Averaging Method:
             </Texto>

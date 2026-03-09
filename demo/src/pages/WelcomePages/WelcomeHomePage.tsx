@@ -52,7 +52,7 @@ export function WelcomeHomePage() {
       {/* Quick stats */}
       <Horizontal
         className="mb-4"
-        style={{ gap: "24px", minHeight: "fit-content" }}
+        gap={24} style={{ minHeight: "fit-content" }}
       >
         <Vertical style={{ minWidth: "120px" }}>
           <BBDTag theme2 className="p-2 text-center">

@@ -45,8 +45,14 @@ function getCondensedSummary(): string {
 - \`appearance="secondary"\` on Texto = **BLUE** (use \`"medium"\` for gray)
 - \`<GraviButton success>\` not \`<GraviButton theme="success">\`
 - No \`htmlType\` on GraviButton - use \`onClick={() => form.submit()}\`
-- \`<Modal visible={...}>\` not \`<Modal open={...}>\` (same for Drawer)
-- No \`gap\` prop on Horizontal/Vertical - use \`className="gap-12"\` or \`style={{ gap: '12px' }}\`
+- \`<Modal open={...}>\` not \`<Modal visible={...}>\` (same for Drawer) — antd v5
+- \`destroyOnHidden\` not \`destroyOnClose\` — antd v5
+- \`onOpenChange\` not \`onVisibleChange\` — antd v5
+- Use \`gap={12}\` prop on Horizontal/Vertical (not \`className\` or \`style\`)
+- Tabs: Use \`items\` prop, not \`Tabs.TabPane\` children
+- Menu: Use \`items\` prop, not \`Menu.Item\` children
+- Select: Use \`options\` prop, not \`Select.Option\` children
+- \`appearance="outlined"\` not \`appearance="outline"\`
 - Use \`<Vertical flex="1">\` not \`<Vertical style={{ flex: 1 }}>\`
 
 ## Styling Priority

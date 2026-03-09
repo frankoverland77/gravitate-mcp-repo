@@ -123,11 +123,11 @@ export function PreviewEmailModal({ visible, config, onClose }: PreviewEmailModa
   return (
     <Modal
       title={`Email Preview - ${config.QuoteConfigName}`}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       width='85vw'
       style={{ top: 160, marginLeft: '10vw' }}
-      bodyStyle={{ maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' }}
+      styles={{ body: { maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' } }}
       footer={null}
     >
       <Vertical className='gap-16'>

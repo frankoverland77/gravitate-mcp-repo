@@ -34,7 +34,7 @@ export function PerformanceDetailsTab() {
     <Vertical>
       <PerformanceSummaryTiles summary={summary} />
       <ProductPerformanceTable data={PRODUCT_PERFORMANCE_DATA} onRowClick={handleRowClick} />
-      <DetailedAnalysisModal visible={modalVisible} onClose={handleCloseModal} data={analysisData} />
+      <DetailedAnalysisModal open={modalVisible} onClose={handleCloseModal} data={analysisData} />
     </Vertical>
   )
 }

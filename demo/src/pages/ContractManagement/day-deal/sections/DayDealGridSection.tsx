@@ -287,7 +287,7 @@ export function DayDealGridSection({
             title: 'Day Deals',
             hideActiveFilters: true,
             actionButtons: (
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems='center'>
                 <GraviButton buttonText='Import' icon={<UploadOutlined />} onClick={onImport} />
                 <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
                 <GraviButton buttonText='Add Day Deal' theme1 icon={<PlusOutlined />} onClick={onAddDetail} />

@@ -46,7 +46,7 @@ export function BulkChangeTest() {
           options: categoryOptions,
         },
         cellRenderer: ({ value }: { value: string[] }) => (
-          <Horizontal style={{ gap: '4px', flexWrap: 'wrap' }}>
+          <Horizontal gap={4} style={{ flexWrap: 'wrap' }}>
             {(value || []).map((cat) => {
               const option = categoryOptions.find((o) => o.Value === cat);
               return (
@@ -69,7 +69,7 @@ export function BulkChangeTest() {
           options: tagOptions,
         },
         cellRenderer: ({ value }: { value: string[] }) => (
-          <Horizontal style={{ gap: '4px', flexWrap: 'wrap' }}>
+          <Horizontal gap={4} style={{ flexWrap: 'wrap' }}>
             {(value || []).map((tag) => {
               const option = tagOptions.find((o) => o.Value === tag);
               return (
@@ -92,7 +92,7 @@ export function BulkChangeTest() {
           options: regionOptions,
         },
         cellRenderer: ({ value }: { value: string[] }) => (
-          <Horizontal style={{ gap: '4px', flexWrap: 'wrap' }}>
+          <Horizontal gap={4} style={{ flexWrap: 'wrap' }}>
             {(value || []).map((region) => {
               const option = regionOptions.find((o) => o.Value === region);
               return (

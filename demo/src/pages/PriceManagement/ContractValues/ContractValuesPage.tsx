@@ -12,7 +12,11 @@ import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, RangeP
 import { Alert, Collapse, DatePicker, Drawer, Form, InputNumber, Menu, Modal, Popover, Select, Switch, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 import type {
   ContractValuesRow,
@@ -64,7 +68,7 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       field: 'UpdatedDateTime',
       headerName: 'Updated',
       width: 170,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY hh:mm A') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : ''),
     },
     {
       field: '_actions',
@@ -121,7 +125,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       field: 'EffectiveFrom',
       headerName: 'Eff From',
       width: 120,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
     },
     {
       field: 'EffectiveTo',
@@ -129,7 +133,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       width: 110,
       valueFormatter: ({ value }: any) => {
         if (!value) return '';
-        return moment(value).year() >= 9999 ? 'max' : moment(value).format('MM/DD/YYYY');
+        return dayjs(value).year() >= 9999 ? 'max' : dayjs(value).format('MM/DD/YYYY');
       },
     },
     { field: 'Publisher', headerName: 'Publisher', width: 100 },
@@ -139,7 +143,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       field: 'Updated',
       headerName: 'Updated',
       width: 160,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YY hh:mm A') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YY hh:mm A') : ''),
     },
   ];
 }
@@ -163,12 +167,12 @@ function InlinePriceEntry({
 }: InlinePriceEntryProps) {
   const [form] = Form.useForm();
   const [selectedUploadType, setSelectedUploadType] = useState<UploadType>(component.UploadType ?? 'Posting');
-  const [historyDates, setHistoryDates] = useState<moment.Moment[]>([
-    moment().subtract(1, 'day').startOf('day'),
-    moment().add(1, 'day').endOf('day'),
+  const [historyDates, setHistoryDates] = useState<dayjs.Dayjs[]>([
+    dayjs().subtract(1, 'day').startOf('day'),
+    dayjs().add(1, 'day').endOf('day'),
   ]);
-  const [effectiveFrom, setEffectiveFrom] = useState<moment.Moment>(moment().startOf('day'));
-  const [effectiveTo, setEffectiveTo] = useState<moment.Moment>(moment().add(1, 'day').endOf('day'));
+  const [effectiveFrom, setEffectiveFrom] = useState<dayjs.Dayjs>(dayjs().startOf('day'));
+  const [effectiveTo, setEffectiveTo] = useState<dayjs.Dayjs>(dayjs().add(1, 'day').endOf('day'));
   const [conflictState, setConflictState] = useState<'idle' | 'loading' | 'found' | 'none'>('idle');
   const [conflictRowIds, setConflictRowIds] = useState<Set<number>>(new Set());
   const [conflictCount, setConflictCount] = useState(0);
@@ -181,7 +185,7 @@ function InlinePriceEntry({
   const filteredPriceHistory = useMemo(() => {
     const [from, to] = historyDates;
     return allPriceHistory.filter((row) => {
-      const effFrom = moment(row.EffectiveFrom);
+      const effFrom = dayjs(row.EffectiveFrom);
       return effFrom.isSameOrAfter(from, 'day') && effFrom.isSameOrBefore(to, 'day');
     });
   }, [allPriceHistory, historyDates]);
@@ -194,8 +198,8 @@ function InlinePriceEntry({
 
   const handleUploadTypeChange = (value: UploadType) => {
     setSelectedUploadType(value);
-    setEffectiveFrom(moment().startOf('day'));
-    setEffectiveTo(moment().add(1, 'day').endOf('day'));
+    setEffectiveFrom(dayjs().startOf('day'));
+    setEffectiveTo(dayjs().add(1, 'day').endOf('day'));
     setFormDirty(true);
     clearConflicts();
   };
@@ -266,7 +270,7 @@ function InlinePriceEntry({
         }}
       >
         <Horizontal verticalCenter style={{ marginBottom: 10 }}>
-          <Texto category="h6" flex="1">Enter Price</Texto>
+          <Texto category="h5" flex="1">Enter Price</Texto>
           <GraviButton
             size="small"
             buttonText="Cancel"
@@ -297,7 +301,7 @@ function InlinePriceEntry({
           disabled={isSaving}
           size="small"
         >
-          <Horizontal style={{ gap: 12, flexWrap: 'wrap' }}>
+          <Horizontal gap={12} style={{ flexWrap: 'wrap' }}>
             <Form.Item
               label="Price Value"
               name="priceValue"
@@ -308,10 +312,10 @@ function InlinePriceEntry({
             </Form.Item>
 
             <Form.Item label="Status" name="estimateActual" style={{ width: 120, marginBottom: 8 }}>
-              <Select>
-                <Select.Option value="Actual">Actual</Select.Option>
-                <Select.Option value="Estimate">Estimate</Select.Option>
-              </Select>
+              <Select options={[
+                { value: 'Actual', label: 'Actual' },
+                { value: 'Estimate', label: 'Estimate' },
+              ]} />
             </Form.Item>
 
             <Form.Item
@@ -320,11 +324,11 @@ function InlinePriceEntry({
               rules={[{ required: true, message: 'Required' }]}
               style={{ width: 160, marginBottom: 8 }}
             >
-              <Select onChange={handleUploadTypeChange}>
-                <Select.Option value="Posting">Posting</Select.Option>
-                <Select.Option value="EffectiveStart">Effective Start</Select.Option>
-                <Select.Option value="EffectiveDates">Effective Dates</Select.Option>
-              </Select>
+              <Select onChange={handleUploadTypeChange} options={[
+                { value: 'Posting', label: 'Posting' },
+                { value: 'EffectiveStart', label: 'Effective Start' },
+                { value: 'EffectiveDates', label: 'Effective Dates' },
+              ]} />
             </Form.Item>
 
             {showEffectiveDates && (
@@ -359,7 +363,7 @@ function InlinePriceEntry({
             )}
           </Horizontal>
 
-          <Horizontal style={{ gap: 8, marginTop: 4 }}>
+          <Horizontal gap={8} style={{ marginTop: 4 }}>
             <GraviButton
               size="small"
               buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
@@ -407,18 +411,18 @@ function InlinePriceEntry({
           <Collapse.Panel
             key="history"
             header={
-              <Texto category="h6" style={{ fontSize: 13 }}>
+              <Texto category="h5" style={{ fontSize: 13 }}>
                 Price History ({filteredPriceHistory.length})
               </Texto>
             }
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
           >
-            <Horizontal className="pb-2" verticalCenter style={{ gap: 12 }}>
+            <Horizontal className="pb-2" verticalCenter gap={12}>
               <RangePicker
                 inputKey="cvPriceHistoryDates"
                 dates={historyDates}
                 onChange={(dates) => {
-                  setHistoryDates(dates.map((d: any) => (moment.isMoment(d) ? d : moment(d))));
+                  setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
                   clearConflicts();
                 }}
                 placement="bottomRight"
@@ -594,7 +598,7 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
         field: 'EffectiveAsOfDate',
         headerName: 'As of Date',
         width: 160,
-        cellRenderer: ({ value }: { value: string }) => value ? moment(value).format('MM/DD/YYYY hh:mm A') : '',
+        cellRenderer: ({ value }: { value: string }) => value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '',
       },
     ];
 
@@ -616,9 +620,10 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
                 placement="bottomRight"
                 overlayStyle={{ padding: 0 }}
                 content={
-                  <Menu onClick={() => handleEditClickRef.current(rowData.FormulaResultComponentId)}>
-                    <Menu.Item key="upload">Upload Price</Menu.Item>
-                  </Menu>
+                  <Menu
+                    onClick={() => handleEditClickRef.current(rowData.FormulaResultComponentId)}
+                    items={[{ key: 'upload', label: 'Upload Price' }]}
+                  />
                 }
               >
                 <GraviButton size="small" type="link" icon={<MoreOutlined style={{ fontSize: 14 }} />} />
@@ -649,29 +654,29 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
     <Vertical height="100%">
       {/* Header bar — always visible */}
       <Horizontal className="p-4 bg-2 bordered" style={{ flexShrink: 0 }}>
-        <Vertical flex="5" style={{ gap: 10 }}>
+        <Vertical flex="5" gap={10}>
           <Horizontal verticalCenter>
             <BBDTag className="py-1" success>
               <Horizontal verticalCenter>
                 <ExperimentFilled style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }} />
-                <Texto category="h6">{data.ForProductName}</Texto>
+                <Texto category="h5">{data.ForProductName}</Texto>
               </Horizontal>
             </BBDTag>
             <Texto category="h5" className="mr-2">@</Texto>
             <BBDTag className="py-1" success>
               <Horizontal verticalCenter>
                 <EnvironmentFilled style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }} />
-                <Texto category="h6">{data.ForLocationName}</Texto>
+                <Texto category="h5">{data.ForLocationName}</Texto>
               </Horizontal>
             </BBDTag>
           </Horizontal>
           <Horizontal verticalCenter>
             <Texto className="mr-3 mt-1">COUNTERPARTY: </Texto>
-            <Texto category="h6">{data.ForCounterPartyName}</Texto>
+            <Texto category="h5">{data.ForCounterPartyName}</Texto>
           </Horizontal>
         </Vertical>
 
-        <Vertical flex="2" style={{ gap: 8 }}>
+        <Vertical flex="2" gap={8}>
           <Horizontal verticalCenter justifyContent="flex-end">
             <Texto category="p2" className="px-3">PRICE:</Texto>
             <Texto category="h4" style={{
@@ -684,12 +689,12 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
           </Horizontal>
           <Horizontal verticalCenter justifyContent="flex-end">
             <Texto category="p2" className="px-3">AS OF DATE:</Texto>
-            <Texto category="h6" style={{
+            <Texto category="h5" style={{
               transition: 'color 0.3s ease',
               ...(showSuccessTimestamp ? { color: 'var(--theme-success)' } : {}),
               ...(isLoading ? { opacity: 0.5, animation: 'pulse 1.5s ease-in-out infinite' } : {}),
             }}>
-              {showSuccessTimestamp ? 'Revalued just now' : moment(displayDate).format('MM/DD/YYYY hh:mm A')}
+              {showSuccessTimestamp ? 'Revalued just now' : dayjs(displayDate).format('MM/DD/YYYY hh:mm A')}
             </Texto>
           </Horizontal>
           <Horizontal justifyContent="flex-end" style={{ marginTop: 4 }}>
@@ -720,7 +725,7 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
           <>
             <Horizontal className="px-4 py-2" verticalCenter>
               <Texto className="mr-4">Formula Name:</Texto>
-              <Texto category="h6">{data.CalculationName}</Texto>
+              <Texto category="h5">{data.CalculationName}</Texto>
             </Horizontal>
 
             <div className="mx-4" style={{ fontFamily: 'monospace', fontSize: 13, padding: '12px 16px', backgroundColor: 'var(--theme-bg-3)', borderRadius: 6, border: '1px solid var(--theme-border)', minHeight: 60, whiteSpace: 'pre-wrap', color: 'var(--theme-text)' }}>
@@ -847,7 +852,7 @@ export function ContractValuesPage() {
               Click "View Buildup" on any row, then use the action menu (&#8943;) on a price variable row to upload a price via the stacked drawer.
             </Texto>
           </Vertical>
-          <Horizontal verticalCenter style={{ gap: 8 }}>
+          <Horizontal verticalCenter gap={8}>
             <Texto style={{ fontSize: 13 }}>Has price upload permission</Texto>
             <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
           </Horizontal>
@@ -874,8 +879,8 @@ export function ContractValuesPage() {
         placement="right"
         onClose={handleCloseDrawer}
         width={drawerWidth}
-        visible={isDrawerOpen}
-        bodyStyle={{ padding: 0, position: 'relative' }}
+        open={isDrawerOpen}
+        styles={{ body: { padding: 0, position: 'relative' } }}
       >
         <ResizeHandle onResize={handleResize} />
         {!data ? (

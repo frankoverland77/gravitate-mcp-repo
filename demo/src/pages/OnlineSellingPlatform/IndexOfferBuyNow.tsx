@@ -364,11 +364,11 @@ export function IndexOfferBuyNow() {
         title={null}
         placement="bottom"
         height="65%"
-        visible={drawerVisible}
+        open={drawerVisible}
         onClose={handleClose}
         closable={false}
-        destroyOnClose
-        bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
+        destroyOnHidden
+        styles={{ body: { padding: 0, height: '100%', display: 'flex', flexDirection: 'column' } }}
         className="index-offer-drawer"
       >
         {/* ---- HEADER ---- */}
@@ -380,7 +380,7 @@ export function IndexOfferBuyNow() {
           }}
         >
           <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <Vertical style={{ gap: 8 }}>
+            <Vertical gap={8}>
               <BBDTag style={{ maxWidth: 120, fontWeight: 600 }}>Index Purchase</BBDTag>
               <Texto style={{ color: '#ffffff', fontSize: 14 }}>
                 {selectedOffer?.product ?? '-'} @ {selectedOffer?.location ?? '-'}
@@ -398,13 +398,10 @@ export function IndexOfferBuyNow() {
           <Form form={form} name="indexOfferBuyNowForm" layout="vertical">
             {/* ---- PURCHASE TYPE BAR ---- */}
             <Horizontal
-              style={{
-                padding: '12px 24px',
+              gap={12} style={{ padding: '12px 24px',
                 backgroundColor: '#fafafa',
                 borderBottom: '1px solid #e8e8e8',
-                alignItems: 'center',
-                gap: 12,
-              }}
+                alignItems: 'center' }}
             >
               <Texto
                 style={{
@@ -433,13 +430,13 @@ export function IndexOfferBuyNow() {
 
             {/* ---- 3-COLUMN BODY ---- */}
             <Vertical>
-              <Horizontal style={{ padding: '24px', gap: 32 }}>
+              <Horizontal gap={32} style={{ padding: '24px' }}>
                 {/* ============================================ */}
                 {/* COLUMN 1 — DETAILS (flex 2)                  */}
                 {/* ============================================ */}
                 <Vertical flex={2}>
                   <Texto
-                    category="h6"
+                    category="h5"
                     weight={900}
                     style={{
                       textTransform: 'uppercase',
@@ -557,7 +554,7 @@ export function IndexOfferBuyNow() {
                 {/* ============================================ */}
                 <Vertical flex={3} style={{ borderLeft: '1px solid #f0f0f0', paddingLeft: 32 }}>
                   <Texto
-                    category="h6"
+                    category="h5"
                     weight={900}
                     style={{
                       textTransform: 'uppercase',
@@ -677,7 +674,7 @@ export function IndexOfferBuyNow() {
                 {/* ============================================ */}
                 <Vertical flex={3} style={{ borderLeft: '1px solid #f0f0f0', paddingLeft: 32 }}>
                   <Texto
-                    category="h6"
+                    category="h5"
                     weight={900}
                     style={{
                       textTransform: 'uppercase',
@@ -761,7 +758,7 @@ export function IndexOfferBuyNow() {
           }}
         >
           <div />
-          <Horizontal style={{ gap: 12, alignItems: 'center' }}>
+          <Horizontal gap={12} style={{ alignItems: 'center' }}>
             <Button size="large" onClick={handleClose}>
               Cancel
             </Button>

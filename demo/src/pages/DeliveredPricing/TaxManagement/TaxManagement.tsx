@@ -48,8 +48,8 @@ export function TaxManagement() {
       subtitle: 'Manage per-gallon fuel excise tax rates by jurisdiction.',
       hideActiveFilters: false,
       actionButtons: (
-        <Horizontal verticalCenter style={{ gap: '0.75rem' }}>
-          <Horizontal verticalCenter style={{ gap: 6 }}>
+        <Horizontal gap="0.75rem" verticalCenter>
+          <Horizontal gap={6} verticalCenter>
             <span
               style={{
                 fontSize: 11,

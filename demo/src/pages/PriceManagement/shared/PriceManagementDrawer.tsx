@@ -11,7 +11,11 @@ import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, RangeP
 import { Alert, Collapse, DatePicker, Drawer, Form, InputNumber, Modal, Select } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useMemo, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 import type { PriceFormValues, PriceHistoryRow, PriceInstrumentContext, UploadType } from './types';
 import { mockPriceHistory } from './mockData';
@@ -29,7 +33,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       field: 'EffectiveFrom',
       headerName: 'Eff From',
       width: 120,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
     },
     {
       field: 'EffectiveTo',
@@ -37,7 +41,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       width: 110,
       valueFormatter: ({ value }: any) => {
         if (!value) return '';
-        return moment(value).year() >= 9999 ? 'max' : moment(value).format('MM/DD/YYYY');
+        return dayjs(value).year() >= 9999 ? 'max' : dayjs(value).format('MM/DD/YYYY');
       },
     },
     {
@@ -56,7 +60,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       field: 'Updated',
       headerName: 'Updated',
       width: 160,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YY hh:mm A') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YY hh:mm A') : ''),
     },
   ];
 }
@@ -73,7 +77,7 @@ function getInstrumentContextColumnDefs(): ColDef[] {
       field: 'effectiveFrom',
       headerName: 'Eff From',
       width: 120,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
     },
     {
       field: 'effectiveTo',
@@ -81,7 +85,7 @@ function getInstrumentContextColumnDefs(): ColDef[] {
       width: 110,
       valueFormatter: ({ value }: any) => {
         if (!value) return '';
-        return moment(value).year() >= 9999 ? 'max' : moment(value).format('MM/DD/YYYY');
+        return dayjs(value).year() >= 9999 ? 'max' : dayjs(value).format('MM/DD/YYYY');
       },
     },
     {
@@ -102,7 +106,7 @@ function getInstrumentContextColumnDefs(): ColDef[] {
 // ─── PriceManagementDrawer Props ────────────────────────────────────────────
 
 interface PriceManagementDrawerProps {
-  visible: boolean;
+  open: boolean;
   instrumentContext: PriceInstrumentContext | null;
   onSaveSuccess: (instrumentId: number, newPrice: number) => void;
   onClose: () => void;
@@ -112,7 +116,7 @@ interface PriceManagementDrawerProps {
 // ─── PriceManagementDrawer Component ────────────────────────────────────────
 
 export function PriceManagementDrawer({
-  visible,
+  open,
   instrumentContext,
   onSaveSuccess,
   onClose,
@@ -125,14 +129,14 @@ export function PriceManagementDrawer({
   const [selectedUploadType, setSelectedUploadType] = useState<UploadType>('Posting');
 
   // Date range filter for price history
-  const [historyDates, setHistoryDates] = useState<moment.Moment[]>([
-    moment().subtract(1, 'day').startOf('day'),
-    moment().add(1, 'day').endOf('day'),
+  const [historyDates, setHistoryDates] = useState<dayjs.Dayjs[]>([
+    dayjs().subtract(1, 'day').startOf('day'),
+    dayjs().add(1, 'day').endOf('day'),
   ]);
 
   // Effective dates for price entry (used when upload type requires dates)
-  const [effectiveFrom, setEffectiveFrom] = useState<moment.Moment>(moment().startOf('day'));
-  const [effectiveTo, setEffectiveTo] = useState<moment.Moment>(moment().add(1, 'day').endOf('day'));
+  const [effectiveFrom, setEffectiveFrom] = useState<dayjs.Dayjs>(dayjs().startOf('day'));
+  const [effectiveTo, setEffectiveTo] = useState<dayjs.Dayjs>(dayjs().add(1, 'day').endOf('day'));
 
   // Conflict check state
   const [conflictState, setConflictState] = useState<'idle' | 'loading' | 'found' | 'none'>('idle');
@@ -165,9 +169,9 @@ export function PriceManagementDrawer({
         setIsSaving(false);
         setFormDirty(false);
         setHistoryExpanded(true);
-        setHistoryDates([moment().subtract(1, 'day').startOf('day'), moment().add(1, 'day').endOf('day')]);
-        setEffectiveFrom(moment().startOf('day'));
-        setEffectiveTo(moment().add(1, 'day').endOf('day'));
+        setHistoryDates([dayjs().subtract(1, 'day').startOf('day'), dayjs().add(1, 'day').endOf('day')]);
+        setEffectiveFrom(dayjs().startOf('day'));
+        setEffectiveTo(dayjs().add(1, 'day').endOf('day'));
       }
     },
     [instrumentContext, form, resetWidth]
@@ -181,7 +185,7 @@ export function PriceManagementDrawer({
   const filteredPriceHistory = useMemo(() => {
     const [from, to] = historyDates;
     return allPriceHistory.filter((row) => {
-      const effFrom = moment(row.EffectiveFrom);
+      const effFrom = dayjs(row.EffectiveFrom);
       return effFrom.isSameOrAfter(from, 'day') && effFrom.isSameOrBefore(to, 'day');
     });
   }, [allPriceHistory, historyDates]);
@@ -195,8 +199,8 @@ export function PriceManagementDrawer({
 
   const handleUploadTypeChange = (value: UploadType) => {
     setSelectedUploadType(value);
-    setEffectiveFrom(moment().startOf('day'));
-    setEffectiveTo(moment().add(1, 'day').endOf('day'));
+    setEffectiveFrom(dayjs().startOf('day'));
+    setEffectiveTo(dayjs().add(1, 'day').endOf('day'));
     setFormDirty(true);
     clearConflicts();
   };
@@ -300,28 +304,28 @@ export function PriceManagementDrawer({
       placement="right"
       onClose={handleClose}
       width={drawerWidth}
-      visible={visible}
+      open={open}
       closable={false}
-      afterVisibleChange={handleAfterVisibleChange}
-      bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}
+      afterOpenChange={handleAfterVisibleChange}
+      styles={{ body: { padding: 0, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' } }}
     >
       <ResizeHandle onResize={handleResize} />
       <Vertical height="100%">
         {/* ── SECTION 1: CONTEXT HEADER ─────────────────────────── */}
         <div className="p-4 bg-2 bordered" style={{ flexShrink: 0, borderBottom: '1px solid var(--theme-border)' }}>
           <Horizontal verticalCenter>
-            <Vertical flex="1" style={{ gap: 8 }}>
-              <Horizontal verticalCenter style={{ gap: 8 }}>
+            <Vertical flex="1" gap={8}>
+              <Horizontal verticalCenter gap={8}>
                 <BBDTag className="py-1" success>
                   <Horizontal verticalCenter>
                     <ExperimentFilled style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }} />
-                    <Texto category="h6">{instrumentContext.product}</Texto>
+                    <Texto category="h5">{instrumentContext.product}</Texto>
                   </Horizontal>
                 </BBDTag>
                 <BBDTag className="py-1" success>
                   <Horizontal verticalCenter>
                     <EnvironmentFilled style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }} />
-                    <Texto category="h6">{instrumentContext.location}</Texto>
+                    <Texto category="h5">{instrumentContext.location}</Texto>
                   </Horizontal>
                 </BBDTag>
                 {instrumentContext.counterparty && (
@@ -332,9 +336,9 @@ export function PriceManagementDrawer({
               </Horizontal>
             </Vertical>
 
-            <Horizontal verticalCenter style={{ gap: 16 }}>
+            <Horizontal verticalCenter gap={16}>
               <Vertical style={{ textAlign: 'right' }}>
-                <Horizontal verticalCenter justifyContent="flex-end" style={{ gap: 6 }}>
+                <Horizontal verticalCenter justifyContent="flex-end" gap={6}>
                   <Texto appearance="medium" style={{ fontSize: 12 }}>PRICE</Texto>
                   <Texto category="h4" style={{ fontWeight: 700 }}>
                     {instrumentContext.currentPrice != null
@@ -342,11 +346,11 @@ export function PriceManagementDrawer({
                       : '\u2014'}
                   </Texto>
                 </Horizontal>
-                <Horizontal verticalCenter justifyContent="flex-end" style={{ gap: 6 }}>
+                <Horizontal verticalCenter justifyContent="flex-end" gap={6}>
                   <Texto appearance="medium" style={{ fontSize: 11 }}>AS OF</Texto>
                   <Texto style={{ fontSize: 12 }}>
                     {instrumentContext.asOfDate
-                      ? moment(instrumentContext.asOfDate).format('MM/DD/YYYY hh:mm A')
+                      ? dayjs(instrumentContext.asOfDate).format('MM/DD/YYYY hh:mm A')
                       : '\u2014'}
                   </Texto>
                 </Horizontal>
@@ -381,7 +385,7 @@ export function PriceManagementDrawer({
             flexShrink: 0,
           }}
         >
-          <Texto category="h6" style={{ marginBottom: 10 }}>
+          <Texto category="h5" style={{ marginBottom: 10 }}>
             Enter Price
           </Texto>
 
@@ -407,7 +411,7 @@ export function PriceManagementDrawer({
             disabled={isSaving}
             size="small"
           >
-            <Horizontal style={{ gap: 12, flexWrap: 'wrap' }}>
+            <Horizontal gap={12} style={{ flexWrap: 'wrap' }}>
               <Form.Item
                 label="Price Value"
                 name="priceValue"
@@ -418,10 +422,10 @@ export function PriceManagementDrawer({
               </Form.Item>
 
               <Form.Item label="Status" name="estimateActual" style={{ width: 120, marginBottom: 8 }}>
-                <Select>
-                  <Select.Option value="Actual">Actual</Select.Option>
-                  <Select.Option value="Estimate">Estimate</Select.Option>
-                </Select>
+                <Select options={[
+                  { value: 'Actual', label: 'Actual' },
+                  { value: 'Estimate', label: 'Estimate' },
+                ]} />
               </Form.Item>
 
               <Form.Item
@@ -430,11 +434,11 @@ export function PriceManagementDrawer({
                 rules={[{ required: true, message: 'Required' }]}
                 style={{ width: 160, marginBottom: 8 }}
               >
-                <Select onChange={handleUploadTypeChange}>
-                  <Select.Option value="Posting">Posting</Select.Option>
-                  <Select.Option value="EffectiveStart">Effective Start</Select.Option>
-                  <Select.Option value="EffectiveDates">Effective Dates</Select.Option>
-                </Select>
+                <Select onChange={handleUploadTypeChange} options={[
+                  { value: 'Posting', label: 'Posting' },
+                  { value: 'EffectiveStart', label: 'Effective Start' },
+                  { value: 'EffectiveDates', label: 'Effective Dates' },
+                ]} />
               </Form.Item>
 
               {showEffectiveDates && (
@@ -469,7 +473,7 @@ export function PriceManagementDrawer({
               )}
             </Horizontal>
 
-            <Horizontal style={{ gap: 8, marginTop: 4 }}>
+            <Horizontal gap={8} style={{ marginTop: 4 }}>
               <GraviButton
                 size="small"
                 buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
@@ -524,19 +528,19 @@ export function PriceManagementDrawer({
             <Collapse.Panel
               key="history"
               header={
-                <Texto category="h6" style={{ fontSize: 13 }}>
+                <Texto category="h5" style={{ fontSize: 13 }}>
                   Price History ({filteredPriceHistory.length})
                 </Texto>
               }
               style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
             >
               {/* Date range filter */}
-              <Horizontal className="pb-2" verticalCenter style={{ gap: 12 }}>
+              <Horizontal className="pb-2" verticalCenter gap={12}>
                 <RangePicker
                   inputKey="priceHistoryDates"
                   dates={historyDates}
                   onChange={(dates) => {
-                    setHistoryDates(dates.map((d: any) => (moment.isMoment(d) ? d : moment(d))));
+                    setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
                     clearConflicts();
                   }}
                   placement="bottomRight"

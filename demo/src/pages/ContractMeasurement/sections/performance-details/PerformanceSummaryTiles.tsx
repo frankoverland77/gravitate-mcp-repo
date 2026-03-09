@@ -34,8 +34,8 @@ interface MetricTileProps {
 function MetricTile({ icon, iconColor = '#8c8c8c', label, value, valueColor }: MetricTileProps) {
   return (
     <div style={cardStyle}>
-      <Vertical style={{ gap: '12px' }}>
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+      <Vertical gap={12}>
+        <Horizontal gap={8} alignItems='center'>
           <span style={{ fontSize: '16px', color: iconColor }}>{icon}</span>
           <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             {label}

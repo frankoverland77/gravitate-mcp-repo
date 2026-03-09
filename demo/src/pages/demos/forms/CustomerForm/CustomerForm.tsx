@@ -65,7 +65,7 @@ export function CustomerForm() {
         </Form.Item>
 
         <Form.Item>
-          <Horizontal justifyContent="flex-end" style={{ gap: '12px' }}>
+          <Horizontal gap={12} justifyContent="flex-end">
             <GraviButton
               buttonText="Cancel"
               onClick={() => form.resetFields()}

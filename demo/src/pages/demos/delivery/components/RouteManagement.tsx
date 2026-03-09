@@ -800,13 +800,14 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
               value={activeFilters.routes.status || []}
               onChange={(values: any[]) => setRouteFilters({ status: values })}
               allowClear
-            >
-              <Select.Option value="DRAFT">Draft</Select.Option>
-              <Select.Option value="SCHEDULED">Scheduled</Select.Option>
-              <Select.Option value="ACTIVE">Active</Select.Option>
-              <Select.Option value="COMPLETED">Completed</Select.Option>
-              <Select.Option value="CANCELLED">Cancelled</Select.Option>
-            </Select>
+              options={[
+                { label: 'Draft', value: 'DRAFT' },
+                { label: 'Scheduled', value: 'SCHEDULED' },
+                { label: 'Active', value: 'ACTIVE' },
+                { label: 'Completed', value: 'COMPLETED' },
+                { label: 'Cancelled', value: 'CANCELLED' },
+              ]}
+            />
             
             <Select
               mode="multiple"
@@ -815,11 +816,12 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
               value={activeFilters.routes.priority || []}
               onChange={(values: string[]) => setRouteFilters({ priority: values })}
               allowClear
-            >
-              <Select.Option value="LOW">Low</Select.Option>
-              <Select.Option value="MEDIUM">Medium</Select.Option>
-              <Select.Option value="HIGH">High</Select.Option>
-            </Select>
+              options={[
+                { label: 'Low', value: 'LOW' },
+                { label: 'Medium', value: 'MEDIUM' },
+                { label: 'High', value: 'HIGH' },
+              ]}
+            />
             
             <Select
               placeholder="Filter by Driver"
@@ -827,13 +829,8 @@ export function RouteManagement({ onCreateRoute }: RouteManagementProps) {
               value={activeFilters.routes.driverId}
               onChange={(value: string | undefined) => setRouteFilters({ driverId: value })}
               allowClear
-            >
-              {drivers.map(driver => (
-                <Select.Option key={driver.id} value={driver.id}>
-                  {driver.name}
-                </Select.Option>
-              ))}
-            </Select>
+              options={drivers.map(driver => ({ label: driver.name, value: driver.id }))}
+            />
             
             {(activeFilters.routes.status?.length || activeFilters.routes.priority?.length || activeFilters.routes.driverId || searchState.routes) ? (
               <GraviButton 

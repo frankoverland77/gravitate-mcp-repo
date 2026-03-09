@@ -13,7 +13,11 @@ import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, Texto,
 import { Alert, DatePicker, Drawer, Form, InputNumber, Modal, Select, Switch, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 import {
   PriceEntryFormulaDetail,
@@ -61,7 +65,7 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       field: 'UpdatedDateTime',
       headerName: 'Updated',
       width: 170,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY hh:mm A') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : ''),
     },
     {
       field: 'actions',
@@ -104,8 +108,8 @@ interface PriceFormValues {
   priceValue: number;
   estimateActual: 'Actual' | 'Estimate';
   uploadType: UploadType;
-  effectiveFrom?: moment.Moment;
-  effectiveTo?: moment.Moment;
+  effectiveFrom?: dayjs.Dayjs;
+  effectiveTo?: dayjs.Dayjs;
 }
 
 // ─── Price History Grid Column Defs ─────────────────────────────────────────
@@ -128,7 +132,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       field: 'EffectiveFrom',
       headerName: 'Effective From',
       width: 150,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
     },
     {
       field: 'EffectiveTo',
@@ -136,7 +140,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       width: 150,
       valueFormatter: ({ value }: any) => {
         if (!value) return '';
-        return moment(value).year() >= 9999 ? 'max' : moment(value).format('MM/DD/YYYY');
+        return dayjs(value).year() >= 9999 ? 'max' : dayjs(value).format('MM/DD/YYYY');
       },
     },
     { field: 'Publisher', headerName: 'Publisher', width: 100 },
@@ -146,7 +150,7 @@ function getPriceHistoryColumnDefs(): ColDef[] {
       field: 'Updated',
       headerName: 'Updated',
       width: 170,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY hh:mm A') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : ''),
     },
   ];
 }
@@ -173,8 +177,8 @@ function StackedPriceDrawer({
   const [form] = Form.useForm();
 
   // Date range filter state — default: yesterday through tomorrow
-  const [dateFrom, setDateFrom] = useState<moment.Moment>(moment().subtract(1, 'day').startOf('day'));
-  const [dateTo, setDateTo] = useState<moment.Moment>(moment().add(1, 'day').endOf('day'));
+  const [dateFrom, setDateFrom] = useState<dayjs.Dayjs>(dayjs().subtract(1, 'day').startOf('day'));
+  const [dateTo, setDateTo] = useState<dayjs.Dayjs>(dayjs().add(1, 'day').endOf('day'));
 
   // Upload type drives conditional date fields
   const [selectedUploadType, setSelectedUploadType] = useState<UploadType>(
@@ -196,20 +200,20 @@ function StackedPriceDrawer({
   const allPriceHistory = mockPriceHistory[component.PriceInstrumentId] ?? [];
   const filteredPriceHistory = useMemo(() => {
     return allPriceHistory.filter((row) => {
-      const effFrom = moment(row.EffectiveFrom);
+      const effFrom = dayjs(row.EffectiveFrom);
       return effFrom.isSameOrAfter(dateFrom, 'day') && effFrom.isSameOrBefore(dateTo, 'day');
     });
   }, [allPriceHistory, dateFrom, dateTo]);
 
   // Clear conflict highlighting when date fields change
-  const handleDateFromChange = (val: moment.Moment | null) => {
+  const handleDateFromChange = (val: dayjs.Dayjs | null) => {
     if (val) {
       setDateFrom(val);
       clearConflicts();
     }
   };
 
-  const handleDateToChange = (val: moment.Moment | null) => {
+  const handleDateToChange = (val: dayjs.Dayjs | null) => {
     if (val) {
       setDateTo(val);
       clearConflicts();
@@ -308,12 +312,12 @@ function StackedPriceDrawer({
         style={{ borderBottom: '1px solid var(--theme-border)' }}
       >
         <Vertical flex="1">
-          <Texto category="h6">Price History</Texto>
+          <Texto category="h5">Price History</Texto>
           <Texto appearance="medium" style={{ fontSize: 12, marginTop: 2 }}>
             {component.PriceInstrumentName}
           </Texto>
         </Vertical>
-        <Horizontal verticalCenter style={{ gap: 6 }}>
+        <Horizontal verticalCenter gap={6}>
           <BBDTag style={{ fontSize: 10 }}>{component.PriceTypeCodeValueDisplay}</BBDTag>
           <GraviButton
             size="small"
@@ -325,8 +329,8 @@ function StackedPriceDrawer({
       </Horizontal>
 
       {/* ── DATE RANGE FILTER ──────────────────────────────── */}
-      <Horizontal className="px-4 py-2" verticalCenter style={{ gap: 12 }}>
-        <Horizontal verticalCenter style={{ gap: 6 }}>
+      <Horizontal className="px-4 py-2" verticalCenter gap={12}>
+        <Horizontal verticalCenter gap={6}>
           <Texto style={{ fontSize: 12, whiteSpace: 'nowrap' }}>Effective From:</Texto>
           <DatePicker
             size="small"
@@ -336,7 +340,7 @@ function StackedPriceDrawer({
             allowClear={false}
           />
         </Horizontal>
-        <Horizontal verticalCenter style={{ gap: 6 }}>
+        <Horizontal verticalCenter gap={6}>
           <Texto style={{ fontSize: 12, whiteSpace: 'nowrap' }}>Effective To:</Texto>
           <DatePicker
             size="small"
@@ -392,7 +396,7 @@ function StackedPriceDrawer({
           flexShrink: 0,
         }}
       >
-        <Texto category="h6" style={{ marginBottom: 10 }}>Enter Price</Texto>
+        <Texto category="h5" style={{ marginBottom: 10 }}>Enter Price</Texto>
 
         {/* Error alert */}
         {saveError && (
@@ -413,13 +417,13 @@ function StackedPriceDrawer({
           initialValues={{
             estimateActual: 'Actual',
             uploadType: component.UploadType ?? 'Posting',
-            effectiveFrom: showEffectiveFrom ? moment() : undefined,
-            effectiveTo: showEffectiveTo ? moment().endOf('month') : undefined,
+            effectiveFrom: showEffectiveFrom ? dayjs() : undefined,
+            effectiveTo: showEffectiveTo ? dayjs().endOf('month') : undefined,
           }}
           disabled={isSaving}
           size="small"
         >
-          <Horizontal style={{ gap: 12, flexWrap: 'wrap' }}>
+          <Horizontal gap={12} style={{ flexWrap: 'wrap' }}>
             <Form.Item
               label="Price Value"
               name="priceValue"
@@ -439,10 +443,7 @@ function StackedPriceDrawer({
               name="estimateActual"
               style={{ width: 120, marginBottom: 8 }}
             >
-              <Select>
-                <Select.Option value="Actual">Actual</Select.Option>
-                <Select.Option value="Estimate">Estimate</Select.Option>
-              </Select>
+              <Select options={[{ value: 'Actual', label: 'Actual' }, { value: 'Estimate', label: 'Estimate' }]} />
             </Form.Item>
 
             <Form.Item
@@ -451,11 +452,7 @@ function StackedPriceDrawer({
               rules={[{ required: true, message: 'Required' }]}
               style={{ width: 160, marginBottom: 8 }}
             >
-              <Select onChange={handleUploadTypeChange}>
-                <Select.Option value="Posting">Posting</Select.Option>
-                <Select.Option value="EffectiveStart">Effective Start</Select.Option>
-                <Select.Option value="EffectiveDates">Effective Dates</Select.Option>
-              </Select>
+              <Select onChange={handleUploadTypeChange} options={[{ value: 'Posting', label: 'Posting' }, { value: 'EffectiveStart', label: 'Effective Start' }, { value: 'EffectiveDates', label: 'Effective Dates' }]} />
             </Form.Item>
 
             {showEffectiveFrom && (
@@ -489,7 +486,7 @@ function StackedPriceDrawer({
             )}
           </Horizontal>
 
-          <Horizontal style={{ gap: 8, marginTop: 4 }}>
+          <Horizontal gap={8} style={{ marginTop: 4 }}>
             <GraviButton
               size="small"
               buttonText={conflictCheckState === 'loading' ? 'Checking...' : 'Check Conflicts'}
@@ -716,7 +713,7 @@ function DrawerContent({
         headerName: 'As of Date',
         width: 170,
         cellRenderer: ({ value }: { value: string }) =>
-          value ? moment(value).format('MM/DD/YYYY hh:mm A') : '',
+          value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '',
       },
     ];
 
@@ -775,7 +772,7 @@ function DrawerContent({
     <Vertical height="100%">
       {/* ── HEADER BAR — always visible ────────────────────── */}
       <Horizontal className="p-4 bg-2 bordered" style={{ flexShrink: 0 }}>
-        <Vertical flex="5" style={{ gap: 10 }}>
+        <Vertical flex="5" gap={10}>
           <Horizontal verticalCenter>
             <Tooltip title="Product">
               <BBDTag className="py-1" style={{ whiteSpace: 'normal' }} success>
@@ -783,7 +780,7 @@ function DrawerContent({
                   <ExperimentFilled
                     style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }}
                   />
-                  <Texto category="h6">{data.ForProductName}</Texto>
+                  <Texto category="h5">{data.ForProductName}</Texto>
                 </Horizontal>
               </BBDTag>
             </Tooltip>
@@ -796,18 +793,18 @@ function DrawerContent({
                   <EnvironmentFilled
                     style={{ marginRight: 5, fontSize: 12, color: 'var(--theme-color-2)' }}
                   />
-                  <Texto category="h6">{data.ForLocationName}</Texto>
+                  <Texto category="h5">{data.ForLocationName}</Texto>
                 </Horizontal>
               </BBDTag>
             </Tooltip>
           </Horizontal>
           <Horizontal verticalCenter>
             <Texto className="mr-3 mt-1">COUNTERPARTY: </Texto>
-            <Texto category="h6">{data.ForCounterPartyName}</Texto>
+            <Texto category="h5">{data.ForCounterPartyName}</Texto>
           </Horizontal>
         </Vertical>
 
-        <Vertical flex="2" style={{ gap: 8 }}>
+        <Vertical flex="2" gap={8}>
           <Horizontal verticalCenter justifyContent="flex-end">
             <Texto category="p2" className="px-3">
               PRICE:
@@ -833,7 +830,7 @@ function DrawerContent({
               AS OF DATE:
             </Texto>
             <Texto
-              category="h6"
+              category="h5"
               style={{
                 transition: 'color 0.3s ease',
                 ...(showSuccessTimestamp ? { color: 'var(--theme-success)' } : {}),
@@ -844,7 +841,7 @@ function DrawerContent({
             >
               {showSuccessTimestamp
                 ? 'Revalued just now'
-                : moment(displayDate).format('MM/DD/YYYY hh:mm A')}
+                : dayjs(displayDate).format('MM/DD/YYYY hh:mm A')}
             </Texto>
           </Horizontal>
 
@@ -917,7 +914,7 @@ function DrawerContent({
           {/* Formula name */}
           <Horizontal className="px-4 py-2" verticalCenter>
             <Texto className="mr-4">Formula Name:</Texto>
-            <Texto category="h6">{data.CalculationName}</Texto>
+            <Texto category="h5">{data.CalculationName}</Texto>
           </Horizontal>
 
           {/* Formula editor */}
@@ -1067,16 +1064,16 @@ export function PriceEntryPage() {
               row to open the stacked price entry drawer with price history grid.
             </Texto>
           </Vertical>
-          <Vertical style={{ gap: 8, minWidth: 220, alignItems: 'flex-end' }}>
-            <Horizontal verticalCenter style={{ gap: 8 }}>
+          <Vertical gap={8} style={{ minWidth: 220, alignItems: 'flex-end' }}>
+            <Horizontal verticalCenter gap={8}>
               <Texto style={{ fontSize: 13 }}>Has price upload permission</Texto>
               <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
             </Horizontal>
-            <Horizontal verticalCenter style={{ gap: 8 }}>
+            <Horizontal verticalCenter gap={8}>
               <Texto style={{ fontSize: 13 }}>Simulate lock conflict</Texto>
               <Switch checked={simulateLockConflict} onChange={setSimulateLockConflict} size="small" />
             </Horizontal>
-            <Horizontal verticalCenter style={{ gap: 8 }}>
+            <Horizontal verticalCenter gap={8}>
               <Texto style={{ fontSize: 13 }}>Simulate conflicts found</Texto>
               <Switch checked={simulateConflicts} onChange={setSimulateConflicts} size="small" />
             </Horizontal>
@@ -1104,7 +1101,7 @@ export function PriceEntryPage() {
         placement="right"
         onClose={handleCloseDrawer}
         width="50vw"
-        visible={isDrawerOpen}
+        open={isDrawerOpen}
       >
         {!data ? (
           <Horizontal fullHeight horizontalCenter verticalCenter>

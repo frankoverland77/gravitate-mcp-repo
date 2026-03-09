@@ -42,7 +42,7 @@ function FilterDropdown({
   onToggle: (value: string) => void
 }) {
   return (
-    <Vertical style={{ gap: '8px', padding: '8px', minWidth: '150px' }}>
+    <Vertical gap={8} style={{ padding: '8px', minWidth: '150px' }}>
       {options.map((option) => (
         <Checkbox key={option} checked={selected.has(option)} onChange={() => onToggle(option)}>
           {option}
@@ -211,7 +211,7 @@ export function DetailGridSection({
     const cols: ColumnsType<DetailRow> = [
       {
         title: (
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <Texto weight='600'>Product</Texto>
             <Popover
               content={
@@ -231,7 +231,7 @@ export function DetailGridSection({
       },
       {
         title: (
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <Texto weight='600'>Location</Texto>
             <Popover
               content={
@@ -307,10 +307,10 @@ export function DetailGridSection({
   }, [filteredDetails])
 
   return (
-    <Vertical style={{ gap: '12px' }}>
+    <Vertical gap={12}>
       {/* Header with metric selector */}
       <Horizontal justifyContent='space-between' alignItems='center'>
-        <Horizontal alignItems='center' style={{ gap: '12px' }}>
+        <Horizontal gap={12} alignItems='center'>
           <Texto category='h5' weight='600'>
             Product/Location Details
           </Texto>

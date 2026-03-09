@@ -3,7 +3,7 @@ import { GraviButton, GraviGrid, Horizontal, Texto, Vertical } from '@gravitate-
 import { Menu, Popover, Switch, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import type { AllPricesRow, PriceInstrumentContext } from '../shared/types';
 import { mockAllPricesRows } from '../shared/mockData';
@@ -24,7 +24,7 @@ function getAllPricesColumnDefs(
       field: 'EffectiveFrom',
       headerName: 'Eff From',
       width: 120,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YYYY') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
     },
     {
       field: 'EffectiveTo',
@@ -32,7 +32,7 @@ function getAllPricesColumnDefs(
       width: 110,
       valueFormatter: ({ value }: any) => {
         if (!value) return '';
-        return moment(value).year() >= 9999 ? 'max' : moment(value).format('MM/DD/YYYY');
+        return dayjs(value).year() >= 9999 ? 'max' : dayjs(value).format('MM/DD/YYYY');
       },
     },
     {
@@ -60,7 +60,7 @@ function getAllPricesColumnDefs(
       field: 'UpdatedDateTime',
       headerName: 'Updated',
       width: 160,
-      valueFormatter: ({ value }: any) => (value ? moment(value).format('MM/DD/YY hh:mm A') : ''),
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YY hh:mm A') : ''),
     },
     {
       field: '_actions',
@@ -105,15 +105,18 @@ function ActionMenu({
         }
         setVisible(false);
       }}
-    >
-      <Menu.Item key="uploadPrice" disabled={!hasPermission}>
-        {hasPermission ? 'Upload Price' : (
-          <Tooltip title="You do not have price upload permission">
-            <span style={{ color: 'var(--theme-text-disabled)' }}>Upload Price</span>
-          </Tooltip>
-        )}
-      </Menu.Item>
-    </Menu>
+      items={[
+        {
+          key: 'uploadPrice',
+          disabled: !hasPermission,
+          label: hasPermission ? 'Upload Price' : (
+            <Tooltip title="You do not have price upload permission">
+              <span style={{ color: 'var(--theme-text-disabled)' }}>Upload Price</span>
+            </Tooltip>
+          ),
+        },
+      ]}
+    />
   );
 
   return (
@@ -121,8 +124,8 @@ function ActionMenu({
       content={menu}
       trigger="click"
       placement="bottomRight"
-      visible={visible}
-      onVisibleChange={setVisible}
+      open={visible}
+      onOpenChange={setVisible}
       overlayStyle={{ padding: 0 }}
     >
       <GraviButton
@@ -211,7 +214,7 @@ export function AllPricesPage() {
               View all price instruments. Click the action menu (&#8943;) on any database-sourced row to upload or correct a price inline.
             </Texto>
           </Vertical>
-          <Horizontal verticalCenter style={{ gap: 8 }}>
+          <Horizontal verticalCenter gap={8}>
             <Texto style={{ fontSize: 13 }}>Has price upload permission</Texto>
             <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
           </Horizontal>
@@ -236,7 +239,8 @@ export function AllPricesPage() {
 
       {/* ── PRICE MANAGEMENT DRAWER ──────────────────────────── */}
       <PriceManagementDrawer
-        visible={drawerVisible}
+        open={drawerVisible}
+
         instrumentContext={selectedInstrumentContext}
         onSaveSuccess={handleSaveSuccess}
         onClose={handleCloseDrawer}

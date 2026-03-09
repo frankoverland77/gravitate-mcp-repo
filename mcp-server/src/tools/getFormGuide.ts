@@ -50,7 +50,7 @@ function MyForm() {
           <Input placeholder="Enter name" />
         </Form.Item>
         
-        <Horizontal className="gap-12">
+        <Horizontal gap={12}>
           <GraviButton buttonText="Cancel" onClick={() => form.resetFields()} />
           <GraviButton success buttonText="Save" onClick={() => form.submit()} />
         </Horizontal>
@@ -70,7 +70,7 @@ function MyForm() {
 ✅ \`form.submit()\` in onClick, NOT \`htmlType="submit"\`
 ✅ \`<GraviButton success>\` NOT \`<GraviButton theme="success">\`
 ✅ Labels inside Form.Item \`label\` prop
-✅ Use \`className="gap-12"\` for spacing between buttons
+✅ Use \`gap={12}\` for spacing between buttons
 
 ## Common Field Types
 \`\`\`tsx
@@ -406,7 +406,7 @@ function MyForm() {
   return (
     <Form form={form} onFinish={handleSubmit}>
       {/* fields */}
-      <Horizontal className="gap-12">
+      <Horizontal gap={12}>
         <GraviButton 
           buttonText="Cancel" 
           onClick={() => form.resetFields()} 
@@ -447,7 +447,7 @@ function ProductForm({ onClose }) {
   return (
     <Form form={form} onFinish={mutation.mutate}>
       {/* fields */}
-      <Horizontal className="gap-12">
+      <Horizontal gap={12}>
         <GraviButton buttonText="Cancel" onClick={onClose} />
         <GraviButton 
           success 
@@ -582,7 +582,7 @@ function ProductForm({ onSuccess }) {
           <Select placeholder="Select category" options={categoryOptions} />
         </Form.Item>
 
-        <Horizontal justifyContent="flex-end" className="gap-12 mt-2">
+        <Horizontal justifyContent="flex-end" gap={12} className="mt-2">
           <GraviButton buttonText="Cancel" onClick={() => form.resetFields()} />
           <GraviButton 
             success 
@@ -599,7 +599,7 @@ function ProductForm({ onSuccess }) {
 
 ## 2. Modal Form
 \`\`\`tsx
-function EditProductModal({ visible, product, onClose }) {
+function EditProductModal({ open, product, onClose }) {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -623,11 +623,11 @@ function EditProductModal({ visible, product, onClose }) {
 
   return (
     <Modal
-      visible={visible}  // NOT "open"!
+      open={open}  // antd v5: use "open" not "visible"
       title="Edit Product"
       onCancel={handleClose}
       footer={
-        <Horizontal justifyContent="flex-end" className="gap-12">
+        <Horizontal justifyContent="flex-end" gap={12}>
           <GraviButton buttonText="Cancel" onClick={handleClose} />
           <GraviButton 
             success 
@@ -678,7 +678,7 @@ function FilterForm({ onFilter }) {
         <RangePicker />
       </Form.Item>
       
-      <Horizontal className="gap-8">
+      <Horizontal gap={8}>
         <GraviButton buttonText="Reset" onClick={handleReset} />
         <GraviButton theme1 buttonText="Apply" onClick={() => form.submit()} />
       </Horizontal>
@@ -742,7 +742,7 @@ function MultiStepForm() {
         )}
       </Form>
       
-      <Horizontal justifyContent="flex-end" className="gap-12 mt-2">
+      <Horizontal justifyContent="flex-end" gap={12} className="mt-2">
         {step > 0 && <GraviButton buttonText="Previous" onClick={prev} />}
         {step < steps.length - 1 && (
           <GraviButton theme1 buttonText="Next" onClick={next} />

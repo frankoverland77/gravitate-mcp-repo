@@ -56,26 +56,23 @@ export function CustomerElasticityView() {
   }, [gridApi])
 
   return (
-    <Vertical height="100%" style={{ gap: '8px' }}>
+    <Vertical gap={8} height="100%">
       {/* Compact totals header */}
       <CompactTotalsHeader totals={MOCK_CUSTOMER_TOTALS} />
 
       {/* Main content area */}
-      <Horizontal flex="1" style={{ gap: '0px', minHeight: 0 }}>
+      <Horizontal flex="1" gap={0} style={{ minHeight: 0 }}>
         {/* Left panel - Elasticity Curve (visible when customer selected) */}
         {selectedCustomer && (
           <Vertical
             flex="1"
-            style={{
-              borderRight: '1px solid #e8e8e8',
+            gap={12} style={{ borderRight: '1px solid #e8e8e8',
               padding: '12px',
-              overflow: 'auto',
-              gap: '12px',
-            }}
+              overflow: 'auto' }}
           >
             {/* Panel header */}
             <Horizontal justifyContent="space-between" alignItems="center">
-              <Vertical style={{ gap: '2px' }}>
+              <Vertical gap={2}>
                 <Texto category="h5" weight="600">
                   {selectedCustomer.counterParty}
                 </Texto>
@@ -83,7 +80,7 @@ export function CustomerElasticityView() {
                   Price Elasticity Curve
                 </Texto>
               </Vertical>
-              <Horizontal style={{ gap: '8px' }} alignItems="center">
+              <Horizontal gap={8} alignItems="center">
                 <Select
                   value={segmentation}
                   onChange={setSegmentation}

@@ -22,7 +22,7 @@ import {
 import styles from './FormulaScenarioDrawer.module.css'
 
 interface FormulaScenarioDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onSave?: (scenario: Scenario) => void
   editingScenario?: Scenario
@@ -79,7 +79,7 @@ function StatusCellRenderer(props: { value: string }) {
   const status = props.value
   if (status === 'confirmed') {
     return (
-      <Horizontal alignItems="center" style={{ gap: '6px' }}>
+      <Horizontal gap={6} alignItems="center">
         <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
         <Texto category="p2" style={{ color: '#52c41a' }}>
           Confirmed
@@ -89,7 +89,7 @@ function StatusCellRenderer(props: { value: string }) {
   }
   if (status === 'in-progress') {
     return (
-      <Horizontal alignItems="center" style={{ gap: '6px' }}>
+      <Horizontal gap={6} alignItems="center">
         <ClockCircleOutlined style={{ color: '#faad14', fontSize: '14px' }} />
         <Texto category="p2" style={{ color: '#faad14' }}>
           In Progress
@@ -98,7 +98,7 @@ function StatusCellRenderer(props: { value: string }) {
     )
   }
   return (
-    <Horizontal alignItems="center" style={{ gap: '6px' }}>
+    <Horizontal gap={6} alignItems="center">
       <MinusCircleOutlined style={{ color: '#8c8c8c', fontSize: '14px' }} />
       <Texto category="p2" appearance="medium">
         Empty
@@ -108,7 +108,7 @@ function StatusCellRenderer(props: { value: string }) {
 }
 
 export function FormulaScenarioDrawer({
-  visible,
+  open,
   onClose,
   onSave,
   editingScenario,
@@ -123,7 +123,7 @@ export function FormulaScenarioDrawer({
   const isSingleDetailMode = isEditMode && !!editingDetailId
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       if (editingScenario) {
         // Edit mode - load existing scenario data
         setName(editingScenario.name)
@@ -139,7 +139,7 @@ export function FormulaScenarioDrawer({
       }
       setClipboard(EMPTY_CLIPBOARD)
     }
-  }, [visible, editingScenario])
+  }, [open, editingScenario])
 
   // Get selected row count from AG Grid
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -431,20 +431,20 @@ export function FormulaScenarioDrawer({
     <Drawer
       placement="bottom"
       height="85%"
-      visible={visible}
+      open={open}
       onClose={onClose}
       closable={false}
       title={null}
       headerStyle={{ display: 'none' }}
-      bodyStyle={{
+      styles={{ body: {
         backgroundColor: '#f5f5f5',
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-      }}
+      } }}
       zIndex={2000}
-      destroyOnClose
+      destroyOnHidden
     >
       <DrawerHeader onClose={onClose} isEditMode={isEditMode} isSingleDetailMode={isSingleDetailMode} />
       <ClipboardBar clipboard={clipboard} onClear={handleClearClipboard} />

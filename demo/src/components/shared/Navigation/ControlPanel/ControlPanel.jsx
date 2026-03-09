@@ -12,9 +12,7 @@ import { Avatar, Button, Drawer, Select } from "antd";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const { Option } = Select;
-
-export function ControlPanel({ onClose, visible }) {
+export function ControlPanel({ onClose, open: visible }) {
   // const { useUserInfoQuery } = useCredential()
   // const { data: user } = useUserInfoQuery()
 
@@ -24,7 +22,7 @@ export function ControlPanel({ onClose, visible }) {
       placement="right"
       width={450}
       onClose={onClose}
-      visible={visible}
+      open={visible}
     >
       <div className="vertical-flex" style={{ height: "43%" }}>
         {/* <UserDetails user={user} />
@@ -89,7 +87,7 @@ function UserDetails({ user }) {
           {securityContext?.Roles && (
             <ManyTag tagItems={securityContext.Roles} maxCount={2} />
           )}
-          <Texto appearance="secondary" className="flex items-center mt-2">
+          <Texto appearance="medium" className="flex items-center mt-2">
             <MailFilled className="pr-3" />
             {user?.Data.Email || "No Email"}
           </Texto>
@@ -117,13 +115,11 @@ function ThemeSelect() {
           localStorage.getItem("TYPE_OF_THEME") ||
           availableThemes.find((theme) => theme.default).key
         }
-      >
-        {availableThemes.map((theme, i) => (
-          <Option key={i} value={theme.key}>
-            {theme.display}
-          </Option>
-        ))}
-      </Select>
+        options={availableThemes.map((theme, i) => ({
+          label: theme.display,
+          value: theme.key,
+        }))}
+      />
       <div className="border-div" />
     </div>
   );

@@ -77,10 +77,10 @@ export function ConfirmModal({
   return (
     <Modal
       title='Confirm Price Notification'
-      visible={isShowingConfirmModal}
+      open={isShowingConfirmModal}
       onCancel={() => setIsShowingConfirmModal(false)}
       footer={
-        <Horizontal justifyContent='flex-end' alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} justifyContent='flex-end' alignItems='center'>
           <GraviButton
             disabled={isSending}
             buttonText='Cancel'
@@ -116,7 +116,7 @@ export function ConfirmModal({
         )}
 
         <Vertical className='mt-2'>
-          <Texto category='h6'>Notification Summary</Texto>
+          <Texto category='h5'>Notification Summary</Texto>
           <Texto>• Method: {getMethodDisplayName(notificationMethod)}</Texto>
           <Texto>• Mode: {getModeDisplayName(mode)}</Texto>
           <Texto>• Total Prices: {selectedQuoteConfigs?.length.toLocaleString()}</Texto>

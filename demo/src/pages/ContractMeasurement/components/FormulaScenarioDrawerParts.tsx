@@ -24,7 +24,7 @@ export function DrawerHeader({ onClose, isEditMode, isSingleDetailMode }: Header
   return (
     <div className={styles.header}>
       <Horizontal justifyContent="space-between" alignItems="flex-start">
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>{title}</Texto>
           <Texto style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.85)' }}>{subtitle}</Texto>
         </Vertical>
@@ -221,7 +221,7 @@ export function DrawerFooter({
         </div>
 
         {/* Right side: Cancel + Save buttons */}
-        <Horizontal style={{ gap: '16px' }}>
+        <Horizontal gap={16}>
           <GraviButton
             buttonText="Cancel"
             size="large"

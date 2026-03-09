@@ -153,7 +153,7 @@ export function ExistingBenchmarkSelector({
               className={`${styles.benchmarkCard} ${selectedManagedId === b.id ? styles.benchmarkCardSelected : ''}`}
               onClick={() => handleSelectManaged(b)}
             >
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems='center'>
                 <span className={`${styles.publisherBadge} ${PUBLISHER_BADGE_CLASS[b.publisher] || ''}`}>
                   {b.publisher}
                 </span>
@@ -215,7 +215,7 @@ export function ExistingBenchmarkSelector({
               <Texto category='p2' appearance='medium' style={{ marginBottom: '4px', display: 'block' }}>
                 Differential (Optional)
               </Texto>
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems='center'>
                 <Select
                   value={diffSign}
                   onChange={(val) => onDiffSignChange(val as '+' | '-')}

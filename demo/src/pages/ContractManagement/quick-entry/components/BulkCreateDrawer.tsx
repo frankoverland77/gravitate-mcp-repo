@@ -13,12 +13,12 @@ import { PRODUCT_OPTIONS, LOCATION_OPTIONS } from '../../data/contract.data'
 import styles from './BulkCreateDrawer.module.css'
 
 interface BulkCreateDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onCreate: (products: string[], locations: string[]) => void
 }
 
-export function BulkCreateDrawer({ visible, onClose, onCreate }: BulkCreateDrawerProps) {
+export function BulkCreateDrawer({ open, onClose, onCreate }: BulkCreateDrawerProps) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
 
@@ -69,7 +69,7 @@ export function BulkCreateDrawer({ visible, onClose, onCreate }: BulkCreateDrawe
 
   return (
     <Drawer
-      visible={visible}
+      open={open}
       onClose={handleClose}
       title='Bulk Create Details'
       placement='right'
@@ -81,7 +81,7 @@ export function BulkCreateDrawer({ visible, onClose, onCreate }: BulkCreateDrawe
               ? `${previewCount} detail${previewCount !== 1 ? 's' : ''} will be created`
               : 'Select products and locations'}
           </Texto>
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText='Cancel' onClick={handleClose} />
             <GraviButton
               buttonText='Create Details'
@@ -94,12 +94,12 @@ export function BulkCreateDrawer({ visible, onClose, onCreate }: BulkCreateDrawe
         </Horizontal>
       }
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Products Selection */}
         <Vertical>
           <Horizontal justifyContent='space-between' alignItems='center' className='mb-2'>
             <Texto
-              category='h6'
+              category='h5'
               appearance='medium'
               weight='600'
               style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}
@@ -136,7 +136,7 @@ export function BulkCreateDrawer({ visible, onClose, onCreate }: BulkCreateDrawe
         <Vertical>
           <Horizontal justifyContent='space-between' alignItems='center' className='mb-2'>
             <Texto
-              category='h6'
+              category='h5'
               appearance='medium'
               weight='600'
               style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}

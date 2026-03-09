@@ -24,7 +24,7 @@ export function BulkChangeBar({ selectedRows, setIsBulkChangeVisible, refetch })
             <GraviButton
               theme2
               style={{ background: 'var(--gray-200)' }}
-              appearance='outline'
+              appearance='outlined'
               buttonText='Bulk Change Quotes'
               onClick={() => setIsBulkChangeVisible(true)}
               className='mr-3'
@@ -37,7 +37,7 @@ export function BulkChangeBar({ selectedRows, setIsBulkChangeVisible, refetch })
   }
   return (
     <div className='bg-3 p-4'>
-      <Texto category='h5' weight='bold' appearance='secondary'>
+      <Texto category='h5' weight='bold' appearance='medium'>
         Select quote(s) to override
       </Texto>
     </div>

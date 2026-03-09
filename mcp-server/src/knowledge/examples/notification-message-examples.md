@@ -196,7 +196,7 @@ const handleBulkUpdate = async (items) => {
     />,
     <GraviButton
       key="import"
-      appearance="outline"
+      appearance="outlined"
       buttonText="Import Project"
       icon={<UploadOutlined />}
       onClick={() => setShowImportModal(true)}

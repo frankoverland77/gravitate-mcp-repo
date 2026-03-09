@@ -46,14 +46,14 @@ export function LayoutShowcase() {
         </div>
       </SpecimenCard>
       <SpecimenCard label="alignItems='center'" props='alignItems="center"'>
-        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems="center">
           <PlaceholderBox label="Short" />
           <div style={{ padding: '24px 16px', background: '#fff7e6', border: '1px dashed #ffd591', borderRadius: '4px', fontSize: '12px', color: '#fa8c16' }}>Tall</div>
           <PlaceholderBox label="Short" />
         </Horizontal>
       </SpecimenCard>
       <SpecimenCard label="With gap (via style)" props='style={{ gap: "16px" }}'>
-        <Horizontal style={{ gap: '16px' }}>
+        <Horizontal gap={16}>
           <PlaceholderBox label="A" />
           <PlaceholderBox label="B" />
           <PlaceholderBox label="C" />

@@ -99,7 +99,7 @@ export function LinkUnlinkAssociationActionButtons({
   }, [selectedGravitateRowsToAssociate, canWrite, refreshRateSelectOptions, setBulkSelectedRefreshRate])
 
   return (
-    <Horizontal style={{ gap: 10 }} className='mr-4'>
+    <Horizontal gap={10} className='mr-4'>
       {canAutoMap && (
         <Popconfirm
           title={<Texto category='p2'>{AutoMapTitle}</Texto>}

@@ -464,10 +464,11 @@ export function MapView({
                 onChange={setMapStyle}
                 size="small"
                 style={{ width: 100 }}
-              >
-                <Select.Option value="streets">Streets</Select.Option>
-                <Select.Option value="satellite">Satellite</Select.Option>
-              </Select>
+                options={[
+                  { label: 'Streets', value: 'streets' },
+                  { label: 'Satellite', value: 'satellite' },
+                ]}
+              />
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

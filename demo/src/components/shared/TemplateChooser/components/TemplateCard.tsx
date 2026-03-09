@@ -38,7 +38,7 @@ interface CardHeaderProps {
 function CardHeader({ template, hasPlaceholders }: CardHeaderProps) {
   return (
     <div className="template-card-header">
-      <Horizontal verticalCenter className="gap-8 mb-2">
+      <Horizontal verticalCenter className="mb-2" gap={8}>
         <Texto className="template-card-title">{template.name}</Texto>
         {hasPlaceholders && <Tag className="template-card-placeholder-tag">PLACEHOLDERS</Tag>}
       </Horizontal>

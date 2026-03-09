@@ -28,9 +28,9 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title={
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <ExclamationCircleOutlined style={{ color: '#faad14' }} />
           <Texto weight='600'>Eliminate {supplierNames.length} Supplier{supplierNames.length !== 1 ? 's' : ''}</Texto>
         </Horizontal>
@@ -39,13 +39,13 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
       footer={null}
       width={480}
     >
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         {/* Supplier list */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Texto category='p2' appearance='medium'>
             The following supplier{supplierNames.length !== 1 ? 's' : ''} will be eliminated from this round:
           </Texto>
-          <Horizontal style={{ gap: '8px', flexWrap: 'wrap' }}>
+          <Horizontal gap={8} style={{ flexWrap: 'wrap' }}>
             {supplierNames.map((name) => (
               <Tag key={name} color='orange'>
                 {name}
@@ -55,7 +55,7 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
         </Vertical>
 
         {/* Reason input */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Texto category='p2' weight='600'>
             Reason for elimination
           </Texto>
@@ -70,7 +70,7 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
         </Vertical>
 
         {/* Actions */}
-        <Horizontal justifyContent='flex-end' style={{ gap: '8px', marginTop: '8px' }}>
+        <Horizontal justifyContent='flex-end' gap={8} style={{ marginTop: '8px' }}>
           <GraviButton buttonText='Cancel' appearance='outlined' onClick={onCancel} />
           <GraviButton buttonText='Confirm Elimination' appearance='warning' onClick={handleConfirm} />
         </Horizontal>

@@ -75,13 +75,12 @@ export function RoundStepper({
   }
 
   return (
-    <Horizontal alignItems="center" style={{ gap: '8px' }}>
+    <Horizontal gap={8} alignItems="center">
       {steps.map((step, index) => (
-        <Horizontal key={step.round || 'award'} alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} key={step.round || 'award'} alignItems="center">
           {/* Step indicator */}
-          <Horizontal
+          <Horizontal gap={12}
             alignItems="center"
-            style={{ gap: '12px' }}
             className={`${styles.step} ${step.isCompleted ? styles.stepCompleted : ''} ${step.isCurrent ? styles.stepCurrent : ''} ${isClickable(step) && onRoundClick ? styles.stepClickable : ''}`}
             onClick={() => handleStepClick(step)}
           >
@@ -94,7 +93,7 @@ export function RoundStepper({
                 <span className={styles.stepDot} />
               )}
             </div>
-            <Vertical style={{ gap: '2px' }}>
+            <Vertical gap={2}>
               <Texto weight="600" category="p2">
                 {step.label}
               </Texto>

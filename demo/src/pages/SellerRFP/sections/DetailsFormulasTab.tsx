@@ -246,7 +246,7 @@ export function DetailsFormulasTab({
 
       return (
         <Tooltip title={tooltipText}>
-          <Horizontal alignItems="center" style={{ gap: '4px' }}>
+          <Horizontal gap={4} alignItems="center">
             {display}
             <span className={styles['diff-indicator']} style={{ color: diff >= 0 ? '#52c41a' : '#ff4d4f' }}>
               {diff >= 0 ? '▲' : '▼'}
@@ -687,7 +687,7 @@ export function DetailsFormulasTab({
     : 0
 
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Round diff indicator */}
       {hasRoundDiffs && changedCount > 0 && (
         <div className={styles['diff-banner']}>
@@ -698,7 +698,7 @@ export function DetailsFormulasTab({
       )}
 
       {/* Toolbar */}
-      <Horizontal justifyContent="flex-end" style={{ gap: '8px' }}>
+      <Horizontal gap={8} justifyContent="flex-end">
         <GraviButton
           buttonText="Add Detail"
           icon={<PlusOutlined />}
@@ -734,7 +734,7 @@ export function DetailsFormulasTab({
 
       {/* Sale Formula Drawer */}
       <SaleFormulaDrawer
-        visible={saleFormulaDrawerOpen}
+        open={saleFormulaDrawerOpen}
         detail={activeDetail}
         onClose={onCloseSaleFormula}
         onApply={handleSaleFormulaApply}

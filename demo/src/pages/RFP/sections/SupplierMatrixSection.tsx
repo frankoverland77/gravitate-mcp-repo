@@ -81,7 +81,7 @@ function IssuesDetailContent({ supplier }: { supplier: Supplier }) {
 
   if (failedIssues.length === 0) {
     return (
-      <Vertical style={{ gap: '4px', maxWidth: '200px' }}>
+      <Vertical gap={4} style={{ maxWidth: '200px' }}>
         <Texto category="p2" weight="600">
           No Issues
         </Texto>
@@ -93,12 +93,12 @@ function IssuesDetailContent({ supplier }: { supplier: Supplier }) {
   }
 
   return (
-    <Vertical style={{ gap: '8px', maxWidth: '220px' }}>
+    <Vertical gap={8} style={{ maxWidth: '220px' }}>
       <Texto category="p2" weight="600">
         {failedIssues.length} Issue{failedIssues.length !== 1 ? 's' : ''} Flagged
       </Texto>
       {failedIssues.map((issue) => (
-        <Horizontal key={issue.label} alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} key={issue.label} alignItems="center">
           <WarningOutlined style={{ color: '#faad14' }} />
           <Texto category="p2">{issue.label} out of threshold</Texto>
         </Horizontal>
@@ -397,7 +397,7 @@ export function SupplierMatrixSection({
         >
           {/* Top row: checkbox, incumbent flag, and actions */}
           <Horizontal justifyContent="space-between" alignItems="center" className="mb-1">
-            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems="center">
               {!isViewingHistory && (
                 <Checkbox
                   checked={isSelected}
@@ -409,7 +409,7 @@ export function SupplierMatrixSection({
             </Horizontal>
 
             {/* Actions */}
-            <Horizontal style={{ gap: '4px' }}>
+            <Horizontal gap={4}>
               {!isViewingHistory && (
                 <>
                   {/* Drag handle - only for non-incumbent when reorder is enabled */}
@@ -450,13 +450,13 @@ export function SupplierMatrixSection({
           {/* Content wrapper - pushes overall tag to bottom */}
           <div className={styles.supplierContent}>
             {/* Top-aligned section: disposition badges, name, bid name */}
-            <Vertical style={{ gap: '4px' }}>
+            <Vertical gap={4}>
               {/* Disposition badge */}
               {!isViewingHistory && disposition === 'advance' && (
                 <span className={styles.dispositionAdvancing}>ADVANCING</span>
               )}
               {!isViewingHistory && disposition === 'eliminate' && (
-                <Horizontal alignItems="center" style={{ gap: '4px' }}>
+                <Horizontal gap={4} alignItems="center">
                   <span className={styles.dispositionEliminated}>ELIMINATED</span>
                   {onUndoElimination && (
                     <Tooltip title="Undo elimination">
@@ -535,7 +535,7 @@ export function SupplierMatrixSection({
               className={`${styles.metricLabel} ${record.metric === currentMetric ? styles.metricActive : ''}`}
               onClick={() => onMetricClick?.(record.metric, productFilter)}
             >
-              <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems="center">
                 {isExpandable && (
                   <span
                     className={styles.expandIcon}
@@ -583,7 +583,7 @@ export function SupplierMatrixSection({
               >
                 <Horizontal
                   alignItems="center"
-                  style={{ gap: '8px', cursor: 'pointer' }}
+                  gap={8} style={{ cursor: 'pointer' }}
                   className={hasIssues ? styles.issuesClickable : undefined}
                 >
                   <Texto>{cellData.value}</Texto>
@@ -594,7 +594,7 @@ export function SupplierMatrixSection({
           }
 
           return (
-            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems="center">
               <Texto>{cellData.value}</Texto>
               <StatusIndicator status={cellData.status} />
             </Horizontal>

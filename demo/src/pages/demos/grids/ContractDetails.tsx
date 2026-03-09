@@ -1135,7 +1135,7 @@ export function ContractDetails() {
         <>
             <Vertical className="mb-4">
             {/* Two Column Layout */}
-            <Horizontal style={{ flex: 1, gap: 0, height: '100%' }}>
+            <Horizontal gap={0} style={{ flex: 1, height: '100%' }}>
                 {/* Left Column - 20% - Contract Form */}
                 <Vertical style={{
                     width: '20%',

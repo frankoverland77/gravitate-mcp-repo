@@ -200,14 +200,14 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
       title="New RFP Response"
       placement="right"
       width={520}
-      visible={visible}
+      open={visible}
       onClose={handleClose}
       footer={
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           {/* Decline inline expansion */}
           {declineExpanded && (
             <div className={styles['decline-expansion']}>
-              <Vertical style={{ gap: '8px' }}>
+              <Vertical gap={8}>
                 <Select
                   placeholder="Select decline reason..."
                   value={declineReason}
@@ -237,7 +237,7 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
             <Texto category="p2" appearance="medium">
               {previewCount > 0 ? `${selectedProducts.length} products × ${selectedTerminals.length} terminals = ${previewCount} detail rows` : 'Select products and terminals'}
             </Texto>
-            <Horizontal style={{ gap: '8px' }}>
+            <Horizontal gap={8}>
               <GraviButton
                 buttonText="Decline"
                 onClick={() => setDeclineExpanded(!declineExpanded)}
@@ -255,14 +255,14 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
         </Vertical>
       }
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* RFP Metadata */}
-        <Vertical style={{ gap: '16px' }}>
-          <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+        <Vertical gap={16}>
+          <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
             RFP Information
           </Texto>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">RFP Name</Texto>
             <Input
               placeholder="e.g., Gulf Coast Gasoline Supply 2026"
@@ -271,7 +271,7 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
             />
           </Vertical>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Buyer</Texto>
             <Select
               placeholder="Select buyer..."
@@ -286,7 +286,7 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
             />
           </Vertical>
 
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Response Deadline</Texto>
             <DatePicker
               style={{ width: '100%' }}
@@ -296,9 +296,9 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
         </Vertical>
 
         {/* Products */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Horizontal justifyContent="space-between" alignItems="center">
-            <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+            <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
               Products
             </Texto>
             <Checkbox
@@ -325,9 +325,9 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
         </Vertical>
 
         {/* Terminals */}
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Horizontal justifyContent="space-between" alignItems="center">
-            <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+            <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
               Terminals
             </Texto>
             <Checkbox

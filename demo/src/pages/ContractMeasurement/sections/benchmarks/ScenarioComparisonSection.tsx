@@ -886,7 +886,7 @@ export function ScenarioComparisonSection({
               render: (_: unknown, record: TableRow) => {
                 if (record.isGroupHeader) {
                   return (
-                    <Vertical style={{ gap: '2px' }}>
+                    <Vertical gap={2}>
                       <Texto weight="600">{(record.totalVolume / 1000).toFixed(0)}K gal</Texto>
                       <Texto category="p2" appearance="medium">
                         {record.totalPercentage.toFixed(1)}%
@@ -895,7 +895,7 @@ export function ScenarioComparisonSection({
                   );
                 }
                 return (
-                  <Vertical style={{ gap: '2px' }}>
+                  <Vertical gap={2}>
                     <Texto>{(record.volume / 1000).toFixed(0)}K gal</Texto>
                     <Texto category="p2" appearance="medium">
                       {record.percentTotal.toFixed(1)}%
@@ -933,7 +933,7 @@ export function ScenarioComparisonSection({
             onDrop={canDrag ? (e) => handleDrop(e, scenario.id) : undefined}
             onDragEnd={canDrag ? handleDragEnd : undefined}
           >
-            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+            <Horizontal gap={8} alignItems="center">
               {canDrag && (
                 <Tooltip title="Drag to reorder">
                   <HolderOutlined className={styles.dragHandle} />
@@ -967,7 +967,7 @@ export function ScenarioComparisonSection({
                 </Tooltip>
               )}
             </Horizontal>
-            <Horizontal alignItems="center" style={{ gap: '4px' }}>
+            <Horizontal gap={4} alignItems="center">
               <Tooltip title={isSorted ? (sortDirection === 'asc' ? 'Sort descending' : 'Clear sort') : 'Sort by delta'}>
                 {isSorted && sortDirection === 'asc' ? (
                   <SortAscendingOutlined
@@ -1057,7 +1057,7 @@ export function ScenarioComparisonSection({
             {
               title: (
                 <Tooltip title="Difference between contract price and the selected reference benchmark price">
-                  <Vertical style={{ gap: '2px', cursor: 'default' }}>
+                  <Vertical gap={2} style={{ cursor: 'default' }}>
                     <Texto category="p2" weight="600">
                       CONTRACT DELTA
                     </Texto>
@@ -1275,7 +1275,7 @@ export function ScenarioComparisonSection({
   if (scenarios.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <Vertical alignItems="center" style={{ gap: '16px' }}>
+        <Vertical gap={16} alignItems="center">
           <StarOutlined className={styles.emptyIcon} />
           <Texto category="h4">No Scenarios Configured</Texto>
           <Texto appearance="medium">Contact your administrator.</Texto>
@@ -1367,7 +1367,7 @@ export function ScenarioComparisonSection({
               />
             </>
           )}
-          <Popover trigger="click" visible={addScenarioOpen} onVisibleChange={(v) => setAddScenarioOpen(v)} content={addScenarioPopoverContent}>
+          <Popover trigger="click" open={addScenarioOpen} onOpenChange={(v) => setAddScenarioOpen(v)} content={addScenarioPopoverContent}>
             <GraviButton
               buttonText="Add Scenario"
               icon={<PlusOutlined />}
@@ -1503,20 +1503,20 @@ export function ScenarioComparisonSection({
 
       {/* Scenario Drawers */}
       <BenchmarkScenarioDrawer
-        visible={benchmarkDrawerVisible}
+        open={benchmarkDrawerVisible}
         onClose={handleCloseBenchmarkDrawer}
         onSave={handleSaveBenchmarkScenario}
         editingScenario={editingScenario?.entryMethod === 'benchmark' ? editingScenario : undefined}
       />
       <FormulaScenarioDrawer
-        visible={formulaDrawerVisible}
+        open={formulaDrawerVisible}
         onClose={handleCloseFormulaDrawer}
         onSave={handleSaveFormulaScenario}
         editingScenario={editingScenario?.entryMethod === 'formula' ? editingScenario : undefined}
         editingDetailId={editingDetailId}
       />
       <UploadScenarioDrawer
-        visible={uploadDrawerVisible}
+        open={uploadDrawerVisible}
         onClose={handleCloseUploadDrawer}
         onSave={handleSaveUploadScenario}
         editingScenario={editingScenario?.entryMethod === 'upload' ? editingScenario : undefined}

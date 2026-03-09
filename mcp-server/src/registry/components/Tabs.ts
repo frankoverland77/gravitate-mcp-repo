@@ -12,7 +12,7 @@ export const tabsComponent: ComponentMetadata = {
   complexity: "medium",
   tags: ["tabs", "navigation", "tabbed", "panel", "layout", "antd"],
   source: "antd",
-  version: "4.20",
+  version: "5.0",
   dependencies: ["antd", "react"],
   props: [
     {
@@ -68,110 +68,104 @@ export const tabsComponent: ComponentMetadata = {
       description: "Extra content in tab bar"
     },
     {
-      name: "children",
-      type: "Tabs.TabPane[]",
+      name: "items",
+      type: "TabsProps['items']",
       required: true,
-      description: "Tab panes (use Tabs.TabPane components)"
+      description: "Array of tab items with key, label, and children properties"
     }
   ],
   examples: [
     {
       name: "Basic Tabs",
-      description: "Simple tabbed interface with multiple panels",
+      description: "Simple tabbed interface with multiple panels using items prop",
       code: `import { Tabs } from "antd";
 
 function BasicTabs() {
-  return (
-    <Tabs defaultActiveKey="1">
-      <Tabs.TabPane tab="Tab 1" key="1">
-        Content of Tab Pane 1
-      </Tabs.TabPane>
-      <Tabs.TabPane tab="Tab 2" key="2">
-        Content of Tab Pane 2
-      </Tabs.TabPane>
-      <Tabs.TabPane tab="Tab 3" key="3">
-        Content of Tab Pane 3
-      </Tabs.TabPane>
-    </Tabs>
-  );
+  const items = [
+    { key: "1", label: "Tab 1", children: "Content of Tab Pane 1" },
+    { key: "2", label: "Tab 2", children: "Content of Tab Pane 2" },
+    { key: "3", label: "Tab 3", children: "Content of Tab Pane 3" },
+  ];
+
+  return <Tabs defaultActiveKey="1" items={items} />;
 }`,
       tags: ["basic"]
     },
     {
       name: "Tabs with Icons",
-      description: "Tabs with icons and labels (from WelcomePage example)",
+      description: "Tabs with icons and labels using items prop",
       code: `import { Tabs } from "antd";
 import { HomeOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
 
 function IconTabs() {
-  const tabs = [
+  const items = [
     {
-      label: "Home",
       key: "home",
-      icon: <HomeOutlined />,
-      content: <div>Home Content</div>
+      label: <span><HomeOutlined /> Home</span>,
+      children: <div>Home Content</div>,
     },
     {
-      label: "Profile",
       key: "profile",
-      icon: <UserOutlined />,
-      content: <div>Profile Content</div>
+      label: <span><UserOutlined /> Profile</span>,
+      children: <div>Profile Content</div>,
     },
     {
-      label: "Settings",
       key: "settings",
-      icon: <SettingOutlined />,
-      content: <div>Settings Content</div>
-    }
+      label: <span><SettingOutlined /> Settings</span>,
+      children: <div>Settings Content</div>,
+    },
   ];
 
-  return (
-    <Tabs>
-      {tabs.map((tab) => (
-        <Tabs.TabPane
-          tab={
-            <span>
-              {tab.icon} {tab.label}
-            </span>
-          }
-          key={tab.key}
-        >
-          {tab.content}
-        </Tabs.TabPane>
-      ))}
-    </Tabs>
-  );
+  return <Tabs items={items} />;
 }`,
       tags: ["icons", "dynamic"]
     },
     {
       name: "Card Style Tabs",
-      description: "Tabs with card-style appearance",
+      description: "Tabs with card-style appearance using items prop",
       code: `import { Tabs } from "antd";
 
 function CardTabs() {
-  return (
-    <Tabs type="card">
-      <Tabs.TabPane tab="Products" key="products">
-        <h3>Product List</h3>
-        <p>Display your products here...</p>
-      </Tabs.TabPane>
-      <Tabs.TabPane tab="Orders" key="orders">
-        <h3>Order Management</h3>
-        <p>Manage orders here...</p>
-      </Tabs.TabPane>
-      <Tabs.TabPane tab="Customers" key="customers">
-        <h3>Customer Database</h3>
-        <p>View customers here...</p>
-      </Tabs.TabPane>
-    </Tabs>
-  );
+  const items = [
+    {
+      key: "products",
+      label: "Products",
+      children: (
+        <>
+          <h3>Product List</h3>
+          <p>Display your products here...</p>
+        </>
+      ),
+    },
+    {
+      key: "orders",
+      label: "Orders",
+      children: (
+        <>
+          <h3>Order Management</h3>
+          <p>Manage orders here...</p>
+        </>
+      ),
+    },
+    {
+      key: "customers",
+      label: "Customers",
+      children: (
+        <>
+          <h3>Customer Database</h3>
+          <p>View customers here...</p>
+        </>
+      ),
+    },
+  ];
+
+  return <Tabs type="card" items={items} />;
 }`,
       tags: ["card", "style"]
     },
     {
       name: "Controlled Tabs with State",
-      description: "Tabs with controlled active state",
+      description: "Tabs with controlled active state using items prop",
       code: `import { Tabs } from "antd";
 import { useState } from "react";
 
@@ -183,20 +177,16 @@ function ControlledTabs() {
     setActiveTab(key);
   };
 
+  const items = [
+    { key: "overview", label: "Overview", children: "Overview content" },
+    { key: "details", label: "Details", children: "Detailed information" },
+    { key: "analytics", label: "Analytics", children: "Analytics dashboard" },
+  ];
+
   return (
     <div>
       <p>Current tab: {activeTab}</p>
-      <Tabs activeKey={activeTab} onChange={handleTabChange}>
-        <Tabs.TabPane tab="Overview" key="overview">
-          Overview content
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Details" key="details">
-          Detailed information
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Analytics" key="analytics">
-          Analytics dashboard
-        </Tabs.TabPane>
-      </Tabs>
+      <Tabs activeKey={activeTab} onChange={handleTabChange} items={items} />
     </div>
   );
 }`,
@@ -204,51 +194,33 @@ function ControlledTabs() {
     },
     {
       name: "Full WelcomePage Example",
-      description: "Complete example from the demo showing tabs with multiple component examples",
+      description: "Complete example from the demo showing tabs with items prop and icons",
       code: `import { Tabs, Horizontal } from "@gravitate-js/excalibrr";
 import { HomeOutlined, TabletOutlined, TagOutlined } from "@ant-design/icons";
 
 export function WelcomePage() {
-  const tabs = [
+  const items = [
     {
-      label: "Home",
       key: "home",
-      component: <div>Home Page Content</div>,
-      icon: <HomeOutlined />,
+      label: <span><HomeOutlined /> Home</span>,
+      children: <Horizontal><div>Home Page Content</div></Horizontal>,
     },
     {
-      label: "Components",
       key: "components",
-      component: <div>Component Examples</div>,
-      icon: <TabletOutlined />,
+      label: <span><TabletOutlined /> Components</span>,
+      children: <Horizontal><div>Component Examples</div></Horizontal>,
     },
     {
-      label: "Tags",
       key: "tags",
-      component: <div>Tag Examples</div>,
-      icon: <TagOutlined />,
+      label: <span><TagOutlined /> Tags</span>,
+      children: <Horizontal><div>Tag Examples</div></Horizontal>,
     },
   ];
 
-  return (
-    <Tabs style={{ minWidth: "100%" }}>
-      {tabs?.map((tab) => (
-        <Tabs.TabPane
-          tab={
-            <span>
-              {tab.icon} {tab.label}
-            </span>
-          }
-          key={tab.key}
-        >
-          <Horizontal>{tab.component}</Horizontal>
-        </Tabs.TabPane>
-      ))}
-    </Tabs>
-  );
+  return <Tabs style={{ minWidth: "100%" }} items={items} />;
 }`,
       tags: ["complete", "real-world", "icons"]
     }
   ],
-  notes: "This component comes from Ant Design (antd v4.20) which is already included in the demo project. The Tabs component works well with Excalibrr theming and is used in the WelcomePage demo."
+  notes: "This component comes from Ant Design (antd v5) which is already included in the demo project. The Tabs component uses the items prop (not Tabs.TabPane children) and works well with Excalibrr theming."
 };

@@ -43,7 +43,6 @@ import {
 import { useState } from "react";
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 export function OverlayComponentsExample() {
   // Modal states
@@ -82,21 +81,15 @@ export function OverlayComponentsExample() {
   };
 
   const menuItems = (
-    <Menu>
-      <Menu.Item key="edit" icon={<EditOutlined />}>
-        Edit Item
-      </Menu.Item>
-      <Menu.Item key="copy" icon={<CopyOutlined />}>
-        Duplicate
-      </Menu.Item>
-      <Menu.Item key="share" icon={<ShareAltOutlined />}>
-        Share
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="delete" danger icon={<DeleteOutlined />}>
-        Delete
-      </Menu.Item>
-    </Menu>
+    <Menu
+      items={[
+        { key: 'edit', icon: <EditOutlined />, label: 'Edit Item' },
+        { key: 'copy', icon: <CopyOutlined />, label: 'Duplicate' },
+        { key: 'share', icon: <ShareAltOutlined />, label: 'Share' },
+        { type: 'divider' as const },
+        { key: 'delete', danger: true, icon: <DeleteOutlined />, label: 'Delete' },
+      ]}
+    />
   );
 
   const richPopoverContent = (
@@ -169,7 +162,7 @@ export function OverlayComponentsExample() {
           </Button>
         ]}
       >
-        <Vertical style={{ gap: '12px' }}>
+        <Vertical gap={12}>
           <Texto category="p1">
             This is a basic modal with standard styling and layout.
           </Texto>
@@ -189,13 +182,13 @@ export function OverlayComponentsExample() {
               className="mr-2"
               style={{ color: 'var(--theme-warning)' }}
             />
-            <Texto category="h6">Confirm Action</Texto>
+            <Texto category="h5">Confirm Action</Texto>
           </Horizontal>
         }
         open={confirmModalVisible}
         onCancel={() => setConfirmModalVisible(false)}
         footer={
-          <Horizontal justifyContent="flex-end" style={{ gap: '10px' }}>
+          <Horizontal gap={10} justifyContent="flex-end">
             <GraviButton
               buttonText="Cancel"
               onClick={() => setConfirmModalVisible(false)}
@@ -208,7 +201,7 @@ export function OverlayComponentsExample() {
           </Horizontal>
         }
       >
-        <Vertical style={{ gap: '8px' }}>
+        <Vertical gap={8}>
           <Texto category="p1">
             Are you sure you want to proceed with this action?
           </Texto>
@@ -231,7 +224,7 @@ export function OverlayComponentsExample() {
             Create Item
           </Button>
         ]}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}
@@ -250,11 +243,11 @@ export function OverlayComponentsExample() {
             label="Category"
             rules={[{ required: true, message: 'Please select a category' }]}
           >
-            <Select placeholder="Select category">
-              <Option value="type1">Category 1</Option>
-              <Option value="type2">Category 2</Option>
-              <Option value="type3">Category 3</Option>
-            </Select>
+            <Select placeholder="Select category" options={[
+              { label: 'Category 1', value: 'type1' },
+              { label: 'Category 2', value: 'type2' },
+              { label: 'Category 3', value: 'type3' },
+            ]} />
           </Form.Item>
           <Form.Item name="description" label="Description">
             <TextArea placeholder="Enter description" rows={3} />
@@ -270,7 +263,7 @@ export function OverlayComponentsExample() {
         width={600}
         footer={null}
       >
-        <Vertical style={{ gap: '20px' }}>
+        <Vertical gap={20}>
           <Card size="small" title="User Information">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
@@ -285,7 +278,7 @@ export function OverlayComponentsExample() {
           </Card>
 
           <Card size="small" title="Permissions">
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               <Horizontal justifyContent="space-between" alignItems="center">
                 <Texto category="p2">Can Edit Content</Texto>
                 <Switch defaultChecked />
@@ -301,7 +294,7 @@ export function OverlayComponentsExample() {
             </Vertical>
           </Card>
 
-          <Horizontal justifyContent="flex-end" style={{ gap: '10px' }}>
+          <Horizontal gap={10} justifyContent="flex-end">
             <Button onClick={() => setComplexModalVisible(false)}>
               Cancel
             </Button>
@@ -320,7 +313,7 @@ export function OverlayComponentsExample() {
       </Texto>
 
       <Card title="Popover Variations" className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           {/* Basic Popover */}
           <div>
             <Texto category="p2" className="mb-2">Basic Content:</Texto>
@@ -380,7 +373,7 @@ export function OverlayComponentsExample() {
       </Texto>
 
       <Card title="Popconfirm Variations" className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           {/* Basic Delete Confirmation */}
           <div>
             <Texto category="p2" className="mb-2">Delete Action:</Texto>
@@ -468,11 +461,11 @@ export function OverlayComponentsExample() {
       </Texto>
 
       <Card title="Tooltip Variations" className="mb-4">
-        <Vertical style={{ gap: "20px" }}>
+        <Vertical gap={20}>
           {/* Basic Tooltips */}
           <div>
             <Texto category="p2" className="mb-3">Basic Tooltips:</Texto>
-            <Horizontal style={{ gap: "16px", flexWrap: "wrap" }}>
+            <Horizontal gap={16} style={{ flexWrap: "wrap" }}>
               <Tooltip title="This is a simple tooltip">
                 <Button>Simple Tooltip</Button>
               </Tooltip>
@@ -516,7 +509,7 @@ export function OverlayComponentsExample() {
           {/* Rich Content Tooltips */}
           <div>
             <Texto category="p2" className="mb-3">Rich Content Tooltips:</Texto>
-            <Horizontal style={{ gap: "16px", flexWrap: "wrap" }}>
+            <Horizontal gap={16} style={{ flexWrap: "wrap" }}>
               <Tooltip
                 title={
                   <div>
@@ -586,7 +579,7 @@ export function OverlayComponentsExample() {
           {/* Conditional Tooltips */}
           <div>
             <Texto category="p2" className="mb-3">Conditional Tooltips:</Texto>
-            <Horizontal style={{ gap: "16px" }}>
+            <Horizontal gap={16}>
               <Tooltip title="This field has an error" open={true}>
                 <Input status="error" placeholder="Error field" style={{ width: '150px' }} />
               </Tooltip>
@@ -609,7 +602,7 @@ export function OverlayComponentsExample() {
 
       {/* Integration Examples */}
       <Card title="Integration Examples" className="mb-4" style={{ backgroundColor: "var(--theme-bg-elevated)" }}>
-        <Vertical style={{ gap: "16px" }}>
+        <Vertical gap={16}>
           <div>
             <Texto category="p2" className="mb-3">Data Table Actions:</Texto>
             <div style={{
@@ -628,7 +621,7 @@ export function OverlayComponentsExample() {
                   Description of the data item with some details
                 </Texto>
               </div>
-              <Horizontal style={{ gap: '8px' }}>
+              <Horizontal gap={8}>
                 <Tooltip title="View details">
                   <Button size="small" icon={<EyeOutlined />} />
                 </Tooltip>
@@ -651,7 +644,7 @@ export function OverlayComponentsExample() {
 
           <div>
             <Texto category="p2" className="mb-3">Form Field Helpers:</Texto>
-            <Horizontal style={{ gap: "16px", alignItems: "end" }}>
+            <Horizontal gap={16} style={{ alignItems: "end" }}>
               <div>
                 <Texto category="p2" className="mb-1">
                   Username
@@ -691,7 +684,7 @@ export function OverlayComponentsExample() {
             <ul style={{ marginLeft: '16px', lineHeight: '1.6' }}>
               <li><Texto category="p2">Use for content requiring full attention</Texto></li>
               <li><Texto category="p2">Always provide clear close options</Texto></li>
-              <li><Texto category="p2">Use destroyOnClose for forms</Texto></li>
+              <li><Texto category="p2">Use destroyOnHidden for forms</Texto></li>
               <li><Texto category="p2">Consider mobile responsiveness</Texto></li>
             </ul>
           </div>

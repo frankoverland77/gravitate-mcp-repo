@@ -94,7 +94,7 @@ function HiddenSuppliersPopover({
         Hidden Suppliers
       </Texto>
       {hiddenList.map((id) => (
-        <Horizontal key={id} alignItems="center" style={{ gap: '8px' }} className="mb-1">
+        <Horizontal gap={8} key={id} alignItems="center" className="mb-1">
           <Checkbox checked={false} onChange={() => onShowSupplier?.(id)} />
           <Texto category="p2">{hiddenSupplierNames[id] || id}</Texto>
         </Horizontal>
@@ -183,7 +183,7 @@ export function ComparisonToolbar({
       {/* Row 1: Controls + Action buttons + Parameters */}
       <Horizontal justifyContent="space-between" alignItems="center">
         {/* Left: Sort, Manual, Search, Hidden */}
-        <Horizontal alignItems="center" style={{ gap: '12px' }}>
+        <Horizontal gap={12} alignItems="center">
           <Select
             value={sortOrder}
             onChange={onSortChange}
@@ -223,7 +223,7 @@ export function ComparisonToolbar({
         </Horizontal>
 
         {/* Right: Action buttons + Parameters */}
-        <Horizontal alignItems="center" style={{ gap: '12px' }}>
+        <Horizontal gap={12} alignItems="center">
           {!isViewingHistory && (
             <>
               {round >= 2 && (
@@ -294,7 +294,7 @@ export function ComparisonToolbar({
       {/* Row 2: Disposition counter + Advance on left, Threshold pills on right */}
       <Horizontal justifyContent="space-between" alignItems="center">
         {/* Left: Counter + Advance button (current) OR Historical summary + View button (history view) */}
-        <Horizontal alignItems="center" style={{ gap: '12px' }}>
+        <Horizontal gap={12} alignItems="center">
           {isViewingHistory && historicalOutcome ? (
             <>
               <Texto category="p2" appearance="medium">
@@ -330,7 +330,7 @@ export function ComparisonToolbar({
         </Horizontal>
 
         {/* Right: Threshold pills only */}
-        <Horizontal alignItems="center" style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems="center">
           <ThresholdPill label={penaltyLabel} onClick={onOpenThresholds} />
           <ThresholdPill label={ratabilityLabel} onClick={onOpenThresholds} />
           <ThresholdPill label={allocationLabel} onClick={onOpenThresholds} />

@@ -42,7 +42,7 @@ export function ContractAnalyticsSection() {
   const maxVolume = Math.max(...VOLUME_DATA.map((d) => Math.max(d.target, d.actual)));
 
   return (
-    <Vertical style={{ gap: '16px' }}>
+    <Vertical gap={16}>
       {/* Section Header */}
       <div>
         <Texto category="h4" weight="600">Contract Analytics</Texto>
@@ -53,12 +53,12 @@ export function ContractAnalyticsSection() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         {/* Chart 1: Volume Performance */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <BarChartOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">Volume Performance</Texto>
           </Horizontal>
 
-          <Vertical style={{ gap: '12px' }}>
+          <Vertical gap={12}>
             {VOLUME_DATA.map((item, index) => {
               const targetWidth = (item.target / maxVolume) * 100;
               const actualWidth = (item.actual / maxVolume) * 100;
@@ -102,12 +102,12 @@ export function ContractAnalyticsSection() {
             })}
 
             {/* Legend */}
-            <Horizontal style={{ gap: '16px', marginTop: '8px' }}>
-              <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+            <Horizontal gap={16} style={{ marginTop: '8px' }}>
+              <Horizontal gap={6} style={{ alignItems: 'center' }}>
                 <div style={{ width: '12px', height: '12px', backgroundColor: '#e8e8e8', borderRadius: '2px' }} />
                 <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>Target</Texto>
               </Horizontal>
-              <Horizontal style={{ alignItems: 'center', gap: '6px' }}>
+              <Horizontal gap={6} style={{ alignItems: 'center' }}>
                 <div style={{ width: '12px', height: '12px', backgroundColor: '#52c41a', borderRadius: '2px' }} />
                 <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>Actual</Texto>
               </Horizontal>
@@ -117,7 +117,7 @@ export function ContractAnalyticsSection() {
 
         {/* Chart 2: Financial Performance Trend */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <LineChartOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">Financial Performance Trend</Texto>
           </Horizontal>
@@ -187,12 +187,12 @@ export function ContractAnalyticsSection() {
 
         {/* Chart 3: Product Mix */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <PieChartOutlined style={{ fontSize: '18px', color: '#8c8c8c' }} />
             <Texto category="h5" weight="600">Product Mix</Texto>
           </Horizontal>
 
-          <Horizontal style={{ gap: '24px', alignItems: 'center' }}>
+          <Horizontal gap={24} style={{ alignItems: 'center' }}>
             {/* Simple Donut Chart using CSS */}
             <div
               style={{
@@ -227,10 +227,10 @@ export function ContractAnalyticsSection() {
             </div>
 
             {/* Legend */}
-            <Vertical style={{ gap: '12px', flex: 1 }}>
+            <Vertical gap={12} style={{ flex: 1 }}>
               {PRODUCT_MIX.map((item, index) => (
                 <Horizontal key={index} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                  <Horizontal gap={8} style={{ alignItems: 'center' }}>
                     <div
                       style={{
                         width: '12px',
@@ -250,14 +250,14 @@ export function ContractAnalyticsSection() {
 
         {/* Chart 4: Risk Assessment */}
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
-          <Horizontal style={{ alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+          <Horizontal gap={8} style={{ alignItems: 'center', marginBottom: '20px' }}>
             <WarningOutlined style={{ fontSize: '18px', color: '#cf1322' }} />
             <Texto category="h5" weight="600">Risk Assessment</Texto>
           </Horizontal>
 
-          <Vertical style={{ gap: '20px' }}>
+          <Vertical gap={20}>
             {/* Overall Score */}
-            <Horizontal style={{ alignItems: 'center', gap: '16px' }}>
+            <Horizontal gap={16} style={{ alignItems: 'center' }}>
               <div
                 style={{
                   width: '80px',
@@ -275,14 +275,14 @@ export function ContractAnalyticsSection() {
               >
                 <Texto category="h3" weight="600">7.2</Texto>
               </div>
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <BBDTag error style={{ fontSize: '12px', padding: '2px 8px' }}>HIGH RISK</BBDTag>
                 <Texto category="p2" appearance="medium">Overall Risk Score</Texto>
               </Vertical>
             </Horizontal>
 
             {/* Risk Factors */}
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Risk Factors
               </Texto>
@@ -294,7 +294,7 @@ export function ContractAnalyticsSection() {
                   <div key={index}>
                     <Horizontal style={{ justifyContent: 'space-between', marginBottom: '4px' }}>
                       <Texto category="p2">{factor.name}</Texto>
-                      <Horizontal style={{ gap: '8px', alignItems: 'center' }}>
+                      <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         <Texto category="p2" appearance="medium">{factor.weight}% weight</Texto>
                         <Texto category="p2" weight="600" style={{ color: statusColor }}>
                           {factor.score}

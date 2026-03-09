@@ -53,7 +53,7 @@ export function DownloadStep({ rfp, round, suppliers, details, onNext }: Downloa
         showIcon
         message='Excel File Structure'
         description={
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category='p2'>
               <strong>Sheet 1 - Bid Summary:</strong> Read-only overview of all bids
             </Texto>
@@ -71,7 +71,7 @@ export function DownloadStep({ rfp, round, suppliers, details, onNext }: Downloa
         className='mb-4'
       />
 
-      <Horizontal style={{ gap: '16px' }} className='mb-4'>
+      <Horizontal gap={16} className='mb-4'>
         <div className={styles.statCard}>
           <Texto category='h3' weight='600'>
             {suppliers.length}
@@ -98,7 +98,7 @@ export function DownloadStep({ rfp, round, suppliers, details, onNext }: Downloa
         </div>
       </Horizontal>
 
-      <Horizontal alignItems='center' style={{ gap: '16px' }}>
+      <Horizontal gap={16} alignItems='center'>
         <GraviButton
           buttonText={isDownloading ? 'Generating...' : 'Download Excel'}
           icon={isDownloading ? undefined : <DownloadOutlined />}
@@ -108,7 +108,7 @@ export function DownloadStep({ rfp, round, suppliers, details, onNext }: Downloa
         />
 
         {hasDownloaded && (
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <FileExcelOutlined style={{ color: 'var(--theme-success-color)' }} />
             <Texto category='p2' appearance='medium'>
               File downloaded! Edit in Excel then continue.

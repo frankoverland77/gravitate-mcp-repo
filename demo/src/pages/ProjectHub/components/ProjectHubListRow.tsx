@@ -43,10 +43,10 @@ export function ProjectHubListRow({
       }}
     >
       <Horizontal justifyContent="space-between" alignItems="center">
-        <Horizontal alignItems="center" style={{ gap: 12, flex: 1, minWidth: 0 }}>
+        <Horizontal alignItems="center" gap={12} style={{ flex: 1, minWidth: 0 }}>
           <span style={{ fontSize: 18, color: 'var(--gray-500)', flexShrink: 0 }}>{icon}</span>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <Horizontal alignItems="center" style={{ gap: 8 }}>
+            <Horizontal alignItems="center" gap={8}>
               <Texto weight="500" style={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',

@@ -2,7 +2,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { GraviGrid, Horizontal, Texto, Vertical } from '@gravitate-js/excalibrr';
 import { Alert, InputNumber, Modal, Switch } from 'antd';
 import { ColDef } from 'ag-grid-community';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { QuotebookRow, mockQuotebookRows, getSpreadFamilyIds } from './mockData';
@@ -48,13 +48,13 @@ function getDiffIcon(isSpread: boolean): React.ReactNode {
 // ─── Spread Override Modal ──────────────────────────────────────────────────
 
 function SpreadOverrideModal({
-  visible,
+  open,
   row,
   parentRow,
   onApply,
   onCancel,
 }: {
-  visible: boolean;
+  open: boolean;
   row: QuotebookRow | null;
   parentRow: QuotebookRow | null;
   onApply: (row: QuotebookRow, newValue: number) => void;
@@ -65,22 +65,22 @@ function SpreadOverrideModal({
 
   // Reset and auto-focus when modal opens
   useEffect(() => {
-    if (visible && row) {
+    if (open && row) {
       setOverrideValue(row.Adjustment);
       setTimeout(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
       }, 100);
     }
-  }, [visible, row]);
+  }, [open, row]);
 
   if (!row) return null;
 
   return (
     <Modal
       className="spread-override-modal"
-      visible={visible}
-      title={<Texto category="h6">Override Spread Differential</Texto>}
+      open={open}
+      title={<Texto category="h5">Override Spread Differential</Texto>}
       width={400}
       centered
       okText="Apply Override"
@@ -92,7 +92,7 @@ function SpreadOverrideModal({
       }}
       onCancel={onCancel}
     >
-      <Vertical style={{ gap: 8 }}>
+      <Vertical gap={8}>
         <div>
           <Texto category="h5" className="mb-1">Product:</Texto>
           <Texto category="p2">{row.ProductName}</Texto>
@@ -266,7 +266,7 @@ function getColumnDefs(
         const isSpread = data.ParentMappingId != null;
         const displayValue = data.SpreadOverride != null ? data.SpreadOverride : data.Adjustment;
         return (
-          <Horizontal verticalCenter style={{ height: '100%', gap: 4 }}>
+          <Horizontal verticalCenter gap={4} style={{ height: '100%' }}>
             {getDiffIcon(isSpread)}
             <span>{formatSpread(displayValue)}</span>
           </Horizontal>
@@ -297,7 +297,7 @@ function getColumnDefs(
       field: 'UpdatedDateTime',
       width: 170,
       valueFormatter: ({ value }: { value: string }) =>
-        value ? moment(value).format('MM/DD/YYYY hh:mm A') : '',
+        value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '',
     },
   ];
 }
@@ -488,7 +488,7 @@ export function RowRefreshPage() {
   const controlBarProps = useMemo(
     () => ({
       title: refreshingRows.size > 0 ? (
-        <Horizontal verticalCenter style={{ gap: 8 }}>
+        <Horizontal verticalCenter gap={8}>
           <span>Quotebook</span>
           <LoadingOutlined spin style={{ fontSize: 14, color: 'var(--theme-color-1)' }} />
           <Texto appearance="medium" style={{ fontSize: 13, color: 'var(--theme-color-1)' }}>
@@ -506,9 +506,9 @@ export function RowRefreshPage() {
   return (
     <Vertical height="100%">
       {/* ── INSTRUCTIONS / CONTROL PANEL ── */}
-      <Horizontal className="p-3 bg-2 bordered mx-2 mt-2" verticalCenter style={{ gap: 16 }}>
-        <Vertical flex="1" style={{ gap: 4 }}>
-          <Texto category="h6">Interactive Demo: Single-Row Refresh with Live Revaluation</Texto>
+      <Horizontal className="p-3 bg-2 bordered mx-2 mt-2" verticalCenter gap={16}>
+        <Vertical flex="1" gap={4}>
+          <Texto category="h5">Interactive Demo: Single-Row Refresh with Live Revaluation</Texto>
           <Texto appearance="medium" style={{ fontSize: 13 }}>
             <strong>Right-click</strong> on any{' '}
             <strong style={{ color: 'var(--theme-color-1)' }}>Diff</strong> cell
@@ -518,8 +518,8 @@ export function RowRefreshPage() {
             The entire spread family refreshes with a loading overlay, then highlights yellow.
           </Texto>
         </Vertical>
-        <Vertical style={{ gap: 4, minWidth: 180 }}>
-          <Horizontal verticalCenter style={{ gap: 8 }}>
+        <Vertical gap={4} style={{ minWidth: 180 }}>
+          <Horizontal verticalCenter gap={8}>
             <Switch
               size="small"
               checked={simulateFailure}
@@ -563,7 +563,7 @@ export function RowRefreshPage() {
       {/* ── SPREAD OVERRIDE MODAL ── */}
       {selectedRow && (
         <SpreadOverrideModal
-          visible={isModalOpen}
+          open={isModalOpen}
           row={selectedRow}
           parentRow={parentRow}
           onApply={(row, value) => {

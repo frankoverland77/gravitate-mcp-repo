@@ -105,7 +105,7 @@ export function BenchmarksSidebar({
       <div style={cardStyle}>
         <div style={sectionHeaderStyle} onClick={() => setParametersExpanded(!parametersExpanded)}>
           <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               {parametersExpanded ? <DownOutlined style={{ fontSize: '10px' }} /> : <RightOutlined style={{ fontSize: '10px' }} />}
               <Texto weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '12px' }}>
                 Parameters
@@ -116,13 +116,13 @@ export function BenchmarksSidebar({
         </div>
 
         {parametersExpanded && (
-          <Vertical style={{ gap: '12px', marginTop: '8px' }}>
+          <Vertical gap={12} style={{ marginTop: '8px' }}>
             {!parametersEditMode ? (
               // Summary View
               <>
                 <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <Vertical style={{ gap: '8px' }}>
-                    <Horizontal style={{ gap: '8px' }}>
+                  <Vertical gap={8}>
+                    <Horizontal gap={8}>
                       <Texto category='p2' appearance='medium' style={{ minWidth: '50px' }}>
                         Price:
                       </Texto>
@@ -134,10 +134,10 @@ export function BenchmarksSidebar({
               </>
             ) : (
               // Edit Mode
-              <Vertical style={{ gap: '16px' }}>
+              <Vertical gap={16}>
                 {/* Price History */}
-                <Vertical style={{ gap: '8px' }}>
-                  <Horizontal style={{ gap: '8px', flexWrap: 'wrap' }}>
+                <Vertical gap={8}>
+                  <Horizontal gap={8} style={{ flexWrap: 'wrap' }}>
                     <Select
                       size='small'
                       value={parameters.price.lookback}
@@ -176,7 +176,7 @@ export function BenchmarksSidebar({
       <div style={cardStyle}>
         <div style={sectionHeaderStyle} onClick={() => setScenariosExpanded(!scenariosExpanded)}>
           <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+            <Horizontal gap={8} style={{ alignItems: 'center' }}>
               {scenariosExpanded ? <DownOutlined style={{ fontSize: '10px' }} /> : <RightOutlined style={{ fontSize: '10px' }} />}
               <Texto weight='600' style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '12px' }}>
                 Scenarios
@@ -187,7 +187,7 @@ export function BenchmarksSidebar({
         </div>
 
         {scenariosExpanded && (
-          <Vertical style={{ gap: '12px', marginTop: '8px' }}>
+          <Vertical gap={12} style={{ marginTop: '8px' }}>
             {/* Scenario Cards */}
             {scenarios.map((scenario) => {
               const isExpanded = expandedScenarioIds.has(scenario.id)
@@ -203,7 +203,7 @@ export function BenchmarksSidebar({
                 >
                   <div style={{ cursor: 'pointer' }} onClick={() => toggleScenarioExpansion(scenario.id)}>
                     <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Horizontal style={{ alignItems: 'center', gap: '8px' }}>
+                      <Horizontal gap={8} style={{ alignItems: 'center' }}>
                         {isExpanded ? <DownOutlined style={{ fontSize: '10px' }} /> : <RightOutlined style={{ fontSize: '10px' }} />}
                         <Texto weight='600' style={{ fontSize: '13px' }}>
                           {scenario.name}
@@ -224,7 +224,7 @@ export function BenchmarksSidebar({
                   </div>
 
                   {isExpanded && (
-                    <Vertical style={{ marginTop: '12px', gap: '8px' }}>
+                    <Vertical gap={8} style={{ marginTop: '12px' }}>
                       <Texto category='p2' appearance='medium'>
                         Products: {getProductsLabel(scenario.products)}
                       </Texto>
@@ -237,7 +237,7 @@ export function BenchmarksSidebar({
                         </Texto>
                       )}
 
-                      <Horizontal style={{ gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                      <Horizontal gap={8} style={{ marginTop: '8px', flexWrap: 'wrap' }}>
                         <GraviButton buttonText='Edit' icon={<EditOutlined />} appearance='outlined' onClick={() => onEditScenario(scenario)} />
                         <GraviButton buttonText='Duplicate' icon={<CopyOutlined />} appearance='outlined' onClick={() => onDuplicateScenario(scenario)} />
                         <Popconfirm

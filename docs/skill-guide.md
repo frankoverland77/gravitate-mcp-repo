@@ -241,14 +241,16 @@ Browse or search the component registry.
 | Mistake | Correct |
 |---------|---------|
 | `<Vertical style={{ flex: 1 }}>` | `<Vertical flex="1">` |
-| `<Horizontal gap={12}>` | `<Horizontal className="gap-12">` |
-| `<Modal open={isOpen}>` | `<Modal visible={isOpen}>` |
-| `<Drawer open={isOpen}>` | `<Drawer visible={isOpen}>` |
+| `<Horizontal style={{ gap: '12px' }}>` | `<Horizontal gap={12}>` |
+| `<Modal visible={isOpen}>` | `<Modal open={isOpen}>` |
+| `<Drawer visible={isOpen}>` | `<Drawer open={isOpen}>` |
 | `<GraviButton theme="success">` | `<GraviButton success>` |
-| `<GraviButton htmlType="submit">` | `<GraviButton type="submit">` |
+| `<GraviButton htmlType="submit">` | `<GraviButton onClick={() => form.submit()}>` |
 | `<Texto appearance="secondary">` (for gray) | `<Texto appearance="medium">` |
 | `<div style={{ display: 'flex' }}>` | `<Vertical>` or `<Horizontal>` |
-| `style={{ gap: '12px' }}` | `className="gap-12"` |
+| `destroyOnClose` | `destroyOnHidden` |
+| `onVisibleChange` | `onOpenChange` |
+| `appearance='outline'` | `appearance='outlined'` |
 | `style={{ justifyContent: 'center' }}` | `justifyContent="center"` prop |
 
 ---
@@ -265,11 +267,11 @@ import { Vertical, Horizontal } from '@gravitate-js/excalibrr';
   {children}
 </Vertical>
 
-// Horizontal row - use className for gap, props for alignment
+// Horizontal row - use gap prop (v5), props for alignment
 <Horizontal
   justifyContent="space-between"
   alignItems="center"
-  className="gap-12"
+  gap={12}
 >
   {children}
 </Horizontal>
@@ -308,18 +310,20 @@ import { Texto } from '@gravitate-js/excalibrr';
 ```typescript
 import { Modal, Drawer } from 'antd';
 
-// Use "visible" NOT "open"!
+// Use "open" NOT "visible" (antd v5)!
 <Modal
-  visible={isModalOpen}  // Correct
+  open={isModalOpen}
   onCancel={() => setIsModalOpen(false)}
   title="Edit Customer"
+  destroyOnHidden
 >
   {content}
 </Modal>
 
 <Drawer
-  visible={isDrawerOpen}  // Correct
+  open={isDrawerOpen}
   onClose={() => setIsDrawerOpen(false)}
+  destroyOnHidden
 >
   {content}
 </Drawer>

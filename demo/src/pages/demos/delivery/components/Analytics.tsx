@@ -516,7 +516,7 @@ export function Analytics() {
             onChange={(value: string) => {
               const today = new Date();
               let start: Date;
-              
+
               switch (value) {
                 case 'today':
                   start = new Date(today);
@@ -533,18 +533,19 @@ export function Analytics() {
                 default:
                   start = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
               }
-              
+
               setDateRange('analytics', {
                 start: start.toISOString().split('T')[0],
                 end: today.toISOString().split('T')[0]
               });
             }}
-          >
-            <Select.Option value="today">Today</Select.Option>
-            <Select.Option value="week">Last 7 Days</Select.Option>
-            <Select.Option value="month">Last 30 Days</Select.Option>
-            <Select.Option value="quarter">Last 90 Days</Select.Option>
-          </Select>
+            options={[
+              { label: 'Today', value: 'today' },
+              { label: 'Last 7 Days', value: 'week' },
+              { label: 'Last 30 Days', value: 'month' },
+              { label: 'Last 90 Days', value: 'quarter' },
+            ]}
+          />
           
           <GraviButton 
             buttonText="Export Data"

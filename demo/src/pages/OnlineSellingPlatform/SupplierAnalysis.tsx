@@ -134,7 +134,7 @@ export function SupplierAnalysis() {
     ], [navigate]);
 
     return (
-        <Vertical style={{ height: '100%', gap: 0 }}>
+        <Vertical gap={0} style={{ height: '100%' }}>
             <GraviGrid
                 storageKey="supplier-analysis-grid"
                 rowData={rowData}

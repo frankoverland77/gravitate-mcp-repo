@@ -593,7 +593,7 @@ export function ${name}Page() {
         agPropOverrides={{}}
       />
       ${options.includeForm ? `<${name}FormModal
-        visible={isModalOpen}
+        open={isModalOpen}
         onClose={() => { setIsModalOpen(false); setEditingItem(undefined) }}
         onSubmit={handleSubmit}
         initialValues={editingItem}
@@ -636,7 +636,7 @@ ${cols},
       field: 'actions',
       minWidth: 100,
       cellRenderer: (p: { data: ${name}Data }) => (
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           {onEdit && <GraviButton type='text' size='small' icon={<EditOutlined />} onClick={() => onEdit(p.data)} />}
           <GraviButton type='text' size='small' icon={<DeleteOutlined />} danger onClick={() => onDelete(p.data.Id)} />
         </Horizontal>
@@ -651,8 +651,7 @@ function generateForm(name: string, fields: FeatureBuilderArgs['fields']): strin
   const formFields = fields!.filter(f => f.name !== 'Id' && !f.name.includes('At')).map(f => {
     if (f.type === 'select' && f.options) {
       return `        <Form.Item name='${f.name}' label='${f.name}'${f.required ? " rules={[{ required: true }]}" : ''}>
-          <Select placeholder='Select ${f.name}'>${f.options.map(o => `\n            <Select.Option value='${o}'>${o}</Select.Option>`).join('')}
-          </Select>
+          <Select placeholder='Select ${f.name}' options={[${f.options.map(o => `{ value: '${o}', label: '${o}' }`).join(', ')}]} />
         </Form.Item>`
     }
     if (f.type === 'number') {
@@ -673,20 +672,20 @@ import { GraviButton, Horizontal } from '@gravitate-js/excalibrr'
 import { ${name}Data } from '../api/types.schema'
 
 interface Props {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onSubmit: (values: any) => void
   initialValues?: ${name}Data
 }
 
-export function ${name}FormModal({ visible, onClose, onSubmit, initialValues }: Props) {
+export function ${name}FormModal({ open, onClose, onSubmit, initialValues }: Props) {
   const [form] = Form.useForm()
   const isEdit = !!initialValues?.Id
 
   useEffect(() => {
-    if (visible && initialValues) form.setFieldsValue(initialValues)
-    else if (visible) form.resetFields()
-  }, [visible, initialValues])
+    if (open && initialValues) form.setFieldsValue(initialValues)
+    else if (open) form.resetFields()
+  }, [open, initialValues])
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -694,10 +693,10 @@ export function ${name}FormModal({ visible, onClose, onSubmit, initialValues }: 
   }
 
   return (
-    <Modal visible={visible} title={isEdit ? 'Edit' : 'Create'} onCancel={onClose} footer={null} destroyOnClose>
+    <Modal open={open} title={isEdit ? 'Edit' : 'Create'} onCancel={onClose} footer={null} destroyOnHidden>
       <Form form={form} layout='vertical'>
 ${formFields}
-        <Horizontal justifyContent='flex-end' style={{ gap: '12px', marginTop: '24px' }}>
+        <Horizontal justifyContent='flex-end' gap={12} style={{ marginTop: '24px' }}>
           <GraviButton buttonText='Cancel' onClick={onClose} />
           <GraviButton buttonText={isEdit ? 'Update' : 'Create'} theme1 onClick={handleSubmit} />
         </Horizontal>
@@ -747,13 +746,10 @@ export function ${name}FilterBar({ onFilter, onReset }: Props) {
         <Input placeholder='Search...' prefix={<SearchOutlined />} style={{ width: 200 }} />
       </Form.Item>
       <Form.Item name='status'>
-        <Select placeholder='Status' style={{ width: 150 }} allowClear>
-          <Select.Option value='Active'>Active</Select.Option>
-          <Select.Option value='Inactive'>Inactive</Select.Option>
-        </Select>
+        <Select placeholder='Status' style={{ width: 150 }} allowClear options={[{ value: 'Active', label: 'Active' }, { value: 'Inactive', label: 'Inactive' }]} />
       </Form.Item>
       <Form.Item>
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton buttonText='Filter' theme1 onClick={() => onFilter(form.getFieldsValue())} />
           <GraviButton buttonText='Reset' onClick={() => { form.resetFields(); onReset() }} />
         </Horizontal>

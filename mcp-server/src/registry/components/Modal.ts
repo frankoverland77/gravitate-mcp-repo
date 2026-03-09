@@ -16,10 +16,10 @@ export const modalComponent: ComponentMetadata = {
   dependencies: ["@gravitate-js/excalibrr", "react"],
   props: [
     {
-      name: "visible",
+      name: "open",
       type: "boolean",
       required: true,
-      description: "Controls modal visibility"
+      description: "Controls modal open state"
     },
     {
       name: "onClose",
@@ -75,16 +75,16 @@ export const modalComponent: ComponentMetadata = {
 import { useState } from 'react';
 
 function BasicModal() {
-  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <GraviButton onClick={() => setVisible(true)}>
+      <GraviButton onClick={() => setOpen(true)}>
         Open Modal
       </GraviButton>
       <Modal
-        visible={visible}
-        onClose={() => setVisible(false)}
+        open={open}
+        onClose={() => setOpen(false)}
         title="Information"
       >
         <p>This is a basic modal with some content.</p>
@@ -101,25 +101,25 @@ function BasicModal() {
 import { useState } from 'react';
 
 function ConfirmationModal() {
-  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleConfirm = () => {
     // Perform action
-    setVisible(false);
+    setOpen(false);
   };
 
   return (
     <>
-      <GraviButton theme="danger" onClick={() => setVisible(true)}>
+      <GraviButton theme="danger" onClick={() => setOpen(true)}>
         Delete Item
       </GraviButton>
       <Modal
-        visible={visible}
-        onClose={() => setVisible(false)}
+        open={open}
+        onClose={() => setOpen(false)}
         title="Confirm Deletion"
         footer={
           <Horizontal gap="8px" justifyContent="flex-end">
-            <GraviButton onClick={() => setVisible(false)}>
+            <GraviButton onClick={() => setOpen(false)}>
               Cancel
             </GraviButton>
             <GraviButton theme="danger" onClick={handleConfirm}>

@@ -126,7 +126,7 @@ export function ContentConfigurationTab() {
       title: 'Content Configuration',
       hideActiveFilters: false,
       actionButtons: lastSaved ? (
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <Texto category='p2' style={{ color: 'var(--theme-success)' }}>
             Last Saved: {formatLastSaved(lastSaved)}
           </Texto>
@@ -146,20 +146,20 @@ export function ContentConfigurationTab() {
         storageKey={storageKey}
       />
       <EditConfigModal
-        visible={editingConfig !== null}
+        open={editingConfig !== null}
         config={editingConfig}
         onClose={() => setEditingConfig(null)}
         onSave={handleSaveEdit}
       />
       <CopyConfigModal
-        visible={copyingConfig !== null}
+        open={copyingConfig !== null}
         targetConfig={copyingConfig}
         allConfigs={rowData}
         onClose={() => setCopyingConfig(null)}
         onCopy={handleCopyConfirm}
       />
       <PreviewEmailModal
-        visible={previewingConfig !== null}
+        open={previewingConfig !== null}
         config={previewingConfig}
         onClose={() => setPreviewingConfig(null)}
       />

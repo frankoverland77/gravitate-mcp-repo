@@ -43,11 +43,11 @@ export function DogGroomingFormModal({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title={isEdit ? 'Edit Dog Grooming' : 'Create Dog Grooming'}
       onCancel={handleCancel}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       width={500}
     >
       <Form form={form} layout="vertical">
@@ -83,7 +83,7 @@ export function DogGroomingFormModal({
           <Input placeholder="Enter type" />
         </Form.Item>
 
-        <Horizontal justifyContent="flex-end" style={{ gap: '12px', marginTop: '24px' }}>
+        <Horizontal justifyContent="flex-end" gap={12} style={{ marginTop: '24px' }}>
           <GraviButton buttonText="Cancel" onClick={handleCancel} />
           <GraviButton
             buttonText={isEdit ? 'Update' : 'Create'}

@@ -104,8 +104,8 @@ export interface PriceFormValues {
   priceValue: number;
   estimateActual: EstimateActual;
   uploadType: UploadType;
-  effectiveFrom?: moment.Moment;
-  effectiveTo?: moment.Moment;
+  effectiveFrom?: dayjs.Dayjs;
+  effectiveTo?: dayjs.Dayjs;
 }
 
 /** Result returned after a successful price save */
@@ -119,4 +119,4 @@ export interface SavedPriceResult {
   endDatedInstrumentName?: string;
 }
 
-import moment from 'moment';
+import dayjs from 'dayjs';

@@ -86,7 +86,7 @@ export const PopconfirmExamples: PopconfirmExample[] = [
     tags: ['clear', 'form', 'selection', 'custom-icon'],
     code: `<Popconfirm
   title="Are you sure you want to clear this field?"
-  visible={isPopConfirmVisible}
+  open={isPopConfirmOpen}
   onConfirm={() => {
     setSelected([])
     setIsPopConfirmVisible(false)
@@ -107,7 +107,7 @@ export const PopconfirmExamples: PopconfirmExample[] = [
 </Popconfirm>`,
     props: {
       title: '"Are you sure you want to clear this field?"',
-      visible: 'Controlled visibility state',
+      open: 'Controlled open state',
       onConfirm: 'Clear action with state cleanup',
       onCancel: 'Cancel action with state cleanup'
     },

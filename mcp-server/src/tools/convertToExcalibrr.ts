@@ -156,11 +156,11 @@ const CONVERSIONS: Conversion[] = [
     }
   },
   
-  // Fix Modal open to visible
+  // Fix Modal visible to open (antd v5)
   {
-    pattern: /<Modal([^>]*)\sopen\s*=\s*\{([^}]+)\}/gi,
-    description: 'Fix Modal open to visible',
-    convert: (match, before, value) => `<Modal${before} visible={${value}}`
+    pattern: /<Modal([^>]*)\svisible\s*=\s*\{([^}]+)\}/gi,
+    description: 'Fix Modal visible to open',
+    convert: (match, before, value) => `<Modal${before} open={${value}}`
   },
   
   // Fix GraviButton theme string to boolean
@@ -266,7 +266,7 @@ Provide \`code\` parameter with the code to convert.
 - \`<div style={{display:'flex'}}>\` → \`<Horizontal>\` / \`<Vertical>\`
 - \`<h1>\`, \`<p>\`, \`<span>\` → \`<Texto>\`
 - \`<button>\` → \`<GraviButton>\`
-- \`<Modal open={...}>\` → \`<Modal visible={...}>\`
+- \`<Modal visible={...}>\` → \`<Modal open={...}>\`
 - \`<GraviButton theme="success">\` → \`<GraviButton success>\`
 - \`<GraviButton htmlType="submit">\` → \`<GraviButton success onClick={() => form.submit()}>\`
 - Inline alignment styles → Component props

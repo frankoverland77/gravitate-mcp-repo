@@ -524,18 +524,18 @@ export function NegotiationModePage() {
     <div className='negotiation-dashboard'>
       {/* Dashboard Header */}
       <div className='negotiation-dashboard-header'>
-        <Vertical style={{ gap: 2 }}>
+        <Vertical gap={2}>
           <Texto category='h4'>OSP Order Administration</Texto>
           <Texto category='p2' appearance='medium'>
             Manage pending orders and negotiations. Click an order to view details and negotiation
             status.
           </Texto>
         </Vertical>
-        <Horizontal verticalCenter style={{ gap: 16 }}>
+        <Horizontal gap={16} verticalCenter>
           {Object.entries(NEGOTIATION_STATE_MAP).map(([key, state]) => {
             const count = pendingOrders.filter((o) => o.negotiationState === key).length
             return (
-              <Horizontal key={key} verticalCenter style={{ gap: 4 }}>
+              <Horizontal gap={4} key={key} verticalCenter>
                 <Tag color={state.color} icon={state.icon} style={{ margin: 0, fontSize: '11px' }}>
                   {state.label}
                 </Tag>
@@ -562,7 +562,7 @@ export function NegotiationModePage() {
 
       {/* Order Details Modal with Negotiation Panel */}
       <OrderDetailsModal
-        visible={modalVisible}
+        open={modalVisible}
         order={selectedOrder}
         onClose={handleCloseModal}
       />

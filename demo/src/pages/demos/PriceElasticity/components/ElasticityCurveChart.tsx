@@ -196,12 +196,12 @@ export function ElasticityCurveChart({
   )
 
   return (
-    <Vertical style={{ gap: '8px' }}>
+    <Vertical gap={8}>
       {(title || subtitle) && (
-        <Vertical style={{ gap: '2px' }}>
+        <Vertical gap={2}>
           <Horizontal justifyContent="space-between" alignItems="center">
             {title && (
-              <Texto category="h6" weight="600">
+              <Texto category="h5" weight="600">
                 {title}
               </Texto>
             )}
@@ -281,32 +281,32 @@ export function ElasticityCurveChart({
         </div>
       </div>
       {/* Legend */}
-      <Horizontal style={{ gap: '16px' }} justifyContent="center">
-        <Horizontal style={{ gap: '4px' }} alignItems="center">
+      <Horizontal gap={16} justifyContent="center">
+        <Horizontal gap={4} alignItems="center">
           <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#52c41a' }} />
           <Texto category="p2" appearance="medium">
             Optimal Zone
           </Texto>
         </Horizontal>
-        <Horizontal style={{ gap: '4px' }} alignItems="center">
+        <Horizontal gap={4} alignItems="center">
           <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#faad14' }} />
           <Texto category="p2" appearance="medium">
             Caution
           </Texto>
         </Horizontal>
-        <Horizontal style={{ gap: '4px' }} alignItems="center">
+        <Horizontal gap={4} alignItems="center">
           <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ff4d4f' }} />
           <Texto category="p2" appearance="medium">
             Cliff / Danger
           </Texto>
         </Horizontal>
-        <Horizontal style={{ gap: '4px' }} alignItems="center">
+        <Horizontal gap={4} alignItems="center">
           <div style={{ width: 12, height: 3, backgroundColor: '#1890ff' }} />
           <Texto category="p2" appearance="medium">
             Fitted Curve
           </Texto>
         </Horizontal>
-        <Horizontal style={{ gap: '4px' }} alignItems="center">
+        <Horizontal gap={4} alignItems="center">
           <div style={{ width: 12, height: 12, backgroundColor: '#1890ff', opacity: 0.15, borderRadius: 2 }} />
           <Texto category="p2" appearance="medium">
             Confidence Band

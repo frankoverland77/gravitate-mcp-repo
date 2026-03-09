@@ -256,7 +256,7 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
     : '—'
 
   return (
-    <Vertical style={{ gap: '32px', overflow: 'visible' }}>
+    <Vertical gap={32} style={{ overflow: 'visible' }}>
       {/* Summary Cards */}
       <div className={styles['stats-row']}>
         <div className={styles['stat-card']}>
@@ -284,8 +284,8 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
       </div>
 
       {/* Terms Summary */}
-      <Vertical style={{ gap: '12px', overflow: 'visible' }}>
-        <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+      <Vertical gap={12} style={{ overflow: 'visible' }}>
+        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Terms Summary
         </Texto>
         <div className={styles['terms-grid']}>
@@ -325,8 +325,8 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
       </Vertical>
 
       {/* Detail Summary Grid */}
-      <Vertical style={{ gap: '12px', overflow: 'visible' }}>
-        <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+      <Vertical gap={12} style={{ overflow: 'visible' }}>
+        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Detail Summary
         </Texto>
 
@@ -346,11 +346,11 @@ export function SummaryExportTab({ rfp }: SummaryExportTabProps) {
       </Vertical>
 
       {/* Export Actions */}
-      <Vertical style={{ gap: '12px' }}>
-        <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+      <Vertical gap={12}>
+        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Export
         </Texto>
-        <Horizontal style={{ gap: '12px' }}>
+        <Horizontal gap={12}>
           <GraviButton
             buttonText="Export to Excel"
             icon={<FileExcelOutlined />}

@@ -185,7 +185,7 @@ const CORE_CONVENTIONS = `
 ### Layout Components
 - **NEVER** use \`<div style={{display:'flex'}}>\` → Use \`<Vertical>\` or \`<Horizontal>\`
 - Use component props for \`justifyContent\` and \`alignItems\` (not style)
-- **NO gap prop** on Vertical/Horizontal → Use \`style={{ gap: '12px' }}\` or \`className="gap-12"\`
+- Use \`gap={12}\` prop on Vertical/Horizontal (not \`style={{ gap }}\` or \`className\`)
 - Use \`flex="1"\` prop instead of \`style={{ flex: 1 }}\`
 - Use \`height="100%"\` prop instead of \`style={{ height: '100%' }}\`
 
@@ -198,15 +198,25 @@ const CORE_CONVENTIONS = `
 - Boolean theme props: \`success\`, \`theme1\`, \`danger\` (not \`theme="success"\`)
 - No \`htmlType\` prop → Use \`onClick={() => form.submit()}\`
 
-### Modal/Drawer
-- Use \`visible={...}\` prop (not \`open={...}\`)
+### Modal/Drawer (antd v5)
+- Use \`open={...}\` prop (not \`visible={...}\`)
+- Use \`destroyOnHidden\` (not \`destroyOnClose\`)
+- Use \`onOpenChange\` (not \`onVisibleChange\`)
+
+### Component Children → Props (antd v5)
+- Tabs: Use \`items={[{ key, label, children }]}\` (not \`Tabs.TabPane\` children)
+- Menu: Use \`items={[{ key, label }]}\` (not \`Menu.Item\` children)
+- Select: Use \`options={[{ value, label }]}\` (not \`Select.Option\` children)
+
+### GraviButton
+- Use \`appearance="outlined"\` (not \`appearance="outline"\`)
 
 ### GraviGrid
 - Always include \`agPropOverrides={{}}\`
 - Always include \`storageKey="UniqueGridName"\`
 
 ### Styling
-- Prefer utility classes: \`mb-2\`, \`p-3\`, \`gap-16\`, \`border-radius-5\`
+- Prefer utility classes: \`mb-2\`, \`p-3\`, \`border-radius-5\`
 - Use CSS variables: \`var(--theme-color-2)\`, \`var(--theme-bg-elevated)\`
 `;
 
@@ -222,7 +232,7 @@ function getCondensedAPI(component: ComponentMetadata): string {
     p.required || 
     ['justifyContent', 'alignItems', 'flex', 'height', 'className', 'style',
      'buttonText', 'success', 'theme1', 'danger', 'onClick',
-     'visible', 'onCancel', 'title', 'footer',
+     'open', 'onCancel', 'title', 'footer',
      'columnDefs', 'rowData', 'storageKey', 'agPropOverrides',
      'category', 'appearance', 'weight'].includes(p.name)
   ) || [];

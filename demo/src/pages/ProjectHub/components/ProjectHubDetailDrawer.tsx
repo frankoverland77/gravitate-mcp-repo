@@ -87,7 +87,7 @@ export function ProjectHubDetailDrawer({
               flexShrink: 0,
             }}
           >
-            <Horizontal alignItems="center" style={{ gap: 8 }}>
+            <Horizontal alignItems="center" gap={8}>
               <span style={{ fontSize: 18, color: 'var(--gray-500)' }}>{icon}</span>
               <Texto category="h5" weight="600">{title}</Texto>
             </Horizontal>
@@ -114,7 +114,7 @@ export function ProjectHubDetailDrawer({
           <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
             {/* Status & Version */}
             <div style={{ marginBottom: 16 }}>
-              <Horizontal alignItems="center" style={{ gap: 8, marginBottom: 8 }}>
+              <Horizontal alignItems="center" gap={8} style={{ marginBottom: 8 }}>
                 <Texto appearance="medium" category="label" style={{ width: 60 }}>Status</Texto>
                 {!pinned ? (
                   <Select
@@ -131,10 +131,10 @@ export function ProjectHubDetailDrawer({
                   <ProjectHubStatusBadge status={entry.status} />
                 )}
               </Horizontal>
-              <Horizontal alignItems="center" style={{ gap: 8, marginBottom: 8 }}>
+              <Horizontal alignItems="center" gap={8} style={{ marginBottom: 8 }}>
                 <Texto appearance="medium" category="label" style={{ width: 60 }}>Version</Texto>
                 {editingVersion ? (
-                  <Horizontal alignItems="center" style={{ gap: 4 }}>
+                  <Horizontal alignItems="center" gap={4}>
                     <Input
                       value={versionDraft}
                       onChange={(e) => setVersionDraft(e.target.value)}
@@ -149,7 +149,7 @@ export function ProjectHubDetailDrawer({
                     </span>
                   </Horizontal>
                 ) : (
-                  <Horizontal alignItems="center" style={{ gap: 4 }}>
+                  <Horizontal alignItems="center" gap={4}>
                     <Texto category="label">
                       {entry.versionLabel || '—'}
                     </Texto>
@@ -159,7 +159,7 @@ export function ProjectHubDetailDrawer({
                   </Horizontal>
                 )}
               </Horizontal>
-              <Horizontal alignItems="center" style={{ gap: 8 }}>
+              <Horizontal alignItems="center" gap={8}>
                 <Texto appearance="medium" category="label" style={{ width: 60 }}>Routes</Texto>
                 <Texto category="label">{routeCount}</Texto>
               </Horizontal>
@@ -167,7 +167,7 @@ export function ProjectHubDetailDrawer({
 
             {/* Description */}
             <div style={{ marginBottom: 16 }}>
-              <Horizontal alignItems="center" style={{ gap: 4, marginBottom: 4 }}>
+              <Horizontal alignItems="center" gap={4} style={{ marginBottom: 4 }}>
                 <Texto weight="600" category="label">Description</Texto>
                 {!editingDesc && (
                   <span onClick={startEditDesc} style={{ cursor: 'pointer' }}>

@@ -9,7 +9,7 @@ import {
 import type { DetailedAnalysisData } from '../../types/performanceDetails.types'
 
 interface DetailedAnalysisModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   data: DetailedAnalysisData | null
 }
@@ -29,7 +29,7 @@ const chartCardStyle = {
   height: '280px',
 }
 
-export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalysisModalProps) {
+export function DetailedAnalysisModal({ open, onClose, data }: DetailedAnalysisModalProps) {
   // Calculate derived values only when data exists
   const product = data?.product
   const dailyLiftingData = data?.dailyLiftingData || []
@@ -66,11 +66,11 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       onCancel={onClose}
       title={product ? `Detailed Analysis: ${product.productName} @ ${product.location}` : 'Detailed Analysis'}
       width={1000}
-      destroyOnClose
+      destroyOnHidden
       footer={
         <Horizontal justifyContent='flex-end'>
           <GraviButton buttonText='Close' onClick={onClose} />
@@ -78,13 +78,13 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
       }
     >
       {product ? (
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Overview Metrics - 3 cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           {/* Performance Card */}
           <div style={cardStyle}>
-            <Vertical style={{ gap: '12px' }}>
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+            <Vertical gap={12}>
+              <Horizontal gap={8} alignItems='center'>
                 <DashboardOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Performance
@@ -107,8 +107,8 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
 
           {/* Daily Pace Card */}
           <div style={cardStyle}>
-            <Vertical style={{ gap: '12px' }}>
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+            <Vertical gap={12}>
+              <Horizontal gap={8} alignItems='center'>
                 <ThunderboltOutlined style={{ fontSize: '16px', color: '#faad14' }} />
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Weekly Pace
@@ -129,8 +129,8 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
 
           {/* Timeline Card */}
           <div style={cardStyle}>
-            <Vertical style={{ gap: '12px' }}>
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+            <Vertical gap={12}>
+              <Horizontal gap={8} alignItems='center'>
                 <CalendarOutlined style={{ fontSize: '16px', color: '#722ed1' }} />
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Timeline
@@ -155,7 +155,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           {/* Daily Lifting Chart */}
           <div style={chartCardStyle}>
-            <Vertical style={{ gap: '16px', height: '100%' }}>
+            <Vertical gap={16} style={{ height: '100%' }}>
               <Texto category='h5' weight='600'>
                 Daily Lifting (30 Days)
               </Texto>
@@ -205,14 +205,14 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                     })}
                   </div>
                   {/* Legend */}
-                  <Horizontal style={{ gap: '16px', marginTop: '8px' }}>
-                    <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                  <Horizontal gap={16} style={{ marginTop: '8px' }}>
+                    <Horizontal gap={6} alignItems='center'>
                       <div style={{ width: '12px', height: '12px', backgroundColor: '#1890ff', borderRadius: '2px' }} />
                       <Texto category='p2' appearance='medium'>
                         Actual
                       </Texto>
                     </Horizontal>
-                    <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                    <Horizontal gap={6} alignItems='center'>
                       <div style={{ width: '12px', height: '2px', backgroundColor: '#cf1322' }} />
                       <Texto category='p2' appearance='medium'>
                         Target
@@ -226,7 +226,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
 
           {/* Day of Week Pattern */}
           <div style={chartCardStyle}>
-            <Vertical style={{ gap: '16px', height: '100%' }}>
+            <Vertical gap={16} style={{ height: '100%' }}>
               <Texto category='h5' weight='600'>
                 Day of Week Pattern
               </Texto>
@@ -278,15 +278,15 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
 
           return (
             <div style={{ ...cardStyle, backgroundColor: '#fff' }}>
-              <Vertical style={{ gap: '16px' }}>
+              <Vertical gap={16}>
                 <Horizontal alignItems='center' justifyContent='space-between'>
-                  <Horizontal alignItems='center' style={{ gap: '8px' }}>
+                  <Horizontal gap={8} alignItems='center'>
                     <FallOutlined style={{ fontSize: '18px', color: '#cf1322' }} />
                     <Texto category='h5' weight='600'>
                       Lower-of Impact Analysis
                     </Texto>
                   </Horizontal>
-                  <Horizontal style={{ gap: '16px' }}>
+                  <Horizontal gap={16}>
                     <Texto category='p2' appearance='medium'>
                       Total Impact: <span style={{ color: '#cf1322', fontWeight: 600 }}>-${totalLoss.toLocaleString()}</span>
                     </Texto>
@@ -409,16 +409,16 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                 </div>
 
                 {/* Legend */}
-                <Horizontal style={{ gap: '20px' }}>
-                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                <Horizontal gap={20}>
+                  <Horizontal gap={6} alignItems='center'>
                     <div style={{ width: '12px', height: '12px', backgroundColor: '#1890ff', borderRadius: '2px', opacity: 0.85 }} />
                     <Texto category='p2' appearance='medium'>Contract Terms Revenue</Texto>
                   </Horizontal>
-                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                  <Horizontal gap={6} alignItems='center'>
                     <div style={{ width: '12px', height: '12px', backgroundColor: '#cf1322', borderRadius: '2px', opacity: 0.85 }} />
                     <Texto category='p2' appearance='medium'>Rack Undercut (Margin Erosion)</Texto>
                   </Horizontal>
-                  <Horizontal alignItems='center' style={{ gap: '6px' }}>
+                  <Horizontal gap={6} alignItems='center'>
                     <div style={{ width: '12px', height: '12px', backgroundColor: '#52c41a', borderRadius: '2px', opacity: 0.85 }} />
                     <Texto category='p2' appearance='medium'>Actual Realized Revenue</Texto>
                   </Horizontal>
@@ -430,12 +430,12 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
 
         {/* Pace Analysis */}
         <div style={{ ...cardStyle, backgroundColor: '#fff' }}>
-          <Vertical style={{ gap: '16px' }}>
+          <Vertical gap={16}>
             <Texto category='h5' weight='600'>
               Pace Analysis
             </Texto>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Current Pace
                 </Texto>
@@ -443,7 +443,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                   {(product.dailyAverageLifting * 7).toLocaleString()}/week
                 </Texto>
               </Vertical>
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Required Pace
                 </Texto>
@@ -451,7 +451,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                   {(product.requiredDailyPace * 7).toLocaleString()}/week
                 </Texto>
               </Vertical>
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Variance
                 </Texto>
@@ -460,7 +460,7 @@ export function DetailedAnalysisModal({ visible, onClose, data }: DetailedAnalys
                   {product.paceVariance.toFixed(1)}%
                 </Texto>
               </Vertical>
-              <Vertical style={{ gap: '4px' }}>
+              <Vertical gap={4}>
                 <Texto category='p2' appearance='medium' style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Trend
                 </Texto>

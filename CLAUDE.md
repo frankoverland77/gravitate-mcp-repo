@@ -49,14 +49,18 @@ register_demo({
 |---------|-----|
 | `<Vertical style={{ flex: 1 }}>` | `<Vertical flex="1">` |
 | `<Vertical style={{ height: '100%' }}>` | `<Vertical height="100%">` |
-| `<Horizontal gap={12}>` | `<Horizontal style={{ gap: '12px' }}>` or `className="gap-12"` |
+| `<Horizontal style={{ gap: '12px' }}>` | `<Horizontal gap={12}>` |
 | `<Horizontal style={{ justifyContent: '...' }}>` | `<Horizontal justifyContent="...">` |
-| `<Modal open={isOpen}>` | `<Modal visible={isOpen}>` |
-| `<Drawer open={isOpen}>` | `<Drawer visible={isOpen}>` |
+| `<Modal visible={isOpen}>` | `<Modal open={isOpen}>` |
+| `<Drawer visible={isOpen}>` | `<Drawer open={isOpen}>` |
+| `destroyOnClose` | `destroyOnHidden` |
+| `onVisibleChange` | `onOpenChange` |
+| `appearance='outline'` | `appearance='outlined'` |
 | `<GraviButton theme="success">` | `<GraviButton success>` |
 | `<GraviButton htmlType="submit">` | `<GraviButton onClick={() => form.submit()}>` |
 | `<Texto appearance="secondary">` for gray | `<Texto appearance="medium">` (secondary is BLUE!) |
 | `<GraviGrid />` without agPropOverrides | `<GraviGrid agPropOverrides={{}} />` |
+| `<Menu><Menu.Item key="x">Label</Menu.Item></Menu>` | `<Menu items={[{ key: 'x', label: 'Label' }]} />` |
 
 ---
 

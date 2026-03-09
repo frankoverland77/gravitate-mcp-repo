@@ -34,15 +34,15 @@ export function PriceChangeCorrelationChart({ data, upCapture, downCapture }: Pr
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <Vertical style={{ gap: '4px' }}>
-                    <Texto category="h6" weight="600">
+                <Vertical gap={4}>
+                    <Texto category="h5" weight="600">
                         Price Change vs Market
                     </Texto>
                     <Texto category="p2" appearance="medium">
                         Shows correlation between market movement and competitor response
                     </Texto>
                 </Vertical>
-                <Horizontal style={{ gap: '12px' }}>
+                <Horizontal gap={12}>
                     <BBDTag success style={{ width: 'fit-content' }}>
                         Up: {upCapture}%
                     </BBDTag>

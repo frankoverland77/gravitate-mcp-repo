@@ -480,7 +480,7 @@ export function DetailsGridSection({
             title: 'Contract Details',
             hideActiveFilters: true,
             actionButtons: isExpired ? undefined : (
-              <Horizontal alignItems='center' style={{ gap: '8px' }}>
+              <Horizontal gap={8} alignItems='center'>
                 <GraviButton buttonText='Manage Groups' icon={<GroupOutlined />} onClick={onManageGroups} />
                 <GraviButton buttonText='Bulk Add' icon={<AppstoreAddOutlined />} onClick={onBulkCreate} />
                 <GraviButton

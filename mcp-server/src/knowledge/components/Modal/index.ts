@@ -32,28 +32,28 @@ export const ModalExamples: ModalExample[] = [
     category: "interactive",
     tags: ["confirmation", "basic", "buttons", "excalibrr"],
     code: `<Modal
-  visible={isVisible}
+  open={isVisible}
   onCancel={onCancel}
   title={
     <Horizontal alignItems='center'>
       <ExclamationCircleOutlined className='mr-2' style={{ color: 'var(--theme-error)' }} />
-      <Texto category='h6'>Confirm Revaluation</Texto>
+      <Texto category='h5'>Confirm Revaluation</Texto>
     </Horizontal>
   }
   footer={
-    <Horizontal justifyContent='flex-end' style={{ gap: 10 }}>
+    <Horizontal justifyContent='flex-end' gap={10}>
       <GraviButton buttonText='Cancel' onClick={onCancel} />
       <GraviButton buttonText='Confirm Revaluation' theme1 onClick={() => onConfirm()} />
     </Horizontal>
   }
 >
   <Vertical style={{ fontSize: '12px' }}>
-    <Texto category='h6' className='mb-2'>
+    <Texto category='h5' className='mb-2'>
       Are you sure you want to revalue the selected contract detail(s)?
     </Texto>
-    <Horizontal style={{ gap: 10 }}>
+    <Horizontal gap={10}>
       <Texto category='p2'>Start date: </Texto>
-      <Texto category='p2'>{moment(startDate).format(dateFormat.SHORT_DATE_YEAR_TIME)}</Texto>
+      <Texto category='p2'>{dayjs(startDate).format(dateFormat.SHORT_DATE_YEAR_TIME)}</Texto>
     </Horizontal>
     <Texto category='p2'>This action cannot be undone.</Texto>
   </Vertical>
@@ -66,20 +66,23 @@ export const ModalExamples: ModalExample[] = [
     complexity: "simple",
     category: "forms",
     tags: ["form", "basic", "input", "submit"],
-    code: `<Modal visible={visible} onCancel={onCancel} onOk={form.submit} okText='Submit'>
+    code: `<Modal open={visible} onCancel={onCancel} onOk={form.submit} okText='Submit'>
   <Form form={form} layout='vertical' onFinish={onCreateProxy}>
-    <Vertical style={{ gap: '1rem' }}>
+    <Vertical gap='1rem'>
       <Form.Item label='Configuration Name' name='ConfigurationName' rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item label='Default Cost Source' name='DefaultCostSourceMarkerId'>
-        <Select allowClear showSearch optionFilterProp='children'>
-          {metadata?.CostSources?.filter((cst) => cst.IsMarker).map((option) => (
-            <Select.Option key={option.Value} value={option.Value}>
-              <FunctionOutlined /> {option.Text}
-            </Select.Option>
-          ))}
-        </Select>
+        <Select
+          allowClear
+          showSearch
+          optionFilterProp='label'
+          options={metadata?.CostSources?.filter((cst) => cst.IsMarker).map((option) => ({
+            key: option.Value,
+            value: option.Value,
+            label: <><FunctionOutlined /> {option.Text}</>,
+          }))}
+        />
       </Form.Item>
     </Vertical>
   </Form>
@@ -93,9 +96,9 @@ export const ModalExamples: ModalExample[] = [
     category: "interactive",
     tags: ["save", "basic", "minimal", "custom-styling"],
     code: `<Modal
-  visible={isDraftModalVisible}
+  open={isDraftModalVisible}
   title={<Texto category='p1'>{saveAsModalTitle}</Texto>}
-  destroyOnClose
+  destroyOnHidden
   style={{ minWidth: '20vw' }}
   className='save-as-modal'
   footer={null}
@@ -117,7 +120,7 @@ export const ModalExamples: ModalExample[] = [
     category: "data",
     tags: ["fullscreen", "grid", "data", "custom-styling", "widget"],
     code: `<Modal
-  visible={isModalOpen}
+  open={isModalOpen}
   onCancel={closeModal}
   title={null}
   footer={null}
@@ -151,7 +154,7 @@ export const ModalExamples: ModalExample[] = [
     tags: ["settings", "form", "validation", "api", "custom-footer"],
     code: `<Modal
   title='Command Center Page Settings'
-  visible={isModalOpen}
+  open={isModalOpen}
   onCancel={onClose}
   footer={
     <PageSettingsModalFooter
@@ -165,7 +168,7 @@ export const ModalExamples: ModalExample[] = [
   <Form form={form} layout='vertical' onFinish={onFinish}>
     <Vertical className='p-4'>
       <Vertical verticalCenter className='mb-4'>
-        <Texto category='h6'>Location Hierarchy</Texto>
+        <Texto category='h5'>Location Hierarchy</Texto>
         <Form.Item name='LocationHierarchy'>
           <Select options={locationHeirarchyList} className='w-full' />
         </Form.Item>
@@ -173,7 +176,7 @@ export const ModalExamples: ModalExample[] = [
       <Vertical className='p-4 bordered bg-2 mt-4'>
         <Horizontal verticalCenter className='mb-2'>
           <InfoCircleOutlined />
-          <Texto category='h6' className='ml-2'>Important Note</Texto>
+          <Texto category='h5' className='ml-2'>Important Note</Texto>
         </Horizontal>
         <Texto category='p2'>
           Changing these hierarchies will affect how data is aggregated.
@@ -192,18 +195,18 @@ export const ModalExamples: ModalExample[] = [
     category: "data",
     tags: ["data-grid", "loading", "dynamic", "api-integration"],
     code: `<Modal
-  visible={visible}
+  open={visible}
   title={\`Price Conflicts (\${conflictIds.length})\`}
   footer={[
-    <GraviButton 
-      key='close' 
-      icon={<CloseOutlined />} 
-      buttonText='Close' 
-      onClick={handleClose} 
+    <GraviButton
+      key='close'
+      icon={<CloseOutlined />}
+      buttonText='Close'
+      onClick={handleClose}
     />
   ]}
   onCancel={handleClose}
-  destroyOnClose
+  destroyOnHidden
   width='80vw'
   bodyStyle={{ height: '60vh' }}
 >
@@ -226,9 +229,9 @@ export const ModalExamples: ModalExample[] = [
     category: "forms",
     tags: ["wizard", "multi-step", "form", "navigation", "api-calls"],
     code: `<Modal
-  visible={isModalOpen}
+  open={isModalOpen}
   title={<ModalTitle />}
-  destroyOnClose={true}
+  destroyOnHidden={true}
   onCancel={onClose}
   className='manual-revaluation-modal'
   width='65vw'
@@ -276,9 +279,9 @@ export const ModalExamples: ModalExample[] = [
     tags: ["trading", "timer", "conditional", "state-management", "audio"],
     code: `<Modal
   className='forwards-modal-container'
-  visible={isModalVisible}
+  open={isModalVisible}
   centered
-  destroyOnClose
+  destroyOnHidden
   footer={
     isPriceExpired ? null : (
       <OrderFooter
@@ -346,8 +349,8 @@ export const ModalExamples: ModalExample[] = [
         ),
         config: {
           title: <Texto>{selectedEntityAction}</Texto>,
-          destroyOnClose: true,
-          visible: isInfoModalOpen,
+          destroyOnHidden: true,
+          open: isInfoModalOpen,
           style: { minWidth: '30vw' },
           footer: null,
           onCancel: () => setIsInfoModalOpen(false),
@@ -366,9 +369,9 @@ export const ModalExamples: ModalExample[] = [
         ),
         config: {
           title: <Texto>View Details</Texto>,
-          destroyOnClose: true,
+          destroyOnHidden: true,
           className: 'no-ant-modal-body-padding',
-          visible: isInfoModalOpen,
+          open: isInfoModalOpen,
           style: { minWidth: '50vw' },
           footer: null,
           onCancel: () => setIsInfoModalOpen(false),
@@ -408,9 +411,9 @@ export const ModalExamples: ModalExample[] = [
     ],
     code: `<Modal
   className='spread-override-modal'
-  visible={isSpreadOverrideModalOpen}
-  title={<Texto category='h6'>Override Spread Differential</Texto>}
-  destroyOnClose
+  open={isSpreadOverrideModalOpen}
+  title={<Texto category='h5'>Override Spread Differential</Texto>}
+  destroyOnHidden
   width={400}
   centered
   cancelButtonProps={{ disabled: saveSpreadOverrides?.isLoading, tabIndex: 1 }}

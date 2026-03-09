@@ -106,7 +106,7 @@ function BidHistoryTooltip({ active, payload, viewMetric }: BidTooltipProps) {
 
   return (
     <Vertical className={styles.tooltip}>
-      <Horizontal alignItems='center' style={{ gap: '8px' }}>
+      <Horizontal gap={8} alignItems='center'>
         <Texto category='p2' weight='600'>
           {data.name}
         </Texto>
@@ -118,7 +118,7 @@ function BidHistoryTooltip({ active, payload, viewMetric }: BidTooltipProps) {
       </Horizontal>
 
       <Horizontal justifyContent='space-between' style={{ marginTop: '8px' }}>
-        <Horizontal alignItems='center' style={{ gap: '6px' }}>
+        <Horizontal gap={6} alignItems='center'>
           <div className={styles.legendDot} style={{ backgroundColor: chartColors.r1 }} />
           <Texto category='p2' appearance='medium'>
             Round 1:
@@ -128,7 +128,7 @@ function BidHistoryTooltip({ active, payload, viewMetric }: BidTooltipProps) {
       </Horizontal>
 
       <Horizontal justifyContent='space-between' style={{ marginTop: '4px' }}>
-        <Horizontal alignItems='center' style={{ gap: '6px' }}>
+        <Horizontal gap={6} alignItems='center'>
           <div className={styles.legendDot} style={{ backgroundColor: chartColors.r2 }} />
           <Texto category='p2' appearance='medium'>
             Round 2:
@@ -183,7 +183,7 @@ function TerminalHistoryTooltip({ active, payload, viewMode }: TerminalTooltipPr
         </Texto>
 
         <Horizontal justifyContent='space-between' style={{ marginBottom: '4px' }}>
-          <Horizontal alignItems='center' style={{ gap: '6px' }}>
+          <Horizontal gap={6} alignItems='center'>
             <div className={styles.legendDot} style={{ backgroundColor: chartColors.contractPrice }} />
             <Texto category='p2' appearance='medium'>
               Contract:
@@ -193,7 +193,7 @@ function TerminalHistoryTooltip({ active, payload, viewMode }: TerminalTooltipPr
         </Horizontal>
 
         <Horizontal justifyContent='space-between' style={{ marginBottom: '4px' }}>
-          <Horizontal alignItems='center' style={{ gap: '6px' }}>
+          <Horizontal gap={6} alignItems='center'>
             <div className={styles.legendDot} style={{ backgroundColor: chartColors.rackAverage }} />
             <Texto category='p2' appearance='medium'>
               Rack Avg:
@@ -203,7 +203,7 @@ function TerminalHistoryTooltip({ active, payload, viewMode }: TerminalTooltipPr
         </Horizontal>
 
         <Horizontal justifyContent='space-between' style={{ marginBottom: '4px' }}>
-          <Horizontal alignItems='center' style={{ gap: '6px' }}>
+          <Horizontal gap={6} alignItems='center'>
             <div className={styles.legendDot} style={{ backgroundColor: chartColors.spotPrice }} />
             <Texto category='p2' appearance='medium'>
               Spot:
@@ -216,7 +216,7 @@ function TerminalHistoryTooltip({ active, payload, viewMode }: TerminalTooltipPr
           justifyContent='space-between'
           style={{ marginTop: '8px', borderTop: '1px solid #f0f0f0', paddingTop: '8px' }}
         >
-          <Horizontal alignItems='center' style={{ gap: '6px' }}>
+          <Horizontal gap={6} alignItems='center'>
             <div className={styles.legendDot} style={{ backgroundColor: chartColors.volume }} />
             <Texto category='p2' appearance='medium'>
               Volume:
@@ -326,7 +326,7 @@ function BidHistoryChart({ historicalData, round, onExport }: BidHistoryChartPro
     <div className={styles.chartCard}>
       {/* Controls Row */}
       <Horizontal justifyContent='space-between' alignItems='center' className={styles.controlsRow}>
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <Texto category='p2' appearance='medium'>
             View:
           </Texto>
@@ -341,7 +341,7 @@ function BidHistoryChart({ historicalData, round, onExport }: BidHistoryChartPro
           />
         </Horizontal>
 
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton icon={<CopyOutlined />}>Copy Data</GraviButton>
           <GraviButton icon={<DownloadOutlined />} onClick={onExport}>
             Export
@@ -351,15 +351,15 @@ function BidHistoryChart({ historicalData, round, onExport }: BidHistoryChartPro
 
       {/* Legend */}
       <Horizontal className={styles.legend}>
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <div className={styles.legendDot} style={{ backgroundColor: chartColors.r1 }} />
           <Texto category='p2'>R1 Bid</Texto>
         </Horizontal>
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <div className={styles.legendDot} style={{ backgroundColor: chartColors.r2 }} />
           <Texto category='p2'>R2 Bid</Texto>
         </Horizontal>
-        <Horizontal alignItems='center' style={{ gap: '8px', marginLeft: '16px' }}>
+        <Horizontal alignItems='center' gap={8} style={{ marginLeft: '16px' }}>
           <Tag color='blue' style={{ margin: 0 }}>
             INCUMBENT
           </Tag>
@@ -478,7 +478,7 @@ function TerminalHistoryChart({ onExport }: TerminalHistoryChartProps) {
     <div className={styles.chartCard}>
       {/* Header with terminal info */}
       <Horizontal justifyContent='space-between' alignItems='center' style={{ marginBottom: '16px' }}>
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category='p1' weight='600'>
             {terminalHistory.terminalName}
           </Texto>
@@ -490,7 +490,7 @@ function TerminalHistoryChart({ onExport }: TerminalHistoryChartProps) {
 
       {/* Controls Row */}
       <Horizontal justifyContent='space-between' alignItems='center' className={styles.controlsRow}>
-        <Horizontal alignItems='center' style={{ gap: '16px' }}>
+        <Horizontal gap={16} alignItems='center'>
           {/* View mode toggle */}
           {/* @ts-expect-error - Antd Segmented type definitions issue */}
           <Segmented
@@ -503,7 +503,7 @@ function TerminalHistoryChart({ onExport }: TerminalHistoryChartProps) {
           />
 
           {/* Time period selector */}
-          <Horizontal alignItems='center' style={{ gap: '8px' }}>
+          <Horizontal gap={8} alignItems='center'>
             <Texto category='p2' appearance='medium'>
               View:
             </Texto>
@@ -516,7 +516,7 @@ function TerminalHistoryChart({ onExport }: TerminalHistoryChartProps) {
           </Horizontal>
         </Horizontal>
 
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap={8}>
           <GraviButton icon={<CopyOutlined />}>Copy Data</GraviButton>
           <GraviButton icon={<DownloadOutlined />} onClick={onExport}>
             Export
@@ -707,11 +707,11 @@ function TerminalHistoryChart({ onExport }: TerminalHistoryChartProps) {
 
       {/* Reference line legend */}
       <Horizontal className={styles.referenceLegend}>
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <div className={styles.referenceLine} style={{ borderColor: chartColors.rfpReference }} />
           <Texto category='p2'>RFP Proposed Price: ${terminalHistory.rfpProposedPrice.toFixed(2)}</Texto>
         </Horizontal>
-        <Horizontal alignItems='center' style={{ gap: '8px' }}>
+        <Horizontal gap={8} alignItems='center'>
           <div className={`${styles.referenceLine} ${styles.dashed}`} style={{ borderColor: chartColors.avgReference }} />
           <Texto category='p2'>Avg Historical: ${terminalHistory.avgHistoricalPrice.toFixed(2)}</Texto>
         </Horizontal>
@@ -733,7 +733,7 @@ export function HistoricalRFPSection({ round, historicalData, terminalHistory, o
   return (
     <Vertical className={styles.container}>
       {/* Header */}
-      <Vertical style={{ gap: '4px' }}>
+      <Vertical gap={4}>
         <Texto category='h4' weight='600'>
           Historical Analysis
         </Texto>

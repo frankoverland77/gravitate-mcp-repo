@@ -143,8 +143,8 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
   }, [selectedRfp, rfpName, buyerId, buyerName, deadline, includeFormulas, includeCostData, onCreate, resetForm])
 
   const renderSelectStep = () => (
-    <Vertical style={{ gap: '16px' }}>
-      <Vertical style={{ gap: '4px' }}>
+    <Vertical gap={16}>
+      <Vertical gap={4}>
         <Texto category="h5" weight="600">Copy Previous Response</Texto>
         <Texto category="p2" appearance="medium">
           Select an existing RFP to use as a starting point
@@ -165,7 +165,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
           onChange={(e) => setSelectedRfpId(e.target.value)}
           style={{ width: '100%' }}
         >
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             {filteredRfps.map((rfp) => {
               const totalVolume = rfp.details.reduce((s, d) => s + (d.volume || 0), 0)
               const statusColors = STATUS_COLORS[rfp.status]
@@ -175,11 +175,11 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
                   className={`${styles['rfp-item']} ${selectedRfpId === rfp.id ? styles['rfp-item-selected'] : ''}`}
                 >
                   <Radio value={rfp.id} />
-                  <Vertical style={{ flex: 1, gap: '2px', minWidth: 0 }}>
+                  <Vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
                     <Texto category="p2" weight="500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {rfp.name}
                     </Texto>
-                    <Horizontal style={{ gap: '8px' }} alignItems="center">
+                    <Horizontal gap={8} alignItems="center">
                       <Texto category="p3" appearance="medium">{rfp.buyerName}</Texto>
                       <Texto category="p3" appearance="medium">{rfp.details.length} rows</Texto>
                       {totalVolume > 0 && (
@@ -206,7 +206,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
       </div>
 
       {/* Toggles */}
-      <Vertical style={{ gap: '8px', borderTop: '1px solid #f0f0f0', paddingTop: '12px' }}>
+      <Vertical gap={8} style={{ borderTop: '1px solid #f0f0f0', paddingTop: '12px' }}>
         <Horizontal justifyContent="space-between" alignItems="center">
           <Texto category="p2">Include sale formulas</Texto>
           <Switch size="small" checked={includeFormulas} onChange={setIncludeFormulas} />
@@ -220,16 +220,16 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
   )
 
   const renderMetadataStep = () => (
-    <Vertical style={{ gap: '16px' }}>
-      <Vertical style={{ gap: '4px' }}>
+    <Vertical gap={16}>
+      <Vertical gap={4}>
         <Texto category="h5" weight="600">RFP Details</Texto>
         <Texto category="p2" appearance="medium">
           Copying {selectedRfp?.details.length} rows from "{selectedRfp?.name}"
         </Texto>
       </Vertical>
 
-      <Vertical style={{ gap: '12px' }}>
-        <Vertical style={{ gap: '4px' }}>
+      <Vertical gap={12}>
+        <Vertical gap={4}>
           <Texto category="p2" weight="500">RFP Name</Texto>
           <Input
             value={rfpName}
@@ -238,7 +238,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
           />
         </Vertical>
 
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category="p2" weight="500">Buyer</Texto>
           <Select
             placeholder="Select buyer..."
@@ -253,7 +253,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
           />
         </Vertical>
 
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category="p2" weight="500">Response Deadline</Texto>
           <DatePicker
             style={{ width: '100%' }}
@@ -266,7 +266,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       onCancel={handleClose}
       width={600}
       centered
@@ -279,7 +279,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
           ) : (
             <span />
           )}
-          <Horizontal style={{ gap: '8px' }}>
+          <Horizontal gap={8}>
             <GraviButton buttonText="Cancel" onClick={handleClose} />
             {step === 'select' ? (
               <GraviButton

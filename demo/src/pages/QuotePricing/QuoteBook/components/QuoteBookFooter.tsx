@@ -24,9 +24,9 @@ export function QuoteBookFooter({
   return (
     <Horizontal
       alignItems="center"
-      style={{ gap: '8px', padding: '8px 16px', borderTop: '1px solid var(--gray-200)', background: 'var(--bg-1)' }}
+      gap={8} style={{ padding: '8px 16px', borderTop: '1px solid var(--gray-200)', background: 'var(--bg-1)' }}
     >
-      <Horizontal flex="1" alignItems="center" style={{ gap: '8px' }}>
+      <Horizontal gap={8} flex="1" alignItems="center">
         <FileTextOutlined />
         <Texto category="h4">Quote Publisher</Texto>
         {hardExceptionCount > 0 && (
@@ -49,7 +49,7 @@ export function QuoteBookFooter({
           <Alert message="Publishing For Current Period" type="warning" showIcon style={{ padding: '2px 8px' }} />
         )}
       </Horizontal>
-      <Horizontal style={{ gap: '8px' }}>
+      <Horizontal gap={8}>
         <GraviButton buttonText="Reset" icon={<SyncOutlined />} onClick={onReset} />
         <GraviButton buttonText="Save Adjustments" icon={<SaveOutlined />} disabled={dirtyCount === 0} />
         {publishMode && (

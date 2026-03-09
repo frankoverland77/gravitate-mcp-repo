@@ -30,7 +30,7 @@ export function TopHeader({ onCancel, onSaveDraft, mode = 'create', contractStat
 
   return (
     <Horizontal className={styles.container} justifyContent='space-between' alignItems='center'>
-      <Horizontal alignItems='center' style={{ gap: '16px' }}>
+      <Horizontal gap={16} alignItems='center'>
         <Texto category='h3' weight='600'>
           Quick Deal Entry
         </Texto>
@@ -48,7 +48,7 @@ export function TopHeader({ onCancel, onSaveDraft, mode = 'create', contractStat
       </Horizontal>
 
       {!isViewMode && (
-        <Horizontal style={{ gap: '12px' }}>
+        <Horizontal gap={12}>
           <GraviButton buttonText='Cancel' onClick={onCancel} />
           <GraviButton buttonText='Save as Draft' onClick={onSaveDraft} />
         </Horizontal>

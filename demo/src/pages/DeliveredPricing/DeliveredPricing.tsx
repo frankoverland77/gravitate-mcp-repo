@@ -344,10 +344,10 @@ export function DeliveredPricing() {
         'End of Day quote book — review and adjust delivered pricing by origin, destination, and product.',
       hideActiveFilters: false,
       actionButtons: (
-        <Horizontal verticalCenter style={{ gap: '0.75rem' }}>
+        <Horizontal gap="0.75rem" verticalCenter>
           {/* Context pills — which quote row is linked to analytics */}
           {selectedRow && (
-            <Horizontal verticalCenter style={{ gap: 6 }}>
+            <Horizontal gap={6} verticalCenter>
               <span
                 style={{
                   fontSize: 11,

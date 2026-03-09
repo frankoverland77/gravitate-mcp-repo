@@ -21,17 +21,17 @@ export function NotificationMethodModal({
   return (
     <Modal
       title='Select Notification Method'
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={null}
       width={400}
     >
-      <Vertical style={{ gap: '16px' }}>
+      <Vertical gap={16}>
         <Texto appearance='medium'>
           How would you like to send notifications for {selectedCount} selected{' '}
           {selectedCount === 1 ? 'price' : 'prices'}?
         </Texto>
-        <Horizontal justifyContent='center' style={{ gap: '12px', flexWrap: 'wrap' }}>
+        <Horizontal justifyContent='center' gap={12} style={{ flexWrap: 'wrap' }}>
           <GraviButton
             buttonText='DTN Message'
             theme1

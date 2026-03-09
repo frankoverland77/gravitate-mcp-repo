@@ -44,19 +44,17 @@ export const PopoverExamples: PopoverExample[] = [
     complexity: "simple",
     category: "interactive",
     tags: ["menu", "click", "state", "action", "button", "trigger"],
-    code: `const [popoverVisible, setPopoverVisible] = useState<boolean>(false)
+    code: `const [popoverOpen, setPopoverOpen] = useState<boolean>(false)
 
 const menu = (
-  <Menu>
-    <Menu.Item key='action1' icon={<DollarOutlined />} onClick={() => handleAction()}>
-      Action Item
-    </Menu.Item>
-  </Menu>
+  <Menu items={[
+    { key: 'action1', icon: <DollarOutlined />, label: 'Action Item', onClick: () => handleAction() },
+  ]} />
 )
 
 <Popover
-  visible={popoverVisible}
-  onVisibleChange={setPopoverVisible}
+  open={popoverOpen}
+  onOpenChange={setPopoverOpen}
   overlayClassName='custom-popover-no-padding'
   placement='bottomRight'
   trigger='click'
@@ -74,18 +72,18 @@ const menu = (
     category: "forms",
     tags: ["form", "creation", "submit", "state-management", "button-trigger"],
     code: `const CreateMappingPopover: React.FC<PopoverProps> = ({ selectedFormula, handleSubmit, metadata }) => {
-  const [isPopoverVisible, setIsPopoverVisible] = React.useState(false)
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false)
 
   return (
     <Popover
-      visible={isPopoverVisible}
+      open={isPopoverOpen}
       trigger='click'
-      onVisibleChange={(visible) => setIsPopoverVisible(visible)}
+      onOpenChange={(open) => setIsPopoverOpen(open)}
       content={
         <NewMappingForm
           onSubmit={(values) => {
             handleSubmit(values)
-            setIsPopoverVisible(false)
+            setIsPopoverOpen(false)
           }}
           locationOptions={metadata?.Locations}
           productOptions={metadata?.Products}
@@ -100,7 +98,7 @@ const menu = (
         size='small'
         icon={<PlusOutlined />}
         onClick={() => {
-          setIsPopoverVisible(true)
+          setIsPopoverOpen(true)
         }}
       />
     </Popover>
@@ -136,8 +134,8 @@ const menu = (
       placement='bottomRight'
       content={() => <ActionMenuItems actions={actions} />}
       trigger='click'
-      onVisibleChange={(event) => setIsMenuOpen(event)}
-      visible={isMenuOpen}
+      onOpenChange={(event) => setIsMenuOpen(event)}
+      open={isMenuOpen}
     >
       <MenuButton
         onClick={(e) => {
@@ -232,11 +230,11 @@ const menu = (
       "advanced",
     ],
     code: `export const NewMarkerPopover: React.FC<IProps> = ({
-  visible,
-  onVisibleChange,
+  open,
+  onOpenChange,
   productOptions,
   locationOptions,
-  setNewMarkerFormVisible,
+  setNewMarkerFormOpen,
   setActiveEditMarkerKey,
   activeMarker,
   canInsertNewMarker = true,
@@ -263,18 +261,18 @@ const menu = (
   return (
     <Popover
       trigger='click'
-      visible={visible || !!activeMarker}
-      onVisibleChange={(visible) => {
-        if (!visible) {
+      open={open || !!activeMarker}
+      onOpenChange={(open) => {
+        if (!open) {
           form.resetFields()
           setActiveEditMarkerKey(null)
         }
-        setNewMarkerFormVisible(visible)
+        setNewMarkerFormOpen(open)
       }}
       placement='bottom'
       content={
         <Form form={form} onFinish={handleSubmit} layout='vertical' style={{ minWidth: 280 }}>
-          <Vertical style={{ gap: '1rem' }} className='p-3'>
+          <Vertical gap='1rem' className='p-3'>
             <Texto category='h5' style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <FolderAddOutlined />
               {mode === 'edit' ? 'Edit Marker' : 'New Marker'}
@@ -285,13 +283,14 @@ const menu = (
             </Form.Item>
             
             <Form.Item name='ProductHierarchyTypeCvId' label='Product Hierarchy'>
-              <Select placeholder='Product Hierarchy'>
-                {productOptions?.map((option) => (
-                  <Select.Option value={option.Value} key={option.Value}>
-                    {option.Text}
-                  </Select.Option>
-                ))}
-              </Select>
+              <Select
+                placeholder='Product Hierarchy'
+                options={productOptions?.map((option) => ({
+                  value: option.Value,
+                  key: option.Value,
+                  label: option.Text,
+                }))}
+              />
             </Form.Item>
           </Vertical>
         </Form>
@@ -299,7 +298,7 @@ const menu = (
     >
       {canInsertNewMarker && (
         <Tooltip title='Create New Marker' placement='bottomRight'>
-          <Button icon={<FolderAddOutlined />} onClick={() => onVisibleChange(true)} />
+          <Button icon={<FolderAddOutlined />} onClick={() => onOpenChange(true)} />
         </Tooltip>
       )}
     </Popover>
@@ -315,22 +314,22 @@ const menu = (
     category: "data",
     tags: ["hover", "api", "loading", "rules", "data-fetching", "conditional"],
     code: `export function NetGrossDefaultRenderer({ value, data }) {
-  const [popoverVisible, setPopoverVisible] = useState(false)
+  const [popoverOpen, setPopoverOpen] = useState(false)
   const hasDefaultRule = !!data.DefaultNetOrGrossCvId
   const hasRuleApplied = !!data.NetOrGrossCvId
   const isOverridden = hasDefaultRule && hasRuleApplied && 
     data?.NetOrGrossCvId?.toString() !== data?.DefaultNetOrGrossCvId?.toString()
 
   const { useNetGrossGetDefault } = useNetOrGross()
-  const query = useNetGrossGetDefault(data, { enabled: popoverVisible && hasDefaultRule })
+  const query = useNetGrossGetDefault(data, { enabled: popoverOpen && hasDefaultRule })
 
   return (
     <Popover
       overlayClassName='quoterow-rule-popover'
       trigger='hover'
       placement='bottom'
-      visible={popoverVisible && hasDefaultRule}
-      onVisibleChange={(visible) => setPopoverVisible(visible)}
+      open={popoverOpen && hasDefaultRule}
+      onOpenChange={(open) => setPopoverOpen(open)}
       content={() => {
         return (
           <Vertical style={{ minWidth: 400 }}>
@@ -345,7 +344,7 @@ const menu = (
               <>
                 <Horizontal alignItems='center' justifyContent='space-between' className='p-3'>
                   <Texto>NET / GROSS:</Texto>
-                  <Horizontal style={{ gap: '0.35rem' }}>
+                  <Horizontal gap='0.35rem'>
                     <span>{getIcon(data?.NetOrGrossCvId, value, data?.DefaultNetOrGrossCvId)}</span>
                     <Texto>{value}</Texto>
                   </Horizontal>
@@ -425,11 +424,11 @@ const menu = (
   return (
     <Popover
       placement='bottom'
-      visible={true}
+      open={true}
       content={() => {
         if (params.data.CostSourceType?.toLowerCase()?.includes('instrument')) {
           return (
-            <Vertical width={700} style={{ gap: '1rem' }} className='p-3'>
+            <Vertical width={700} gap='1rem' className='p-3'>
               <Texto category='label' appearance='medium'>
                 Select a Price Instrument
               </Texto>
@@ -446,8 +445,8 @@ const menu = (
         }
         if (params.data.CostSourceType?.toLowerCase()?.includes('contract')) {
           return (
-            <Vertical width={500} style={{ gap: '1rem' }} className='p-3'>
-              <Horizontal width='100%' style={{ gap: '1rem' }}>
+            <Vertical width={500} gap='1rem' className='p-3'>
+              <Horizontal width='100%' gap='1rem'>
                 <Vertical className='flex-1'>
                   <Texto category='label'>Product</Texto>
                   <Select

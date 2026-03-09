@@ -517,7 +517,7 @@ export function QuickEntryFlow({
 
       {/* Edit Header Modal */}
       <EditHeaderModal
-        visible={editHeaderModalOpen}
+        open={editHeaderModalOpen}
         header={header}
         onClose={() => setEditHeaderModalOpen(false)}
         onSave={setHeader}
@@ -525,7 +525,7 @@ export function QuickEntryFlow({
 
       {/* Formula Editor Drawer */}
       <FormulaEditorDrawer
-        visible={formulaDrawerOpen}
+        open={formulaDrawerOpen}
         detail={activeDetail}
         onClose={() => {
           setFormulaDrawerOpen(false)
@@ -536,25 +536,25 @@ export function QuickEntryFlow({
 
       {/* Bulk Create Drawer */}
       <BulkCreateDrawer
-        visible={bulkCreateDrawerOpen}
+        open={bulkCreateDrawerOpen}
         onClose={() => setBulkCreateDrawerOpen(false)}
         onCreate={handleBulkCreate}
       />
 
       {/* Import File Modal */}
       <ImportFileModal
-        visible={importFileModalOpen}
+        open={importFileModalOpen}
         onClose={() => setImportFileModalOpen(false)}
         onImport={handleImportComplete}
         headerDates={{ startDate: header.startDate, endDate: header.endDate }}
       />
 
       {/* Copy Deal Modal */}
-      <CopyDealModal visible={copyDealModalOpen} onClose={() => setCopyDealModalOpen(false)} onCopy={handleCopyDeal} />
+      <CopyDealModal open={copyDealModalOpen} onClose={() => setCopyDealModalOpen(false)} onCopy={handleCopyDeal} />
 
       {/* Extend Contract Modal (expired) */}
       <ExtendContractModal
-        visible={extendModalOpen}
+        open={extendModalOpen}
         currentStartDate={header.startDate}
         currentEndDate={header.endDate}
         onClose={() => setExtendModalOpen(false)}

@@ -146,7 +146,7 @@ const createColumnDefs = (
     cellRenderer: (params: { data: ScheduleRecord }) => {
       if (!params.data) return null;
       return (
-        <Horizontal alignItems="center" className="gap-8">
+        <Horizontal alignItems="center" gap={8}>
           <GraviButton
             icon={<EditOutlined />}
             onClick={() => onEdit(params.data)}
@@ -232,18 +232,18 @@ export function ScheduleDemo() {
 
       <Drawer
         title={editingRecord ? 'Edit Schedule' : 'Create Schedule'}
-        visible={drawerVisible}
+        open={drawerVisible}
         onClose={handleDrawerClose}
         width={400}
         footer={
-          <Horizontal justifyContent="flex-end" className="gap-12">
+          <Horizontal justifyContent="flex-end" gap={12}>
             <GraviButton buttonText="Cancel" onClick={handleDrawerClose} />
             <GraviButton buttonText="Save" success onClick={handleSave} />
           </Horizontal>
         }
       >
         <Form form={form} layout="vertical">
-          <Vertical className="gap-16">
+          <Vertical gap={16}>
             <Form.Item
               name="name"
               label={

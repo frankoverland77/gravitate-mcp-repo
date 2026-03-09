@@ -58,18 +58,18 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
   }, [rfp.details])
 
   return (
-    <Vertical style={{ gap: '32px', overflow: 'visible' }}>
+    <Vertical gap={32} style={{ overflow: 'visible' }}>
       {/* Volume & Allocation */}
-      <Vertical style={{ gap: '16px', overflow: 'visible' }}>
-        <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+      <Vertical gap={16} style={{ overflow: 'visible' }}>
+        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Volume & Allocation
         </Texto>
 
         {/* Volume Summary Card */}
         <div className={styles['volume-card']}>
-          <Horizontal alignItems="stretch" style={{ gap: '1px', backgroundColor: '#e8e8e8' }}>
+          <Horizontal alignItems="stretch" gap={1} style={{ backgroundColor: '#e8e8e8' }}>
             {/* Aggregated from details */}
-            <Vertical style={{ flex: 1, padding: '20px', backgroundColor: '#fff', gap: '6px' }}>
+            <Vertical gap={6} style={{ flex: 1, padding: '20px', backgroundColor: '#fff' }}>
               <Texto category="p3" appearance="medium">Detail Volume (sum)</Texto>
               <Texto category="h5" weight="600">
                 {detailVolumeTotal > 0 ? formatVolume(detailVolumeTotal) : '—'}
@@ -80,7 +80,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
             </Vertical>
 
             {/* RFP-level commitment */}
-            <Vertical style={{ flex: 1, padding: '20px', backgroundColor: '#fff', gap: '6px' }}>
+            <Vertical gap={6} style={{ flex: 1, padding: '20px', backgroundColor: '#fff' }}>
               <Horizontal alignItems="center" justifyContent="space-between">
                 <Texto category="p3" appearance="medium">RFP Volume Commitment</Texto>
                 <Segmented
@@ -129,7 +129,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
             </Vertical>
 
             {/* Allocation Period */}
-            <Vertical style={{ flex: 1, padding: '20px', backgroundColor: '#fff', gap: '6px' }}>
+            <Vertical gap={6} style={{ flex: 1, padding: '20px', backgroundColor: '#fff' }}>
               <Texto category="p3" appearance="medium">Allocation Period</Texto>
               <Select
                 value={terms.allocationPeriod}
@@ -176,7 +176,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
                     >
                       {isFirstInGroup ? (
                         <td rowSpan={details.length} className={styles['terminal-cell']}>
-                          <Vertical style={{ gap: '2px' }}>
+                          <Vertical gap={2}>
                             <Texto category="p2" weight="500">{terminal.replace(' Terminal', '')}</Texto>
                             <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>
                               {formatVolume(terminalTotal)}
@@ -216,14 +216,14 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
       </Vertical>
 
       {/* Contract & Payment Terms */}
-      <Vertical style={{ gap: '16px', overflow: 'visible' }}>
-        <Texto category="h6" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
+      <Vertical gap={16} style={{ overflow: 'visible' }}>
+        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
           Contract & Payment Terms
         </Texto>
 
         <div className={styles['form-grid']}>
           {/* Contract Period */}
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Contract Period</Texto>
             <RangePicker
               value={
@@ -247,7 +247,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
           </Vertical>
 
           {/* Payment Terms */}
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Payment Terms</Texto>
             <Select
               value={terms.paymentTerms}
@@ -260,9 +260,9 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
           </Vertical>
 
           {/* Ratability Range */}
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Ratability (% range)</Texto>
-            <Horizontal style={{ gap: '8px' }} alignItems="center">
+            <Horizontal gap={8} alignItems="center">
               <InputNumber
                 value={terms.ratabilityMin}
                 onChange={(v) => updateField('ratabilityMin', v)}
@@ -286,7 +286,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
           </Vertical>
 
           {/* Deficiency Penalty */}
-          <Vertical style={{ gap: '4px' }}>
+          <Vertical gap={4}>
             <Texto category="p2" weight="500">Deficiency Penalty</Texto>
             <InputNumber
               value={terms.penaltyCpg}
@@ -303,7 +303,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
         </div>
 
         {/* Notes */}
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category="p2" weight="500">Notes</Texto>
           <TextArea
             value={terms.notes || ''}

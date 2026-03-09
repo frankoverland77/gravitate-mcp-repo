@@ -28,27 +28,27 @@ export function ProjectHubHeader({
       borderBottom: '1px solid var(--gray-200)',
     }}>
       <Horizontal justifyContent="space-between" alignItems="center" style={{ marginBottom: 12 }}>
-        <Horizontal alignItems="center" style={{ gap: 10 }}>
+        <Horizontal alignItems="center" gap={10}>
           <AppstoreOutlined style={{ fontSize: 22, color: 'var(--primary)' }} />
           <Texto category="h3" weight="600">Project Hub</Texto>
         </Horizontal>
       </Horizontal>
       <Horizontal justifyContent="space-between" alignItems="center">
-        <Horizontal alignItems="center" style={{ gap: 12 }}>
-          <Horizontal alignItems="center" style={{ gap: 4 }}>
+        <Horizontal alignItems="center" gap={12}>
+          <Horizontal alignItems="center" gap={4}>
             <Texto appearance="medium" category="label">Active:</Texto>
             <BBDTag color="green">{activeCount}</BBDTag>
           </Horizontal>
-          <Horizontal alignItems="center" style={{ gap: 4 }}>
+          <Horizontal alignItems="center" gap={4}>
             <Texto appearance="medium" category="label">Draft:</Texto>
             <BBDTag color="orange">{draftCount}</BBDTag>
           </Horizontal>
-          <Horizontal alignItems="center" style={{ gap: 4 }}>
+          <Horizontal alignItems="center" gap={4}>
             <Texto appearance="medium" category="label">Archived:</Texto>
             <BBDTag color="default">{archivedCount}</BBDTag>
           </Horizontal>
         </Horizontal>
-        <Horizontal alignItems="center" style={{ gap: 8 }}>
+        <Horizontal alignItems="center" gap={8}>
           <Input
             placeholder="Search projects..."
             prefix={<SearchOutlined style={{ color: 'var(--gray-400)' }} />}

@@ -11,7 +11,7 @@ import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibr
 import dayjs from 'dayjs'
 
 interface ExtendContractModalProps {
-  visible: boolean
+  open: boolean
   currentStartDate: Date
   currentEndDate: Date
   onClose: () => void
@@ -19,7 +19,7 @@ interface ExtendContractModalProps {
 }
 
 export function ExtendContractModal({
-  visible,
+  open,
   currentStartDate,
   currentEndDate,
   onClose,
@@ -35,24 +35,24 @@ export function ExtendContractModal({
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title='Extend Contract'
       onCancel={onClose}
       footer={
-        <Horizontal justifyContent='flex-end' style={{ gap: '8px' }}>
+        <Horizontal gap={8} justifyContent='flex-end'>
           <GraviButton buttonText='Cancel' onClick={onClose} />
           <GraviButton buttonText='Extend' theme1 onClick={handleExtend} />
         </Horizontal>
       }
       width={480}
-      destroyOnClose
+      destroyOnHidden
     >
-      <Vertical style={{ gap: '16px' }} className='py-3'>
+      <Vertical gap={16} className='py-3'>
         <Texto category='p2' appearance='medium'>
           Extend the contract by updating the start and end dates. This will update all detail rows.
         </Texto>
 
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category='p2' weight='600'>
             Start Date
           </Texto>
@@ -63,7 +63,7 @@ export function ExtendContractModal({
           />
         </Vertical>
 
-        <Vertical style={{ gap: '4px' }}>
+        <Vertical gap={4}>
           <Texto category='p2' weight='600'>
             End Date
           </Texto>

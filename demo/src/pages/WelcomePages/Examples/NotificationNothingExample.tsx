@@ -110,7 +110,7 @@ export function NotificationNothingExample() {
         <Texto category="p2" className="mb-3">
           Test different notification types with live examples:
         </Texto>
-        <Horizontal style={{ gap: "12px", flexWrap: "wrap" }}>
+        <Horizontal gap={12} style={{ flexWrap: "wrap" }}>
           <Button
             type="primary"
             icon={<CheckCircleOutlined />}
@@ -146,8 +146,8 @@ export function NotificationNothingExample() {
 
       {/* Custom Notification Builder */}
       <Card title="Custom Notification Builder" className="mb-4">
-        <Vertical style={{ gap: "12px" }}>
-          <Horizontal style={{ gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+        <Vertical gap={12}>
+          <Horizontal gap={12} style={{ alignItems: "center", flexWrap: "wrap" }}>
             <div style={{ flex: "1", minWidth: "200px" }}>
               <Texto category="p2" className="mb-1">Title:</Texto>
               <Input
@@ -165,7 +165,7 @@ export function NotificationNothingExample() {
               />
             </div>
           </Horizontal>
-          <Horizontal style={{ gap: "12px", alignItems: "center" }}>
+          <Horizontal gap={12} style={{ alignItems: "center" }}>
             <Texto category="p2">Error state:</Texto>
             <Switch checked={isError} onChange={setIsError} />
             <Button type="primary" onClick={triggerCustom}>
@@ -206,7 +206,7 @@ export function NotificationNothingExample() {
 
       {/* Basic Empty States */}
       <Card title="Basic Empty States" className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card size="small" title="No Data" style={{ width: 280 }}>
             <NothingMessage
               title="No Items"
@@ -232,7 +232,7 @@ export function NotificationNothingExample() {
 
       {/* Enhanced Empty States with Icons */}
       <Card title="Enhanced Empty States with Icons" className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card size="small" title="Database Empty" style={{ width: 280 }}>
             <NothingMessage
               title="No Data Available"
@@ -261,7 +261,7 @@ export function NotificationNothingExample() {
 
       {/* Interactive Empty States */}
       <Card title="Interactive Empty States with Actions" className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card size="small" title="No Projects" style={{ width: 320 }}>
             <NothingMessage
               title="No Projects Yet"
@@ -276,7 +276,7 @@ export function NotificationNothingExample() {
                 />,
                 <GraviButton
                   key="import"
-                  appearance="outline"
+                  appearance="outlined"
                   buttonText="Import"
                   icon={<UploadOutlined />}
                   onClick={() => NotificationMessage('Action', 'Import project clicked!', false)}
@@ -305,8 +305,8 @@ export function NotificationNothingExample() {
 
       {/* Loading and Dynamic States */}
       <Card title="Loading and Dynamic States" className="mb-4">
-        <Vertical style={{ gap: "16px" }}>
-          <Horizontal style={{ gap: "12px", alignItems: "center" }}>
+        <Vertical gap={16}>
+          <Horizontal gap={12} style={{ alignItems: "center" }}>
             <Button onClick={simulateLoading} disabled={isLoading}>
               {isLoading ? 'Loading...' : 'Simulate Data Loading'}
             </Button>
@@ -352,7 +352,7 @@ export function NotificationNothingExample() {
 
       {/* Contextual Empty States */}
       <Card title="Contextual Empty States" className="mb-4">
-        <Horizontal style={{ gap: "20px", flexWrap: "wrap" }}>
+        <Horizontal gap={20} style={{ flexWrap: "wrap" }}>
           <Card size="small" title="E-commerce" style={{ width: 280 }}>
             <NothingMessage
               title="Empty Cart"
@@ -381,8 +381,8 @@ export function NotificationNothingExample() {
 
       {/* Search-based Empty State */}
       <Card title="Search-based Empty State" className="mb-4">
-        <Vertical style={{ gap: "12px" }}>
-          <Horizontal style={{ gap: "12px" }}>
+        <Vertical gap={12}>
+          <Horizontal gap={12}>
             <Input
               placeholder="Search for items..."
               value={searchQuery}
@@ -411,7 +411,7 @@ export function NotificationNothingExample() {
 
       {/* Best Practices Summary */}
       <Card title="Usage Guidelines" className="mb-4" style={{ backgroundColor: "var(--theme-bg-elevated)" }}>
-        <Vertical style={{ gap: "12px" }}>
+        <Vertical gap={12}>
           <div>
             <Texto category="p1" style={{ fontWeight: "bold", marginBottom: "8px" }}>
               NotificationMessage Best Practices:

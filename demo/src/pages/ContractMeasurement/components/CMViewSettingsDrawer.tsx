@@ -12,13 +12,13 @@ const COLORS = {
 }
 
 interface CMViewSettingsDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   isReadOnly: boolean
   onReadOnlyChange: (value: boolean) => void
 }
 
-export function CMViewSettingsDrawer({ visible, onClose, isReadOnly, onReadOnlyChange }: CMViewSettingsDrawerProps) {
+export function CMViewSettingsDrawer({ open, onClose, isReadOnly, onReadOnlyChange }: CMViewSettingsDrawerProps) {
   const { featureMode, setFeatureMode } = useFeatureMode()
 
   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({
@@ -36,11 +36,11 @@ export function CMViewSettingsDrawer({ visible, onClose, isReadOnly, onReadOnlyC
       placement='right'
       width={400}
       onClose={onClose}
-      visible={visible}
+      open={open}
       zIndex={2000}
       maskClosable={true}
     >
-      <Vertical style={{ gap: '24px' }}>
+      <Vertical gap={24}>
         {/* Feature Prioritization Section */}
         <div>
           <Texto category='p1' weight='600' style={{ marginBottom: '12px', display: 'block' }}>
@@ -55,7 +55,7 @@ export function CMViewSettingsDrawer({ visible, onClose, isReadOnly, onReadOnlyC
           </Texto>
 
           <Radio.Group value={featureMode} onChange={(e) => setFeatureMode(e.target.value)} style={{ width: '100%' }}>
-            <Vertical style={{ gap: '12px' }}>
+            <Vertical gap={12}>
               {/* MVP Mode */}
               <div style={getOptionCardStyle(featureMode === 'mvp')} onClick={() => setFeatureMode('mvp')}>
                 <Radio value='mvp' style={{ marginBottom: '8px' }}>

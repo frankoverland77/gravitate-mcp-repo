@@ -269,7 +269,7 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             const freightDisplay = `$${Number(data.Freight).toFixed(4)}`
 
             const popoverContent = (
-              <Vertical style={{ width: 240, gap: 4 }}>
+              <Vertical gap={4} style={{ width: 240 }}>
                 <Horizontal justifyContent="space-between">
                   <Texto>Carrier</Texto>
                   <Texto weight={600}>{data.CarrierName ?? '\u2014'}</Texto>
@@ -348,7 +348,7 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             )
 
             const popoverContent = (
-              <Vertical style={{ width: 280, gap: 4 }}>
+              <Vertical gap={4} style={{ width: 280 }}>
                 {/* Context */}
                 <Horizontal justifyContent="space-between">
                   <Texto size={12} color="#8c8c8c">Destination</Texto>

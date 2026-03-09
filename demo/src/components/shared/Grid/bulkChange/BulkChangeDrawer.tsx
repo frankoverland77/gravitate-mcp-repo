@@ -72,11 +72,11 @@ export function BulkChangeDrawer({
     <Drawer
       placement='bottom'
       onClose={() => setIsBulkChangeVisible(false)}
-      visible={isBulkChangeVisible}
+      open={isBulkChangeVisible}
       title='Bulk Strategy Change'
       height='80vh'
-      bodyStyle={{ padding: '0px' }}
-      destroyOnClose
+      styles={{ body: { padding: '0px' } }}
+      destroyOnHidden
     >
       <Form
         form={form}
@@ -116,7 +116,7 @@ export function BulkChangeDrawer({
               className='quote-bulk-update-form'
             >
               <Col span={6}>
-                <Texto category='heading' appearance='secondary'>
+                <Texto category='heading' appearance='medium'>
                   Update Values
                 </Texto>
               </Col>
