@@ -49,6 +49,8 @@ import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesal
 import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBook';
 import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRows';
 import { QuotebookQoLPage } from './pages/QuotebookQoL';
+import { RowRefreshPage } from './pages/QuotebookQoL/RowRefresh';
+import { PriceEntryPage } from './pages/QuotebookQoL/PriceEntry';
 import {
   TypographyShowcase,
   ButtonsShowcase,
@@ -323,16 +325,44 @@ export const demoRegistry: DemoRoute[] = [
   },
   // Quotebook Quality of Life
   {
-    key: 'QuotebookQoL',
-    title: 'Quotebook Quality of Life',
+    key: 'QuotebookQoLAdHoc',
+    title: 'Ad-Hoc Valuation (Story 1)',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <QuotebookQoLPage />
       </ThemeRouteWrapper>
     ),
-    path: '/QuotebookQoL',
+    path: '/QuotebookQoL/AdHocValuation',
     description:
       'Ad-hoc valuation revalue button design prototype — Story 1 from Quotebook QoL epic',
+    created: new Date().toISOString(),
+    category: 'grids',
+  },
+  {
+    key: 'QuotebookQoLRowRefresh',
+    title: 'Row Refresh (Story 2)',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <RowRefreshPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/QuotebookQoL/RowRefresh',
+    description:
+      'Single-row refresh with live revaluation after spread override save — Story 2 from Quotebook QoL epic',
+    created: new Date().toISOString(),
+    category: 'grids',
+  },
+  {
+    key: 'QuotebookQoLPriceEntry',
+    title: 'Price Entry (Story 4)',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <PriceEntryPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/QuotebookQoL/PriceEntry',
+    description:
+      'Inline price entry in valuation drawer with conditional date fields, save & revalue flow — Story 4 from Quotebook QoL epic',
     created: new Date().toISOString(),
     category: 'grids',
   },
@@ -892,12 +922,44 @@ export const createPageConfig = (): PageConfig => {
     key: 'QuotebookQoL',
     icon: <SyncOutlined />,
     title: 'Quotebook QoL',
-    element: (
-      <ThemeRouteWrapper theme="PE_LIGHT">
-        <QuotebookQoLPage />
-      </ThemeRouteWrapper>
-    ),
-    path: '/QuotebookQoL',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'QuotebookQoLAdHoc',
+        title: 'Ad-Hoc Valuation (Story 1)',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <QuotebookQoLPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotebookQoL/AdHocValuation',
+        description: 'Ad-hoc valuation revalue button design prototype',
+      },
+      {
+        hasPermission: () => true,
+        key: 'QuotebookQoLRowRefresh',
+        title: 'Row Refresh (Story 2)',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <RowRefreshPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotebookQoL/RowRefresh',
+        description: 'Single-row refresh with live revaluation after spread override save',
+      },
+      {
+        hasPermission: () => true,
+        key: 'QuotebookQoLPriceEntry',
+        title: 'Price Entry (Story 4)',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <PriceEntryPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotebookQoL/PriceEntry',
+        description: 'Inline price entry in valuation drawer with save & revalue flow',
+      },
+    ],
   };
 
   return config;
