@@ -12,6 +12,7 @@ import {
 import { AuthenticatedRoute } from "./AuthenticatedRoute";
 import { demoRegistry } from "../pageConfig";
 import { WelcomePage } from "../pages/WelcomePages/WelcomePage";
+import { ProjectHub } from "../pages/ProjectHub/ProjectHub";
 
 export function Main() {
   // Debug: log the routes being created
@@ -25,9 +26,9 @@ export function Main() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/*" element={<AuthenticatedRoute />}>
-        {/* Welcome/Home route */}
-        <Route index element={<WelcomePage />} />
-        <Route path="demos" element={<WelcomePage />} />
+        {/* Project Hub is the home/landing page */}
+        <Route index element={<ProjectHub />} />
+        <Route path="demos" element={<ProjectHub />} />
 
         {/* Demo routes from registry */}
         {demoRegistry.map((demo) => {

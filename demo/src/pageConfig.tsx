@@ -15,9 +15,11 @@ import {
   LineChartOutlined,
   BookOutlined,
   SyncOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
+import { ProjectHub } from './pages/ProjectHub/ProjectHub';
 import { PriceElasticity } from './pages/demos/PriceElasticity/PriceElasticity';
 import { ContractManagementPage, CreateContractPage } from './pages/ContractManagement';
 import { CustomerForm } from './pages/demos/forms/CustomerForm/CustomerForm';
@@ -486,6 +488,14 @@ export const createPageConfig = (): PageConfig => {
   const dashboardRoutes = getRoutesByCategory('dashboards');
 
   const config: PageConfig = {
+    ProjectHub: {
+      hasPermission: () => true,
+      key: 'ProjectHub',
+      icon: <AppstoreOutlined />,
+      title: 'Project Hub',
+      element: <ProjectHub />,
+      path: '/',
+    },
     Welcome: {
       hasPermission: () => true,
       key: 'Sandbox',
