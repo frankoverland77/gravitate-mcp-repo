@@ -108,3 +108,6 @@ local-setup.sh
 # Package files
 *.deb
 *.rpm
+
+# Git worktrees
+.worktrees/

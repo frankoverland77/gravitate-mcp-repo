@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { GraviGrid, Vertical, Texto } from '@gravitate-js/excalibrr'
+import { GraviGrid, Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { Drawer } from 'antd'
 import { quoteBookData } from './QuoteBook.data'
 import { getQuoteBookColumnDefs } from './QuoteBook.columnDefs'
@@ -8,6 +8,8 @@ import { QuoteBookActionButtons } from './components/QuoteBookActionButtons'
 import { QuoteBookAnalyticsPanel } from './components/QuoteBookAnalyticsPanel'
 import { QuoteBookFooter } from './components/QuoteBookFooter'
 import { QuoteBookHistoryDrawer } from './components/QuoteBookHistoryDrawer'
+import { QuoteBookProfileChip } from './components/QuoteBookProfileChip'
+import type { DrawerState } from './QuoteBook.types'
 
 export function QuoteBook() {
   const [activeGroupTab, setActiveGroupTab] = useState('wholesale')
@@ -19,6 +21,14 @@ export function QuoteBook() {
   const [isPublishDrawerOpen, setIsPublishDrawerOpen] = useState(false)
   const [dirtyCount, setDirtyCount] = useState(0)
   const [selectedRow, setSelectedRow] = useState<any>(null)
+  const [activePageTab, setActivePageTab] = useState<'configuration' | 'profiles'>('configuration')
+  const [drawerState, setDrawerState] = useState<DrawerState>({
+    isOpen: false,
+    mode: 'empty',
+    selectedRowIds: [],
+    actionMode: 'profile',
+    selectedProfileKey: null,
+  })
 
   const filteredRows = useMemo(() => {
     return quoteBookData.filter(row => {
@@ -41,6 +51,20 @@ export function QuoteBook() {
     <Vertical height="100%">
       <QuoteBookGroupTabs activeTab={activeGroupTab} onTabChange={setActiveGroupTab} />
       <QuoteBookAnalyticsPanel visible={showAnalytics} selectedRow={selectedRow} />
+      <Horizontal style={{ display: 'none' }} data-testid="page-level-tabs">
+        <Texto
+          style={{ cursor: 'pointer', fontWeight: activePageTab === 'configuration' ? 600 : 400 }}
+          onClick={() => setActivePageTab('configuration')}
+        >
+          Configuration
+        </Texto>
+        <Texto
+          style={{ cursor: 'pointer', fontWeight: activePageTab === 'profiles' ? 600 : 400 }}
+          onClick={() => setActivePageTab('profiles')}
+        >
+          Exception Profiles
+        </Texto>
+      </Horizontal>
       <GraviGrid
         storageKey="quotebook-main-grid"
         rowData={filteredRows}
@@ -59,15 +83,18 @@ export function QuoteBook() {
           title: 'Quote Book — EOD',
           hideActiveFilters: true,
           actionButtons: (
-            <QuoteBookActionButtons
-              publicationMode={publicationMode}
-              setPublicationMode={setPublicationMode}
-              showAnalytics={showAnalytics}
-              setShowAnalytics={setShowAnalytics}
-              showSpreadRows={showSpreadRows}
-              setShowSpreadRows={setShowSpreadRows}
-              publishMode={publishMode}
-            />
+            <Horizontal alignItems="center" style={{ gap: '8px' }}>
+              <QuoteBookProfileChip />
+              <QuoteBookActionButtons
+                publicationMode={publicationMode}
+                setPublicationMode={setPublicationMode}
+                showAnalytics={showAnalytics}
+                setShowAnalytics={setShowAnalytics}
+                showSpreadRows={showSpreadRows}
+                setShowSpreadRows={setShowSpreadRows}
+                publishMode={publishMode}
+              />
+            </Horizontal>
           ),
         }}
       />

@@ -1,3 +1,5 @@
+import type { ExceptionType, ThresholdOverride } from './QuoteBook.types'
+
 export type QuoteRow = {
   id: number
   group: string
@@ -21,6 +23,10 @@ export type QuoteRow = {
   allocation: number
   strategy: string
   exceptions: string[]
+  profileKey?: string
+  exceptionType?: ExceptionType
+  exceptionCount?: number
+  overrides?: ThresholdOverride[]
 }
 
 export const quoteBookData: QuoteRow[] = [
@@ -47,6 +53,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.65,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 2,
@@ -70,6 +80,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.72,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 3,
@@ -93,6 +107,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.58,
     strategy: 'Cost Plus',
     exceptions: ['Below Min Margin'],
+    profileKey: 'marginDefense',
+    exceptionType: 'hard',
+    exceptionCount: 1,
+    overrides: [],
   },
   {
     id: 4,
@@ -116,6 +134,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.45,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 5,
@@ -139,6 +161,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.80,
     strategy: 'Market',
     exceptions: ['Market Move Alert'],
+    profileKey: 'standard',
+    exceptionType: 'soft',
+    exceptionCount: 1,
+    overrides: [],
   },
   {
     id: 6,
@@ -163,6 +189,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.60,
     strategy: 'Spread',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
 
   // Industrial (5 rows)
@@ -188,6 +218,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.88,
     strategy: 'Contract',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 8,
@@ -211,6 +245,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.55,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 9,
@@ -234,6 +272,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.70,
     strategy: 'Cost Plus',
     exceptions: ['Below Min Margin'],
+    profileKey: 'marginDefense',
+    exceptionType: 'hard',
+    exceptionCount: 1,
+    overrides: [],
   },
   {
     id: 10,
@@ -257,6 +299,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.62,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 11,
@@ -281,6 +327,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.48,
     strategy: 'Spread',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
 
   // Retail (5 rows)
@@ -306,6 +356,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.92,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 13,
@@ -329,6 +383,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.85,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 14,
@@ -352,6 +410,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.40,
     strategy: 'Cost Plus',
     exceptions: ['Market Move Alert'],
+    profileKey: 'standard',
+    exceptionType: 'soft',
+    exceptionCount: 1,
+    overrides: [],
   },
   {
     id: 15,
@@ -375,6 +437,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.78,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 16,
@@ -399,6 +465,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.68,
     strategy: 'Spread',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
 
   // Other (4 rows)
@@ -424,6 +494,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.50,
     strategy: 'Contract',
     exceptions: ['Below Min Margin'],
+    profileKey: 'marginDefense',
+    exceptionType: 'hard',
+    exceptionCount: 1,
+    overrides: [],
   },
   {
     id: 18,
@@ -447,6 +521,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.55,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 19,
@@ -470,6 +548,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.63,
     strategy: 'Market',
     exceptions: [],
+    profileKey: 'standard',
+    exceptionType: 'clean',
+    exceptionCount: 0,
+    overrides: [],
   },
   {
     id: 20,
@@ -493,6 +575,10 @@ export const quoteBookData: QuoteRow[] = [
     allocation: 0.42,
     strategy: 'Cost Plus',
     exceptions: ['Market Move Alert'],
+    profileKey: 'standard',
+    exceptionType: 'soft',
+    exceptionCount: 1,
+    overrides: [],
   },
 ]
 
