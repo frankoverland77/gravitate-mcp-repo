@@ -40,6 +40,7 @@ export function AuthenticatedRoute() {
     PriceElasticity: true,
     QuotebookWholesale: true,
     QuotePricing: true,
+    QuotebookQoL: true,
   };
   return (
     <FeatureModeProvider>

@@ -14,6 +14,7 @@ import {
   BgColorsOutlined,
   LineChartOutlined,
   BookOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 
 import { WelcomePage } from './pages/WelcomePages/WelcomePage';
@@ -47,6 +48,7 @@ import { TaxManagement } from './pages/DeliveredPricing/TaxManagement/TaxManagem
 import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesale';
 import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBook';
 import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRows';
+import { QuotebookQoLPage } from './pages/QuotebookQoL';
 import {
   TypographyShowcase,
   ButtonsShowcase,
@@ -316,6 +318,21 @@ export const demoRegistry: DemoRoute[] = [
     ),
     path: '/quotebookwholesale',
     description: 'End of Day wholesale pricing quote book with 25 dummy rows across 5 products and 5 locations',
+    created: new Date().toISOString(),
+    category: 'grids',
+  },
+  // Quotebook Quality of Life
+  {
+    key: 'QuotebookQoL',
+    title: 'Quotebook Quality of Life',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <QuotebookQoLPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/QuotebookQoL',
+    description:
+      'Ad-hoc valuation revalue button design prototype — Story 1 from Quotebook QoL epic',
     created: new Date().toISOString(),
     category: 'grids',
   },
@@ -868,6 +885,19 @@ export const createPageConfig = (): PageConfig => {
       </ThemeRouteWrapper>
     ),
     path: '/quotebookwholesale',
+  };
+
+  config.QuotebookQoL = {
+    hasPermission: () => true,
+    key: 'QuotebookQoL',
+    icon: <SyncOutlined />,
+    title: 'Quotebook QoL',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <QuotebookQoLPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/QuotebookQoL',
   };
 
   return config;
