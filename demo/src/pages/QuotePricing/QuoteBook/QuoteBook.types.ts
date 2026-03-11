@@ -34,6 +34,21 @@ export type ThresholdOverride = {
   severity: ThresholdSeverity
 }
 
+export type ComponentViolation = {
+  component: string
+  severity: 'Hard' | 'Soft'
+  value: number
+  threshold: number
+  direction: 'below_floor' | 'above_ceiling'
+  deviationPct: number
+}
+
+export type EvaluationResult = {
+  exceptionType: ExceptionType
+  exceptionCount: number
+  violations: ComponentViolation[]
+}
+
 export type DrawerState = {
   isOpen: boolean
   mode: DrawerMode
