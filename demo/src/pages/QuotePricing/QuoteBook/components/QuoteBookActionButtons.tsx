@@ -1,6 +1,7 @@
-import { Horizontal, Texto } from '@gravitate-js/excalibrr'
+import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Select, Switch, Tooltip } from 'antd'
-import { BarChartOutlined, ShrinkOutlined, ArrowsAltOutlined } from '@ant-design/icons'
+import { BarChartOutlined, ShrinkOutlined, ArrowsAltOutlined, SettingOutlined } from '@ant-design/icons'
+import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
 
 interface QuoteBookActionButtonsProps {
   publicationMode: 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay'
@@ -10,6 +11,7 @@ interface QuoteBookActionButtonsProps {
   showSpreadRows: boolean
   setShowSpreadRows: (v: boolean) => void
   publishMode: boolean
+  onManageThresholds?: () => void
 }
 
 export function QuoteBookActionButtons({
@@ -20,7 +22,10 @@ export function QuoteBookActionButtons({
   showSpreadRows,
   setShowSpreadRows,
   publishMode,
+  onManageThresholds,
 }: QuoteBookActionButtonsProps) {
+  const { isFutureMode: _isFutureMode } = useFeatureMode()
+
   return (
     <Horizontal style={{ gap: '16px' }} alignItems="center">
       {publicationMode !== 'IntraDay' && (
@@ -54,6 +59,11 @@ export function QuoteBookActionButtons({
           unCheckedChildren={<BarChartOutlined />}
         />
       </Tooltip>
+      <GraviButton
+        buttonText="Manage Thresholds"
+        icon={<SettingOutlined />}
+        onClick={onManageThresholds}
+      />
       <Texto appearance="medium">Last Save: Today 9:14 AM</Texto>
     </Horizontal>
   )

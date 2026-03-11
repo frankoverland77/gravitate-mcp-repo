@@ -1,4 +1,5 @@
-import { Horizontal, Texto, MaterialIcon } from '@gravitate-js/excalibrr'
+import { Horizontal, Texto } from '@gravitate-js/excalibrr'
+import { SafetyCertificateOutlined } from '@ant-design/icons'
 
 type QuoteBookProfileChipProps = {
   profileName?: string
@@ -16,7 +17,7 @@ export function QuoteBookProfileChip({ profileName = 'Standard Day' }: QuoteBook
         cursor: 'default',
       }}
     >
-      <MaterialIcon icon="shield" style={{ fontSize: '16px', color: 'var(--gravi-color-primary, #1890ff)' }} />
+      <SafetyCertificateOutlined style={{ fontSize: '14px', color: 'var(--gravi-color-primary, #1890ff)' }} />
       <Texto appearance="medium" style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
         {profileName}
       </Texto>

@@ -1,6 +1,6 @@
 import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Alert } from 'antd'
-import { SyncOutlined, SaveOutlined, CloseOutlined, CloudUploadOutlined, FileTextOutlined } from '@ant-design/icons'
+import { SyncOutlined, SaveOutlined, CloseOutlined, CloudUploadOutlined, FileTextOutlined, WarningOutlined } from '@ant-design/icons'
 
 interface QuoteBookFooterProps {
   publicationMode: 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay'
@@ -9,6 +9,7 @@ interface QuoteBookFooterProps {
   dirtyCount: number
   onPublish: () => void
   onReset: () => void
+  hardExceptionCount: number
 }
 
 export function QuoteBookFooter({
@@ -18,6 +19,7 @@ export function QuoteBookFooter({
   dirtyCount,
   onPublish,
   onReset,
+  hardExceptionCount,
 }: QuoteBookFooterProps) {
   return (
     <Horizontal
@@ -27,6 +29,22 @@ export function QuoteBookFooter({
       <Horizontal flex="1" alignItems="center" style={{ gap: '8px' }}>
         <FileTextOutlined />
         <Texto category="h4">Quote Publisher</Texto>
+        {hardExceptionCount > 0 && (
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '2px 10px',
+            background: '#fef2f2',
+            color: '#dc2626',
+            borderRadius: 12,
+            fontSize: 12,
+            fontWeight: 500,
+          }}>
+            <WarningOutlined style={{ fontSize: 11 }} />
+            {hardExceptionCount} hard exception{hardExceptionCount !== 1 ? 's' : ''} block publishing
+          </span>
+        )}
         {publicationMode === 'EndOfDayCurrentPeriod' && (
           <Alert message="Publishing For Current Period" type="warning" showIcon style={{ padding: '2px 8px' }} />
         )}
