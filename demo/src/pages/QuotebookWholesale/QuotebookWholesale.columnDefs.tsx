@@ -1,6 +1,5 @@
-import { Horizontal, Texto } from '@gravitate-js/excalibrr'
+import { BBDTag, Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { ColDef } from 'ag-grid-community'
-import { Tag } from 'antd'
 
 const currency = (value: number | null | undefined): string => {
   if (value == null) return ''
@@ -34,9 +33,9 @@ export function getQuotebookWholesaleColumnDefs(): ColDef[] {
             if (!params.data) return null
             const isNet = params.data.NetOrGross === 'Net'
             return (
-              <Tag color={isNet ? 'cyan' : 'green'} style={{ margin: 0, fontSize: 10 }}>
+              <BBDTag theme1={isNet} success={!isNet} style={{ margin: 0, fontSize: 10 }}>
                 {params.data.NetOrGross}
-              </Tag>
+              </BBDTag>
             )
           },
         },

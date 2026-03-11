@@ -1,7 +1,6 @@
 import { ColDef } from 'ag-grid-community'
-import { Tag } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
-import { GraviButton, Texto } from '@gravitate-js/excalibrr'
+import { BBDTag, GraviButton, Texto } from '@gravitate-js/excalibrr'
 
 export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
   {
@@ -9,7 +8,7 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
     headerName: 'Competitors',
     width: 110,
     cellRenderer: ({ value }: { value: number }) => (
-      <Tag color={value > 0 ? 'blue' : 'default'}>{value} Competitors</Tag>
+      <BBDTag theme1={value > 0} style={{ margin: 0, width: 'fit-content' }}>{value} Competitors</BBDTag>
     ),
   },
   {
@@ -17,7 +16,7 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
     headerName: 'Active',
     width: 90,
     cellRenderer: ({ value }: { value: boolean }) => (
-      <Tag color={value ? 'success' : 'default'}>{value ? 'Active' : 'Off'}</Tag>
+      <BBDTag success={value} style={{ margin: 0, width: 'fit-content' }}>{value ? 'Active' : 'Off'}</BBDTag>
     ),
   },
   {
@@ -45,7 +44,7 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
     width: 100,
     cellRenderer: ({ value }: { value: string }) =>
       value !== 'None' ? (
-        <Tag color="purple">{value}</Tag>
+        <BBDTag theme3 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
       ) : (
         <Texto appearance="medium">—</Texto>
       ),

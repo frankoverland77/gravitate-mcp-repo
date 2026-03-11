@@ -1,13 +1,41 @@
+import { useState } from 'react'
 import { Vertical, Texto } from '@gravitate-js/excalibrr'
 import { Tabs } from 'antd'
 import { QuoteRowsTab } from './tabs/QuoteRowsTab'
 import { QuoteSpreadsTab } from './tabs/QuoteSpreadsTab'
+import { PriceExceptionsTab } from './tabs/PriceExceptionsTab'
+import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 
 export function ManageQuoteRows() {
+  const { isFutureMode: _isFutureMode } = useFeatureMode()
+  const [activeKey, setActiveKey] = useState('quoteRows')
+
   return (
     <Vertical height="100%">
+      <style>{`
+        .quote-pricing-tabs > .ant-tabs-content-holder {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-height: 0;
+        }
+        .quote-pricing-tabs > .ant-tabs-content-holder > .ant-tabs-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
+        }
+        .quote-pricing-tabs .ant-tabs-tabpane-active {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
+        }
+      `}</style>
       <Tabs
-        defaultActiveKey="quoteRows"
+        className="quote-pricing-tabs"
+        activeKey={activeKey}
+        onChange={setActiveKey}
         style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
         tabBarStyle={{ marginBottom: 0, paddingLeft: 16 }}
       >
@@ -23,7 +51,7 @@ export function ManageQuoteRows() {
           </Vertical>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Manage Spreads" key="spreads" style={{ height: '100%' }}>
-          <QuoteSpreadsTab />
+          {activeKey === 'spreads' && <QuoteSpreadsTab />}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Manage Benchmarks" key="benchmarks">
           <Vertical className="gap-8" style={{ padding: 24 }}>
@@ -32,6 +60,9 @@ export function ManageQuoteRows() {
               Benchmark correlation management coming soon.
             </Texto>
           </Vertical>
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Price Exceptions" key="priceExceptions" style={{ height: '100%' }}>
+          {activeKey === 'priceExceptions' && <PriceExceptionsTab />}
         </Tabs.TabPane>
       </Tabs>
     </Vertical>
