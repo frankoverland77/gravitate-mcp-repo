@@ -120,15 +120,26 @@ export function updateProject(
   return updated;
 }
 
-/** Toggle sidebar visibility for a project */
-export function toggleSidebar(
+/** Toggle sidebar visibility for a project (local only — does NOT save) */
+export function toggleSidebarLocal(
   state: ProjectHubState,
   sectionKey: string
 ): ProjectHubState {
   if (isPinned(sectionKey)) return state;
   const current = state.projects[sectionKey];
   if (!current) return state;
-  return updateProject(state, sectionKey, { showInSidebar: !current.showInSidebar });
+
+  return {
+    ...state,
+    projects: {
+      ...state.projects,
+      [sectionKey]: {
+        ...current,
+        showInSidebar: !current.showInSidebar,
+        lastModified: new Date().toISOString(),
+      },
+    },
+  };
 }
 
 /** Archive a project (auto-hides from sidebar) */

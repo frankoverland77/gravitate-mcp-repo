@@ -1,8 +1,11 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Texto } from '@gravitate-js/excalibrr';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { SaveOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 import {
   loadHubState,
-  toggleSidebar,
+  toggleSidebarLocal,
+  saveHubState,
   archiveProject,
   restoreProject,
   addActivityLogEntry,
@@ -27,6 +30,8 @@ export function ProjectHub() {
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
   const [activeTab, setActiveTab] = useState<'active-draft' | 'archived'>('active-draft');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const savedStateRef = useRef<ProjectHubState>(state);
 
   // Build a lookup for section titles and icons from pageConfig
   const pageConfig = useMemo(() => createPageConfig(), []);
@@ -75,16 +80,28 @@ export function ProjectHub() {
 
   // Handlers
   const handleToggleSidebar = (key: string) => {
-    setState(prev => toggleSidebar(prev, key));
+    setState(prev => toggleSidebarLocal(prev, key));
+    setIsDirty(true);
+  };
+
+  const handleSave = () => {
+    saveHubState(state);
+    savedStateRef.current = state;
+    setIsDirty(false);
+    message.success('Sidebar updated');
   };
 
   const handleArchive = (key: string) => {
     setState(prev => archiveProject(prev, key));
+    savedStateRef.current = state;
+    setIsDirty(false);
     setSelectedKey(null);
   };
 
   const handleRestore = (key: string) => {
     setState(prev => restoreProject(prev, key));
+    savedStateRef.current = state;
+    setIsDirty(false);
   };
 
   const handleStatusChange = (key: string, status: ProjectStatus) => {
@@ -121,31 +138,39 @@ export function ProjectHub() {
           <div style={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             padding: '0 24px',
             borderBottom: '2px solid var(--gray-200)',
             flexShrink: 0,
           }}>
-            {([
-              { key: 'active-draft' as const, label: 'Active & Draft' },
-              { key: 'archived' as const, label: `Archived (${archivedCount})` },
-            ]).map(tab => (
-              <span
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                style={{
-                  padding: '10px 20px',
-                  fontSize: '13px',
-                  fontWeight: activeTab === tab.key ? 600 : 500,
-                  color: activeTab === tab.key ? 'var(--theme-color-1)' : 'var(--gray-500)',
-                  cursor: 'pointer',
-                  borderBottom: activeTab === tab.key ? '2px solid var(--theme-color-1)' : '2px solid transparent',
-                  marginBottom: '-2px',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Texto>{tab.label}</Texto>
-              </span>
-            ))}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {([
+                { key: 'active-draft' as const, label: 'Active & Draft' },
+                { key: 'archived' as const, label: `Archived (${archivedCount})` },
+              ]).map(tab => (
+                <span
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '13px',
+                    fontWeight: activeTab === tab.key ? 600 : 500,
+                    color: activeTab === tab.key ? 'var(--theme-color-1)' : 'var(--gray-500)',
+                    cursor: 'pointer',
+                    borderBottom: activeTab === tab.key ? '2px solid var(--theme-color-1)' : '2px solid transparent',
+                    marginBottom: '-2px',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Texto>{tab.label}</Texto>
+                </span>
+              ))}
+            </div>
+            {isDirty && (
+              <GraviButton size="small" success onClick={handleSave}>
+                <SaveOutlined /> Save Changes
+              </GraviButton>
+            )}
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto' }}>
