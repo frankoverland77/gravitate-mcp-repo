@@ -1,5 +1,3 @@
-export type ThresholdSeverity = 'Hard' | 'Soft' | 'Off'
-
 export type ExceptionType = 'hard' | 'soft' | 'clean'
 
 export type ProfileTier = 'org' | 'personal'
@@ -9,11 +7,14 @@ export type DrawerMode = 'empty' | 'single' | 'multi'
 export type ThresholdComponent = {
   component: string
   colorDot: string
-  floor: number
-  ceiling: number
-  severity: ThresholdSeverity
-  orgFloor: number
-  orgCeiling: number
+  criticalBelow: number | null
+  warningBelow: number | null
+  warningAbove: number | null
+  criticalAbove: number | null
+  orgCriticalBelow: number | null
+  orgWarningBelow: number | null
+  orgWarningAbove: number | null
+  orgCriticalAbove: number | null
 }
 
 export type ExceptionProfile = {
@@ -29,9 +30,10 @@ export type ExceptionProfile = {
 
 export type ThresholdOverride = {
   component: string
-  floor: number
-  ceiling: number
-  severity: ThresholdSeverity
+  criticalBelow: number | null
+  warningBelow: number | null
+  warningAbove: number | null
+  criticalAbove: number | null
 }
 
 export type ComponentViolation = {
@@ -39,7 +41,7 @@ export type ComponentViolation = {
   severity: 'Hard' | 'Soft'
   value: number
   threshold: number
-  direction: 'below_floor' | 'above_ceiling'
+  direction: 'below_critical' | 'below_warning' | 'above_warning' | 'above_critical'
   deviationPct: number
 }
 
@@ -55,4 +57,10 @@ export type DrawerState = {
   selectedRowIds: number[]
   actionMode: 'profile' | 'override'
   selectedProfileKey: string | null
+}
+
+export function getComponentStatus(t: ThresholdComponent): 'hard' | 'soft' | 'off' {
+  if (t.criticalBelow !== null || t.criticalAbove !== null) return 'hard'
+  if (t.warningBelow !== null || t.warningAbove !== null) return 'soft'
+  return 'off'
 }

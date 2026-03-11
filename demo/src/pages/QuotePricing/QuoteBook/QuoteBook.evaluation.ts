@@ -11,67 +11,46 @@ const FIELD_MAP: Record<string, (row: QuoteRow) => number | null> = {
   'Bench Value': () => null,
 }
 
+const ABSOLUTE_COMPONENTS = new Set(['Market Move', 'Bench Delta'])
+
 function evaluateComponent(
   row: QuoteRow,
   threshold: ThresholdComponent,
 ): ComponentViolation | null {
-  if (threshold.severity === 'Off') return null
-
-  // Check for row-level override
+  // Merge override boundaries if row has one
   const override = row.overrides?.find(o => o.component === threshold.component)
-  const floor = override ? override.floor : threshold.floor
-  const ceiling = override ? override.ceiling : threshold.ceiling
-  const severity = override ? override.severity : threshold.severity
-  if (severity === 'Off') return null
+  const cb = override ? override.criticalBelow : threshold.criticalBelow
+  const wb = override ? override.warningBelow : threshold.warningBelow
+  const wa = override ? override.warningAbove : threshold.warningAbove
+  const ca = override ? override.criticalAbove : threshold.criticalAbove
+
+  // All null → component is off
+  if (cb === null && wb === null && wa === null && ca === null) return null
 
   const getValue = FIELD_MAP[threshold.component]
   if (!getValue) return null
-  const value = getValue(row)
-  if (value === null) return null
+  const rawValue = getValue(row)
+  if (rawValue === null) return null
 
-  // For Market Move and Bench Delta, compare absolute value against ceiling only
-  const isAbsoluteComponent = threshold.component === 'Market Move' || threshold.component === 'Bench Delta'
-  const compareValue = isAbsoluteComponent ? Math.abs(value) : value
+  const isAbsolute = ABSOLUTE_COMPONENTS.has(threshold.component)
+  const value = isAbsolute ? Math.abs(rawValue) : rawValue
 
-  if (isAbsoluteComponent) {
-    if (compareValue > ceiling) {
-      const devPct = ceiling !== 0 ? Math.abs((compareValue - ceiling) / ceiling) * 100 : 0
-      return {
-        component: threshold.component,
-        severity: severity as 'Hard' | 'Soft',
-        value: compareValue,
-        threshold: ceiling,
-        direction: 'above_ceiling',
-        deviationPct: Math.round(devPct * 10) / 10,
-      }
-    }
-    return null
+  // Check zones worst-first
+  if (cb !== null && value < cb) {
+    const devPct = cb !== 0 ? Math.abs((value - cb) / cb) * 100 : 0
+    return { component: threshold.component, severity: 'Hard', value, threshold: cb, direction: 'below_critical', deviationPct: Math.round(devPct * 10) / 10 }
   }
-
-  if (compareValue < floor) {
-    const bound = floor
-    const devPct = bound !== 0 ? Math.abs((compareValue - bound) / bound) * 100 : 0
-    return {
-      component: threshold.component,
-      severity: severity as 'Hard' | 'Soft',
-      value: compareValue,
-      threshold: bound,
-      direction: 'below_floor',
-      deviationPct: Math.round(devPct * 10) / 10,
-    }
+  if (ca !== null && value > ca) {
+    const devPct = ca !== 0 ? Math.abs((value - ca) / ca) * 100 : 0
+    return { component: threshold.component, severity: 'Hard', value, threshold: ca, direction: 'above_critical', deviationPct: Math.round(devPct * 10) / 10 }
   }
-
-  if (compareValue > ceiling) {
-    const bound = ceiling
-    const devPct = bound !== 0 ? Math.abs((compareValue - bound) / bound) * 100 : 0
-    return {
-      component: threshold.component,
-      severity: severity as 'Hard' | 'Soft',
-      value: compareValue,
-      threshold: bound,
-      direction: 'above_ceiling',
-      deviationPct: Math.round(devPct * 10) / 10,
-    }
+  if (wb !== null && value < wb) {
+    const devPct = wb !== 0 ? Math.abs((value - wb) / wb) * 100 : 0
+    return { component: threshold.component, severity: 'Soft', value, threshold: wb, direction: 'below_warning', deviationPct: Math.round(devPct * 10) / 10 }
+  }
+  if (wa !== null && value > wa) {
+    const devPct = wa !== 0 ? Math.abs((value - wa) / wa) * 100 : 0
+    return { component: threshold.component, severity: 'Soft', value, threshold: wa, direction: 'above_warning', deviationPct: Math.round(devPct * 10) / 10 }
   }
 
   return null

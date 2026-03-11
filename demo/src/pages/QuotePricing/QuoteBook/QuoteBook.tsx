@@ -105,7 +105,8 @@ export function QuoteBook() {
       if (!row) return
       const maxDev = Math.max(...result.violations.map(v => v.deviationPct))
       const worstV = result.violations.reduce((a, b) => a.deviationPct > b.deviationPct ? a : b)
-      const dirLabel = worstV.direction === 'below_floor' ? 'below floor' : 'above ceiling'
+      const dirLabels: Record<string, string> = { below_critical: 'below critical', above_critical: 'above critical', below_warning: 'below warning', above_warning: 'above warning' }
+      const dirLabel = dirLabels[worstV.direction] || worstV.direction
       offenders.push({
         rowId,
         quote: `QC-${String(rowId).padStart(3, '0')}`,

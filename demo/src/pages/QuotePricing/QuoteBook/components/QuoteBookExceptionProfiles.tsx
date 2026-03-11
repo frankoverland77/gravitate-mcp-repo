@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { PlusOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Input, Select, message } from 'antd'
-import type { ExceptionProfile, ThresholdSeverity } from '../QuoteBook.types'
+import { Input, InputNumber, Select, message } from 'antd'
+import type { ExceptionProfile, ThresholdComponent } from '../QuoteBook.types'
+import { getComponentStatus } from '../QuoteBook.types'
 
 type EditMode = 'view' | 'edit' | 'create'
 
@@ -11,15 +12,7 @@ type EditForm = {
   description: string
   ownership: 'personal' | 'org'
   startFrom: string
-  thresholds: {
-    component: string
-    colorDot: string
-    floor: number
-    ceiling: number
-    severity: ThresholdSeverity
-    orgFloor: number
-    orgCeiling: number
-  }[]
+  thresholds: ThresholdComponent[]
   scopeTerminal: string
   scopeProduct: string
 }
@@ -87,11 +80,24 @@ export function QuoteBookExceptionProfiles({
       return
     }
 
-    // Validate org limits
+    // Validate org limits — each non-null personal boundary must not exceed corresponding org boundary
     for (const t of editForm.thresholds) {
-      if (t.floor < t.orgFloor || t.ceiling > t.orgCeiling) {
-        message.error(`${t.component}: values exceed org limits (${t.orgFloor.toFixed(4)} – ${t.orgCeiling.toFixed(4)})`)
-        return
+      const checks: { field: string; val: number | null; orgVal: number | null; dir: 'below' | 'above' }[] = [
+        { field: 'criticalBelow', val: t.criticalBelow, orgVal: t.orgCriticalBelow, dir: 'below' },
+        { field: 'warningBelow', val: t.warningBelow, orgVal: t.orgWarningBelow, dir: 'below' },
+        { field: 'warningAbove', val: t.warningAbove, orgVal: t.orgWarningAbove, dir: 'above' },
+        { field: 'criticalAbove', val: t.criticalAbove, orgVal: t.orgCriticalAbove, dir: 'above' },
+      ]
+      for (const c of checks) {
+        if (c.val === null || c.orgVal === null) continue
+        if (c.dir === 'below' && c.val < c.orgVal) {
+          message.error(`${t.component} ${c.field}: ${c.val.toFixed(4)} is below org limit ${c.orgVal.toFixed(4)}`)
+          return
+        }
+        if (c.dir === 'above' && c.val > c.orgVal) {
+          message.error(`${t.component} ${c.field}: ${c.val.toFixed(4)} exceeds org limit ${c.orgVal.toFixed(4)}`)
+          return
+        }
       }
     }
 
@@ -368,13 +374,15 @@ function ProfileViewMode({
 }
 
 /* ---------- Threshold Summary Card ---------- */
-function ThresholdSummaryCard({ threshold }: { threshold: ExceptionProfile['thresholds'][0] }) {
-  const severityColors: Record<string, { bg: string; color: string }> = {
-    Hard: { bg: '#fef2f2', color: '#dc2626' },
-    Soft: { bg: '#fffbeb', color: '#d97706' },
-    Off: { bg: 'var(--gray-100)', color: 'var(--gray-400)' },
+function ThresholdSummaryCard({ threshold }: { threshold: ThresholdComponent }) {
+  const status = getComponentStatus(threshold)
+  const statusDisplay: Record<string, { bg: string; color: string; label: string }> = {
+    hard: { bg: '#fef2f2', color: '#dc2626', label: 'Hard' },
+    soft: { bg: '#fffbeb', color: '#d97706', label: 'Soft' },
+    off: { bg: 'var(--gray-100)', color: 'var(--gray-400)', label: 'Off' },
   }
-  const sc = severityColors[threshold.severity] || severityColors.Off
+  const sc = statusDisplay[status]
+  const fmt = (v: number | null) => v !== null ? `$${v.toFixed(4)}` : '—'
 
   return (
     <div style={{
@@ -401,12 +409,23 @@ function ThresholdSummaryCard({ threshold }: { threshold: ExceptionProfile['thre
           background: sc.bg,
           color: sc.color,
         }}>
-          {threshold.severity}
+          {sc.label}
         </span>
       </Horizontal>
-      <Texto style={{ fontSize: 12, fontFamily: 'monospace' }}>
-        ${threshold.floor.toFixed(4)} – ${threshold.ceiling.toFixed(4)}
-      </Texto>
+      {status !== 'off' ? (
+        <div style={{ fontSize: 12, fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {(threshold.criticalBelow !== null || threshold.criticalAbove !== null) && (
+            <span style={{ color: '#dc2626' }}>Critical: {fmt(threshold.criticalBelow)} – {fmt(threshold.criticalAbove)}</span>
+          )}
+          {(threshold.warningBelow !== null || threshold.warningAbove !== null) && (
+            <span style={{ color: '#d97706' }}>Warning: {fmt(threshold.warningBelow)} – {fmt(threshold.warningAbove)}</span>
+          )}
+        </div>
+      ) : (
+        <Texto style={{ fontSize: 12, fontFamily: 'monospace', color: 'var(--gray-400)' }}>
+          Not enforced
+        </Texto>
+      )}
     </div>
   )
 }
@@ -427,7 +446,7 @@ function ProfileEditMode({
   onCancel: () => void
   onSave: () => void
 }) {
-  const updateThreshold = (index: number, field: string, value: any) => {
+  const updateThreshold = (index: number, field: string, value: number | null) => {
     const updated = [...editForm.thresholds]
     updated[index] = { ...updated[index], [field]: value }
     setEditForm({ ...editForm, thresholds: updated })
@@ -536,9 +555,7 @@ function ProfileEditMode({
             <ThresholdEditorCard
               key={t.component}
               threshold={t}
-              onSeverityChange={(s) => updateThreshold(i, 'severity', s)}
-              onFloorChange={(v) => updateThreshold(i, 'floor', v)}
-              onCeilingChange={(v) => updateThreshold(i, 'ceiling', v)}
+              onBoundaryChange={(field, value) => updateThreshold(i, field, value)}
             />
           ))}
         </div>
@@ -610,16 +627,40 @@ function ProfileEditMode({
 /* ---------- Threshold Editor Card ---------- */
 function ThresholdEditorCard({
   threshold,
-  onSeverityChange,
-  onFloorChange,
-  onCeilingChange,
+  onBoundaryChange,
 }: {
-  threshold: EditForm['thresholds'][0]
-  onSeverityChange: (s: ThresholdSeverity) => void
-  onFloorChange: (v: number) => void
-  onCeilingChange: (v: number) => void
+  threshold: ThresholdComponent
+  onBoundaryChange: (field: string, value: number | null) => void
 }) {
-  const severities: ThresholdSeverity[] = ['Soft', 'Hard', 'Off']
+  const isAbsolute = threshold.component === 'Market Move' || threshold.component === 'Bench Delta'
+
+  const boundaryRow = (field: string, label: string, color: string, value: number | null, orgValue: number | null, disabled?: boolean) => (
+    <Horizontal alignItems="center" style={{ gap: '6px', marginBottom: 4 }}>
+      <span style={{
+        width: 100,
+        fontSize: 11,
+        fontWeight: 500,
+        color,
+        flexShrink: 0,
+      }}>
+        {label}
+      </span>
+      <InputNumber
+        size="small"
+        style={{ width: 120, fontFamily: 'monospace', fontSize: 12 }}
+        step={0.0001}
+        placeholder={disabled ? 'N/A' : 'null'}
+        value={value}
+        onChange={v => onBoundaryChange(field, v)}
+        disabled={disabled}
+      />
+      {orgValue !== null && (
+        <span style={{ fontSize: 10, color: 'var(--gray-400)', fontFamily: 'monospace' }}>
+          org: {orgValue.toFixed(4)}
+        </span>
+      )}
+    </Horizontal>
+  )
 
   return (
     <div style={{
@@ -628,92 +669,50 @@ function ThresholdEditorCard({
       borderRadius: 6,
       maxWidth: 520,
     }}>
-      {/* Header: dot + name */}
-      <Horizontal alignItems="center" style={{ gap: '6px', marginBottom: 8 }}>
-        <span style={{
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          background: threshold.colorDot,
-          flexShrink: 0,
-        }} />
-        <Texto weight="500" style={{ fontSize: 13 }}>{threshold.component}</Texto>
+      {/* Header: dot + name + derived status */}
+      <Horizontal alignItems="center" justifyContent="space-between" style={{ marginBottom: 8 }}>
+        <Horizontal alignItems="center" style={{ gap: '6px' }}>
+          <span style={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background: threshold.colorDot,
+            flexShrink: 0,
+          }} />
+          <Texto weight="500" style={{ fontSize: 13 }}>{threshold.component}</Texto>
+        </Horizontal>
+        <StatusBadge threshold={threshold} />
       </Horizontal>
 
-      {/* Severity segmented control */}
-      <div style={{
-        display: 'inline-flex',
-        border: '1px solid var(--gray-200)',
-        borderRadius: 4,
-        overflow: 'hidden',
-        marginBottom: 8,
-        maxWidth: 180,
-      }}>
-        {severities.map(s => (
-          <span
-            key={s}
-            onClick={() => onSeverityChange(s)}
-            style={{
-              width: 60,
-              padding: '4px 0',
-              textAlign: 'center',
-              fontSize: 11,
-              fontWeight: 500,
-              cursor: 'pointer',
-              background: threshold.severity === s ? (s === 'Hard' ? '#fef2f2' : s === 'Soft' ? '#fffbeb' : 'var(--gray-100)') : 'transparent',
-              color: threshold.severity === s ? (s === 'Hard' ? '#dc2626' : s === 'Soft' ? '#d97706' : 'var(--gray-500)') : 'var(--gray-400)',
-              transition: 'all 0.1s',
-            }}
-          >
-            {s}
-          </span>
-        ))}
-      </div>
-
-      {/* Floor + Ceiling inputs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: 6, width: 'fit-content' }}>
-        <div style={{ width: 120 }}>
-          <Texto appearance="medium" style={{ fontSize: 10, marginBottom: 2 }}>Floor</Texto>
-          <Input
-            size="small"
-            value={threshold.floor.toFixed(4)}
-            onChange={e => {
-              const v = parseFloat(e.target.value)
-              if (!isNaN(v)) onFloorChange(v)
-            }}
-            style={{ fontFamily: 'monospace', fontSize: 12 }}
-          />
-        </div>
-        <div style={{ width: 120 }}>
-          <Texto appearance="medium" style={{ fontSize: 10, marginBottom: 2 }}>Ceiling</Texto>
-          <Input
-            size="small"
-            value={threshold.ceiling.toFixed(4)}
-            onChange={e => {
-              const v = parseFloat(e.target.value)
-              if (!isNaN(v)) onCeilingChange(v)
-            }}
-            style={{ fontFamily: 'monospace', fontSize: 12 }}
-          />
-        </div>
-      </div>
-
-      {/* Org limit locked row */}
-      <div style={{
-        padding: '4px 8px',
-        border: '1px dashed var(--gray-200)',
-        borderRadius: 4,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        cursor: 'not-allowed',
-      }}>
-        <LockOutlined style={{ fontSize: 10, color: 'var(--gray-400)' }} />
-        <Texto appearance="medium" style={{ fontSize: 10 }}>
-          Org limit: ${threshold.orgFloor.toFixed(4)} – ${threshold.orgCeiling.toFixed(4)}
-        </Texto>
-      </div>
+      {/* 4 boundary rows */}
+      {boundaryRow('criticalBelow', 'Critical Below', '#dc2626', threshold.criticalBelow, threshold.orgCriticalBelow, isAbsolute)}
+      {boundaryRow('warningBelow', 'Warning Below', '#d97706', threshold.warningBelow, threshold.orgWarningBelow, isAbsolute)}
+      {boundaryRow('warningAbove', 'Warning Above', '#d97706', threshold.warningAbove, threshold.orgWarningAbove)}
+      {boundaryRow('criticalAbove', 'Critical Above', '#dc2626', threshold.criticalAbove, threshold.orgCriticalAbove)}
     </div>
+  )
+}
+
+/* ---------- Status Badge (derived from boundaries) ---------- */
+function StatusBadge({ threshold }: { threshold: ThresholdComponent }) {
+  const status = getComponentStatus(threshold)
+  const display: Record<string, { bg: string; color: string; label: string }> = {
+    hard: { bg: '#fef2f2', color: '#dc2626', label: 'Hard' },
+    soft: { bg: '#fffbeb', color: '#d97706', label: 'Soft' },
+    off: { bg: 'var(--gray-100)', color: 'var(--gray-400)', label: 'Off' },
+  }
+  const d = display[status]
+  return (
+    <span style={{
+      padding: '1px 6px',
+      borderRadius: 3,
+      fontSize: 10,
+      fontWeight: 600,
+      background: d.bg,
+      color: d.color,
+    }}>
+      {d.label}
+    </span>
   )
 }
 

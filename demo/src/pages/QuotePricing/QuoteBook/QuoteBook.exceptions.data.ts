@@ -1,5 +1,11 @@
 import type { ExceptionProfile } from './QuoteBook.types'
 
+// Absolute components (Market Move, Bench Delta) only use "above" boundaries.
+// Mapping from old model:
+//   Hard + floor/ceiling → criticalBelow=floor, criticalAbove=ceiling, warning ~10% inside
+//   Soft + floor/ceiling → warningBelow=floor, warningAbove=ceiling, critical=null
+//   Off → all null
+
 export const exceptionProfiles: ExceptionProfile[] = [
   {
     key: 'standard',
@@ -10,13 +16,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: null,
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 1.8000, ceiling: 4.0000, severity: 'Hard', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 1.8000, ceiling: 3.5000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0040, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.0500, ceiling: 0.0500, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 2.0000, ceiling: 4.0000, severity: 'Soft', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0200, severity: 'Off', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.5000, ceiling: 4.0000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: 1.8000, warningBelow: 2.0200, warningAbove: 3.7800, criticalAbove: 4.0000, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.8000, warningBelow: 2.0000, warningAbove: 3.3000, criticalAbove: 3.5000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0040, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0500, warningAbove: 0.0500, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.0000, warningAbove: 4.0000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
   {
@@ -28,13 +34,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: { text: 'Tight', variant: 'warning' },
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 2.5000, ceiling: 3.5000, severity: 'Hard', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 2.0000, ceiling: 3.0000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0020, severity: 'Hard', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.0200, ceiling: 0.0200, severity: 'Hard', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 2.1000, ceiling: 3.5000, severity: 'Soft', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0100, severity: 'Soft', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.8000, ceiling: 3.5000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: 2.5000, warningBelow: 2.6000, warningAbove: 3.4000, criticalAbove: 3.5000, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 2.0000, warningBelow: 2.1000, warningAbove: 2.9000, criticalAbove: 3.0000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0016, criticalAbove: 0.0020, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: -0.0200, warningBelow: -0.0160, warningAbove: 0.0160, criticalAbove: 0.0200, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.1000, warningAbove: 3.5000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: 0.0080, criticalAbove: 0.0100, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
   {
@@ -46,13 +52,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: { text: 'Wide', variant: 'primary' },
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 1.5000, ceiling: 5.0000, severity: 'Soft', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 1.5000, ceiling: 4.0000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0060, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.1000, ceiling: 0.1000, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 1.5000, ceiling: 5.0000, severity: 'Off', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0400, severity: 'Off', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.0000, ceiling: 5.0000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: null, warningBelow: 1.5000, warningAbove: 5.0000, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.5000, warningBelow: 1.6500, warningAbove: 3.7500, criticalAbove: 4.0000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0060, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.1000, warningAbove: 0.1000, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
   {
@@ -64,13 +70,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: { text: 'Strict', variant: 'error' },
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 2.8000, ceiling: 3.5000, severity: 'Hard', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 1.8000, ceiling: 3.2000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0025, severity: 'Hard', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.0300, ceiling: 0.0300, severity: 'Hard', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 2.1000, ceiling: 3.5000, severity: 'Soft', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0100, severity: 'Soft', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.8000, ceiling: 3.5000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: 2.8000, warningBelow: 2.8700, warningAbove: 3.4300, criticalAbove: 3.5000, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.8000, warningBelow: 1.9400, warningAbove: 3.0600, criticalAbove: 3.2000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0020, criticalAbove: 0.0025, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: -0.0300, warningBelow: -0.0240, warningAbove: 0.0240, criticalAbove: 0.0300, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.1000, warningAbove: 3.5000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: 0.0080, criticalAbove: 0.0100, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
   {
@@ -82,13 +88,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: { text: 'Wide', variant: 'primary' },
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 1.0000, ceiling: 5.0000, severity: 'Soft', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 1.5000, ceiling: 4.0000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0050, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.0800, ceiling: 0.0800, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 1.8000, ceiling: 4.5000, severity: 'Soft', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0300, severity: 'Off', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.2000, ceiling: 4.5000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: null, warningBelow: 1.0000, warningAbove: 5.0000, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.5000, warningBelow: 1.6500, warningAbove: 3.7500, criticalAbove: 4.0000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0050, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0800, warningAbove: 0.0800, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 1.8000, warningAbove: 4.5000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
   {
@@ -100,13 +106,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: { text: 'System', variant: 'default' },
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 1.8000, ceiling: 4.0000, severity: 'Hard', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 1.8000, ceiling: 3.5000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0040, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.0500, ceiling: 0.0500, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 2.0000, ceiling: 4.0000, severity: 'Soft', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0200, severity: 'Off', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.5000, ceiling: 4.0000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: 1.8000, warningBelow: 2.0200, warningAbove: 3.7800, criticalAbove: 4.0000, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.8000, warningBelow: 2.0000, warningAbove: 3.3000, criticalAbove: 3.5000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0040, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0500, warningAbove: 0.0500, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.0000, warningAbove: 4.0000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
   {
@@ -118,13 +124,13 @@ export const exceptionProfiles: ExceptionProfile[] = [
     scope: 'All rows',
     badge: null,
     thresholds: [
-      { component: 'Margin', colorDot: '#2563eb', floor: 1.8000, ceiling: 4.2000, severity: 'Hard', orgFloor: 1.0000, orgCeiling: 5.0000 },
-      { component: 'Cost', colorDot: '#16a34a', floor: 1.9000, ceiling: 3.8000, severity: 'Hard', orgFloor: 1.5000, orgCeiling: 4.0000 },
-      { component: 'Market Move', colorDot: '#d97706', floor: 0, ceiling: 0.0040, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price Delta', colorDot: '#ec4899', floor: -0.0600, ceiling: 0.0600, severity: 'Soft', orgFloor: -0.1000, orgCeiling: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', floor: 2.0000, ceiling: 4.2000, severity: 'Soft', orgFloor: 1.5000, orgCeiling: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', floor: 0, ceiling: 0.0200, severity: 'Off', orgFloor: -0.0500, orgCeiling: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', floor: 1.5000, ceiling: 4.2000, severity: 'Off', orgFloor: 1.0000, orgCeiling: 5.0000 },
+      { component: 'Margin', colorDot: '#2563eb', criticalBelow: 1.8000, warningBelow: 2.0400, warningAbove: 3.9600, criticalAbove: 4.2000, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.9000, warningBelow: 2.0900, warningAbove: 3.6100, criticalAbove: 3.8000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
+      { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0040, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0600, warningAbove: 0.0600, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
+      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.0000, warningAbove: 4.2000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
+      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
     ],
   },
 ]

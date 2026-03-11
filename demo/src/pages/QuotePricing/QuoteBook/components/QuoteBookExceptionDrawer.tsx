@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { CloseOutlined, InboxOutlined, SafetyCertificateOutlined, EditOutlined } from '@ant-design/icons'
 import { InputNumber, Select, message } from 'antd'
-import type { DrawerState, ExceptionProfile, ThresholdOverride, ThresholdSeverity } from '../QuoteBook.types'
+import type { DrawerState, ExceptionProfile, ThresholdOverride } from '../QuoteBook.types'
+import { getComponentStatus } from '../QuoteBook.types'
 import type { QuoteRow } from '../QuoteBook.data'
 
 interface QuoteBookExceptionDrawerProps {
@@ -120,7 +121,6 @@ export function QuoteBookExceptionDrawer({
             theme1
             buttonText={actionMode === 'profile' ? 'Apply to Row' : 'Override Row'}
             onClick={() => {
-              // Handled via the sub-component callbacks
               const form = document.querySelector('[data-drawer-submit]') as HTMLElement
               form?.click()
             }}
@@ -319,11 +319,13 @@ function ThresholdPreview({ profileKey, profileMap }: { profileKey: string | nul
   const profile = profileMap[profileKey]
   if (!profile) return null
 
-  const severityColors: Record<string, string> = {
-    Hard: '#dc2626',
-    Soft: '#d97706',
-    Off: 'var(--gray-400)',
+  const statusColors: Record<string, string> = {
+    hard: '#dc2626',
+    soft: '#d97706',
+    off: 'var(--gray-400)',
   }
+
+  const formatBoundary = (val: number | null) => val !== null ? `$${val.toFixed(4)}` : '—'
 
   return (
     <div style={{
@@ -335,29 +337,43 @@ function ThresholdPreview({ profileKey, profileMap }: { profileKey: string | nul
       <Texto weight="600" style={{ fontSize: 12, marginBottom: 10 }}>
         {profile.name} — Threshold Values
       </Texto>
-      {profile.thresholds.slice(0, 5).map(t => (
-        <Horizontal
-          key={t.component}
-          justifyContent="space-between"
-          alignItems="center"
-          style={{ padding: '4px 0', borderBottom: '1px solid var(--gray-50)' }}
-        >
-          <Horizontal alignItems="center" style={{ gap: '6px' }}>
-            <span style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: t.colorDot,
-              display: 'inline-block',
-              flexShrink: 0,
-            }} />
-            <Texto style={{ fontSize: 12 }}>{t.component}</Texto>
-          </Horizontal>
-          <Texto style={{ fontSize: 12, fontFamily: 'monospace', color: severityColors[t.severity] || 'inherit' }}>
-            ${t.floor.toFixed(4)} – ${t.ceiling.toFixed(4)} ({t.severity})
-          </Texto>
-        </Horizontal>
-      ))}
+      {profile.thresholds.slice(0, 5).map(t => {
+        const status = getComponentStatus(t)
+        const hasCritical = t.criticalBelow !== null || t.criticalAbove !== null
+        const hasWarning = t.warningBelow !== null || t.warningAbove !== null
+        return (
+          <div
+            key={t.component}
+            style={{ padding: '4px 0', borderBottom: '1px solid var(--gray-50)' }}
+          >
+            <Horizontal
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Horizontal alignItems="center" style={{ gap: '6px' }}>
+                <span style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: t.colorDot,
+                  display: 'inline-block',
+                  flexShrink: 0,
+                }} />
+                <Texto style={{ fontSize: 12 }}>{t.component}</Texto>
+              </Horizontal>
+              <Texto style={{ fontSize: 11, fontFamily: 'monospace', color: statusColors[status] }}>
+                {status === 'off' ? 'Off' : status.charAt(0).toUpperCase() + status.slice(1)}
+              </Texto>
+            </Horizontal>
+            {status !== 'off' && (
+              <div style={{ marginLeft: 14, fontSize: 11, fontFamily: 'monospace', color: 'var(--gray-500)' }}>
+                {hasCritical && <div style={{ color: '#dc2626' }}>Critical: {formatBoundary(t.criticalBelow)} .. {formatBoundary(t.criticalAbove)}</div>}
+                {hasWarning && <div style={{ color: '#d97706' }}>Warning: {formatBoundary(t.warningBelow)} .. {formatBoundary(t.warningAbove)}</div>}
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -371,28 +387,59 @@ function OverrideForm({
   onSubmit: (override: ThresholdOverride, overwriteExisting: boolean) => void
 }) {
   const [component, setComponent] = useState<string | null>(null)
-  const [floor, setFloor] = useState<number | null>(null)
-  const [ceiling, setCeiling] = useState<number | null>(null)
-  const [severity, setSeverity] = useState<ThresholdSeverity | null>(null)
+  const [criticalBelow, setCriticalBelow] = useState<number | null>(null)
+  const [warningBelow, setWarningBelow] = useState<number | null>(null)
+  const [warningAbove, setWarningAbove] = useState<number | null>(null)
+  const [criticalAbove, setCriticalAbove] = useState<number | null>(null)
   const [overwriteExisting, setOverwriteExisting] = useState(false)
 
   const componentOptions = [
     'Margin', 'Cost', 'Market Move', 'Price Delta', 'Price', 'Bench Delta', 'Bench Value',
   ]
 
+  const isAbsolute = component === 'Market Move' || component === 'Bench Delta'
+
   const handleSubmit = () => {
-    if (!component || floor === null || ceiling === null || !severity) {
-      message.warning('Please fill in all override fields.')
+    if (!component) {
+      message.warning('Please select a component.')
       return
     }
-    onSubmit({ component, floor, ceiling, severity }, overwriteExisting)
+    if (criticalBelow === null && warningBelow === null && warningAbove === null && criticalAbove === null) {
+      message.warning('At least one boundary must be set.')
+      return
+    }
+    onSubmit({ component, criticalBelow, warningBelow, warningAbove, criticalAbove }, overwriteExisting)
     // Reset form
     setComponent(null)
-    setFloor(null)
-    setCeiling(null)
-    setSeverity(null)
+    setCriticalBelow(null)
+    setWarningBelow(null)
+    setWarningAbove(null)
+    setCriticalAbove(null)
     setOverwriteExisting(false)
   }
+
+  const boundaryRow = (label: string, color: string, value: number | null, onChange: (v: number | null) => void, disabled?: boolean) => (
+    <Horizontal alignItems="center" style={{ gap: '8px', marginBottom: 8 }}>
+      <span style={{
+        width: 110,
+        fontSize: 12,
+        fontWeight: 500,
+        color,
+        flexShrink: 0,
+      }}>
+        {label}
+      </span>
+      <InputNumber
+        size="small"
+        style={{ flex: 1 }}
+        step={0.0001}
+        placeholder={disabled ? 'N/A' : 'null'}
+        value={value}
+        onChange={v => onChange(v)}
+        disabled={disabled}
+      />
+    </Horizontal>
+  )
 
   return (
     <div style={{ marginTop: 16 }}>
@@ -403,33 +450,23 @@ function OverrideForm({
           style={{ width: '100%' }}
           size="small"
           value={component}
-          onChange={setComponent}
+          onChange={val => {
+            setComponent(val)
+            // Reset below fields for absolute components
+            if (val === 'Market Move' || val === 'Bench Delta') {
+              setCriticalBelow(null)
+              setWarningBelow(null)
+            }
+          }}
           options={componentOptions.map(c => ({ value: c, label: c }))}
         />
       </div>
-      <Horizontal style={{ gap: '12px', marginBottom: 12 }}>
-        <div style={{ flex: 1 }}>
-          <Texto style={{ fontSize: 12, fontWeight: 500, marginBottom: 4 }}>Floor</Texto>
-          <InputNumber size="small" style={{ width: '100%' }} step={0.01} placeholder="0.0000" value={floor} onChange={v => setFloor(v)} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <Texto style={{ fontSize: 12, fontWeight: 500, marginBottom: 4 }}>Ceiling</Texto>
-          <InputNumber size="small" style={{ width: '100%' }} step={0.01} placeholder="0.0000" value={ceiling} onChange={v => setCeiling(v)} />
-        </div>
-      </Horizontal>
       <div style={{ marginBottom: 12 }}>
-        <Texto style={{ fontSize: 12, fontWeight: 500, marginBottom: 4 }}>Severity</Texto>
-        <Select
-          placeholder="Select severity..."
-          style={{ width: '100%' }}
-          size="small"
-          value={severity}
-          onChange={setSeverity}
-          options={[
-            { value: 'Hard', label: 'Hard' },
-            { value: 'Soft', label: 'Soft' },
-          ]}
-        />
+        <Texto style={{ fontSize: 12, fontWeight: 500, marginBottom: 8 }}>Boundaries</Texto>
+        {boundaryRow('Critical Below', '#dc2626', criticalBelow, setCriticalBelow, isAbsolute)}
+        {boundaryRow('Warning Below', '#d97706', warningBelow, setWarningBelow, isAbsolute)}
+        {boundaryRow('Warning Above', '#d97706', warningAbove, setWarningAbove)}
+        {boundaryRow('Critical Above', '#dc2626', criticalAbove, setCriticalAbove)}
       </div>
       {extraCheckbox && (
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--gray-600)', cursor: 'pointer' }}>
