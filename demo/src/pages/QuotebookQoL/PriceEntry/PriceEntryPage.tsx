@@ -797,7 +797,7 @@ function DrawerContent({ data, hasPermission, simulateLockConflict, onGridRowUpd
               top: popoverAnchorTop,
               zIndex: 1050,
               padding: 16,
-              backgroundColor: 'var(--theme-bg-2)',
+              backgroundColor: '#ffffff',
               border: '1px solid var(--theme-border)',
               borderRadius: 8,
               boxShadow: '0 6px 24px rgba(0, 0, 0, 0.15)',
@@ -826,7 +826,7 @@ function DrawerContent({ data, hasPermission, simulateLockConflict, onGridRowUpd
                 height: 0,
                 borderTop: '8px solid transparent',
                 borderBottom: '8px solid transparent',
-                borderLeft: '8px solid var(--theme-bg-2)',
+                borderLeft: '8px solid #ffffff',
               }}
             />
             <PopoverPriceForm
