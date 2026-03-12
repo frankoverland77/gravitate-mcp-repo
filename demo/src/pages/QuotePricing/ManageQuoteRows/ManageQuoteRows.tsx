@@ -4,6 +4,7 @@ import { Tabs } from 'antd'
 import { QuoteRowsTab } from './tabs/QuoteRowsTab'
 import { QuoteSpreadsTab } from './tabs/QuoteSpreadsTab'
 import { PriceExceptionsTab } from './tabs/PriceExceptionsTab'
+import { CompetitorMappingsTab } from './tabs/CompetitorMappingsTab'
 import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 
 export function ManageQuoteRows() {
