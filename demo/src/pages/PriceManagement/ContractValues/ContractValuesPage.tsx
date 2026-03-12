@@ -1,15 +1,18 @@
 import {
   CheckCircleFilled,
   CloseCircleFilled,
+  EditOutlined,
   EnvironmentFilled,
   ExperimentFilled,
+  HistoryOutlined,
   LoadingOutlined,
+  SearchOutlined,
   MoreOutlined,
   SyncOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, RangePicker, Texto, Vertical } from '@gravitate-js/excalibrr';
-import { Alert, Collapse, DatePicker, Drawer, Form, InputNumber, Menu, Modal, Popover, Select, Switch, Tooltip } from 'antd';
+import { Alert, Collapse, DatePicker, Drawer, Form, Input, InputNumber, Menu, Modal, Popover, Select, Switch, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
@@ -178,6 +181,7 @@ function InlinePriceEntry({
   const [conflictCount, setConflictCount] = useState(0);
   const [formDirty, setFormDirty] = useState(false);
   const [historyExpanded, setHistoryExpanded] = useState(true);
+  const [historySearchText, setHistorySearchText] = useState('');
 
   const showEffectiveDates = selectedUploadType === 'EffectiveStart' || selectedUploadType === 'EffectiveDates';
 
@@ -250,34 +254,32 @@ function InlinePriceEntry({
       getRowId: (params: any) => params.data.PriceHistoryId.toString(),
       suppressDragLeaveHidesColumns: true,
       rowGroupPanelShow: 'never' as const,
+      quickFilterText: historySearchText,
       getRowClass: (params: any) => {
         if (conflictRowIds.has(params.data?.PriceHistoryId)) return 'cv-conflict-row';
         return '';
       },
     }),
-    [conflictRowIds]
+    [conflictRowIds, historySearchText]
   );
 
   return (
     <Vertical flex="1" style={{ animation: 'stackedSlideUp 0.25s ease-out', minHeight: 0 }}>
       {/* ── ENTER PRICE FORM ─────────────────────────────────── */}
       <div
-        className="px-4 py-3"
         style={{
           borderTop: '2px solid var(--theme-border)',
-          backgroundColor: 'var(--theme-bg-2)',
+          borderLeft: '3px solid var(--theme-color-2)',
+          backgroundColor: 'var(--theme-bg-1)',
+          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04)',
+          padding: '20px 24px',
           flexShrink: 0,
         }}
       >
-        <Horizontal verticalCenter style={{ marginBottom: 10 }}>
-          <Texto category="h5" flex="1">Enter Price</Texto>
-          <GraviButton
-            size="small"
-            buttonText="Cancel"
-            onClick={handleClose}
-            disabled={isSaving}
-          />
-        </Horizontal>
+        <Texto category="h5" style={{ marginBottom: 14, fontWeight: 600, letterSpacing: '0.01em' }}>
+          <EditOutlined style={{ marginRight: 6, fontSize: 13 }} />
+          Enter Price
+        </Texto>
 
         {saveError && (
           <Alert
@@ -302,14 +304,21 @@ function InlinePriceEntry({
           size="small"
         >
           <Horizontal gap={12} style={{ flexWrap: 'wrap' }}>
-            <Form.Item
-              label="Price Value"
-              name="priceValue"
-              rules={[{ required: true, message: 'Required' }]}
-              style={{ flex: 1, minWidth: 120, marginBottom: 8 }}
-            >
-              <InputNumber style={{ width: '100%' }} precision={4} placeholder="0.0000" autoFocus />
-            </Form.Item>
+            <div style={{ width: 140, marginBottom: 8 }}>
+              <Form.Item
+                label="Price Value"
+                name="priceValue"
+                rules={[{ required: true, message: 'Required' }]}
+                style={{ marginBottom: 0 }}
+              >
+                <InputNumber style={{ width: '100%', fontSize: 16, fontWeight: 500 }} precision={4} placeholder="0.0000" autoFocus />
+              </Form.Item>
+              {component.ComponentResult != null && (
+                <Texto appearance="medium" style={{ fontSize: 11, marginTop: 2 }}>
+                  Current: {component.ComponentResult.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                </Texto>
+              )}
+            </div>
 
             <Form.Item label="Status" name="estimateActual" style={{ width: 120, marginBottom: 8 }}>
               <Select options={[
@@ -363,13 +372,21 @@ function InlinePriceEntry({
             )}
           </Horizontal>
 
-          <Horizontal gap={8} style={{ marginTop: 4 }}>
+          <Horizontal verticalCenter gap={8} style={{ marginTop: 4 }}>
             <GraviButton
               size="small"
               buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
               icon={conflictState === 'loading' ? <LoadingOutlined spin /> : undefined}
               onClick={handleCheckConflicts}
               disabled={isSaving || conflictState === 'loading'}
+            />
+            <div style={{ flex: 1 }} />
+            <GraviButton
+              size="small"
+              buttonText="Cancel"
+              onClick={handleClose}
+              disabled={isSaving}
+              style={{ border: 'none', boxShadow: 'none' }}
             />
             <GraviButton
               theme1
@@ -378,6 +395,7 @@ function InlinePriceEntry({
               buttonText={isSaving ? 'Saving...' : 'Save & Revalue'}
               onClick={() => form.submit()}
               disabled={isSaving}
+              style={{ minWidth: 80 }}
             />
           </Horizontal>
         </Form>
@@ -402,7 +420,7 @@ function InlinePriceEntry({
       )}
 
       {/* ── COLLAPSIBLE PRICE HISTORY ─────────────────────────── */}
-      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', marginTop: 16, backgroundColor: 'var(--theme-bg-2)', borderTop: '1px solid var(--theme-border)' }}>
         <Collapse
           activeKey={historyExpanded ? ['history'] : []}
           onChange={(keys) => setHistoryExpanded(Array.isArray(keys) ? keys.includes('history') : keys === 'history')}
@@ -411,28 +429,43 @@ function InlinePriceEntry({
           <Collapse.Panel
             key="history"
             header={
-              <Texto category="h5" style={{ fontSize: 13 }}>
-                Price History ({filteredPriceHistory.length})
-              </Texto>
+              <Horizontal verticalCenter justifyContent="space-between" style={{ width: '100%' }}>
+                <Horizontal verticalCenter gap={16} onClick={(e: any) => e.stopPropagation()}>
+                  <Texto category="h4" style={{ fontWeight: 600 }}>
+                    Price History
+                  </Texto>
+                  <Texto category="h6" style={{ color: 'var(--theme-color-2)', fontWeight: 600 }}>
+                    {filteredPriceHistory.length} Result{filteredPriceHistory.length !== 1 ? 's' : ''}
+                  </Texto>
+                  <Input
+                    prefix={<SearchOutlined style={{ color: 'var(--gray-500)' }} />}
+                    placeholder="Search..."
+                    value={historySearchText}
+                    onChange={(e) => setHistorySearchText(e.target.value)}
+                    allowClear
+                    style={{ width: 200 }}
+                  />
+                </Horizontal>
+                <Horizontal verticalCenter style={{ marginLeft: 'auto' }} onClick={(e: any) => e.stopPropagation()}>
+                  <RangePicker
+                    inputKey="cvPriceHistoryDates"
+                    dates={historyDates}
+                    onChange={(dates) => {
+                      setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
+                      clearConflicts();
+                    }}
+                    placement="bottomRight"
+                    size="small"
+                  />
+                </Horizontal>
+              </Horizontal>
             }
             style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
           >
-            <Horizontal className="pb-2" verticalCenter gap={12}>
-              <RangePicker
-                inputKey="cvPriceHistoryDates"
-                dates={historyDates}
-                onChange={(dates) => {
-                  setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
-                  clearConflicts();
-                }}
-                placement="bottomRight"
-              />
-            </Horizontal>
-
-            <div style={{ flex: 1, minHeight: 200 }}>
+            <div className="price-history-grid" style={{ flex: 1, minHeight: 200 }}>
               <GraviGrid
                 storageKey="CV-PriceHistory"
-                controlBarProps={{ title: '', hideActiveFilters: true, size: 'small' }}
+                controlBarProps={{ title: `${filteredPriceHistory.length} Results`, hideActiveFilters: true, size: 'small' }}
                 agPropOverrides={priceHistoryAgProps}
                 rowData={filteredPriceHistory}
                 columnDefs={priceHistoryColDefs}
@@ -642,6 +675,7 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
       getRowId: (row: any) => row?.data?.FormulaResultComponentId?.toString(),
       suppressDragLeaveHidesColumns: true,
       rowGroupPanelShow: 'never' as const,
+      rowHeight: 44,
     }),
     []
   );
@@ -785,10 +819,14 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
           flex: 1 !important;
         }
         .quoteBook-drawer .ant-collapse-content-box {
-          padding: 8px 16px !important;
+          padding: 0 !important;
           display: flex !important;
           flex-direction: column !important;
           flex: 1 !important;
+        }
+        .price-history-grid .search-control,
+        .price-history-grid .page-control-bar {
+          display: none !important;
         }
         .drawer-resizing .ant-drawer-content-wrapper { transition: none !important; }
       `}</style>

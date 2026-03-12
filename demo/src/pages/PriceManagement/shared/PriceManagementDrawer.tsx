@@ -2,13 +2,16 @@ import {
   CheckCircleFilled,
   CloseCircleFilled,
   CloseOutlined,
+  EditOutlined,
   EnvironmentFilled,
   ExperimentFilled,
+  HistoryOutlined,
   LoadingOutlined,
+  SearchOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, RangePicker, Texto, Vertical } from '@gravitate-js/excalibrr';
-import { Alert, Collapse, DatePicker, Drawer, Form, InputNumber, Modal, Select } from 'antd';
+import { Alert, Collapse, DatePicker, Drawer, Form, Input, InputNumber, Modal, Select } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
@@ -152,6 +155,7 @@ export function PriceManagementDrawer({
 
   // Price history panel open state
   const [historyExpanded, setHistoryExpanded] = useState(true);
+  const [historySearchText, setHistorySearchText] = useState('');
 
   const showEffectiveDates = selectedUploadType === 'EffectiveStart' || selectedUploadType === 'EffectiveDates';
 
@@ -271,6 +275,7 @@ export function PriceManagementDrawer({
       getRowId: (params: any) => params.data.PriceHistoryId.toString(),
       suppressDragLeaveHidesColumns: true,
       rowGroupPanelShow: 'never' as const,
+      quickFilterText: historySearchText,
       getRowClass: (params: any) => {
         if (conflictRowIds.has(params.data?.PriceHistoryId)) {
           return 'price-mgmt-conflict-row';
@@ -278,7 +283,7 @@ export function PriceManagementDrawer({
         return '';
       },
     }),
-    [conflictRowIds]
+    [conflictRowIds, historySearchText]
   );
 
   const instrumentAgProps = useMemo(
@@ -287,7 +292,7 @@ export function PriceManagementDrawer({
       suppressDragLeaveHidesColumns: true,
       rowGroupPanelShow: 'never' as const,
       headerHeight: 32,
-      rowHeight: 36,
+      rowHeight: 44,
     }),
     []
   );
@@ -366,7 +371,7 @@ export function PriceManagementDrawer({
         </div>
 
         {/* ── SECTION 2: INSTRUMENT CONTEXT GRID ────────────────── */}
-        <div style={{ height: 130, flexShrink: 0 }}>
+        <div style={{ height: 138, flexShrink: 0, marginBottom: 16, opacity: 0.92 }}>
           <GraviGrid
             storageKey="PriceMgmt-InstrumentContext"
             controlBarProps={{ title: 'Instrument', hideActiveFilters: true, size: 'small' }}
@@ -378,14 +383,17 @@ export function PriceManagementDrawer({
 
         {/* ── SECTION 3: PRICE ENTRY FORM ───────────────────────── */}
         <div
-          className="px-4 py-3"
           style={{
             borderTop: '2px solid var(--theme-border)',
-            backgroundColor: 'var(--theme-bg-2)',
+            borderLeft: '3px solid var(--theme-color-2)',
+            backgroundColor: 'var(--theme-bg-1)',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04)',
+            padding: '20px 24px',
             flexShrink: 0,
           }}
         >
-          <Texto category="h5" style={{ marginBottom: 10 }}>
+          <Texto category="h5" style={{ marginBottom: 14, fontWeight: 600, letterSpacing: '0.01em' }}>
+            <EditOutlined style={{ marginRight: 6, fontSize: 13 }} />
             Enter Price
           </Texto>
 
@@ -412,14 +420,21 @@ export function PriceManagementDrawer({
             size="small"
           >
             <Horizontal gap={12} style={{ flexWrap: 'wrap' }}>
-              <Form.Item
-                label="Price Value"
-                name="priceValue"
-                rules={[{ required: true, message: 'Required' }]}
-                style={{ flex: 1, minWidth: 120, marginBottom: 8 }}
-              >
-                <InputNumber style={{ width: '100%' }} precision={4} placeholder="0.0000" autoFocus />
-              </Form.Item>
+              <div style={{ width: 140, marginBottom: 8 }}>
+                <Form.Item
+                  label="Price Value"
+                  name="priceValue"
+                  rules={[{ required: true, message: 'Required' }]}
+                  style={{ marginBottom: 0 }}
+                >
+                  <InputNumber style={{ width: '100%', fontSize: 16, fontWeight: 500 }} precision={4} placeholder="0.0000" autoFocus />
+                </Form.Item>
+                {instrumentContext.currentPrice != null && (
+                  <Texto appearance="medium" style={{ fontSize: 11, marginTop: 2 }}>
+                    Current: {formatCurrency(instrumentContext.currentPrice)}
+                  </Texto>
+                )}
+              </div>
 
               <Form.Item label="Status" name="estimateActual" style={{ width: 120, marginBottom: 8 }}>
                 <Select options={[
@@ -473,13 +488,21 @@ export function PriceManagementDrawer({
               )}
             </Horizontal>
 
-            <Horizontal gap={8} style={{ marginTop: 4 }}>
+            <Horizontal verticalCenter gap={8} style={{ marginTop: 4 }}>
               <GraviButton
                 size="small"
                 buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
                 icon={conflictState === 'loading' ? <LoadingOutlined spin /> : undefined}
                 onClick={handleCheckConflicts}
                 disabled={isSaving || conflictState === 'loading'}
+              />
+              <div style={{ flex: 1 }} />
+              <GraviButton
+                size="small"
+                buttonText="Cancel"
+                onClick={handleClose}
+                disabled={isSaving}
+                style={{ border: 'none', boxShadow: 'none' }}
               />
               <GraviButton
                 theme1
@@ -488,8 +511,8 @@ export function PriceManagementDrawer({
                 buttonText={isSaving ? 'Saving...' : 'Save'}
                 onClick={() => form.submit()}
                 disabled={isSaving}
+                style={{ minWidth: 80 }}
               />
-              <GraviButton size="small" buttonText="Cancel" onClick={handleClose} disabled={isSaving} />
             </Horizontal>
           </Form>
         </div>
@@ -519,7 +542,7 @@ export function PriceManagementDrawer({
         )}
 
         {/* ── SECTION 4: PRICE HISTORY PANEL ────────────────────── */}
-        <Vertical flex="1" style={{ minHeight: 0, overflow: 'hidden' }}>
+        <Vertical flex="1" style={{ minHeight: 0, overflow: 'hidden', marginTop: 16, backgroundColor: 'var(--theme-bg-2)', borderTop: '1px solid var(--theme-border)' }}>
           <Collapse
             activeKey={historyExpanded ? ['history'] : []}
             onChange={(keys) => setHistoryExpanded(Array.isArray(keys) ? keys.includes('history') : keys === 'history')}
@@ -528,30 +551,44 @@ export function PriceManagementDrawer({
             <Collapse.Panel
               key="history"
               header={
-                <Texto category="h5" style={{ fontSize: 13 }}>
-                  Price History ({filteredPriceHistory.length})
-                </Texto>
+                <Horizontal verticalCenter justifyContent="space-between" style={{ width: '100%' }}>
+                  <Horizontal verticalCenter gap={16} onClick={(e: any) => e.stopPropagation()}>
+                    <Texto category="h4" style={{ fontWeight: 600 }}>
+                      Price History
+                    </Texto>
+                    <Texto category="h6" style={{ color: 'var(--theme-color-2)', fontWeight: 600 }}>
+                      {filteredPriceHistory.length} Result{filteredPriceHistory.length !== 1 ? 's' : ''}
+                    </Texto>
+                    <Input
+                      prefix={<SearchOutlined style={{ color: 'var(--gray-500)' }} />}
+                      placeholder="Search..."
+                      value={historySearchText}
+                      onChange={(e) => setHistorySearchText(e.target.value)}
+                      allowClear
+                      style={{ width: 200 }}
+                    />
+                  </Horizontal>
+                  <Horizontal verticalCenter style={{ marginLeft: 'auto' }} onClick={(e: any) => e.stopPropagation()}>
+                    <RangePicker
+                      inputKey="priceHistoryDates"
+                      dates={historyDates}
+                      onChange={(dates) => {
+                        setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
+                        clearConflicts();
+                      }}
+                      placement="bottomRight"
+                      size="small"
+                    />
+                  </Horizontal>
+                </Horizontal>
               }
               style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
             >
-              {/* Date range filter */}
-              <Horizontal className="pb-2" verticalCenter gap={12}>
-                <RangePicker
-                  inputKey="priceHistoryDates"
-                  dates={historyDates}
-                  onChange={(dates) => {
-                    setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
-                    clearConflicts();
-                  }}
-                  placement="bottomRight"
-                />
-              </Horizontal>
-
               {/* Price history grid */}
-              <div style={{ flex: 1, minHeight: 200 }}>
+              <div className="price-history-grid" style={{ flex: 1, minHeight: 200 }}>
                 <GraviGrid
                   storageKey="PriceMgmt-PriceHistory"
-                  controlBarProps={{ title: '', hideActiveFilters: true, size: 'small' }}
+                  controlBarProps={{ title: `${filteredPriceHistory.length} Results`, hideActiveFilters: true, size: 'small' }}
                   agPropOverrides={priceHistoryAgProps}
                   rowData={filteredPriceHistory}
                   columnDefs={priceHistoryColDefs}
@@ -581,10 +618,14 @@ export function PriceManagementDrawer({
           flex: 1 !important;
         }
         .price-management-drawer .ant-collapse-content-box {
-          padding: 8px 16px !important;
+          padding: 0 !important;
           display: flex;
           flex-direction: column;
           flex: 1;
+        }
+        .price-history-grid .search-control,
+        .price-history-grid .page-control-bar {
+          display: none !important;
         }
         .drawer-resizing .ant-drawer-content-wrapper {
           transition: none !important;
