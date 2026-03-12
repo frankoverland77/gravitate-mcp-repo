@@ -67,6 +67,7 @@ import {
   CellRenderersShowcase,
   GridShowcase,
 } from './pages/DesignSystem';
+import { AllPricesPage, ContractValuesPage } from './pages/PriceManagement';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -364,7 +365,7 @@ export const demoRegistry: DemoRoute[] = [
     ),
     path: '/QuotebookQoL/PriceEntry',
     description:
-      'Inline price entry in valuation drawer with conditional date fields, save & revalue flow — Story 4 from Quotebook QoL epic',
+      'Stacked price entry drawer with price history grid, date range filter, conflict check, and save & revalue flow — Story 4 from Quotebook QoL epic',
     created: new Date().toISOString(),
     category: 'grids',
   },
@@ -967,7 +968,40 @@ export const createPageConfig = (): PageConfig => {
           </ThemeRouteWrapper>
         ),
         path: '/QuotebookQoL/PriceEntry',
-        description: 'Inline price entry in valuation drawer with save & revalue flow',
+        description: 'Stacked price entry drawer with price history grid, conflict check, and save & revalue flow',
+      },
+    ],
+  };
+
+  config.PriceManagement = {
+    hasPermission: () => true,
+    key: 'PriceManagement',
+    icon: <DollarOutlined />,
+    title: 'Price Management',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'AllPrices',
+        title: 'All Prices',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <AllPricesPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/PriceManagement/AllPrices',
+        description: 'View all price instruments with inline price upload via reusable drawer',
+      },
+      {
+        hasPermission: () => true,
+        key: 'ContractValues',
+        title: 'Contract Values',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ContractValuesPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/PriceManagement/ContractValues',
+        description: 'Contract values with formula breakdown drawer and stacked price entry',
       },
     ],
   };

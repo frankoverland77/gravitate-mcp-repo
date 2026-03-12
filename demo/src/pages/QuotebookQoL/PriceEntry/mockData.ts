@@ -2,6 +2,19 @@
 
 export type UploadType = 'Posting' | 'EffectiveStart' | 'EffectiveDates';
 
+export interface PriceHistoryRow {
+  PriceHistoryId: number;
+  InstrumentName: string;
+  PriceType: string;
+  PriceValue: number;
+  EffectiveFrom: string;
+  EffectiveTo: string;
+  Publisher: string;
+  Product: string;
+  Location: string;
+  Updated: string;
+}
+
 export interface PriceEntryResultComponent {
   FormulaResultComponentId: number;
   ComponentDisplayName: string;
@@ -299,7 +312,7 @@ export const mockFormulaBreakdowns: Record<number, PriceEntryFormulaDetail> = {
     ],
   },
 
-  // Shell Unleaded Premium - EffectiveDates upload type
+  // Shell Unleaded Premium — EffectiveDates upload type
   2004: {
     FilledFormula: '(OPIS_UNL_PREM_HSC + 0.0560) * 1.00',
     IsMissingPrices: false,
@@ -361,4 +374,63 @@ export const mockFormulaBreakdowns: Record<number, PriceEntryFormulaDetail> = {
       },
     ],
   },
+};
+
+// ─── Mock Price History Data ────────────────────────────────────────────────
+// Keyed by PriceInstrumentId. Each instrument has prices spanning Mar 8-13 2026
+// so the default filter (yesterday through tomorrow = Mar 10-12) shows a subset.
+
+export const mockPriceHistory: Record<number, PriceHistoryRow[]> = {
+  // OPIS ULSD Chicago Group 3
+  5001: [
+    { PriceHistoryId: 1001, InstrumentName: 'OPIS ULSD Chicago Group 3', PriceType: 'Rack', PriceValue: 2.3920, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-08T14:00:00' },
+    { PriceHistoryId: 1002, InstrumentName: 'OPIS ULSD Chicago Group 3', PriceType: 'Rack', PriceValue: 2.3985, EffectiveFrom: '2026-03-09T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-09T14:15:00' },
+    { PriceHistoryId: 1003, InstrumentName: 'OPIS ULSD Chicago Group 3', PriceType: 'Rack', PriceValue: 2.4050, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-10T14:30:00' },
+    { PriceHistoryId: 1004, InstrumentName: 'OPIS ULSD Chicago Group 3', PriceType: 'Rack', PriceValue: 2.4117, EffectiveFrom: '2026-03-11T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-11T08:15:00' },
+    { PriceHistoryId: 1005, InstrumentName: 'OPIS ULSD Chicago Group 3', PriceType: 'Rack', PriceValue: 2.4200, EffectiveFrom: '2026-03-12T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-11T16:00:00' },
+  ],
+  // Chicago Terminal Basis
+  5002: [
+    { PriceHistoryId: 1011, InstrumentName: 'Chicago Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0440, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-08T10:00:00' },
+    { PriceHistoryId: 1012, InstrumentName: 'Chicago Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0450, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-10T09:30:00' },
+    { PriceHistoryId: 1013, InstrumentName: 'Chicago Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0460, EffectiveFrom: '2026-03-12T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'ULSD', Location: 'Chicago Terminal', Updated: '2026-03-11T17:00:00' },
+  ],
+  // OPIS ULSD Tulsa Group 3
+  5003: [
+    { PriceHistoryId: 1021, InstrumentName: 'OPIS ULSD Tulsa Group 3', PriceType: 'Rack', PriceValue: 2.3410, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-08T14:00:00' },
+    { PriceHistoryId: 1022, InstrumentName: 'OPIS ULSD Tulsa Group 3', PriceType: 'Rack', PriceValue: 2.3500, EffectiveFrom: '2026-03-09T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-09T14:10:00' },
+    { PriceHistoryId: 1023, InstrumentName: 'OPIS ULSD Tulsa Group 3', PriceType: 'Rack', PriceValue: 2.3570, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-10T14:20:00' },
+    { PriceHistoryId: 1024, InstrumentName: 'OPIS ULSD Tulsa Group 3', PriceType: 'Rack', PriceValue: 2.3650, EffectiveFrom: '2026-03-11T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-11T08:30:00' },
+  ],
+  // Tulsa Terminal Basis
+  5004: [
+    { PriceHistoryId: 1031, InstrumentName: 'Tulsa Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0310, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-08T09:00:00' },
+    { PriceHistoryId: 1032, InstrumentName: 'Tulsa Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0320, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '2026-03-31T23:59:59', Publisher: 'Internal', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-10T09:15:00' },
+    { PriceHistoryId: 1033, InstrumentName: 'Tulsa Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0330, EffectiveFrom: '2026-03-12T00:00:00', EffectiveTo: '2026-03-31T23:59:59', Publisher: 'Internal', Product: 'ULSD', Location: 'Tulsa Refinery', Updated: '2026-03-11T16:45:00' },
+  ],
+  // OPIS Jet Fuel Port Arthur (missing price scenario — only old prices)
+  5005: [
+    { PriceHistoryId: 1041, InstrumentName: 'OPIS Jet Fuel Port Arthur', PriceType: 'Rack', PriceValue: 2.5100, EffectiveFrom: '2026-03-06T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Jet Fuel', Location: 'Port Arthur', Updated: '2026-03-06T14:00:00' },
+    { PriceHistoryId: 1042, InstrumentName: 'OPIS Jet Fuel Port Arthur', PriceType: 'Rack', PriceValue: 2.5250, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Jet Fuel', Location: 'Port Arthur', Updated: '2026-03-08T14:15:00' },
+    { PriceHistoryId: 1043, InstrumentName: 'OPIS Jet Fuel Port Arthur', PriceType: 'Rack', PriceValue: 2.5380, EffectiveFrom: '2026-03-09T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Jet Fuel', Location: 'Port Arthur', Updated: '2026-03-09T14:30:00' },
+  ],
+  // Port Arthur Terminal Basis
+  5006: [
+    { PriceHistoryId: 1051, InstrumentName: 'Port Arthur Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0490, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'Jet Fuel', Location: 'Port Arthur', Updated: '2026-03-08T10:00:00' },
+    { PriceHistoryId: 1052, InstrumentName: 'Port Arthur Terminal Basis', PriceType: 'Adjustment', PriceValue: 0.0500, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'Jet Fuel', Location: 'Port Arthur', Updated: '2026-03-10T09:00:00' },
+  ],
+  // OPIS Unleaded Premium Houston SC
+  5007: [
+    { PriceHistoryId: 1061, InstrumentName: 'OPIS Unleaded Premium Houston SC', PriceType: 'Rack', PriceValue: 2.6050, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-08T14:00:00' },
+    { PriceHistoryId: 1062, InstrumentName: 'OPIS Unleaded Premium Houston SC', PriceType: 'Rack', PriceValue: 2.6140, EffectiveFrom: '2026-03-09T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-09T14:20:00' },
+    { PriceHistoryId: 1063, InstrumentName: 'OPIS Unleaded Premium Houston SC', PriceType: 'Rack', PriceValue: 2.6229, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-10T14:30:00' },
+    { PriceHistoryId: 1064, InstrumentName: 'OPIS Unleaded Premium Houston SC', PriceType: 'Rack', PriceValue: 2.6310, EffectiveFrom: '2026-03-11T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-11T08:00:00' },
+    { PriceHistoryId: 1065, InstrumentName: 'OPIS Unleaded Premium Houston SC', PriceType: 'Rack', PriceValue: 2.6400, EffectiveFrom: '2026-03-12T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'OPIS', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-11T16:30:00' },
+  ],
+  // Houston SC Premium Basis
+  5008: [
+    { PriceHistoryId: 1071, InstrumentName: 'Houston SC Premium Basis', PriceType: 'Adjustment', PriceValue: 0.0550, EffectiveFrom: '2026-03-08T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-08T10:00:00' },
+    { PriceHistoryId: 1072, InstrumentName: 'Houston SC Premium Basis', PriceType: 'Adjustment', PriceValue: 0.0560, EffectiveFrom: '2026-03-10T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-10T09:30:00' },
+    { PriceHistoryId: 1073, InstrumentName: 'Houston SC Premium Basis', PriceType: 'Adjustment', PriceValue: 0.0570, EffectiveFrom: '2026-03-12T00:00:00', EffectiveTo: '9999-12-31T23:59:59', Publisher: 'Internal', Product: 'Unleaded Premium', Location: 'Houston Ship Channel', Updated: '2026-03-11T17:00:00' },
+  ],
 };

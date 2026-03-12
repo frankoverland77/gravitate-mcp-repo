@@ -37,6 +37,8 @@ const DEFAULT_SCOPES = {
   PriceElasticity: true,
   QuotebookWholesale: true,
   QuotePricing: true,
+  QuotebookQoL: true,
+  PriceManagement: true,
 };
 
 export function AuthenticatedRoute() {
@@ -60,7 +62,6 @@ export function AuthenticatedRoute() {
     }
     return DEFAULT_SCOPES;
   }, [scopeVersion]);
-
   return (
     <FeatureModeProvider>
       <ProductFormulaProvider>
