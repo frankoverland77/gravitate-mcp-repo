@@ -6,12 +6,10 @@ const FIELD_MAP: Record<string, (row: QuoteRow) => number | null> = {
   'Cost': (row) => row.prior_lastPrice,
   'Market Move': (row) => row.proposed_marketMove,
   'Price Delta': (row) => row.proposed_delta,
-  'Price': (row) => row.proposed_price,
-  'Bench Delta': (row) => Math.abs(row.benchmark_ulsd - row.proposed_price),
-  'Bench Value': () => null,
+  'Ref Strategy to Price': (row) => Math.abs(row.benchmark_ulsd - row.proposed_price),
 }
 
-const ABSOLUTE_COMPONENTS = new Set(['Market Move', 'Bench Delta'])
+const ABSOLUTE_COMPONENTS = new Set(['Market Move', 'Ref Strategy to Price'])
 
 function evaluateComponent(
   row: QuoteRow,

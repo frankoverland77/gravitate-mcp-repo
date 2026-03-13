@@ -394,10 +394,10 @@ function OverrideForm({
   const [overwriteExisting, setOverwriteExisting] = useState(false)
 
   const componentOptions = [
-    'Margin', 'Cost', 'Market Move', 'Price Delta', 'Price', 'Bench Delta', 'Bench Value',
+    'Margin', 'Cost', 'Market Move', 'Price Delta', 'Ref Strategy to Price',
   ]
 
-  const isAbsolute = component === 'Market Move' || component === 'Bench Delta'
+  const isAbsolute = component === 'Market Move' || component === 'Ref Strategy to Price'
 
   const handleSubmit = () => {
     if (!component) {
@@ -453,7 +453,7 @@ function OverrideForm({
           onChange={val => {
             setComponent(val)
             // Reset below fields for absolute components
-            if (val === 'Market Move' || val === 'Bench Delta') {
+            if (val === 'Market Move' || val === 'Ref Strategy to Price') {
               setCriticalBelow(null)
               setWarningBelow(null)
             }

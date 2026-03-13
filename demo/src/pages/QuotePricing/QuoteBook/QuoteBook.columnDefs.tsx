@@ -1,13 +1,16 @@
 import { ColDef, ColGroupDef, ICellRendererParams } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
-import { HistoryOutlined } from '@ant-design/icons'
-import type { ExceptionProfile, EvaluationResult } from './QuoteBook.types'
+import { HistoryOutlined, StopFilled, WarningFilled } from '@ant-design/icons'
+import type { ExceptionProfile, EvaluationResult, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
+import { PROPOSED_COMPONENTS, CURRENT_COMPONENTS } from './QuoteBook.types'
 
 type ColumnOptions = {
   onHistoryClick: () => void
   evaluationMap?: Map<number, EvaluationResult>
   profileMap?: Record<string, ExceptionProfile>
   isFutureMode?: boolean
+  periodDisplay?: PeriodDisplay
+  periodToggleValue?: PeriodToggleValue
 }
 
 function getViolationStyle(
@@ -66,96 +69,135 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
   },
   ]
 
-  const exceptionCols: (ColDef | ColGroupDef)[] = [{
-    headerName: 'Exceptions',
-    children: [
-      {
-        headerName: '',
-        field: 'exceptionCount',
-        width: 56,
-        suppressMenu: true,
-        cellRenderer: (params: ICellRendererParams) => {
-          if (!params.data) return null
-          const { exceptionType, exceptionCount } = params.data
-          if (!exceptionType || exceptionType === 'clean' || !exceptionCount) return null
-          const bg = exceptionType === 'hard' ? '#dc2626' : '#d97706'
-          return (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 22,
-              height: 22,
-              minWidth: 22,
-              flexShrink: 0,
-              borderRadius: '50%',
-              background: bg,
-              color: '#fff',
-              fontSize: 11,
-              fontWeight: 700,
-              lineHeight: 1,
-            }}>
-              {exceptionCount}
-            </span>
-          )
+  function buildExceptionGroup(
+    groupName: string,
+    filterComponents: readonly string[] | null,
+    groupOptions?: { marryChildren?: boolean; includeProfile?: boolean },
+  ): ColGroupDef {
+    const filterSet = filterComponents ? new Set(filterComponents) : null
+
+    return {
+      headerName: groupName,
+      ...(groupOptions?.marryChildren ? { marryChildren: true } : {}),
+      children: [
+        {
+          headerName: '',
+          field: filterComponents ? `exceptionCount_${groupName}` : 'exceptionCount',
+          colId: `exceptionCount_${groupName}`,
+          width: 100,
+          suppressMenu: true,
+          cellRenderer: (params: ICellRendererParams) => {
+            if (!params.data) return null
+            const result = options.evaluationMap?.get(params.data.id)
+            if (!result) return null
+
+            const violations = filterSet
+              ? result.violations.filter(v => filterSet.has(v.component))
+              : result.violations
+            if (violations.length === 0) return null
+
+            const hasHard = violations.some(v => v.severity === 'Hard')
+            const Icon = hasHard ? StopFilled : WarningFilled
+            const iconColor = hasHard ? '#dc2626' : '#d97706'
+            const label = hasHard ? 'Urgent' : 'Caution'
+
+            return (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                whiteSpace: 'nowrap',
+              }}>
+                <Icon style={{ color: iconColor, fontSize: 14 }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#1f2937' }}>
+                  {violations.length}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>
+                  {label}
+                </span>
+              </span>
+            )
+          },
         },
-      },
-      {
-        headerName: 'Details',
-        field: 'exceptions',
-        width: 180,
-        cellRenderer: (params: ICellRendererParams) => {
-          if (!params.data) return null
-          const result = options.evaluationMap?.get(params.data.id)
-          const violations = result?.violations || []
-          if (violations.length === 0) return null
-          return (
-            <span style={{ display: 'flex', gap: 4, alignItems: 'center', height: '100%' }}>
-              {violations.slice(0, 2).map((v, i) => (
-                <BBDTag key={i} error={v.severity === 'Hard'} warning={v.severity === 'Soft'} style={{ margin: 0, fontSize: 11, width: 'fit-content' }}>
-                  {v.component}
-                </BBDTag>
-              ))}
-              {violations.length > 2 && (
-                <BBDTag style={{ margin: 0, fontSize: 11, width: 'fit-content' }}>+{violations.length - 2}</BBDTag>
-              )}
-            </span>
-          )
+        {
+          headerName: 'Details',
+          field: filterComponents ? `exceptions_${groupName}` : 'exceptions',
+          colId: `exceptions_${groupName}`,
+          width: 180,
+          cellRenderer: (params: ICellRendererParams) => {
+            if (!params.data) return null
+            const result = options.evaluationMap?.get(params.data.id)
+            const allViolations = result?.violations || []
+            const violations = filterSet
+              ? allViolations.filter(v => filterSet.has(v.component))
+              : allViolations
+            if (violations.length === 0) return null
+            return (
+              <span style={{ display: 'flex', gap: 4, alignItems: 'center', height: '100%' }}>
+                {violations.slice(0, 2).map((v, i) => (
+                  <BBDTag key={i} error={v.severity === 'Hard'} warning={v.severity === 'Soft'} style={{ margin: 0, fontSize: 11, width: 'fit-content' }}>
+                    {v.component}
+                  </BBDTag>
+                ))}
+                {violations.length > 2 && (
+                  <BBDTag style={{ margin: 0, fontSize: 11, width: 'fit-content' }}>+{violations.length - 2}</BBDTag>
+                )}
+              </span>
+            )
+          },
         },
-      },
-      ...(options.isFutureMode ? [{
-        headerName: 'Profile',
-        field: 'profileKey',
-        width: 155,
-        cellRenderer: (params: ICellRendererParams) => {
-          if (!params.data || !params.data.profileKey) return null
-          const profile = options.profileMap?.[params.data.profileKey]
-          if (!profile) return null
-          const hasOverrides = params.data.overrides && params.data.overrides.length > 0
-          const bg = hasOverrides ? '#fffbeb' : '#eff6ff'
-          const color = hasOverrides ? '#d97706' : '#2563eb'
-          return (
-            <span style={{
-              display: 'inline-block',
-              padding: '2px 8px',
-              borderRadius: 10,
-              fontSize: 11,
-              fontWeight: 500,
-              background: bg,
-              color: color,
-              lineHeight: '18px',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxWidth: 140,
-            }}>
-              {hasOverrides ? `${profile.name} (Override)` : profile.name}
-            </span>
-          )
-        },
-      }] : []),
-    ],
-  }]
+        ...((groupOptions?.includeProfile !== false && options.isFutureMode) ? [{
+          headerName: 'Profile',
+          field: 'profileKey',
+          width: 155,
+          cellRenderer: (params: ICellRendererParams) => {
+            if (!params.data || !params.data.profileKey) return null
+            const profile = options.profileMap?.[params.data.profileKey]
+            if (!profile) return null
+            const hasOverrides = params.data.overrides && params.data.overrides.length > 0
+            const bg = hasOverrides ? '#fffbeb' : '#eff6ff'
+            const color = hasOverrides ? '#d97706' : '#2563eb'
+            return (
+              <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                <span style={{
+                  display: 'inline-block',
+                  padding: '2px 8px',
+                  borderRadius: 10,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  background: bg,
+                  color: color,
+                  lineHeight: '18px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 140,
+                }}>
+                  {hasOverrides ? `${profile.name} (Override)` : profile.name}
+                </span>
+              </span>
+            )
+          },
+        }] : []),
+      ],
+    }
+  }
+
+  const periodDisplay = options.periodDisplay || 'neither'
+  const periodToggleValue = options.periodToggleValue || 'proposed'
+
+  let exceptionCols: ColGroupDef[]
+  if (periodDisplay === 'column-families') {
+    exceptionCols = [
+      buildExceptionGroup('Proposed', PROPOSED_COMPONENTS, { marryChildren: true, includeProfile: true }),
+      buildExceptionGroup('Current', CURRENT_COMPONENTS, { marryChildren: true, includeProfile: false }),
+    ]
+  } else if (periodDisplay === 'toggle') {
+    const activeComponents = periodToggleValue === 'proposed' ? PROPOSED_COMPONENTS : CURRENT_COMPONENTS
+    exceptionCols = [buildExceptionGroup('Exceptions', activeComponents)]
+  } else {
+    exceptionCols = [buildExceptionGroup('Exceptions', null)]
+  }
 
   const restCols: (ColDef | ColGroupDef)[] = [
   {
@@ -216,8 +258,6 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
         valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
         cellStyle: (params) => {
           if (!params.data) return null
-          const violation = getViolationStyle(options.evaluationMap, params.data.id, 'Price')
-          if (violation) return violation
           if (params.data.proposed_price !== params.data.prior_lastPrice) {
             return { backgroundColor: 'rgba(var(--theme-color-1-rgb, 24, 144, 255), 0.08)' }
           }

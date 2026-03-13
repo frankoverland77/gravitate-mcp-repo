@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { GraviGrid, Vertical, Horizontal } from '@gravitate-js/excalibrr'
 import { Modal, message, Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
@@ -15,7 +15,7 @@ import { QuoteBookHistoryDrawer } from './components/QuoteBookHistoryDrawer'
 import { QuoteBookProfileChip } from './components/QuoteBookProfileChip'
 import { QuoteBookExceptionDrawer } from './components/QuoteBookExceptionDrawer'
 import { QuoteBookViewSettingsDrawer } from './components/QuoteBookViewSettingsDrawer'
-import type { DrawerState, ExceptionProfile, ThresholdOverride } from './QuoteBook.types'
+import type { DrawerState, ExceptionProfile, ThresholdOverride, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
 import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 
 export function QuoteBook() {
@@ -32,6 +32,15 @@ export function QuoteBook() {
   const gridApiRef = useRef<any>(null)
   const [publishModalVisible, setPublishModalVisible] = useState(false)
   const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false)
+  const [periodDisplay, setPeriodDisplay] = useState<PeriodDisplay>(() => {
+    return (localStorage.getItem('quotebook-period-display') as PeriodDisplay) || 'neither'
+  })
+  const [periodToggleValue, setPeriodToggleValue] = useState<PeriodToggleValue>('proposed')
+
+  useEffect(() => {
+    localStorage.setItem('quotebook-period-display', periodDisplay)
+  }, [periodDisplay])
+
   const [drawerState, setDrawerState] = useState<DrawerState>({
     isOpen: true,
     mode: 'empty',
@@ -215,7 +224,9 @@ export function QuoteBook() {
     evaluationMap,
     profileMap,
     isFutureMode,
-  }), [evaluationMap, profileMap, isFutureMode])
+    periodDisplay: isFutureMode ? periodDisplay : 'neither',
+    periodToggleValue,
+  }), [evaluationMap, profileMap, isFutureMode, periodDisplay, periodToggleValue])
 
   // Drive drawer state machine from grid row selection
   const handleSelectionChanged = useCallback((event: any) => {
@@ -342,6 +353,9 @@ export function QuoteBook() {
                       setShowSpreadRows={setShowSpreadRows}
                       publishMode={publishMode}
                       onManageThresholds={isFutureMode ? handleDrawerOpen : undefined}
+                      periodDisplay={isFutureMode ? periodDisplay : undefined}
+                      periodToggleValue={periodToggleValue}
+                      onPeriodToggleChange={setPeriodToggleValue}
                     />
                   </Horizontal>
                 ),
@@ -367,15 +381,23 @@ export function QuoteBook() {
         </div>
       </div>
 
-      <QuoteBookFooter
-        publicationMode={publicationMode}
-        publishMode={publishMode}
-        setPublishMode={setPublishMode}
-        dirtyCount={dirtyCount}
-        onPublish={handlePublish}
-        onReset={() => setDirtyCount(0)}
-        hardExceptionCount={hardExceptionCount}
-      />
+      <div style={{
+        maxHeight: isFutureMode && drawerState.isOpen ? 0 : 60,
+        opacity: isFutureMode && drawerState.isOpen ? 0 : 1,
+        transform: isFutureMode && drawerState.isOpen ? 'translateY(20px)' : 'translateY(0)',
+        overflow: 'hidden',
+        transition: 'max-height 300ms ease, opacity 300ms ease, transform 300ms ease',
+      }}>
+        <QuoteBookFooter
+          publicationMode={publicationMode}
+          publishMode={publishMode}
+          setPublishMode={setPublishMode}
+          dirtyCount={dirtyCount}
+          onPublish={handlePublish}
+          onReset={() => setDirtyCount(0)}
+          hardExceptionCount={hardExceptionCount}
+        />
+      </div>
       <QuoteBookHistoryDrawer
         open={isHistoryDrawerOpen}
         onClose={() => setIsHistoryDrawerOpen(false)}
@@ -445,6 +467,8 @@ export function QuoteBook() {
       <QuoteBookViewSettingsDrawer
         open={settingsDrawerVisible}
         onClose={() => setSettingsDrawerVisible(false)}
+        periodDisplay={periodDisplay}
+        onPeriodDisplayChange={setPeriodDisplay}
       />
     </Vertical>
   )

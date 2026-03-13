@@ -105,7 +105,7 @@ export function PriceExceptionsTab() {
               <Horizontal className="gap-8">
                 <GraviButton
                   buttonText={
-                    isBulkChangeVisible ? 'Exit Bulk Edit' : 'Bulk Edit'
+                    isBulkChangeVisible ? 'Exit Bulk Change' : 'Bulk Change'
                   }
                   icon={<EditOutlined />}
                   onClick={() => setIsBulkChangeVisible((v) => !v)}

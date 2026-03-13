@@ -1,0 +1,581 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "menu-unfold" [ref=e7] [cursor=pointer]:
+        - img "menu-unfold" [ref=e8]:
+          - img [ref=e9]
+      - paragraph [ref=e12]:
+        - img "book" [ref=e14]:
+          - img [ref=e15]
+        - text: Quote Pricing
+    - generic [ref=e18]:
+      - heading "Quote Book" [level=5] [ref=e20]:
+        - link "Quote Book" [ref=e21] [cursor=pointer]:
+          - /url: /QuotePricing/QuoteBook
+      - heading "Manage Quote Rows" [level=5] [ref=e23]:
+        - link "Manage Quote Rows" [ref=e24] [cursor=pointer]:
+          - /url: /QuotePricing/ManageQuoteRows
+    - generic [ref=e26] [cursor=pointer]:
+      - paragraph [ref=e28]: Demo User
+      - generic [ref=e31]: DE
+  - generic [ref=e32]:
+    - complementary [ref=e33]:
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - generic:
+            - img "search" [ref=e39]:
+              - img [ref=e40]
+            - text: Search
+            - img "mac-command" [ref=e44]:
+              - img [ref=e45]
+            - generic [ref=e48]: K
+        - generic [ref=e49]:
+          - link "smile Sandbox" [ref=e51] [cursor=pointer]:
+            - /url: /Sandbox
+            - img "smile" [ref=e53]:
+              - img [ref=e54]
+            - paragraph [ref=e56]: Sandbox
+          - generic [ref=e57]:
+            - generic [ref=e58] [cursor=pointer]:
+              - img "bg-colors" [ref=e60]:
+                - img [ref=e61]
+              - paragraph [ref=e63]: Design System
+            - generic:
+              - link "Typography" [ref=e66] [cursor=pointer]:
+                - /url: /DesignSystem/Typography
+                - paragraph: Typography
+              - link "Buttons" [ref=e68] [cursor=pointer]:
+                - /url: /DesignSystem/Buttons
+                - paragraph: Buttons
+              - link "Tags" [ref=e70] [cursor=pointer]:
+                - /url: /DesignSystem/Tags
+                - paragraph: Tags
+              - link "Data Display" [ref=e72] [cursor=pointer]:
+                - /url: /DesignSystem/DataDisplay
+                - paragraph: Data Display
+              - link "Headers" [ref=e74] [cursor=pointer]:
+                - /url: /DesignSystem/Headers
+                - paragraph: Headers
+              - link "Layout" [ref=e76] [cursor=pointer]:
+                - /url: /DesignSystem/Layout
+                - paragraph: Layout
+              - link "Date & Time" [ref=e78] [cursor=pointer]:
+                - /url: /DesignSystem/DateTime
+                - paragraph: Date & Time
+              - link "Form Controls" [ref=e80] [cursor=pointer]:
+                - /url: /DesignSystem/FormControls
+                - paragraph: Form Controls
+              - link "Feedback" [ref=e82] [cursor=pointer]:
+                - /url: /DesignSystem/Feedback
+                - paragraph: Feedback
+              - link "Navigation" [ref=e84] [cursor=pointer]:
+                - /url: /DesignSystem/DSNavigation
+                - paragraph: Navigation
+              - link "Cell Renderers" [ref=e86] [cursor=pointer]:
+                - /url: /DesignSystem/CellRenderers
+                - paragraph: Cell Renderers
+              - link "Grid" [ref=e88] [cursor=pointer]:
+                - /url: /DesignSystem/Grid
+                - paragraph: Grid
+          - generic [ref=e89]:
+            - generic [ref=e90] [cursor=pointer]:
+              - img "shop" [ref=e92]:
+                - img [ref=e93]
+              - paragraph [ref=e95]: Bakery
+            - generic:
+              - link "Bakery Products" [ref=e98] [cursor=pointer]:
+                - /url: /Bakery/BakeryProducts
+                - paragraph: Bakery Products
+              - link "Formula Manager" [ref=e100] [cursor=pointer]:
+                - /url: /Bakery/FormulaManager
+                - paragraph: Formula Manager
+              - link "Delivery Management" [ref=e102] [cursor=pointer]:
+                - /url: /Bakery/DeliveryManagement
+                - paragraph: Delivery Management
+              - link "Supplier Price Analysis" [ref=e104] [cursor=pointer]:
+                - /url: /Bakery/SupplierAnalysis
+                - paragraph: Supplier Price Analysis
+              - link "Supplier Details" [ref=e106] [cursor=pointer]:
+                - /url: /Bakery/SupplierDetails
+                - paragraph: Supplier Details
+              - link "Contract Measurement" [ref=e108] [cursor=pointer]:
+                - /url: /Bakery/ContractMeasurementGrid
+                - paragraph: Contract Measurement
+              - link "Measurement Details" [ref=e110] [cursor=pointer]:
+                - /url: /Bakery/ContractMeasurementDetails
+                - paragraph: Measurement Details
+              - link "Delivered Pricing" [ref=e112] [cursor=pointer]:
+                - /url: /Bakery/DeliveredPricingQuoteBook
+                - paragraph: Delivered Pricing
+              - link "Quotebook Wholesale" [ref=e114] [cursor=pointer]:
+                - /url: /Bakery/QuotebookWholesale
+                - paragraph: Quotebook Wholesale
+          - generic [ref=e115]:
+            - generic [ref=e116] [cursor=pointer]:
+              - img "edit" [ref=e118]:
+                - img [ref=e119]
+              - paragraph [ref=e121]: Forms
+            - link "Customer Form" [ref=e124] [cursor=pointer]:
+              - /url: /Forms/CustomerForm
+              - paragraph: Customer Form
+          - generic [ref=e125]:
+            - generic [ref=e126] [cursor=pointer]:
+              - img "calculator" [ref=e128]:
+                - img [ref=e129]
+              - paragraph [ref=e131]: Contract Management
+            - generic:
+              - link "Prompts" [ref=e134] [cursor=pointer]:
+                - /url: /ContractFormulas/PromptsGrid
+                - paragraph: Prompts
+              - link "Formula Templates" [ref=e136] [cursor=pointer]:
+                - /url: /ContractFormulas/FormulaTemplates
+                - paragraph: Formula Templates
+              - link "Formula Template Details" [ref=e138] [cursor=pointer]:
+                - /url: /ContractFormulas/FormulaTemplateDetails
+                - paragraph: Formula Template Details
+              - link "Contract Details" [ref=e140] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractDetails
+                - paragraph: Contract Details
+              - link "RFP Management" [ref=e142] [cursor=pointer]:
+                - /url: /ContractFormulas/RFPManagement
+                - paragraph: RFP Management
+              - link "Seller RFP Response" [ref=e144] [cursor=pointer]:
+                - /url: /ContractFormulas/SellerRFPResponse
+                - paragraph: Seller RFP Response
+          - link "global Buy Now" [ref=e146] [cursor=pointer]:
+            - /url: /OnlineSellingPlatform
+            - img "global" [ref=e148]:
+              - img [ref=e149]
+            - paragraph [ref=e151]: Buy Now
+          - generic [ref=e152]:
+            - generic [ref=e153] [cursor=pointer]:
+              - img "shop" [ref=e155]:
+                - img [ref=e156]
+              - paragraph [ref=e158]: Market Platform
+            - generic:
+              - link "Index Offer Management" [ref=e161] [cursor=pointer]:
+                - /url: /MarketPlatform/IndexOfferManagement
+                - paragraph: Index Offer Management
+              - link "Index Offer Buy Now" [ref=e163] [cursor=pointer]:
+                - /url: /MarketPlatform/IndexOfferBuyNow
+                - paragraph: Index Offer Buy Now
+          - generic [ref=e164]:
+            - generic [ref=e165] [cursor=pointer]:
+              - img "dashboard" [ref=e167]:
+                - img [ref=e168]
+              - paragraph [ref=e170]: Supplier Analysis
+            - generic:
+              - link "Supplier Price Analysis" [ref=e173] [cursor=pointer]:
+                - /url: /SupplierAnalysis/SupplierProfileAnalysis
+                - paragraph: Supplier Price Analysis
+              - link "Supplier Details" [ref=e175] [cursor=pointer]:
+                - /url: /SupplierAnalysis/SupplierDetails
+                - paragraph: Supplier Details
+          - link "table Global Tiered Pricing" [ref=e177] [cursor=pointer]:
+            - /url: /GlobalTieredPricing
+            - img "table" [ref=e179]:
+              - img [ref=e180]
+            - paragraph [ref=e182]: Global Tiered Pricing
+          - link "credit-card Subscription Management" [ref=e184] [cursor=pointer]:
+            - /url: /SubscriptionManagement
+            - img "credit-card" [ref=e186]:
+              - img [ref=e187]
+            - paragraph [ref=e189]: Subscription Management
+          - generic [ref=e190]:
+            - generic [ref=e191] [cursor=pointer]:
+              - img "dashboard" [ref=e193]:
+                - img [ref=e194]
+              - paragraph [ref=e196]: Contract Measurement
+            - generic:
+              - link "Measurements" [ref=e199] [cursor=pointer]:
+                - /url: /ContractMeasurement/ContractMeasurementGrid
+                - paragraph: Measurements
+              - link "Measurement Details" [ref=e201] [cursor=pointer]:
+                - /url: /ContractMeasurement/ContractMeasurementDetails
+                - paragraph: Measurement Details
+          - link "swap Negotiation Mode" [ref=e203] [cursor=pointer]:
+            - /url: /NegotiationMode
+            - img "swap" [ref=e205]:
+              - img [ref=e206]
+            - paragraph [ref=e208]: Negotiation Mode
+          - generic [ref=e209]:
+            - generic [ref=e210] [cursor=pointer]:
+              - img "dollar" [ref=e212]:
+                - img [ref=e213]
+              - paragraph [ref=e215]: Delivered Pricing
+            - generic:
+              - link "Quote Book" [ref=e218] [cursor=pointer]:
+                - /url: /DeliveredPricing/DeliveredPricingQuoteBook
+                - paragraph: Quote Book
+              - link "Freight Management" [ref=e220] [cursor=pointer]:
+                - /url: /DeliveredPricing/FreightManagement
+                - paragraph: Freight Management
+              - link "Tax Management" [ref=e222] [cursor=pointer]:
+                - /url: /DeliveredPricing/TaxManagement
+                - paragraph: Tax Management
+          - link "table Bulk Change Test" [ref=e224] [cursor=pointer]:
+            - /url: /BulkChangeTest
+            - img "table" [ref=e226]:
+              - img [ref=e227]
+            - paragraph [ref=e229]: Bulk Change Test
+          - generic [ref=e230]:
+            - generic [ref=e231] [cursor=pointer]:
+              - img "file-text" [ref=e233]:
+                - img [ref=e234]
+              - paragraph [ref=e236]: Contracts
+            - generic:
+              - link "All Contracts" [ref=e239] [cursor=pointer]:
+                - /url: /Contracts/ContractsList
+                - paragraph: All Contracts
+              - link "Create Contract" [ref=e241] [cursor=pointer]:
+                - /url: /Contracts/CreateContract
+                - paragraph: Create Contract
+              - link "Edit Contract" [ref=e243] [cursor=pointer]:
+                - /url: /Contracts/EditContract
+                - paragraph: Edit Contract
+          - link "line-chart Price Elasticity" [ref=e245] [cursor=pointer]:
+            - /url: /PriceElasticity
+            - img "line-chart" [ref=e247]:
+              - img [ref=e248]
+            - paragraph [ref=e250]: Price Elasticity
+          - generic [ref=e251]:
+            - generic [ref=e252] [cursor=pointer]:
+              - img "book" [ref=e254]:
+                - img [ref=e255]
+              - paragraph [ref=e257]: Quote Pricing
+            - generic:
+              - link "Quote Book" [ref=e260] [cursor=pointer]:
+                - /url: /QuotePricing/QuoteBook
+                - paragraph: Quote Book
+              - link "Manage Quote Rows" [ref=e262] [cursor=pointer]:
+                - /url: /QuotePricing/ManageQuoteRows
+                - paragraph: Manage Quote Rows
+          - link "dollar Quotebook Wholesale" [ref=e264] [cursor=pointer]:
+            - /url: /QuotebookWholesale
+            - img "dollar" [ref=e266]:
+              - img [ref=e267]
+            - paragraph [ref=e269]: Quotebook Wholesale
+    - main [ref=e270]:
+      - generic [ref=e271]:
+        - generic [ref=e272]:
+          - paragraph [ref=e274] [cursor=pointer]: Wholesale
+          - paragraph [ref=e276] [cursor=pointer]: Industrial
+          - paragraph [ref=e278] [cursor=pointer]: Retail
+          - paragraph [ref=e280] [cursor=pointer]: Other
+        - generic [ref=e281]:
+          - generic:
+            - heading "Quote Analytics" [level=5] [ref=e282]
+            - generic [ref=e283] [cursor=pointer]:
+              - generic [ref=e284]:
+                - combobox [ref=e286]
+                - generic "Liftings vs Benchmark" [ref=e287]
+              - generic:
+                - img:
+                  - img
+          - paragraph [ref=e288]: Select a row to view analytics
+        - generic [ref=e289]:
+          - generic [ref=e290]:
+            - paragraph [ref=e291]: Publish Readiness
+            - generic [ref=e292]:
+              - generic [ref=e293]:
+                - heading "0% Publish Ready" [level=4] [ref=e294]
+                - paragraph [ref=e295]: 0 of 20 rows · 20 with active exceptions
+                - generic [ref=e297]:
+                  - paragraph [ref=e300]: Margin (20)
+                  - paragraph [ref=e303]: Bench Delta (3)
+              - generic [ref=e304]:
+                - generic [ref=e305]:
+                  - paragraph [ref=e306]: "20"
+                  - paragraph [ref=e307]: Hard
+                - generic [ref=e308]:
+                  - paragraph [ref=e309]: "0"
+                  - paragraph [ref=e310]: Soft
+                - generic [ref=e311]:
+                  - paragraph [ref=e312]: "0"
+                  - paragraph [ref=e313]: Clean
+          - generic [ref=e314]:
+            - paragraph [ref=e315]: Worst Offenders
+            - generic [ref=e316]:
+              - generic [ref=e317]: Quote
+              - generic [ref=e318]: Location
+              - generic [ref=e319]: Deviation
+              - generic [ref=e320]: Exc
+              - generic [ref=e321]: Type
+            - generic [ref=e322] [cursor=pointer]:
+              - generic [ref=e323]: QC-017
+              - paragraph [ref=e324]: Chicago Term.
+              - generic [ref=e325]: 4020% above ceiling
+              - generic [ref=e326]: "2"
+              - generic [ref=e327]: hard
+            - generic [ref=e328] [cursor=pointer]:
+              - generic [ref=e329]: QC-009
+              - paragraph [ref=e330]: Chicago Term.
+              - generic [ref=e331]: 1120% above ceiling
+              - generic [ref=e332]: "2"
+              - generic [ref=e333]: hard
+            - generic [ref=e334] [cursor=pointer]:
+              - generic [ref=e335]: QC-003
+              - paragraph [ref=e336]: Dallas Hub
+              - generic [ref=e337]: 970% above ceiling
+              - generic [ref=e338]: "2"
+              - generic [ref=e339]: hard
+            - generic [ref=e340] [cursor=pointer]:
+              - generic [ref=e341]: QC-012
+              - paragraph [ref=e342]: Houston Term.
+              - generic [ref=e343]: 61% below floor
+              - generic [ref=e344]: "1"
+              - generic [ref=e345]: hard
+            - generic [ref=e346] [cursor=pointer]:
+              - generic [ref=e347]: QC-016
+              - paragraph [ref=e348]: Dallas Hub
+              - generic [ref=e349]: 61% below floor
+              - generic [ref=e350]: "1"
+              - generic [ref=e351]: hard
+        - generic [ref=e352]:
+          - paragraph [ref=e354] [cursor=pointer]: Configuration
+          - paragraph [ref=e356] [cursor=pointer]: Exception Profiles
+        - generic [ref=e637]:
+          - generic [ref=e638]:
+            - heading "Exception Profiles" [level=5] [ref=e640]
+            - generic [ref=e641]:
+              - generic [ref=e642]:
+                - img "lock" [ref=e643]:
+                  - img [ref=e644]
+                - paragraph [ref=e646]: Organization
+              - generic [ref=e647] [cursor=pointer]:
+                - generic [ref=e648]:
+                  - paragraph [ref=e649]: Standard Day
+                  - generic [ref=e650]: Active
+                - paragraph [ref=e651]: Normal market conditions. Balanced thresholds for margin, cost, and price movements.
+              - generic [ref=e652] [cursor=pointer]:
+                - generic [ref=e653]:
+                  - paragraph [ref=e654]: Containment
+                  - generic [ref=e655]: Tight
+                - paragraph [ref=e656]: Tighter margins for volatile markets or allocation events.
+              - generic [ref=e657] [cursor=pointer]:
+                - generic [ref=e658]:
+                  - paragraph [ref=e659]: High Volume Push
+                  - generic [ref=e660]: Wide
+                - paragraph [ref=e661]: Maximize throughput. Accept thinner margins and wider price movements.
+              - generic [ref=e662] [cursor=pointer]:
+                - generic [ref=e663]:
+                  - paragraph [ref=e664]: Margin Defense
+                  - generic [ref=e665]: Strict
+                - paragraph [ref=e666]: Protect margins during cost pressure. Tightest margin floors, hard enforcement.
+              - generic [ref=e667] [cursor=pointer]:
+                - generic [ref=e668]:
+                  - paragraph [ref=e669]: Aggressive Sales
+                  - generic [ref=e670]: Wide
+                - paragraph [ref=e671]: Wider thresholds for aggressive pricing. When pushing volume or competing hard.
+              - generic [ref=e672]:
+                - img "user" [ref=e673]:
+                  - img [ref=e674]
+                - paragraph [ref=e676]: Personal
+              - generic [ref=e677] [cursor=pointer]:
+                - generic [ref=e678]:
+                  - paragraph [ref=e679]: Default
+                  - generic [ref=e680]: System
+                - paragraph [ref=e681]: Fallback thresholds applied when no profile is assigned. Cannot be deleted or renamed.
+              - generic [ref=e682] [cursor=pointer]:
+                - paragraph [ref=e684]: Q1 Winter Blend
+                - paragraph [ref=e685]: Adjusted for winter product mix and seasonal spreads.
+            - generic [ref=e687] [cursor=pointer]:
+              - img "plus" [ref=e688]:
+                - img [ref=e689]
+              - text: New Custom Profile
+          - generic [ref=e692]:
+            - heading "New Exception Profile" [level=5] [ref=e761]
+            - generic [ref=e762]:
+              - generic [ref=e763]:
+                - paragraph [ref=e764]: Name
+                - textbox "Profile name..." [ref=e765]
+              - generic [ref=e766]:
+                - paragraph [ref=e767]: Description
+                - textbox "Brief description..." [ref=e768]
+              - generic [ref=e769]:
+                - paragraph [ref=e770]: Ownership
+                - generic [ref=e771]:
+                  - generic [ref=e772] [cursor=pointer]: Personal
+                  - generic [ref=e773]:
+                    - img "lock" [ref=e774]:
+                      - img [ref=e775]
+                    - text: Organization
+              - generic [ref=e777]:
+                - paragraph [ref=e778]: Start From
+                - generic [ref=e779] [cursor=pointer]:
+                  - generic [ref=e780]:
+                    - combobox [ref=e782]
+                    - generic "Standard Day" [ref=e783]
+                  - generic:
+                    - img:
+                      - img
+              - paragraph [ref=e784]: Thresholds
+              - generic [ref=e785]:
+                - generic [ref=e786]:
+                  - paragraph [ref=e789]: Margin
+                  - generic [ref=e790]:
+                    - generic [ref=e791] [cursor=pointer]: Soft
+                    - generic [ref=e792] [cursor=pointer]: Hard
+                    - generic [ref=e793] [cursor=pointer]: "Off"
+                  - generic [ref=e794]:
+                    - generic [ref=e795]:
+                      - paragraph [ref=e796]: Floor
+                      - textbox [ref=e797]: "0.0500"
+                    - generic [ref=e798]:
+                      - paragraph [ref=e799]: Ceiling
+                      - textbox [ref=e800]: "0.1500"
+                  - generic [ref=e801]:
+                    - img "lock" [ref=e802]:
+                      - img [ref=e803]
+                    - paragraph [ref=e805]: "Org limit: $0.0200 – $0.2500"
+                - generic [ref=e806]:
+                  - paragraph [ref=e809]: Cost
+                  - generic [ref=e810]:
+                    - generic [ref=e811] [cursor=pointer]: Soft
+                    - generic [ref=e812] [cursor=pointer]: Hard
+                    - generic [ref=e813] [cursor=pointer]: "Off"
+                  - generic [ref=e814]:
+                    - generic [ref=e815]:
+                      - paragraph [ref=e816]: Floor
+                      - textbox [ref=e817]: "1.8000"
+                    - generic [ref=e818]:
+                      - paragraph [ref=e819]: Ceiling
+                      - textbox [ref=e820]: "3.5000"
+                  - generic [ref=e821]:
+                    - img "lock" [ref=e822]:
+                      - img [ref=e823]
+                    - paragraph [ref=e825]: "Org limit: $1.5000 – $4.0000"
+                - generic [ref=e826]:
+                  - paragraph [ref=e829]: Market Move
+                  - generic [ref=e830]:
+                    - generic [ref=e831] [cursor=pointer]: Soft
+                    - generic [ref=e832] [cursor=pointer]: Hard
+                    - generic [ref=e833] [cursor=pointer]: "Off"
+                  - generic [ref=e834]:
+                    - generic [ref=e835]:
+                      - paragraph [ref=e836]: Floor
+                      - textbox [ref=e837]: "-0.0300"
+                    - generic [ref=e838]:
+                      - paragraph [ref=e839]: Ceiling
+                      - textbox [ref=e840]: "0.0300"
+                  - generic [ref=e841]:
+                    - img "lock" [ref=e842]:
+                      - img [ref=e843]
+                    - paragraph [ref=e845]: "Org limit: $-0.1000 – $0.1000"
+                - generic [ref=e846]:
+                  - paragraph [ref=e849]: Price Delta
+                  - generic [ref=e850]:
+                    - generic [ref=e851] [cursor=pointer]: Soft
+                    - generic [ref=e852] [cursor=pointer]: Hard
+                    - generic [ref=e853] [cursor=pointer]: "Off"
+                  - generic [ref=e854]:
+                    - generic [ref=e855]:
+                      - paragraph [ref=e856]: Floor
+                      - textbox [ref=e857]: "-0.0500"
+                    - generic [ref=e858]:
+                      - paragraph [ref=e859]: Ceiling
+                      - textbox [ref=e860]: "0.0500"
+                  - generic [ref=e861]:
+                    - img "lock" [ref=e862]:
+                      - img [ref=e863]
+                    - paragraph [ref=e865]: "Org limit: $-0.1000 – $0.1000"
+                - generic [ref=e866]:
+                  - paragraph [ref=e869]: Price
+                  - generic [ref=e870]:
+                    - generic [ref=e871] [cursor=pointer]: Soft
+                    - generic [ref=e872] [cursor=pointer]: Hard
+                    - generic [ref=e873] [cursor=pointer]: "Off"
+                  - generic [ref=e874]:
+                    - generic [ref=e875]:
+                      - paragraph [ref=e876]: Floor
+                      - textbox [ref=e877]: "2.0000"
+                    - generic [ref=e878]:
+                      - paragraph [ref=e879]: Ceiling
+                      - textbox [ref=e880]: "4.0000"
+                  - generic [ref=e881]:
+                    - img "lock" [ref=e882]:
+                      - img [ref=e883]
+                    - paragraph [ref=e885]: "Org limit: $1.5000 – $5.0000"
+                - generic [ref=e886]:
+                  - paragraph [ref=e889]: Bench Delta
+                  - generic [ref=e890]:
+                    - generic [ref=e891] [cursor=pointer]: Soft
+                    - generic [ref=e892] [cursor=pointer]: Hard
+                    - generic [ref=e893] [cursor=pointer]: "Off"
+                  - generic [ref=e894]:
+                    - generic [ref=e895]:
+                      - paragraph [ref=e896]: Floor
+                      - textbox [ref=e897]: "-0.0200"
+                    - generic [ref=e898]:
+                      - paragraph [ref=e899]: Ceiling
+                      - textbox [ref=e900]: "0.0200"
+                  - generic [ref=e901]:
+                    - img "lock" [ref=e902]:
+                      - img [ref=e903]
+                    - paragraph [ref=e905]: "Org limit: $-0.0500 – $0.0500"
+                - generic [ref=e906]:
+                  - paragraph [ref=e909]: Bench Value
+                  - generic [ref=e910]:
+                    - generic [ref=e911] [cursor=pointer]: Soft
+                    - generic [ref=e912] [cursor=pointer]: Hard
+                    - generic [ref=e913] [cursor=pointer]: "Off"
+                  - generic [ref=e914]:
+                    - generic [ref=e915]:
+                      - paragraph [ref=e916]: Floor
+                      - textbox [ref=e917]: "1.5000"
+                    - generic [ref=e918]:
+                      - paragraph [ref=e919]: Ceiling
+                      - textbox [ref=e920]: "4.0000"
+                  - generic [ref=e921]:
+                    - img "lock" [ref=e922]:
+                      - img [ref=e923]
+                    - paragraph [ref=e925]: "Org limit: $1.0000 – $5.0000"
+              - generic [ref=e926]:
+                - paragraph [ref=e927]: Scope
+                - generic [ref=e928]:
+                  - generic [ref=e929]:
+                    - paragraph [ref=e930]: Terminal
+                    - generic [ref=e931] [cursor=pointer]:
+                      - generic [ref=e932]:
+                        - combobox [ref=e934]
+                        - generic "All Terminals" [ref=e935]
+                      - generic:
+                        - img:
+                          - img
+                  - generic [ref=e936]:
+                    - paragraph [ref=e937]: Product
+                    - generic [ref=e938] [cursor=pointer]:
+                      - generic [ref=e939]:
+                        - combobox [ref=e941]
+                        - generic "All Products" [ref=e942]
+                      - generic:
+                        - img:
+                          - img
+                - paragraph [ref=e943]: Scope determines which rows this profile can be applied to.
+            - generic [ref=e944]:
+              - button "Cancel" [ref=e945] [cursor=pointer]:
+                - generic [ref=e946]: Cancel
+              - button "Create Profile" [ref=e947] [cursor=pointer]:
+                - generic [ref=e948]: Create Profile
+        - generic [ref=e614]:
+          - generic [ref=e615]:
+            - img "file-text" [ref=e616]:
+              - img [ref=e617]
+            - heading "Quote Publisher" [level=4] [ref=e619]
+            - generic [ref=e620]:
+              - img "warning" [ref=e621]:
+                - img [ref=e622]
+              - text: 20 hard exceptions block publishing
+          - generic [ref=e624]:
+            - button "sync Reset" [ref=e625] [cursor=pointer]:
+              - img "sync" [ref=e626]:
+                - img [ref=e627]
+              - generic [ref=e629]: Reset
+            - button "save Save Adjustments" [disabled] [ref=e630]:
+              - img "save":
+                - img
+              - generic: Save Adjustments
+            - button "cloud-upload Publish Prices" [ref=e631] [cursor=pointer]:
+              - img "cloud-upload" [ref=e632]:
+                - img [ref=e633]
+              - generic [ref=e636]: Publish Prices

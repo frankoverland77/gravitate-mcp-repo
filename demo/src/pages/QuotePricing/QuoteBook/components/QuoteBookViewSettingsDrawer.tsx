@@ -2,6 +2,7 @@ import React from 'react'
 import { Drawer, Radio } from 'antd'
 import { Vertical, Texto } from '@gravitate-js/excalibrr'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
+import type { PeriodDisplay } from '../QuoteBook.types'
 
 const COLORS = {
   DARK_TEXT: '#262626',
@@ -14,9 +15,11 @@ const COLORS = {
 interface QuoteBookViewSettingsDrawerProps {
   open: boolean
   onClose: () => void
+  periodDisplay?: PeriodDisplay
+  onPeriodDisplayChange?: (v: PeriodDisplay) => void
 }
 
-export function QuoteBookViewSettingsDrawer({ open, onClose }: QuoteBookViewSettingsDrawerProps) {
+export function QuoteBookViewSettingsDrawer({ visible, onClose, periodDisplay, onPeriodDisplayChange }: QuoteBookViewSettingsDrawerProps) {
   const { featureMode, setFeatureMode } = useFeatureMode()
 
   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({
@@ -90,6 +93,65 @@ export function QuoteBookViewSettingsDrawer({ open, onClose }: QuoteBookViewSett
             </Texto>
           </div>
         </div>
+
+        {featureMode === 'future-state' && onPeriodDisplayChange && (
+          <div>
+            <Texto category="p1" weight="600" style={{ marginBottom: '12px', display: 'block' }}>
+              Exception Period Display
+            </Texto>
+            <Texto
+              category="p2"
+              appearance="medium"
+              style={{ marginBottom: '16px', display: 'block', color: COLORS.LIGHT_TEXT }}
+            >
+              How exception columns are organized by time period
+            </Texto>
+
+            <Radio.Group
+              value={periodDisplay || 'neither'}
+              onChange={(e) => onPeriodDisplayChange(e.target.value)}
+              style={{ width: '100%' }}
+            >
+              <Vertical style={{ gap: '12px' }}>
+                <div
+                  style={getOptionCardStyle(periodDisplay === 'neither' || !periodDisplay)}
+                  onClick={() => onPeriodDisplayChange('neither')}
+                >
+                  <Radio value="neither" style={{ marginBottom: '8px' }}>
+                    <Texto style={{ fontSize: '14px', fontWeight: 600, color: COLORS.DARK_TEXT }}>Neither</Texto>
+                  </Radio>
+                  <Texto style={{ fontSize: '12px', color: COLORS.LIGHT_TEXT, display: 'block', marginLeft: '24px' }}>
+                    Single "Exceptions" group (current behavior)
+                  </Texto>
+                </div>
+
+                <div
+                  style={getOptionCardStyle(periodDisplay === 'column-families')}
+                  onClick={() => onPeriodDisplayChange('column-families')}
+                >
+                  <Radio value="column-families" style={{ marginBottom: '8px' }}>
+                    <Texto style={{ fontSize: '14px', fontWeight: 600, color: COLORS.DARK_TEXT }}>Column Families</Texto>
+                  </Radio>
+                  <Texto style={{ fontSize: '12px', color: COLORS.LIGHT_TEXT, display: 'block', marginLeft: '24px' }}>
+                    Split into "Proposed" and "Current" groups
+                  </Texto>
+                </div>
+
+                <div
+                  style={getOptionCardStyle(periodDisplay === 'toggle')}
+                  onClick={() => onPeriodDisplayChange('toggle')}
+                >
+                  <Radio value="toggle" style={{ marginBottom: '8px' }}>
+                    <Texto style={{ fontSize: '14px', fontWeight: 600, color: COLORS.DARK_TEXT }}>Toggle</Texto>
+                  </Radio>
+                  <Texto style={{ fontSize: '12px', color: COLORS.LIGHT_TEXT, display: 'block', marginLeft: '24px' }}>
+                    Switch between periods with a pill control
+                  </Texto>
+                </div>
+              </Vertical>
+            </Radio.Group>
+          </div>
+        )}
       </Vertical>
     </Drawer>
   )

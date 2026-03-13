@@ -58,7 +58,7 @@ export function AuthenticatedRoute() {
   const scopes = useMemo(() => {
     const hubScopes = getScopesFromHubState();
     if (Object.keys(hubScopes).length > 0) {
-      return { ...DEFAULT_SCOPES, ...hubScopes, ProjectHub: true, Welcome: true };
+      return { ...hubScopes, ProjectHub: true, Welcome: true };
     }
     return DEFAULT_SCOPES;
   }, [scopeVersion]);

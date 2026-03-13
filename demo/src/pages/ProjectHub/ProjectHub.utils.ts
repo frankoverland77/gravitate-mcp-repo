@@ -15,11 +15,10 @@ export function getScopesFromHubState(): Record<string, boolean> {
     const scopes: Record<string, boolean> = {};
 
     for (const [key, entry] of Object.entries(state.projects)) {
-      if (isPinned(key)) {
+      if (isPinned(key) || (entry.showInSidebar && entry.status !== 'archived')) {
         scopes[key] = true;
-      } else {
-        scopes[key] = entry.showInSidebar && entry.status !== 'archived';
       }
+      // Keys where showInSidebar=false are simply not added — getValidPages checks key existence
     }
 
     return scopes;

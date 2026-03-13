@@ -44,7 +44,7 @@ This project implements the Price Exceptions feature in the Quote Book, a multi-
   - Wave 1: Grid enhancements — Exc column (red/amber circles), Profile column (blue/amber pills), getRowStyle row tinting, cell highlighting on margin (red/hard) and mktMove (amber/soft), selectedRows state + gridApiRef + handleSelectRowById for drill-to-row
   - Wave 2: Drawer content — ProfileRadioCards (org/personal, radio circles, blue selected), ThresholdPreview (5 components, color dots, monospace), OverrideForm (component/floor/ceiling/severity), SingleRowState (real row data scope summary), MultiRowState (aggregated summary, dynamic mismatch notice, impact preview panel)
   - Wave 3a: Analytics — Publish Readiness (92% progress bar, flagged components, 3 severity cards), Worst Offenders (5-row mini table, clickable rows drill to grid)
-  - Wave 3b: Profiles — View mode (ownership badge, action buttons per tier, 2-col threshold summary grid, scope), Edit/Create mode (name/desc inputs, ownership toggle, Start From dropdown, 7 threshold editor cards with severity controls + org-limit locked rows, scope dropdowns)
+  - Wave 3b: Profiles — View mode (ownership badge, action buttons per tier, 2-col threshold summary grid, scope), Edit/Create mode (name/desc inputs, ownership toggle, Start From dropdown, 5 threshold editor cards with severity controls + org-limit locked rows, scope dropdowns)
   - Wave 4: Footer — "5 hard exceptions block publishing" red pill with WarningOutlined
 
 - [x] Phase 4: Logic & Interactivity
@@ -112,13 +112,13 @@ This project implements the Price Exceptions feature in the Quote Book, a multi-
    - `ProfileTier` — 'org' | 'personal'
    - `DrawerMode` — 'empty' | 'single' | 'multi'
    - `ThresholdComponent` — Component thresholds with floor/ceiling/severity
-   - `ExceptionProfile` — Full profile structure with 7 threshold components
+   - `ExceptionProfile` — Full profile structure with 5 threshold components
    - `ThresholdOverride` — Row-level threshold customization
    - `DrawerState` — Drawer open/mode/selection state machine
 
 2. **QuoteBook.exceptions.data.ts** — Profiles & seed data
    - 7 ExceptionProfile objects (standard, containment, highVolumePush, marginDefense, aggressive, default, q1Winter)
-   - Each profile contains 7 ThresholdComponent entries (Margin, Cost, Market Move, Price Delta, Price, Bench Delta, Bench Value)
+   - Each profile contains 5 ThresholdComponent entries (Margin, Cost, Market Move, Price Delta, Bench Delta)
    - Values sourced from wireframe profilesData
    - Exports `exceptionProfiles` array and `exceptionProfileMap` lookup object
 
@@ -198,7 +198,7 @@ All 4 phases are complete. The feature is operational for demo purposes. Future 
 
 **Completed:**
 - Created QuoteBook.types.ts with 8 type definitions (ThresholdSeverity, ExceptionType, ProfileTier, DrawerMode, ThresholdComponent, ExceptionProfile, ThresholdOverride, DrawerState)
-- Created QuoteBook.exceptions.data.ts with 7 organization & personal profiles (standard, containment, highVolumePush, marginDefense, aggressive, default, q1Winter), each with 7 threshold components seeded from wireframe profilesData
+- Created QuoteBook.exceptions.data.ts with 7 organization & personal profiles (standard, containment, highVolumePush, marginDefense, aggressive, default, q1Winter), each with 5 threshold components seeded from wireframe profilesData
 - Created QuoteBookProfileChip.tsx static component (SafetyCertificateOutlined icon + "Standard Day" pill)
 - Modified QuoteBook.data.ts to add exception fields (profileKey, exceptionType, exceptionCount, overrides) and populated all 20 rows with hard/soft/clean exception assignments
 - Modified QuoteBook.tsx to implement full page skeleton (group tabs, control bar, hidden page-level tabs, main content area, publish footer) with DrawerState useState hook
@@ -290,7 +290,7 @@ All 4 phases are complete. The feature is operational for demo purposes. Future 
 **Wave 2 — Drawer Content (major rewrite):**
 - **ProfileRadioCards** — Org section, divider, Personal section. Each card: radio circle + name (semibold) + description (muted). Selected: blue left border + light blue bg
 - **ThresholdPreview** — Shows first 5 components with color dot + name (left) + `$floor – $ceiling (Severity)` (right, monospace). Updates when profile selection changes
-- **OverrideForm** — Component Select (7 options), Floor + Ceiling side-by-side InputNumbers, Severity Select (Hard/Soft/Keep existing). Optional `extraCheckbox` for multi mode
+- **OverrideForm** — Component Select (5 options), Floor + Ceiling side-by-side InputNumbers, Severity Select (Hard/Soft/Keep existing). Optional `extraCheckbox` for multi mode
 - **SingleRowState** — Real scope summary from row data (`{location} · {product} — QC-0{id}`), profile cards + threshold preview (profile mode) or override form (override mode). `selectedProfileKey` synced to row via useEffect
 - **MultiRowState** — Computed unique locations/products for subtitle. Dynamic profile mismatch notice (groups rows by profileKey, shows chip breakdown only if mixed). Impact preview panel: rows selected, profiles affected, rows with overrides, est. exception change (static amber text)
 
@@ -300,8 +300,8 @@ All 4 phases are complete. The feature is operational for demo purposes. Future 
 
 **Wave 3b — Exception Profiles (view/edit/create):**
 - Sidebar: `isSelected` (blue left border + light bg) + `isActive` (green "Active" badge on Standard Day). Click sets profile + returns to view mode. "New Custom Profile" triggers create mode
-- **View mode**: Ownership badge (indigo+lock for org, amber for personal). Action buttons by tier: org → "Duplicate as Personal", personal+!system → "Edit"+"Delete", system → "Edit" only. 2-column CSS grid of 7 ThresholdSummaryCards (color dot, name, severity badge, floor–ceiling monospace). Scope section. Footer: "Active since Today 2:34 PM"
-- **Edit/Create mode**: Header ("Edit {name}" or "New Exception Profile"). Name input + Description textarea. Ownership toggle (Personal active, Org disabled+locked). Start From dropdown (create only, prefills thresholds). 7 ThresholdEditorCards: severity segmented control (Soft/Hard/Off), Floor + Ceiling inputs, org-limit locked row (dashed border, lock icon, not-allowed cursor). Scope: Terminal + Product dropdowns + helper text. Footer: Cancel + Create/Save
+- **View mode**: Ownership badge (indigo+lock for org, amber for personal). Action buttons by tier: org → "Duplicate as Personal", personal+!system → "Edit"+"Delete", system → "Edit" only. 2-column CSS grid of 5 ThresholdSummaryCards (color dot, name, severity badge, floor–ceiling monospace). Scope section. Footer: "Active since Today 2:34 PM"
+- **Edit/Create mode**: Header ("Edit {name}" or "New Exception Profile"). Name input + Description textarea. Ownership toggle (Personal active, Org disabled+locked). Start From dropdown (create only, prefills thresholds). 5 ThresholdEditorCards: severity segmented control (Soft/Hard/Off), Floor + Ceiling inputs, org-limit locked row (dashed border, lock icon, not-allowed cursor). Scope: Terminal + Product dropdowns + helper text. Footer: Cancel + Create/Save
 
 **Wave 4 — Footer:**
 - Added WarningOutlined import
@@ -319,7 +319,7 @@ All 4 phases are complete. The feature is operational for demo purposes. Future 
 **Task 1 — Evaluation Engine + Types:**
 - Added `ComponentViolation` and `EvaluationResult` types to QuoteBook.types.ts
 - Created QuoteBook.evaluation.ts: `evaluateRow(row, profile)` and `evaluateAllRows(rows, profileMap)`
-- Field mapping: Margin (proposed_margin/100), Cost (prior_lastPrice), Market Move (abs comparison), Price Delta (signed), Price (proposed_price), Bench Delta (abs of benchmark_ulsd - proposed_price), Bench Value (skip)
+- Field mapping: Margin (proposed_margin/100), Cost (prior_lastPrice), Market Move (abs comparison), Price Delta (signed), Bench Delta (abs of benchmark_ulsd - proposed_price)
 - Respects overrides (row-level ThresholdOverride supersedes profile), severity='Off' skips
 
 **Task 2 — Mutable State:**

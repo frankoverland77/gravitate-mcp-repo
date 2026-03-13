@@ -1,4 +1,4 @@
-import { Texto } from '@gravitate-js/excalibrr'
+import { Segmented } from 'antd'
 
 interface QuoteBookPageTabsProps {
   activeTab: 'configuration' | 'profiles'
@@ -6,39 +6,17 @@ interface QuoteBookPageTabsProps {
 }
 
 export function QuoteBookPageTabs({ activeTab, onTabChange }: QuoteBookPageTabsProps) {
-  const tabs: { key: 'configuration' | 'profiles'; label: string }[] = [
-    { key: 'configuration', label: 'Configuration' },
-    { key: 'profiles', label: 'Exception Profiles' },
-  ]
-
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 0,
-      padding: '0 16px',
-      background: 'var(--bg-1)',
-      borderBottom: '2px solid var(--gray-200)',
-      flexShrink: 0,
-    }}>
-      {tabs.map(tab => (
-        <span
-          key={tab.key}
-          onClick={() => onTabChange(tab.key)}
-          style={{
-            padding: '10px 20px',
-            fontSize: '13px',
-            fontWeight: activeTab === tab.key ? 600 : 500,
-            color: activeTab === tab.key ? 'var(--theme-color-1)' : 'var(--gray-500)',
-            cursor: 'pointer',
-            borderBottom: activeTab === tab.key ? '2px solid var(--theme-color-1)' : '2px solid transparent',
-            marginBottom: '-2px',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          <Texto>{tab.label}</Texto>
-        </span>
-      ))}
+    <div style={{ padding: '8px 16px' }}>
+      <Segmented
+        value={activeTab}
+        onChange={value => onTabChange(value as 'configuration' | 'profiles')}
+        options={[
+          { label: 'Configuration', value: 'configuration' },
+          { label: 'Exception Profiles', value: 'profiles' },
+        ]}
+        size="middle"
+      />
     </div>
   )
 }

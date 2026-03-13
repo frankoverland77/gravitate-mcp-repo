@@ -1,6 +1,6 @@
 import type { ExceptionProfile } from './QuoteBook.types'
 
-// Absolute components (Market Move, Bench Delta) only use "above" boundaries.
+// Absolute components (Market Move, Ref Strategy to Price) only use "above" boundaries.
 // Mapping from old model:
 //   Hard + floor/ceiling → criticalBelow=floor, criticalAbove=ceiling, warning ~10% inside
 //   Soft + floor/ceiling → warningBelow=floor, warningAbove=ceiling, critical=null
@@ -20,9 +20,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.8000, warningBelow: 2.0000, warningAbove: 3.3000, criticalAbove: 3.5000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0040, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0500, warningAbove: 0.0500, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.0000, warningAbove: 4.0000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
   {
@@ -38,9 +36,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 2.0000, warningBelow: 2.1000, warningAbove: 2.9000, criticalAbove: 3.0000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0016, criticalAbove: 0.0020, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: -0.0200, warningBelow: -0.0160, warningAbove: 0.0160, criticalAbove: 0.0200, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.1000, warningAbove: 3.5000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: 0.0080, criticalAbove: 0.0100, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: 0.0080, criticalAbove: 0.0100, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
   {
@@ -56,9 +52,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.5000, warningBelow: 1.6500, warningAbove: 3.7500, criticalAbove: 4.0000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0060, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.1000, warningAbove: 0.1000, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
   {
@@ -74,9 +68,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.8000, warningBelow: 1.9400, warningAbove: 3.0600, criticalAbove: 3.2000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0020, criticalAbove: 0.0025, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: -0.0300, warningBelow: -0.0240, warningAbove: 0.0240, criticalAbove: 0.0300, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.1000, warningAbove: 3.5000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: 0.0080, criticalAbove: 0.0100, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: 0.0080, criticalAbove: 0.0100, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
   {
@@ -92,9 +84,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.5000, warningBelow: 1.6500, warningAbove: 3.7500, criticalAbove: 4.0000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0050, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0800, warningAbove: 0.0800, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 1.8000, warningAbove: 4.5000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
   {
@@ -110,9 +100,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.8000, warningBelow: 2.0000, warningAbove: 3.3000, criticalAbove: 3.5000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0040, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0500, warningAbove: 0.0500, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.0000, warningAbove: 4.0000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
   {
@@ -128,9 +116,7 @@ export const exceptionProfiles: ExceptionProfile[] = [
       { component: 'Cost', colorDot: '#16a34a', criticalBelow: 1.9000, warningBelow: 2.0900, warningAbove: 3.6100, criticalAbove: 3.8000, orgCriticalBelow: 1.5000, orgWarningBelow: 1.7500, orgWarningAbove: 3.7500, orgCriticalAbove: 4.0000 },
       { component: 'Market Move', colorDot: '#d97706', criticalBelow: null, warningBelow: null, warningAbove: 0.0040, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
       { component: 'Price Delta', colorDot: '#ec4899', criticalBelow: null, warningBelow: -0.0600, warningAbove: 0.0600, criticalAbove: null, orgCriticalBelow: -0.1000, orgWarningBelow: -0.0800, orgWarningAbove: 0.0800, orgCriticalAbove: 0.1000 },
-      { component: 'Price', colorDot: '#7c3aed', criticalBelow: null, warningBelow: 2.0000, warningAbove: 4.2000, criticalAbove: null, orgCriticalBelow: 1.5000, orgWarningBelow: 1.8000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
-      { component: 'Bench Delta', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
-      { component: 'Bench Value', colorDot: '#6b7280', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: 1.0000, orgWarningBelow: 1.4000, orgWarningAbove: 4.6000, orgCriticalAbove: 5.0000 },
+      { component: 'Ref Strategy to Price', colorDot: '#06b6d4', criticalBelow: null, warningBelow: null, warningAbove: null, criticalAbove: null, orgCriticalBelow: null, orgWarningBelow: null, orgWarningAbove: 0.0400, orgCriticalAbove: 0.0500 },
     ],
   },
 ]

@@ -1,0 +1,566 @@
+- generic [ref=e2]:
+  - img "loading" [ref=e4]:
+    - img [ref=e5]
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - button "menu-unfold" [ref=e11]:
+          - img "menu-unfold" [ref=e12]:
+            - img [ref=e13]
+        - paragraph [ref=e16]:
+          - img "book" [ref=e18]:
+            - img [ref=e19]
+          - text: Quote Pricing
+      - generic [ref=e22]:
+        - heading "Quote Book" [level=5] [ref=e24]:
+          - link "Quote Book" [ref=e25] [cursor=pointer]:
+            - /url: /QuotePricing/QuoteBook
+        - heading "Manage Quote Rows" [level=5] [ref=e27]:
+          - link "Manage Quote Rows" [ref=e28] [cursor=pointer]:
+            - /url: /QuotePricing/ManageQuoteRows
+      - generic [ref=e30]:
+        - paragraph [ref=e32]: Demo User
+        - generic [ref=e34]: DE
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - generic [ref=e39]:
+          - generic [ref=e41]:
+            - img "search" [ref=e42]:
+              - img [ref=e43]
+            - text: Search
+            - img "mac-command" [ref=e47]:
+              - img [ref=e48]
+            - generic [ref=e51]: K
+          - generic [ref=e52]:
+            - link "smile Sandbox" [ref=e54] [cursor=pointer]:
+              - /url: /Sandbox
+              - img "smile" [ref=e56]:
+                - img [ref=e57]
+              - paragraph [ref=e59]: Sandbox
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - img "bg-colors" [ref=e63]:
+                  - img [ref=e64]
+                - paragraph [ref=e66]: Design System
+              - generic:
+                - link "Typography" [ref=e68] [cursor=pointer]:
+                  - /url: /DesignSystem/Typography
+                  - paragraph [ref=e69]: Typography
+                - link "Buttons" [ref=e71] [cursor=pointer]:
+                  - /url: /DesignSystem/Buttons
+                  - paragraph [ref=e72]: Buttons
+                - link "Tags" [ref=e74] [cursor=pointer]:
+                  - /url: /DesignSystem/Tags
+                  - paragraph [ref=e75]: Tags
+                - link "Data Display" [ref=e77] [cursor=pointer]:
+                  - /url: /DesignSystem/DataDisplay
+                  - paragraph [ref=e78]: Data Display
+                - link "Headers" [ref=e80] [cursor=pointer]:
+                  - /url: /DesignSystem/Headers
+                  - paragraph [ref=e81]: Headers
+                - link "Layout" [ref=e83] [cursor=pointer]:
+                  - /url: /DesignSystem/Layout
+                  - paragraph [ref=e84]: Layout
+                - link "Date & Time" [ref=e86] [cursor=pointer]:
+                  - /url: /DesignSystem/DateTime
+                  - paragraph [ref=e87]: Date & Time
+                - link "Form Controls" [ref=e89] [cursor=pointer]:
+                  - /url: /DesignSystem/FormControls
+                  - paragraph [ref=e90]: Form Controls
+                - link "Feedback" [ref=e92] [cursor=pointer]:
+                  - /url: /DesignSystem/Feedback
+                  - paragraph [ref=e93]: Feedback
+                - link "Navigation" [ref=e95] [cursor=pointer]:
+                  - /url: /DesignSystem/DSNavigation
+                  - paragraph [ref=e96]: Navigation
+                - link "Cell Renderers" [ref=e98] [cursor=pointer]:
+                  - /url: /DesignSystem/CellRenderers
+                  - paragraph [ref=e99]: Cell Renderers
+                - link "Grid" [ref=e101] [cursor=pointer]:
+                  - /url: /DesignSystem/Grid
+                  - paragraph [ref=e102]: Grid
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - img "shop" [ref=e106]:
+                  - img [ref=e107]
+                - paragraph [ref=e109]: Bakery
+              - generic:
+                - link "Bakery Products" [ref=e111] [cursor=pointer]:
+                  - /url: /Bakery/BakeryProducts
+                  - paragraph [ref=e112]: Bakery Products
+                - link "Formula Manager" [ref=e114] [cursor=pointer]:
+                  - /url: /Bakery/FormulaManager
+                  - paragraph [ref=e115]: Formula Manager
+                - link "Delivery Management" [ref=e117] [cursor=pointer]:
+                  - /url: /Bakery/DeliveryManagement
+                  - paragraph [ref=e118]: Delivery Management
+                - link "Supplier Price Analysis" [ref=e120] [cursor=pointer]:
+                  - /url: /Bakery/SupplierAnalysis
+                  - paragraph [ref=e121]: Supplier Price Analysis
+                - link "Supplier Details" [ref=e123] [cursor=pointer]:
+                  - /url: /Bakery/SupplierDetails
+                  - paragraph [ref=e124]: Supplier Details
+                - link "Contract Measurement" [ref=e126] [cursor=pointer]:
+                  - /url: /Bakery/ContractMeasurementGrid
+                  - paragraph [ref=e127]: Contract Measurement
+                - link "Measurement Details" [ref=e129] [cursor=pointer]:
+                  - /url: /Bakery/ContractMeasurementDetails
+                  - paragraph [ref=e130]: Measurement Details
+                - link "Delivered Pricing" [ref=e132] [cursor=pointer]:
+                  - /url: /Bakery/DeliveredPricingQuoteBook
+                  - paragraph [ref=e133]: Delivered Pricing
+                - link "Quotebook Wholesale" [ref=e135] [cursor=pointer]:
+                  - /url: /Bakery/QuotebookWholesale
+                  - paragraph [ref=e136]: Quotebook Wholesale
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - img "edit" [ref=e140]:
+                  - img [ref=e141]
+                - paragraph [ref=e143]: Forms
+              - link "Customer Form" [ref=e145] [cursor=pointer]:
+                - /url: /Forms/CustomerForm
+                - paragraph [ref=e146]: Customer Form
+            - generic [ref=e147]:
+              - generic [ref=e148]:
+                - img "calculator" [ref=e150]:
+                  - img [ref=e151]
+                - paragraph [ref=e153]: Contract Management
+              - generic:
+                - link "Prompts" [ref=e155] [cursor=pointer]:
+                  - /url: /ContractFormulas/PromptsGrid
+                  - paragraph [ref=e156]: Prompts
+                - link "Formula Templates" [ref=e158] [cursor=pointer]:
+                  - /url: /ContractFormulas/FormulaTemplates
+                  - paragraph [ref=e159]: Formula Templates
+                - link "Formula Template Details" [ref=e161] [cursor=pointer]:
+                  - /url: /ContractFormulas/FormulaTemplateDetails
+                  - paragraph [ref=e162]: Formula Template Details
+                - link "Contract Details" [ref=e164] [cursor=pointer]:
+                  - /url: /ContractFormulas/ContractDetails
+                  - paragraph [ref=e165]: Contract Details
+                - link "RFP Management" [ref=e167] [cursor=pointer]:
+                  - /url: /ContractFormulas/RFPManagement
+                  - paragraph [ref=e168]: RFP Management
+                - link "Seller RFP Response" [ref=e170] [cursor=pointer]:
+                  - /url: /ContractFormulas/SellerRFPResponse
+                  - paragraph [ref=e171]: Seller RFP Response
+            - link "global Buy Now" [ref=e173] [cursor=pointer]:
+              - /url: /OnlineSellingPlatform
+              - img "global" [ref=e175]:
+                - img [ref=e176]
+              - paragraph [ref=e178]: Buy Now
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - img "shop" [ref=e182]:
+                  - img [ref=e183]
+                - paragraph [ref=e185]: Market Platform
+              - generic:
+                - link "Index Offer Management" [ref=e187] [cursor=pointer]:
+                  - /url: /MarketPlatform/IndexOfferManagement
+                  - paragraph [ref=e188]: Index Offer Management
+                - link "Index Offer Buy Now" [ref=e190] [cursor=pointer]:
+                  - /url: /MarketPlatform/IndexOfferBuyNow
+                  - paragraph [ref=e191]: Index Offer Buy Now
+            - generic [ref=e192]:
+              - generic [ref=e193]:
+                - img "dashboard" [ref=e195]:
+                  - img [ref=e196]
+                - paragraph [ref=e198]: Supplier Analysis
+              - generic:
+                - link "Supplier Price Analysis" [ref=e200] [cursor=pointer]:
+                  - /url: /SupplierAnalysis/SupplierProfileAnalysis
+                  - paragraph [ref=e201]: Supplier Price Analysis
+                - link "Supplier Details" [ref=e203] [cursor=pointer]:
+                  - /url: /SupplierAnalysis/SupplierDetails
+                  - paragraph [ref=e204]: Supplier Details
+            - link "table Global Tiered Pricing" [ref=e206] [cursor=pointer]:
+              - /url: /GlobalTieredPricing
+              - img "table" [ref=e208]:
+                - img [ref=e209]
+              - paragraph [ref=e211]: Global Tiered Pricing
+            - link "credit-card Subscription Management" [ref=e213] [cursor=pointer]:
+              - /url: /SubscriptionManagement
+              - img "credit-card" [ref=e215]:
+                - img [ref=e216]
+              - paragraph [ref=e218]: Subscription Management
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - img "dashboard" [ref=e222]:
+                  - img [ref=e223]
+                - paragraph [ref=e225]: Contract Measurement
+              - generic:
+                - link "Measurements" [ref=e227] [cursor=pointer]:
+                  - /url: /ContractMeasurement/ContractMeasurementGrid
+                  - paragraph [ref=e228]: Measurements
+                - link "Measurement Details" [ref=e230] [cursor=pointer]:
+                  - /url: /ContractMeasurement/ContractMeasurementDetails
+                  - paragraph [ref=e231]: Measurement Details
+            - link "swap Negotiation Mode" [ref=e233] [cursor=pointer]:
+              - /url: /NegotiationMode
+              - img "swap" [ref=e235]:
+                - img [ref=e236]
+              - paragraph [ref=e238]: Negotiation Mode
+            - generic [ref=e239]:
+              - generic [ref=e240]:
+                - img "dollar" [ref=e242]:
+                  - img [ref=e243]
+                - paragraph [ref=e245]: Delivered Pricing
+              - generic:
+                - link "Quote Book" [ref=e247] [cursor=pointer]:
+                  - /url: /DeliveredPricing/DeliveredPricingQuoteBook
+                  - paragraph [ref=e248]: Quote Book
+                - link "Freight Management" [ref=e250] [cursor=pointer]:
+                  - /url: /DeliveredPricing/FreightManagement
+                  - paragraph [ref=e251]: Freight Management
+                - link "Tax Management" [ref=e253] [cursor=pointer]:
+                  - /url: /DeliveredPricing/TaxManagement
+                  - paragraph [ref=e254]: Tax Management
+            - link "table Bulk Change Test" [ref=e256] [cursor=pointer]:
+              - /url: /BulkChangeTest
+              - img "table" [ref=e258]:
+                - img [ref=e259]
+              - paragraph [ref=e261]: Bulk Change Test
+            - generic [ref=e262]:
+              - generic [ref=e263]:
+                - img "file-text" [ref=e265]:
+                  - img [ref=e266]
+                - paragraph [ref=e268]: Contracts
+              - generic:
+                - link "All Contracts" [ref=e270] [cursor=pointer]:
+                  - /url: /Contracts/ContractsList
+                  - paragraph [ref=e271]: All Contracts
+                - link "Create Contract" [ref=e273] [cursor=pointer]:
+                  - /url: /Contracts/CreateContract
+                  - paragraph [ref=e274]: Create Contract
+                - link "Edit Contract" [ref=e276] [cursor=pointer]:
+                  - /url: /Contracts/EditContract
+                  - paragraph [ref=e277]: Edit Contract
+            - link "line-chart Price Elasticity" [ref=e279] [cursor=pointer]:
+              - /url: /PriceElasticity
+              - img "line-chart" [ref=e281]:
+                - img [ref=e282]
+              - paragraph [ref=e284]: Price Elasticity
+            - generic [ref=e285]:
+              - generic [ref=e286]:
+                - img "book" [ref=e288]:
+                  - img [ref=e289]
+                - paragraph [ref=e291]: Quote Pricing
+              - generic:
+                - link "Quote Book" [ref=e293] [cursor=pointer]:
+                  - /url: /QuotePricing/QuoteBook
+                  - paragraph [ref=e294]: Quote Book
+                - link "Manage Quote Rows" [ref=e296] [cursor=pointer]:
+                  - /url: /QuotePricing/ManageQuoteRows
+                  - paragraph [ref=e297]: Manage Quote Rows
+            - link "dollar Quotebook Wholesale" [ref=e299] [cursor=pointer]:
+              - /url: /QuotebookWholesale
+              - img "dollar" [ref=e301]:
+                - img [ref=e302]
+              - paragraph [ref=e304]: Quotebook Wholesale
+      - main [ref=e305]:
+        - generic [ref=e306]:
+          - generic [ref=e307]:
+            - paragraph [ref=e309] [cursor=pointer]: Wholesale
+            - paragraph [ref=e311] [cursor=pointer]: Industrial
+            - paragraph [ref=e313] [cursor=pointer]: Retail
+            - paragraph [ref=e315] [cursor=pointer]: Other
+          - generic [ref=e316]:
+            - generic:
+              - heading "Quote Analytics" [level=5] [ref=e317]
+              - generic [ref=e318]:
+                - generic [ref=e319]:
+                  - combobox [ref=e321]
+                  - text: Liftings vs Benchmark
+                - img [ref=e323]:
+                  - img [ref=e324]
+            - paragraph [ref=e326]: Select a row to view analytics
+          - generic [ref=e327]:
+            - generic [ref=e328]:
+              - generic [ref=e331]:
+                - heading "Quote Book — EOD" [level=4] [ref=e332]
+                - heading "5 Results" [level=6] [ref=e333]
+              - generic [ref=e338]:
+                - img "search" [ref=e340]:
+                  - img [ref=e341]
+                - textbox "Search here" [ref=e343]
+              - generic [ref=e345]:
+                - generic [ref=e346]:
+                  - img "safety-certificate" [ref=e347]:
+                    - img [ref=e348]
+                  - paragraph [ref=e350]: Standard Day
+                - generic [ref=e351]:
+                  - generic [ref=e352]:
+                    - paragraph [ref=e353]: Publishing For
+                    - generic [ref=e354]:
+                      - generic [ref=e355]:
+                        - combobox [ref=e357]
+                        - text: EOD
+                      - img [ref=e359]:
+                        - img [ref=e360]
+                  - switch "arrows-alt" [ref=e362]:
+                    - img "arrows-alt" [ref=e364]:
+                      - img [ref=e365]
+                  - switch "bar-chart" [ref=e367]:
+                    - img "bar-chart" [ref=e369]:
+                      - img [ref=e370]
+                  - paragraph [ref=e372]: "Last Save: Today 9:14 AM"
+            - generic [ref=e374]:
+              - generic [ref=e375]: 
+              - listbox "Row Groups" [ref=e376]:
+                - option "Group. Press ENTER to sort. Press DELETE to remove" [ref=e377]:
+                  - text: 
+                  - generic [ref=e378]: Group
+                  - generic:    
+                  - text: 
+              - text: 
+              - treegrid:
+                - generic [ref=e379]:
+                  - row [ref=e380]:
+                    - columnheader [ref=e381]:  
+                    - columnheader [ref=e382]:  
+                    - columnheader [ref=e383]:  
+                    - columnheader [ref=e384]:  
+                  - row "Product Location" [ref=e385]:
+                    - columnheader [ref=e386]:
+                      - generic [ref=e387]:
+                        - checkbox [ref=e388]
+                        - text: 
+                      - text: 
+                      - generic:    
+                    - columnheader [ref=e389]:
+                      - text: 
+                      - text: 
+                      - generic:    
+                    - columnheader "Product" [ref=e390]:
+                      - text: 
+                      - generic [ref=e391]: 
+                      - generic [ref=e392] [cursor=pointer]: Product
+                      - text: 
+                      - generic:    
+                    - columnheader "Location" [ref=e393]:
+                      - text: 
+                      - generic [ref=e394]: 
+                      - generic [ref=e395] [cursor=pointer]: Location
+                      - text: 
+                      - generic:    
+                - rowgroup [ref=e396]:
+                  - row "Prior EOD New EOD" [ref=e397]:
+                    - columnheader [ref=e398]:  
+                    - columnheader "Prior EOD" [ref=e399]: Prior EOD  
+                    - columnheader "New EOD" [ref=e401]: New EOD  
+                  - row "UOM Last Price Last Diff Profit Margin Volume Diff Price Delta Margin Mkt Move" [ref=e403]:
+                    - columnheader "UOM" [ref=e404]:
+                      - text: 
+                      - generic [ref=e405]: 
+                      - generic [ref=e406] [cursor=pointer]: UOM
+                      - text: 
+                      - generic:    
+                    - columnheader "Last Price" [ref=e407]:
+                      - text: 
+                      - generic [ref=e408]: 
+                      - generic [ref=e409] [cursor=pointer]: Last Price
+                      - text: 
+                      - generic:    
+                    - columnheader "Last Diff" [ref=e410]:
+                      - text: 
+                      - generic [ref=e411]: 
+                      - generic [ref=e412] [cursor=pointer]: Last Diff
+                      - text: 
+                      - generic:    
+                    - columnheader "Profit" [ref=e413]:
+                      - text: 
+                      - generic [ref=e414]: 
+                      - generic [ref=e415] [cursor=pointer]: Profit
+                      - text: 
+                      - generic:    
+                    - columnheader "Margin" [ref=e416]:
+                      - text: 
+                      - generic [ref=e417]: 
+                      - generic [ref=e418] [cursor=pointer]: Margin
+                      - text: 
+                      - generic:    
+                    - columnheader "Volume" [ref=e419]:
+                      - text: 
+                      - generic [ref=e420]: 
+                      - generic [ref=e421] [cursor=pointer]: Volume
+                      - text: 
+                      - generic:    
+                    - columnheader "Diff" [ref=e422]:
+                      - text: 
+                      - generic [ref=e423]: 
+                      - generic [ref=e424] [cursor=pointer]: Diff
+                      - text: 
+                      - generic:    
+                    - columnheader "Price" [ref=e425]:
+                      - text: 
+                      - generic [ref=e426]: 
+                      - generic [ref=e427] [cursor=pointer]: Price
+                      - text: 
+                      - generic:    
+                    - columnheader "Delta" [ref=e428]:
+                      - text: 
+                      - generic [ref=e429]: 
+                      - generic [ref=e430] [cursor=pointer]: Delta
+                      - text: 
+                      - generic:    
+                    - columnheader "Margin" [ref=e431]:
+                      - text: 
+                      - generic [ref=e432]: 
+                      - generic [ref=e433] [cursor=pointer]: Margin
+                      - text: 
+                      - generic:    
+                    - columnheader "Mkt Move" [ref=e434]:
+                      - text: 
+                      - generic [ref=e435]: 
+                      - generic [ref=e436] [cursor=pointer]: Mkt Move
+                      - text: 
+                      - generic:    
+                - rowgroup [ref=e437]:
+                  - row "Press SPACE to select this row." [ref=e438]:
+                    - gridcell "Press Space to toggle row selection (unchecked)  1" [ref=e439]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e440]
+                      - text:  1
+                    - gridcell "history" [ref=e441]:
+                      - img "history" [ref=e442] [cursor=pointer]:
+                        - img [ref=e443]
+                    - 'gridcell "Diesel #2" [ref=e445]'
+                    - gridcell "Houston Term." [ref=e446]
+                  - row "Press SPACE to select this row." [ref=e447]:
+                    - gridcell "Press Space to toggle row selection (unchecked)  2" [ref=e448]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e449]
+                      - text:  2
+                    - gridcell "history" [ref=e450]:
+                      - img "history" [ref=e451] [cursor=pointer]:
+                        - img [ref=e452]
+                    - gridcell "Unleaded 87" [ref=e454]
+                    - gridcell "Houston Term." [ref=e455]
+                  - row "Press SPACE to select this row." [ref=e456]:
+                    - gridcell "Press Space to toggle row selection (unchecked)  3" [ref=e457]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e458]
+                      - text:  3
+                    - gridcell "history" [ref=e459]:
+                      - img "history" [ref=e460] [cursor=pointer]:
+                        - img [ref=e461]
+                    - 'gridcell "Diesel #2" [ref=e463]'
+                    - gridcell "Dallas Hub" [ref=e464]
+                  - row "Press SPACE to select this row." [ref=e465]:
+                    - gridcell "Press Space to toggle row selection (unchecked)  4" [ref=e466]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e467]
+                      - text:  4
+                    - gridcell "history" [ref=e468]:
+                      - img "history" [ref=e469] [cursor=pointer]:
+                        - img [ref=e470]
+                    - gridcell "Premium 91" [ref=e472]
+                    - gridcell "Houston Term." [ref=e473]
+                  - row "Press SPACE to select this row." [ref=e474]:
+                    - gridcell "Press Space to toggle row selection (unchecked)  5" [ref=e475]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e476]
+                      - text:  5
+                    - gridcell "history" [ref=e477]:
+                      - img "history" [ref=e478] [cursor=pointer]:
+                        - img [ref=e479]
+                    - 'gridcell "Diesel #2" [ref=e481]'
+                    - gridcell "Chicago Term." [ref=e482]
+                - rowgroup [ref=e483]:
+                  - row "Press SPACE to select this row." [ref=e484]:
+                    - gridcell "GAL" [ref=e485]
+                    - gridcell "$2.8450" [ref=e486]
+                    - gridcell "-0.0150" [ref=e487]
+                    - gridcell "$0.0820" [ref=e488]
+                    - gridcell "2.88%" [ref=e489]
+                    - gridcell "45,000" [ref=e490]
+                    - gridcell "-0.0120" [ref=e491]
+                    - gridcell "$2.8510" [ref=e492]
+                    - gridcell "▲ 0.0060" [ref=e493]:
+                      - generic [ref=e494]: ▲ 0.0060
+                    - gridcell "3.10%" [ref=e495]
+                    - gridcell "0.0045" [ref=e496]
+                  - row "Press SPACE to select this row." [ref=e497]:
+                    - gridcell "GAL" [ref=e498]
+                    - gridcell "$2.5280" [ref=e499]
+                    - gridcell "-0.0200" [ref=e500]
+                    - gridcell "$0.0650" [ref=e501]
+                    - gridcell "2.57%" [ref=e502]
+                    - gridcell "62,000" [ref=e503]
+                    - gridcell "-0.0180" [ref=e504]
+                    - gridcell "$2.5300" [ref=e505]
+                    - gridcell "▲ 0.0020" [ref=e506]:
+                      - generic [ref=e507]: ▲ 0.0020
+                    - gridcell "2.65%" [ref=e508]
+                    - gridcell "0.0032" [ref=e509]
+                  - row "Press SPACE to select this row." [ref=e510]:
+                    - gridcell "GAL" [ref=e511]
+                    - gridcell "$2.8680" [ref=e512]
+                    - gridcell "-0.0100" [ref=e513]
+                    - gridcell "$0.0750" [ref=e514]
+                    - gridcell "2.62%" [ref=e515]
+                    - gridcell "38,000" [ref=e516]
+                    - gridcell "-0.0080" [ref=e517]
+                    - gridcell "$2.8700" [ref=e518]
+                    - gridcell "▲ 0.0020" [ref=e519]:
+                      - generic [ref=e520]: ▲ 0.0020
+                    - gridcell "2.70%" [ref=e521]
+                    - gridcell "0.0028" [ref=e522]
+                  - row "Press SPACE to select this row." [ref=e523]:
+                    - gridcell "GAL" [ref=e524]
+                    - gridcell "$3.0120" [ref=e525]
+                    - gridcell "-0.0180" [ref=e526]
+                    - gridcell "$0.0920" [ref=e527]
+                    - gridcell "3.05%" [ref=e528]
+                    - gridcell "18,000" [ref=e529]
+                    - gridcell "-0.0160" [ref=e530]
+                    - gridcell "$3.0180" [ref=e531]
+                    - gridcell "▲ 0.0060" [ref=e532]:
+                      - generic [ref=e533]: ▲ 0.0060
+                    - gridcell "3.15%" [ref=e534]
+                    - gridcell "0.0050" [ref=e535]
+                  - row "Press SPACE to select this row." [ref=e536]:
+                    - gridcell "BBL" [ref=e537]
+                    - gridcell "$2.9100" [ref=e538]
+                    - gridcell "-0.0220" [ref=e539]
+                    - gridcell "$0.0680" [ref=e540]
+                    - gridcell "2.34%" [ref=e541]
+                    - gridcell "52,000" [ref=e542]
+                    - gridcell "-0.0200" [ref=e543]
+                    - gridcell "$2.9050" [ref=e544]
+                    - gridcell "▼ 0.0050" [ref=e545]:
+                      - generic [ref=e546]: ▼ 0.0050
+                    - gridcell "2.30%" [ref=e547]
+                    - gridcell "-0.0015" [ref=e548]
+                - rowgroup:
+                  - row "Press SPACE to select this row." [expanded] [ref=e549]:
+                    - gridcell " wholesale (5)" [ref=e550]:
+                      - generic [ref=e551] [cursor=pointer]: 
+                      - text: 
+                      - generic [ref=e552]: wholesale
+                      - generic [ref=e553]: (5)
+              - generic:
+                - tablist [ref=e554]:
+                  - tab "Filters" [ref=e555] [cursor=pointer]:
+                    - generic [ref=e556]: 
+                    - generic [ref=e557]: Filters
+                  - tab "Columns" [ref=e558] [cursor=pointer]:
+                    - generic [ref=e559]: 
+                    - generic [ref=e560]: Columns
+                  - tab "Grid Views" [ref=e561] [cursor=pointer]:
+                    - generic [ref=e562]: Grid Views
+                - text:                                                                                                                   
+              - text:    
+          - generic [ref=e563]:
+            - generic [ref=e564]:
+              - img "file-text" [ref=e565]:
+                - img [ref=e566]
+              - heading "Quote Publisher" [level=4] [ref=e568]
+            - generic [ref=e569]:
+              - button "sync Reset" [ref=e570]:
+                - img "sync" [ref=e571]:
+                  - img [ref=e572]
+                - text: Reset
+              - button "save Save Adjustments" [disabled] [ref=e574]:
+                - img "save" [ref=e575]:
+                  - img [ref=e576]
+                - text: Save Adjustments
+              - button "cloud-upload Publish Prices" [ref=e578]:
+                - img "cloud-upload" [ref=e579]:
+                  - img [ref=e580]
+                - text: Publish Prices

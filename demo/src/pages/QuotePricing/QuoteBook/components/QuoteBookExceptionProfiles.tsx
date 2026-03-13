@@ -632,7 +632,7 @@ function ThresholdEditorCard({
   threshold: ThresholdComponent
   onBoundaryChange: (field: string, value: number | null) => void
 }) {
-  const isAbsolute = threshold.component === 'Market Move' || threshold.component === 'Bench Delta'
+  const isAbsolute = threshold.component === 'Market Move' || threshold.component === 'Ref Strategy to Price'
 
   const boundaryRow = (field: string, label: string, color: string, value: number | null, orgValue: number | null, disabled?: boolean) => (
     <Horizontal alignItems="center" gap={6} style={{ marginBottom: 4 }}>

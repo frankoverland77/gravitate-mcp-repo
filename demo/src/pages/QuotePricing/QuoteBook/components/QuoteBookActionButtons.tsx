@@ -1,7 +1,8 @@
 import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
-import { Select, Switch, Tooltip } from 'antd'
+import { Select, Switch, Tooltip, Segmented } from 'antd'
 import { BarChartOutlined, ShrinkOutlined, ArrowsAltOutlined, SettingOutlined } from '@ant-design/icons'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
+import type { PeriodDisplay, PeriodToggleValue } from '../QuoteBook.types'
 
 interface QuoteBookActionButtonsProps {
   publicationMode: 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay'
@@ -12,6 +13,9 @@ interface QuoteBookActionButtonsProps {
   setShowSpreadRows: (v: boolean) => void
   publishMode: boolean
   onManageThresholds?: () => void
+  periodDisplay?: PeriodDisplay
+  periodToggleValue?: PeriodToggleValue
+  onPeriodToggleChange?: (v: PeriodToggleValue) => void
 }
 
 export function QuoteBookActionButtons({
@@ -23,6 +27,9 @@ export function QuoteBookActionButtons({
   setShowSpreadRows,
   publishMode,
   onManageThresholds,
+  periodDisplay,
+  periodToggleValue,
+  onPeriodToggleChange,
 }: QuoteBookActionButtonsProps) {
   const { isFutureMode: _isFutureMode } = useFeatureMode()
 
@@ -59,6 +66,17 @@ export function QuoteBookActionButtons({
           unCheckedChildren={<BarChartOutlined />}
         />
       </Tooltip>
+      {periodDisplay === 'toggle' && onPeriodToggleChange && (
+        <Segmented
+          size="small"
+          value={periodToggleValue || 'proposed'}
+          options={[
+            { value: 'proposed', label: 'Proposed' },
+            { value: 'current', label: 'Current' },
+          ]}
+          onChange={(val) => onPeriodToggleChange(val as PeriodToggleValue)}
+        />
+      )}
       <GraviButton
         buttonText="Manage Thresholds"
         icon={<SettingOutlined />}

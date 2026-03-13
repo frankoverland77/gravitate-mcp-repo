@@ -59,6 +59,12 @@ export type DrawerState = {
   selectedProfileKey: string | null
 }
 
+export type PeriodDisplay = 'neither' | 'column-families' | 'toggle'
+export type PeriodToggleValue = 'proposed' | 'current'
+
+export const PROPOSED_COMPONENTS = ['Margin', 'Market Move', 'Price Delta', 'Cost'] as const
+export const CURRENT_COMPONENTS = ['Ref Strategy to Price'] as const
+
 export function getComponentStatus(t: ThresholdComponent): 'hard' | 'soft' | 'off' {
   if (t.criticalBelow !== null || t.criticalAbove !== null) return 'hard'
   if (t.warningBelow !== null || t.warningAbove !== null) return 'soft'

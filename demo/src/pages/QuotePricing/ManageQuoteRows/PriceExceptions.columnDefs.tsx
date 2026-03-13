@@ -80,7 +80,7 @@ const COMPONENT_GROUPS: ThresholdGroupConfig[] = [
   { headerName: 'Market Move', prefix: 'marketMove', isAbsolute: true },
   { headerName: 'Price Delta', prefix: 'priceDelta' },
   { headerName: 'Price', prefix: 'price' },
-  { headerName: 'Bench Delta', prefix: 'benchDelta', isAbsolute: true },
+  { headerName: 'Ref Strategy to Price', prefix: 'benchDelta', isAbsolute: true },
   { headerName: 'Bench Value', prefix: 'benchValue' },
 ]
 
@@ -102,12 +102,6 @@ export function getPriceExceptionColumnDefs(): (ColDef | ColGroupDef)[] {
       field: 'location',
       headerName: 'Location',
       width: 130,
-      pinned: 'left',
-    },
-    {
-      field: 'costType',
-      headerName: 'Cost Type',
-      width: 100,
       pinned: 'left',
     },
     ...COMPONENT_GROUPS.map(makeThresholdGroup),
