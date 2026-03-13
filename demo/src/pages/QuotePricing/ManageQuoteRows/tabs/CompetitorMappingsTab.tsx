@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import {
   GraviGrid,
   Vertical,
@@ -6,7 +6,7 @@ import {
   Texto,
   GraviButton,
 } from '@gravitate-js/excalibrr'
-import { Modal, Select, message } from 'antd'
+import { Input, Modal, Select, message } from 'antd'
 import {
   SearchOutlined,
   ThunderboltOutlined,
@@ -14,21 +14,34 @@ import {
   InfoCircleOutlined,
   WarningOutlined,
   CloseOutlined,
+  ExpandAltOutlined,
+  ShrinkOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
 } from '@ant-design/icons'
 import {
-  competitorQuoteRows,
+  competitorQuoteRows as initialQuoteRows,
   generateMatchResults,
+  toggleAssociationVisibility,
+  bulkSetVisibility,
   publisherOptions,
   productHierarchyOptions,
   locationHierarchyOptions,
+  getLocationName,
+  getProductName,
 } from '../CompetitorMappings.data'
 import type {
   CompetitorQuoteRow,
+  CompetitorAssociation,
   MatchResult,
 } from '../CompetitorMappings.data'
-import { getCompetitorMappingsColumnDefs } from '../CompetitorMappings.columnDefs'
+import {
+  getCompetitorMappingsColumnDefs,
+  getCompetitorDetailColumnDefs,
+} from '../CompetitorMappings.columnDefs'
 
 export function CompetitorMappingsTab() {
+  const [quoteRows, setQuoteRows] = useState<CompetitorQuoteRow[]>(initialQuoteRows)
   const [selectedRows, setSelectedRows] = useState<CompetitorQuoteRow[]>([])
   const [publisher, setPublisher] = useState<string | undefined>(undefined)
   const [productHierarchy, setProductHierarchy] = useState<string | undefined>(undefined)
@@ -37,11 +50,14 @@ export function CompetitorMappingsTab() {
   const [matchResults, setMatchResults] = useState<MatchResult[]>([])
   const [searchText, setSearchText] = useState('')
   const [configFilter, setConfigFilter] = useState<string | undefined>(undefined)
+  const [allExpanded, setAllExpanded] = useState(false)
+
+  const gridApiRef = useRef<any>(null)
 
   const columnDefs = useMemo(() => getCompetitorMappingsColumnDefs(), [])
 
   const filteredRows = useMemo(() => {
-    let rows = competitorQuoteRows
+    let rows = quoteRows
     if (configFilter) {
       rows = rows.filter((r) => r.configurationName === configFilter)
     }
@@ -50,18 +66,18 @@ export function CompetitorMappingsTab() {
       rows = rows.filter(
         (r) =>
           r.counterparty.toLowerCase().includes(lower) ||
-          r.terminal.toLowerCase().includes(lower) ||
-          r.product.toLowerCase().includes(lower) ||
+          getLocationName(r.locationId).toLowerCase().includes(lower) ||
+          getProductName(r.productId).toLowerCase().includes(lower) ||
           r.costType.toLowerCase().includes(lower),
       )
     }
     return rows
-  }, [configFilter, searchText])
+  }, [quoteRows, configFilter, searchText])
 
   const configOptions = useMemo(() => {
-    const configs = [...new Set(competitorQuoteRows.map((r) => r.configurationName))]
+    const configs = [...new Set(quoteRows.map((r) => r.configurationName))]
     return configs.map((c) => ({ value: c, label: c }))
-  }, [])
+  }, [quoteRows])
 
   const handleSelectionChanged = useCallback((event: any) => {
     const rows = event.api.getSelectedRows() as CompetitorQuoteRow[]
@@ -95,11 +111,69 @@ export function CompetitorMappingsTab() {
     setSelectedRows([])
   }, [])
 
+  // Expand All / Collapse All
+  const handleToggleExpandAll = useCallback(() => {
+    const api = gridApiRef.current
+    if (!api) return
+    const next = !allExpanded
+    api.forEachNode((node: any) => {
+      if (node.master) node.setExpanded(next)
+    })
+    setAllExpanded(next)
+  }, [allExpanded])
+
+  // Single visibility toggle
+  const handleToggleVisibility = useCallback(
+    (quoteRowId: number, associationId: number) => {
+      setQuoteRows((prev) => {
+        const next = toggleAssociationVisibility(prev, quoteRowId, associationId)
+        const row = next.find((r) => r.id === quoteRowId)
+        const assoc = row?.competitorAssociations.find((a) => a.id === associationId)
+        if (assoc) {
+          message.success(`${assoc.name} set to ${assoc.visibility}`)
+        }
+        return next
+      })
+    },
+    [],
+  )
+
+  // Bulk visibility set
+  const handleBulkVisibility = useCallback(
+    (quoteRowId: number, associations: CompetitorAssociation[], value: 'Show' | 'Hide') => {
+      const ids = associations.map((a) => a.id)
+      setQuoteRows((prev) => bulkSetVisibility(prev, quoteRowId, ids, value))
+      message.success(`Set ${ids.length} associations to ${value}`)
+    },
+    [],
+  )
+
+  // Custom detail cell renderer
+  const CompetitorDetailRenderer = useCallback(
+    (params: any) => {
+      const parentRow = params.data as CompetitorQuoteRow
+      if (!parentRow) return null
+      const associations = parentRow.competitorAssociations ?? []
+
+      const detailColDefs = getCompetitorDetailColumnDefs((associationId) =>
+        handleToggleVisibility(parentRow.id, associationId),
+      )
+
+      return <CompetitorDetailPanel
+        parentRow={parentRow}
+        associations={associations}
+        detailColDefs={detailColDefs}
+        onBulkVisibility={handleBulkVisibility}
+      />
+    },
+    [handleToggleVisibility, handleBulkVisibility],
+  )
+
   // Compute stats for selected rows
   const selectionSummary = useMemo(() => {
     if (selectedRows.length === 0) return null
-    const terminals = [...new Set(selectedRows.map((r) => r.terminal.split(' - ')[0]))]
-    const products = [...new Set(selectedRows.map((r) => r.product))]
+    const terminals = [...new Set(selectedRows.map((r) => getLocationName(r.locationId)))]
+    const products = [...new Set(selectedRows.map((r) => getProductName(r.productId)))]
     return { terminals, products }
   }, [selectedRows])
 
@@ -334,9 +408,37 @@ export function CompetitorMappingsTab() {
           border-bottom: 1px solid #e8e8e8;
           background: #fff;
         }
+        /* Detail row expand/collapse animation */
+        .competitor-mappings-left .ag-details-row {
+          animation: detailSlideIn 0.25s ease-out;
+        }
+        @keyframes detailSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        /* Sticky detail grid header */
+        .competitor-mappings-left .ag-details-row .ag-header {
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        }
+        .competitor-detail-panel {
+          padding: 8px 16px 8px 48px;
+          background: var(--theme-bg-elevated, #fafafa);
+        }
+        .competitor-detail-toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 4px 0 8px;
+        }
       `}</style>
-
-
 
       {/* Main Layout */}
       <div className="competitor-mappings-layout">
@@ -379,6 +481,7 @@ export function CompetitorMappingsTab() {
           <Vertical flex="1">
             <GraviGrid
               storageKey="competitor-mappings-grid"
+              externalRef={gridApiRef}
               rowData={filteredRows}
               columnDefs={columnDefs}
               agPropOverrides={{
@@ -389,11 +492,24 @@ export function CompetitorMappingsTab() {
                 groupDisplayType: 'groupRows',
                 suppressAggFuncInHeader: true,
                 groupSelectsChildren: true,
+                masterDetail: true,
+                detailRowAutoHeight: true,
+                isRowMaster: (data: CompetitorQuoteRow) =>
+                  data?.existingCompetitorCount > 0,
+                detailCellRenderer: CompetitorDetailRenderer,
               }}
               onSelectionChanged={handleSelectionChanged}
               controlBarProps={{
                 title: 'Quote Rows',
                 hideActiveFilters: true,
+                hideSearch: true,
+                actionButtons: (
+                  <GraviButton
+                    buttonText={allExpanded ? 'Collapse All' : 'Expand All'}
+                    icon={allExpanded ? <ShrinkOutlined /> : <ExpandAltOutlined />}
+                    onClick={handleToggleExpandAll}
+                  />
+                ),
               }}
             />
           </Vertical>
@@ -545,9 +661,9 @@ export function CompetitorMappingsTab() {
                 {selectedRows.map((row) => (
                   <div className="current-mappings-row" key={row.id}>
                     <div>
-                      <div style={{ fontWeight: 500 }}>{row.product}</div>
+                      <div style={{ fontWeight: 500 }}>{getProductName(row.productId)}</div>
                       <div style={{ fontSize: 10, color: '#999' }}>
-                        {row.terminal.split(' - ')[0]}
+                        {getLocationName(row.locationId)}
                       </div>
                     </div>
                     <Horizontal alignItems="center" className="gap-8">
@@ -587,12 +703,12 @@ export function CompetitorMappingsTab() {
 
       {/* Preview Modal */}
       <Modal
-        visible={previewVisible}
+        open={previewVisible}
         title={null}
         footer={null}
         width={900}
         onCancel={() => setPreviewVisible(false)}
-        bodyStyle={{ padding: 0, maxHeight: '75vh', display: 'flex', flexDirection: 'column' }}
+        styles={{ body: { padding: 0, maxHeight: '75vh', display: 'flex', flexDirection: 'column' } }}
         closable={false}
       >
         {/* Modal header */}
@@ -648,7 +764,7 @@ export function CompetitorMappingsTab() {
         {/* Scrollable body */}
         <div style={{ flex: 1, overflowY: 'auto', paddingTop: 8, paddingBottom: 8 }}>
           {matchResults.map((result) => {
-            const quoteRow = competitorQuoteRows.find(
+            const quoteRow = quoteRows.find(
               (r) => r.id === result.quoteRowId,
             )
             if (!quoteRow) return null
@@ -659,9 +775,9 @@ export function CompetitorMappingsTab() {
               <div className="preview-group" key={result.quoteRowId}>
                 <div className="preview-group-header">
                   <InfoCircleOutlined style={{ color: 'var(--success-color, #10b981)' }} />
-                  <span>{quoteRow.product}</span>
+                  <span>{getProductName(quoteRow.productId)}</span>
                   <span className="qr-detail">
-                    {quoteRow.counterparty} · {quoteRow.terminal.split(' - ')[0]} ·{' '}
+                    {quoteRow.counterparty} · {getLocationName(quoteRow.locationId)} ·{' '}
                     {quoteRow.costType}
                   </span>
                   <span className="badges">
@@ -753,5 +869,64 @@ export function CompetitorMappingsTab() {
         </Horizontal>
       </Modal>
     </Vertical>
+  )
+}
+
+/** Detail panel rendered inside each expanded master row */
+function CompetitorDetailPanel({
+  parentRow,
+  associations,
+  detailColDefs,
+  onBulkVisibility,
+}: {
+  parentRow: CompetitorQuoteRow
+  associations: CompetitorAssociation[]
+  detailColDefs: any[]
+  onBulkVisibility: (quoteRowId: number, associations: CompetitorAssociation[], value: 'Show' | 'Hide') => void
+}) {
+  const [selectedDetailRows, setSelectedDetailRows] = useState<CompetitorAssociation[]>([])
+
+  const handleDetailSelection = useCallback((event: any) => {
+    setSelectedDetailRows(event.api.getSelectedRows() as CompetitorAssociation[])
+  }, [])
+
+  return (
+    <div className="competitor-detail-panel">
+      <div className="competitor-detail-toolbar">
+        <Texto appearance="medium" style={{ fontSize: 11 }}>
+          {associations.length} competitor associations
+        </Texto>
+        {selectedDetailRows.length > 0 && (
+          <Horizontal className="gap-8">
+            <GraviButton
+              success
+              buttonText={`Show (${selectedDetailRows.length})`}
+              icon={<EyeOutlined />}
+              onClick={() => onBulkVisibility(parentRow.id, selectedDetailRows, 'Show')}
+              style={{ fontSize: 11, padding: '2px 8px' }}
+            />
+            <GraviButton
+              buttonText={`Hide (${selectedDetailRows.length})`}
+              icon={<EyeInvisibleOutlined />}
+              onClick={() => onBulkVisibility(parentRow.id, selectedDetailRows, 'Hide')}
+              style={{ fontSize: 11, padding: '2px 8px' }}
+            />
+          </Horizontal>
+        )}
+      </div>
+      <GraviGrid
+        storageKey={`competitor-detail-${parentRow.id}`}
+        rowData={associations}
+        columnDefs={detailColDefs}
+        agPropOverrides={{
+          domLayout: 'autoHeight',
+          rowSelection: 'multiple',
+          suppressRowClickSelection: true,
+          getRowId: (p: any) => String(p.data.id),
+        }}
+        onSelectionChanged={handleDetailSelection}
+        hideControlBar={true}
+      />
+    </div>
   )
 }
