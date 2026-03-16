@@ -20,7 +20,7 @@ import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 
 export function QuoteBook() {
   const { isFutureMode } = useFeatureMode()
-  const [activeGroupTab, setActiveGroupTab] = useState('wholesale')
+  const [activeGroupTab, setActiveGroupTab] = useState('wholesale-east')
   const [publicationMode, setPublicationMode] = useState<'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay'>('EndOfDay')
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [showSpreadRows, setShowSpreadRows] = useState(false)
@@ -395,7 +395,7 @@ export function QuoteBook() {
           dirtyCount={dirtyCount}
           onPublish={handlePublish}
           onReset={() => setDirtyCount(0)}
-          hardExceptionCount={hardExceptionCount}
+          hardExceptionCount={isFutureMode ? hardExceptionCount : 0}
         />
       </div>
       <QuoteBookHistoryDrawer

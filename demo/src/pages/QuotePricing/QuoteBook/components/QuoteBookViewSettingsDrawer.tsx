@@ -19,7 +19,7 @@ interface QuoteBookViewSettingsDrawerProps {
   onPeriodDisplayChange?: (v: PeriodDisplay) => void
 }
 
-export function QuoteBookViewSettingsDrawer({ visible, onClose, periodDisplay, onPeriodDisplayChange }: QuoteBookViewSettingsDrawerProps) {
+export function QuoteBookViewSettingsDrawer({ open, onClose, periodDisplay, onPeriodDisplayChange }: QuoteBookViewSettingsDrawerProps) {
   const { featureMode, setFeatureMode } = useFeatureMode()
 
   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({

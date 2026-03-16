@@ -15,14 +15,14 @@ const DEFAULT_SCOPES = {
   Welcome: true,
   DesignSystem: true,
   Bakery: true,
-  Forms: true,
+  CustomerForm: true,
   Dashboards: true,
   ContractFormulas: true,
-  OnlineSellingPlatform: true,
+
   MarketPlatform: true,
   SupplierAnalysis: true,
   GlobalTieredPricing: true,
-  ContractMeasurement: true,
+
   SubscriptionManagement: true,
   BakeryProducts: true,
   FormulaManager: true,
@@ -31,11 +31,11 @@ const DEFAULT_SCOPES = {
   CustomerList: true,
   InventoryGrid: true,
   BulkChangeTest: true,
-  Contracts: true,
-  NegotiationMode: true,
+
+
   DeliveredPricing: true,
   PriceElasticity: true,
-  QuotebookWholesale: true,
+
   QuotePricing: true,
   QuotebookQoL: true,
   PriceManagement: true,

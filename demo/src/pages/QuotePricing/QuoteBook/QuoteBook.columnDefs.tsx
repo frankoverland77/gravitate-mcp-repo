@@ -82,24 +82,30 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
       children: [
         {
           headerName: '',
-          field: filterComponents ? `exceptionCount_${groupName}` : 'exceptionCount',
           colId: `exceptionCount_${groupName}`,
           width: 100,
           suppressMenu: true,
-          cellRenderer: (params: ICellRendererParams) => {
+          valueGetter: (params: any) => {
             if (!params.data) return null
             const result = options.evaluationMap?.get(params.data.id)
             if (!result) return null
-
             const violations = filterSet
-              ? result.violations.filter(v => filterSet.has(v.component))
+              ? result.violations.filter((v: any) => filterSet.has(v.component))
               : result.violations
             if (violations.length === 0) return null
+            const hasHard = violations.some((v: any) => v.severity === 'Hard')
+            return hasHard ? 'Urgent' : 'Caution'
+          },
+          cellRenderer: (params: ICellRendererParams) => {
+            if (!params.value) return null
+            const isUrgent = params.value === 'Urgent'
+            const Icon = isUrgent ? StopFilled : WarningFilled
+            const iconColor = isUrgent ? '#dc2626' : '#d97706'
 
-            const hasHard = violations.some(v => v.severity === 'Hard')
-            const Icon = hasHard ? StopFilled : WarningFilled
-            const iconColor = hasHard ? '#dc2626' : '#d97706'
-            const label = hasHard ? 'Urgent' : 'Caution'
+            const result = params.data ? options.evaluationMap?.get(params.data.id) : null
+            const violations = result
+              ? (filterSet ? result.violations.filter(v => filterSet.has(v.component)) : result.violations)
+              : []
 
             return (
               <span style={{
@@ -113,7 +119,7 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
                   {violations.length}
                 </span>
                 <span style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>
-                  {label}
+                  {params.value}
                 </span>
               </span>
             )
@@ -206,19 +212,31 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
     width: 70,
   },
   {
-    headerName: 'Prior EOD',
+    headerName: 'Current Period',
     children: [
       {
-        field: 'prior_lastPrice',
-        headerName: 'Last Price',
+        field: 'prior_volume',
+        headerName: 'Sold Vol',
+        width: 100,
+        valueFormatter: ({ value }) => value != null ? value.toLocaleString() : '',
+      },
+      {
+        field: 'prior_cost',
+        headerName: 'Cost',
         width: 110,
         valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
       },
       {
         field: 'prior_lastDiff',
-        headerName: 'Last Diff',
+        headerName: 'Diff',
         width: 100,
         valueFormatter: ({ value }) => value != null ? value.toFixed(4) : '',
+      },
+      {
+        field: 'prior_lastPrice',
+        headerName: 'Price',
+        width: 110,
+        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
       },
       {
         field: 'prior_profit',
@@ -226,23 +244,17 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
         width: 90,
         valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
       },
-      {
-        field: 'prior_margin',
-        headerName: 'Margin',
-        width: 90,
-        valueFormatter: ({ value }) => value != null ? `${value.toFixed(2)}%` : '',
-      },
-      {
-        field: 'prior_volume',
-        headerName: 'Volume',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? value.toLocaleString() : '',
-      },
     ],
   },
   {
-    headerName: 'New EOD',
+    headerName: 'Proposed Period',
     children: [
+      {
+        field: 'proposed_cost',
+        headerName: 'Cost',
+        width: 110,
+        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
+      },
       {
         field: 'proposed_diff',
         headerName: 'Diff',
@@ -266,8 +278,8 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
       },
       {
         field: 'proposed_delta',
-        headerName: 'Delta',
-        width: 90,
+        headerName: 'Price Delta',
+        width: 100,
         cellRenderer: (params: ICellRendererParams) => {
           if (!params.value && params.value !== 0) return null
           const val = params.value as number
@@ -286,11 +298,16 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
       {
         field: 'proposed_margin',
         headerName: 'Margin',
-        width: 90,
-        valueFormatter: ({ value }) => value != null ? `${value.toFixed(2)}%` : '',
+        width: 100,
+        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
         cellStyle: (params) => {
           if (!params.data) return null
-          return getViolationStyle(options.evaluationMap, params.data.id, 'Margin')
+          const val = params.data.proposed_margin
+          const violation = getViolationStyle(options.evaluationMap, params.data.id, 'Margin')
+          if (violation) return violation
+          if (val > 0) return { backgroundColor: 'rgba(82, 196, 26, 0.08)' }
+          if (val < 0) return { backgroundColor: 'rgba(255, 77, 79, 0.08)' }
+          return null
         },
       },
       {
@@ -305,24 +322,7 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
       },
     ],
   },
-  {
-    headerName: 'Benchmarks',
-    children: [
-      {
-        field: 'benchmark_ulsd',
-        headerName: 'ULSD',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-      },
-      {
-        field: 'benchmark_unl',
-        headerName: 'UNL',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-      },
-    ],
-  },
-  {
+{
     field: 'allocation',
     headerName: 'Allocation',
     width: 100,

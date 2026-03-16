@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { GraviGrid, Vertical, Horizontal, GraviButton } from '@gravitate-js/excalibrr'
-import { EditOutlined } from '@ant-design/icons'
+import { GraviGrid, Vertical } from '@gravitate-js/excalibrr'
 import { priceExceptionData } from '../PriceExceptions.data'
 import { getPriceExceptionColumnDefs } from '../PriceExceptions.columnDefs'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
@@ -101,17 +100,6 @@ export function PriceExceptionsTab() {
           controlBarProps={{
             title: 'Price Exceptions',
             hideActiveFilters: true,
-            actionButtons: (
-              <Horizontal className="gap-8">
-                <GraviButton
-                  buttonText={
-                    isBulkChangeVisible ? 'Exit Bulk Change' : 'Bulk Change'
-                  }
-                  icon={<EditOutlined />}
-                  onClick={() => setIsBulkChangeVisible((v) => !v)}
-                />
-              </Horizontal>
-            ),
           }}
         />
       )}

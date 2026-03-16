@@ -28,7 +28,7 @@ import { FormulaManager } from './pages/demos/grids/FormulaManager';
 import { DeliveryManager } from './pages/demos/delivery/DeliveryManager';
 import { PromptsGrid } from './pages/demos/grids/PromptsGrid';
 import { FormulaTemplates } from './pages/demos/grids/FormulaTemplates';
-import { FormulaTemplateDetails } from './pages/demos/grids/FormulaTemplateDetails';
+
 import { ContractDetails } from './pages/demos/grids/ContractDetails';
 import { OnlineSellingPlatformHome } from './pages/OnlineSellingPlatform/OnlineSellingPlatformHome';
 import { IndexOfferManagement } from './pages/OnlineSellingPlatform/IndexOfferManagement';
@@ -156,7 +156,7 @@ export const demoRegistry: DemoRoute[] = [
   },
   {
     key: 'PromptsGrid',
-    title: 'Prompts',
+    title: 'Contracts',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <PromptsGrid />
@@ -181,19 +181,6 @@ export const demoRegistry: DemoRoute[] = [
     category: 'contract-management',
   },
   {
-    key: 'FormulaTemplateDetails',
-    title: 'Formula Template Details',
-    element: (
-      <ThemeRouteWrapper theme="PE_LIGHT">
-        <FormulaTemplateDetails />
-      </ThemeRouteWrapper>
-    ),
-    path: '/ContractFormulas/FormulaTemplateDetails/:id',
-    description: 'View formula template details',
-    created: new Date().toISOString(),
-    category: 'contract-management',
-  },
-  {
     key: 'ContractDetails',
     title: 'Contract Details',
     element: (
@@ -208,7 +195,7 @@ export const demoRegistry: DemoRoute[] = [
   },
   {
     key: 'SupplierAnalysis',
-    title: 'Supplier Price Analysis',
+    title: 'Competitor Price Analysis',
     element: (
       <ThemeRouteWrapper theme="OSP">
         <SupplierAnalysis />
@@ -221,7 +208,7 @@ export const demoRegistry: DemoRoute[] = [
   },
   {
     key: 'SupplierDetails',
-    title: 'Supplier Details',
+    title: 'Competitor Details',
     element: (
       <ThemeRouteWrapper theme="OSP">
         <SupplierDetails />
@@ -261,7 +248,7 @@ export const demoRegistry: DemoRoute[] = [
   // Contract Management routes
   {
     key: 'ContractsList',
-    title: 'All Contracts',
+    title: 'Contracts - New',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <ContractManagementPage />
@@ -274,7 +261,7 @@ export const demoRegistry: DemoRoute[] = [
   },
   {
     key: 'CreateContract',
-    title: 'Create Contract',
+    title: 'Create Contract - New',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <CreateContractPage />
@@ -287,7 +274,7 @@ export const demoRegistry: DemoRoute[] = [
   },
   {
     key: 'EditContract',
-    title: 'Edit Contract',
+    title: 'Edit Contract - New',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <CreateContractPage />
@@ -377,7 +364,7 @@ const getContractManagementRoutes = (): RouteConfig[] => [
   {
     hasPermission: () => true,
     key: 'PromptsGrid',
-    title: 'Prompts',
+    title: 'Contracts',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <PromptsGrid />
@@ -397,19 +384,6 @@ const getContractManagementRoutes = (): RouteConfig[] => [
     ),
     path: '/ContractFormulas/FormulaTemplates',
     description: 'Manage and organize pricing formula templates',
-  },
-  {
-    hasPermission: () => true,
-    key: 'FormulaTemplateDetails',
-    title: 'Formula Template Details',
-    element: (
-      <ThemeRouteWrapper theme="PE_LIGHT">
-        <FormulaTemplateDetails />
-      </ThemeRouteWrapper>
-    ),
-    path: '/ContractFormulas/FormulaTemplateDetails/:id',
-    description: 'View formula template details',
-    hidden: true,
   },
   {
     hasPermission: () => true,
@@ -448,6 +422,68 @@ const getContractManagementRoutes = (): RouteConfig[] => [
     path: '/ContractFormulas/SellerRFPResponse',
     description: 'Manage seller-side RFP responses with cost-aware pricing',
   },
+  {
+    hasPermission: () => true,
+    key: 'ContractMeasurementGrid',
+    title: 'Measurements',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <ContractMeasurementGrid />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/ContractMeasurementGrid',
+    description: 'Contract measurement tracking grid',
+  },
+  {
+    hasPermission: () => true,
+    key: 'ContractMeasurementDetails',
+    title: 'Measurement Details',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <ContractMeasurementDetails />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/ContractMeasurementDetails',
+    description: 'Contract measurement details view',
+    hidden: true,
+  },
+  {
+    hasPermission: () => true,
+    key: 'ContractsList',
+    title: 'Contracts - New',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <ContractManagementPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/ContractsList',
+    description: 'View and manage all contracts',
+  },
+  {
+    hasPermission: () => true,
+    key: 'CreateContract',
+    title: 'Create Contract - New',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <CreateContractPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/CreateContract',
+    description: 'Create a new contract',
+    hidden: true,
+  },
+  {
+    hasPermission: () => true,
+    key: 'EditContract',
+    title: 'Edit Contract - New',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <CreateContractPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ContractFormulas/EditContract',
+    hidden: true,
+  },
 ];
 
 // Supplier Analysis routes configuration
@@ -455,7 +491,7 @@ const getSupplierAnalysisRoutes = (): RouteConfig[] => [
   {
     hasPermission: () => true,
     key: 'SupplierProfileAnalysis',
-    title: 'Supplier Price Analysis',
+    title: 'Competitor Price Analysis',
     element: (
       <ThemeRouteWrapper theme="OSP">
         <SupplierAnalysis />
@@ -467,7 +503,7 @@ const getSupplierAnalysisRoutes = (): RouteConfig[] => [
   {
     hasPermission: () => true,
     key: 'SupplierDetails',
-    title: 'Supplier Details',
+    title: 'Competitor Details',
     element: (
       <ThemeRouteWrapper theme="OSP">
         <SupplierDetails />
@@ -485,7 +521,7 @@ export const createPageConfig = (): PageConfig => {
   // src/_Main/AuthenticatedRoute.jsx or the menu item will not appear!
 
   const gridsRoutes = getRoutesByCategory('grids');
-  const formsRoutes = getRoutesByCategory('forms');
+
   const dashboardRoutes = getRoutesByCategory('dashboards');
 
   const config: PageConfig = {
@@ -609,15 +645,23 @@ export const createPageConfig = (): PageConfig => {
     };
   }
 
-  if (formsRoutes.length > 0) {
-    config.Forms = {
-      hasPermission: () => true,
-      key: 'Forms',
-      icon: <EditOutlined />,
-      title: 'Forms',
-      routes: formsRoutes,
-    };
-  }
+  config.BulkChangeTest = {
+    hasPermission: () => true,
+    key: 'BulkChangeTest',
+    icon: <TableOutlined />,
+    title: 'Bulk Change Test',
+    element: <BulkChangeTest />,
+    path: '/BulkChangeTest',
+  };
+
+  config.CustomerForm = {
+    hasPermission: () => true,
+    key: 'CustomerForm',
+    icon: <EditOutlined />,
+    title: 'Customer Form',
+    element: <CustomerForm />,
+    path: '/demos/forms/customer-form',
+  };
 
   if (dashboardRoutes.length > 0) {
     config.Dashboards = {
@@ -637,25 +681,24 @@ export const createPageConfig = (): PageConfig => {
     routes: getContractManagementRoutes(),
   };
 
-  config.OnlineSellingPlatform = {
-    hasPermission: () => true,
-    key: 'OnlineSellingPlatform',
-    icon: <GlobalOutlined />,
-    title: 'Buy Now',
-    element: (
-      <ThemeRouteWrapper theme="OSP">
-        <OnlineSellingPlatformHome />
-      </ThemeRouteWrapper>
-    ),
-    path: '/OnlineSellingPlatform',
-  };
-
   config.MarketPlatform = {
     hasPermission: () => true,
     key: 'MarketPlatform',
     icon: <ShopOutlined />,
-    title: 'Market Platform',
+    title: 'Online Selling Platform',
     routes: [
+      {
+        hasPermission: () => true,
+        key: 'OnlineSellingPlatform',
+        title: 'Buy Now',
+        element: (
+          <ThemeRouteWrapper theme="OSP">
+            <OnlineSellingPlatformHome />
+          </ThemeRouteWrapper>
+        ),
+        path: '/MarketPlatform/BuyNow',
+        description: 'Online selling platform home',
+      },
       {
         hasPermission: () => true,
         key: 'IndexOfferManagement',
@@ -680,6 +723,18 @@ export const createPageConfig = (): PageConfig => {
         path: '/MarketPlatform/IndexOfferBuyNow',
         description: 'Buyer experience for placing index pricing orders with pickup window dates',
       },
+      {
+        hasPermission: () => true,
+        key: 'NegotiationMode',
+        title: 'Negotiation Mode',
+        element: (
+          <ThemeRouteWrapper theme="OSP">
+            <NegotiationModePage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/MarketPlatform/NegotiationMode',
+        description: 'Negotiation mode for online selling',
+      },
     ],
   };
 
@@ -687,7 +742,7 @@ export const createPageConfig = (): PageConfig => {
     hasPermission: () => true,
     key: 'SupplierAnalysis',
     icon: <DashboardOutlined />,
-    title: 'Supplier Analysis',
+    title: 'Competitor Profile',
     routes: getSupplierAnalysisRoutes(),
   };
 
@@ -695,7 +750,7 @@ export const createPageConfig = (): PageConfig => {
     hasPermission: () => true,
     key: 'GlobalTieredPricing',
     icon: <TableOutlined />,
-    title: 'Global Tiered Pricing',
+    title: 'Global Tiered Diff',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <GlobalTieredPricing />
@@ -715,53 +770,6 @@ export const createPageConfig = (): PageConfig => {
   };
 
   // Add Contract Measurement section (uses PE_LIGHT theme)
-  config.ContractMeasurement = {
-    hasPermission: () => true,
-    key: 'ContractMeasurement',
-    icon: <DashboardOutlined />,
-    title: 'Contract Measurement',
-    routes: [
-      {
-        hasPermission: () => true,
-        key: 'ContractMeasurementGrid',
-        title: 'Measurements',
-        element: (
-          <ThemeRouteWrapper theme="PE_LIGHT">
-            <ContractMeasurementGrid />
-          </ThemeRouteWrapper>
-        ),
-        path: '/ContractMeasurement/ContractMeasurementGrid',
-        description: 'Contract measurement tracking grid',
-      },
-      {
-        hasPermission: () => true,
-        key: 'ContractMeasurementDetails',
-        title: 'Measurement Details',
-        element: (
-          <ThemeRouteWrapper theme="PE_LIGHT">
-            <ContractMeasurementDetails />
-          </ThemeRouteWrapper>
-        ),
-        path: '/ContractMeasurement/ContractMeasurementDetails',
-        description: 'Contract measurement details view',
-        hidden: true,
-      },
-    ],
-  };
-
-  config.NegotiationMode = {
-    hasPermission: () => true,
-    key: 'NegotiationMode',
-    icon: <SwapOutlined />,
-    title: 'Negotiation Mode',
-    element: (
-      <ThemeRouteWrapper theme="OSP">
-        <NegotiationModePage />
-      </ThemeRouteWrapper>
-    ),
-    path: '/NegotiationMode',
-  };
-
   config.DeliveredPricing = {
     hasPermission: () => true,
     key: 'DeliveredPricing',
@@ -804,76 +812,21 @@ export const createPageConfig = (): PageConfig => {
     ],
   };
 
-  config.BulkChangeTest = {
-    hasPermission: () => true,
-    key: 'BulkChangeTest',
-    icon: <TableOutlined />,
-    title: 'Bulk Change Test',
-    element: <BulkChangeTest />,
-    path: '/BulkChangeTest',
-  };
-
   config.SubscriptionManagement = {
     hasPermission: () => true,
     key: 'SubscriptionManagement',
     icon: <CreditCardOutlined />,
-    title: 'Subscription Management',
+    title: 'Price Notifications',
     element: <SubscriptionManagement />,
     path: '/SubscriptionManagement',
   };
 
   // Contract Management (Quick Entry / Full Entry)
-  config.Contracts = {
-    hasPermission: () => true,
-    key: 'Contracts',
-    icon: <FileTextOutlined />,
-    title: 'Contracts',
-    routes: [
-      {
-        hasPermission: () => true,
-        key: 'ContractsList',
-        title: 'All Contracts',
-        element: (
-          <ThemeRouteWrapper theme="PE_LIGHT">
-            <ContractManagementPage />
-          </ThemeRouteWrapper>
-        ),
-        path: '/Contracts/ContractsList',
-        description: 'View and manage all contracts',
-      },
-      {
-        hasPermission: () => true,
-        key: 'CreateContract',
-        title: 'Create Contract',
-        element: (
-          <ThemeRouteWrapper theme="PE_LIGHT">
-            <CreateContractPage />
-          </ThemeRouteWrapper>
-        ),
-        path: '/Contracts/CreateContract',
-        description: 'Create a new contract',
-        hidden: true,
-      },
-      {
-        hasPermission: () => true,
-        key: 'EditContract',
-        title: 'Edit Contract',
-        element: (
-          <ThemeRouteWrapper theme="PE_LIGHT">
-            <CreateContractPage />
-          </ThemeRouteWrapper>
-        ),
-        path: '/Contracts/EditContract',
-        hidden: true,
-      },
-    ],
-  };
-
   config.PriceElasticity = {
     hasPermission: () => true,
     key: 'PriceElasticity',
     icon: <LineChartOutlined />,
-    title: 'Price Elasticity',
+    title: 'Price Elasticity - Needs work',
     element: (
       <ThemeRouteWrapper theme="PE_LIGHT">
         <PriceElasticity />
@@ -886,12 +839,12 @@ export const createPageConfig = (): PageConfig => {
     hasPermission: () => true,
     key: 'QuotePricing',
     icon: <BookOutlined />,
-    title: 'Quote Pricing',
+    title: 'Pricing Engine (exceptions)',
     routes: [
       {
         hasPermission: () => true,
         key: 'QuoteBook',
-        title: 'Quote Book',
+        title: 'Quote Book Exceptions',
         element: (
           <ThemeRouteWrapper theme="PE_LIGHT">
             <QuoteBook />
@@ -903,7 +856,7 @@ export const createPageConfig = (): PageConfig => {
       {
         hasPermission: () => true,
         key: 'ManageQuoteRows',
-        title: 'Manage Quote Rows',
+        title: 'Quote Rows',
         element: (
           <ThemeRouteWrapper theme="PE_LIGHT">
             <ManageQuoteRows />
@@ -912,27 +865,26 @@ export const createPageConfig = (): PageConfig => {
         path: '/QuotePricing/ManageQuoteRows',
         description: 'Configure which products and locations have active quote rows',
       },
+      {
+        hasPermission: () => true,
+        key: 'QuotebookWholesale',
+        title: 'Quotebook Wholesale',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <QuotebookWholesale />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotePricing/QuotebookWholesale',
+        description: 'Wholesale quotebook pricing',
+      },
     ],
-  };
-
-  config.QuotebookWholesale = {
-    hasPermission: () => true,
-    key: 'QuotebookWholesale',
-    icon: <DollarOutlined />,
-    title: 'Quotebook Wholesale',
-    element: (
-      <ThemeRouteWrapper theme="PE_LIGHT">
-        <QuotebookWholesale />
-      </ThemeRouteWrapper>
-    ),
-    path: '/quotebookwholesale',
   };
 
   config.QuotebookQoL = {
     hasPermission: () => true,
     key: 'QuotebookQoL',
     icon: <SyncOutlined />,
-    title: 'Quotebook QoL',
+    title: 'Valuation, Refresh, Entry',
     routes: [
       {
         hasPermission: () => true,

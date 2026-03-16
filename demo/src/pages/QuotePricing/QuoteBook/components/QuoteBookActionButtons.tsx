@@ -77,11 +77,13 @@ export function QuoteBookActionButtons({
           onChange={(val) => onPeriodToggleChange(val as PeriodToggleValue)}
         />
       )}
-      <GraviButton
-        buttonText="Manage Thresholds"
-        icon={<SettingOutlined />}
-        onClick={onManageThresholds}
-      />
+      {onManageThresholds && (
+        <GraviButton
+          buttonText="Manage Thresholds"
+          icon={<SettingOutlined />}
+          onClick={onManageThresholds}
+        />
+      )}
       <Texto appearance="medium">Last Save: Today 9:14 AM</Texto>
     </Horizontal>
   )
