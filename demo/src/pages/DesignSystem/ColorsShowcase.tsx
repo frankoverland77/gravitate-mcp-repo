@@ -43,7 +43,7 @@ function ColorExample({ color, type, label }: { color: string; type: 'button' | 
 function ColorRow({ hex, cssVar, description, example, exampleLabel }: ColorEntry) {
   return (
     <div className={styles['color-row']}>
-      <div className={styles['color-swatch']} style={{ backgroundColor: `var(${cssVar}, ${hex})` }} />
+      <div className={styles['color-swatch']} style={{ backgroundColor: hex }} />
       <div className={styles['color-info']}>
         <div className={styles['color-var-name']}>{cssVar}</div>
         <div className={styles['color-desc']}>{description}</div>
