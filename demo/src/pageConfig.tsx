@@ -66,6 +66,7 @@ import {
   NavigationShowcase,
   CellRenderersShowcase,
   GridShowcase,
+  ColorsShowcase,
 } from './pages/DesignSystem';
 import { AllPricesPage, ContractValuesPage } from './pages/PriceManagement';
 
@@ -631,6 +632,13 @@ export const createPageConfig = (): PageConfig => {
         title: 'Grid',
         element: <GridShowcase />,
         path: '/DesignSystem/Grid',
+      },
+      {
+        hasPermission: () => true,
+        key: 'Colors',
+        title: 'Colors',
+        element: <ColorsShowcase />,
+        path: '/DesignSystem/Colors',
       },
     ],
   };

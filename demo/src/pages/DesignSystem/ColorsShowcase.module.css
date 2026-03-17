@@ -1,0 +1,196 @@
+.color-section {
+  margin-bottom: 12px;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.color-row:last-child {
+  border-bottom: none;
+}
+
+.color-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.color-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.color-var-name {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #262626;
+}
+
+.color-desc {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 1px;
+}
+
+.color-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.color-example {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.example-button {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: none;
+  color: #fff;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.example-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: none;
+  color: #fff;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.example-badge {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.copyable {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #595959;
+  background: #f5f5f5;
+}
+
+.copyable:hover {
+  background: #e8e8e8;
+}
+
+.copyable:active {
+  background: #d9d9d9;
+}
+
+.copied {
+  background: #d9f7be !important;
+  color: #389e0d !important;
+}
+
+/* Side-by-side comparison */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.comparison-column {
+  padding: 0;
+}
+
+.comparison-header {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #595959;
+  padding: 10px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.comparison-column:first-child {
+  border-right: 1px solid #f0f0f0;
+}
+
+/* Collapsible tenant section */
+.tenant-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 0;
+}
+
+.tenant-toggle:hover .tenant-name {
+  color: #0C5A58;
+}
+
+.tenant-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  transition: color 0.15s;
+}
+
+.tenant-arrow {
+  font-size: 10px;
+  color: #8c8c8c;
+  transition: transform 0.2s;
+}
+
+.tenant-arrow-open {
+  transform: rotate(90deg);
+}
+
+.tenant-preview {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.tenant-preview-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tenant-colors {
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.tenant-section {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 4px 16px;
+  margin-bottom: 8px;
+}
