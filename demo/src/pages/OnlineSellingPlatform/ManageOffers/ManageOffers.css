@@ -1,0 +1,150 @@
+.timing-window-container {
+  --pickup-bg: #dcfce7;
+  --visibility-bg: #dbeafe;
+  --pickup-border: #32ae5e;
+  --visibility-border: #4386f6;
+}
+
+.step-circle {
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-circle.active {
+  background-color: var(--theme-color-1);
+}
+
+.step-circle.inactive {
+  background-color: var(--bg-3);
+}
+
+.timing-window-calendar-day {
+  background-color: var(--bg-1) !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.timing-window-calendar-day:hover {
+  background-color: var(--bg-3) !important;
+}
+.timing-window-today {
+  background-color: var(--bg-1) !important;
+  border: 2px solid var(--gray-700) !important;
+}
+.timing-window-visibility-range {
+  background-color: var(--visibility-bg) !important;
+}
+.timing-window-pickup-range {
+  background-color: var(--pickup-bg) !important;
+}
+.timing-window-visibility-selected {
+  border: 2px solid var(--visibility-border) !important;
+}
+.timing-window-pickup-selected {
+  border: 2px solid var(--pickup-border) !important;
+}
+.timing-window-both {
+  background: linear-gradient(135deg, var(--pickup-bg) 50%, var(--visibility-bg) 50%) !important;
+}
+.timing-window-visibility-border {
+  border: 2px solid var(--visibility-border) !important;
+}
+.timing-window-pickup-border {
+  border: 2px solid var(--pickup-border) !important;
+}
+
+.cal-button {
+  height: 40px !important;
+}
+
+.deal-type-card {
+  border: 2px solid var(--bg-3);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 200px;
+}
+.deal-type-card:hover {
+  border-color: var(--theme-color-1);
+  background-color: var(--bg-2);
+}
+.deal-type-card.selected {
+  border-color: var(--theme-color-1);
+  background-color: color-mix(in srgb, var(--theme-color-1) 8%, transparent);
+}
+
+.template-card {
+  border: 2px solid var(--bg-3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 160px;
+}
+.template-card:hover {
+  border-color: var(--theme-color-1);
+}
+.template-card.selected {
+  border-color: var(--theme-color-1);
+  background-color: color-mix(in srgb, var(--theme-color-1) 8%, transparent);
+}
+
+.dotted-border {
+  border: 2px dashed var(--bg-3);
+}
+
+/* Quick-select timing chips */
+.timing-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--bg-3);
+  background-color: var(--bg-1);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.timing-chip:hover:not(:disabled) {
+  border-color: var(--theme-color-1);
+  background-color: var(--bg-2);
+}
+.timing-chip-active {
+  border-color: var(--theme-color-1) !important;
+  background-color: color-mix(in srgb, var(--theme-color-1) 12%, transparent) !important;
+  color: var(--theme-color-1) !important;
+  font-weight: 600;
+}
+.timing-chip-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.timing-chip-disabled:hover {
+  border-color: var(--bg-3);
+  background-color: var(--bg-1);
+}
+
+/* Small inline time chips */
+.timing-chip-sm {
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 12px;
+  line-height: 1.3;
+}
+
+/* Duration custom days input */
+.duration-days-input .ant-input-number-input {
+  height: 20px !important;
+  padding: 0 4px !important;
+  font-size: 11px !important;
+  text-align: center;
+}
