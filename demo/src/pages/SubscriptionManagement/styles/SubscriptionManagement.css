@@ -250,12 +250,11 @@
 
 .subscription-tabs-container .ant-tabs-tabpane {
   height: 100%;
-  display: flex;
   flex-direction: column;
 }
 
 .subscription-tabs-container .ant-tabs-tabpane-active {
-  display: flex !important;
+  display: flex;
   flex-direction: column;
   height: 100%;
 }
