@@ -12,6 +12,7 @@ import {
   MoreOutlined,
   SyncOutlined,
   WarningOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, RangePicker, Texto, Vertical } from '@gravitate-js/excalibrr';
 import { Alert, Collapse, DatePicker, Drawer, Form, Input, InputNumber, Menu, Modal, Popover, Select, Switch, Tooltip } from 'antd';
@@ -33,6 +34,12 @@ import type {
 } from '../shared/types';
 import { mockContractValuesRows, mockFormulaBreakdowns, mockPriceHistory } from '../shared/mockData';
 import { ResizeHandle, useResizableDrawer } from '../shared/useResizableDrawer';
+import { RevaluationConfirmModal } from '../shared/RevaluationConfirmModal';
+import { RevaluationWizardModal } from '../shared/RevaluationWizardModal';
+import { shouldShowRevaluationModal } from '../shared/shouldShowRevaluationModal';
+import { getStatusCellStyle, getComponentCellStyle } from '../shared/statusStyles';
+import { PRICE_MANAGEMENT_STYLES } from '../shared/priceManagement.styles';
+import { useFeatureMode } from '@contexts/FeatureModeContext';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -49,6 +56,18 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
     { field: 'LocationName', headerName: 'Location', flex: 1 },
     { field: 'FormulaName', headerName: 'Formula', flex: 1 },
     {
+      field: 'EffectiveFromDateTime',
+      headerName: 'Eff From',
+      width: 120,
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
+    },
+    {
+      field: 'EffectiveToDateTime',
+      headerName: 'Eff To',
+      width: 120,
+      valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY') : ''),
+    },
+    {
       field: 'Price',
       headerName: 'Price',
       width: 120,
@@ -62,12 +81,7 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       field: 'ValuationStatusDisplay',
       headerName: 'Status',
       width: 130,
-      cellStyle: (params: any) => {
-        if (params.value === 'Missing Prices') return { color: 'var(--theme-error)', fontWeight: '600' };
-        if (params.value === 'Stale') return { color: 'var(--theme-warning)', fontWeight: '600' };
-        if (params.value === 'Estimate') return { color: 'var(--theme-color-1)', fontStyle: 'italic' };
-        return { color: 'var(--theme-success)' };
-      },
+      cellStyle: (params: any) => getStatusCellStyle(params.value),
     },
     {
       field: 'UpdatedDateTime',
@@ -75,6 +89,7 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
       width: 170,
       valueFormatter: ({ value }: any) => (value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : ''),
     },
+    { field: 'TradeEntryId', headerName: 'Trade Entry', width: 110, hide: true },
     {
       field: '_actions',
       headerName: 'Actions',
@@ -109,22 +124,6 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
   ];
 }
 
-// ─── Variable Cell Styling ──────────────────────────────────────────────────
-
-function getCellStyle(params: any) {
-  switch (params.data?.ComponentStatus) {
-    case 'M':
-      return { backgroundColor: 'var(--theme-error-trans)' };
-    case 'O':
-      return { backgroundColor: 'var(--theme-optimal-dim)' };
-    case 'A':
-      return { backgroundColor: 'var(--theme-success-dim)' };
-    case 'E':
-      return { backgroundColor: 'var(--theme-color-1-dim)' };
-    default:
-      return {};
-  }
-}
 
 // ─── Price History Grid Column Defs ─────────────────────────────────────────
 
@@ -189,19 +188,38 @@ function InlinePriceEntry({
   const [form] = Form.useForm();
   const [selectedUploadType, setSelectedUploadType] = useState<UploadType>(component.UploadType ?? 'Posting');
   const [historyDates, setHistoryDates] = useState<dayjs.Dayjs[]>([
-    dayjs().subtract(1, 'day').startOf('day'),
-    dayjs().add(1, 'day').endOf('day'),
+    dayjs('2026-03-06').startOf('day'),
+    dayjs('2026-03-15').endOf('day'),
   ]);
   const [effectiveFrom, setEffectiveFrom] = useState<dayjs.Dayjs>(dayjs().startOf('day'));
   const [effectiveTo, setEffectiveTo] = useState<dayjs.Dayjs>(dayjs().add(1, 'day').endOf('day'));
   const [conflictState, setConflictState] = useState<'idle' | 'loading' | 'found' | 'none'>('idle');
   const [conflictRowIds, setConflictRowIds] = useState<Set<number>>(new Set());
+  const conflictRowIdsRef = useRef<Set<number>>(new Set());
+  const historyGridApiRef = useRef<any>(null);
   const [conflictCount, setConflictCount] = useState(0);
   const [formDirty, setFormDirty] = useState(false);
   const [historyExpanded, setHistoryExpanded] = useState(true);
   const [historySearchText, setHistorySearchText] = useState('');
 
   const showEffectiveDates = selectedUploadType === 'EffectiveStart' || selectedUploadType === 'EffectiveDates';
+
+  useEffect(() => {
+    conflictRowIdsRef.current = conflictRowIds;
+    const timer = setTimeout(() => {
+      const container = document.querySelector('.price-history-grid');
+      if (!container) return;
+      container.querySelectorAll('.ag-row').forEach((row) => {
+        const rowId = row.getAttribute('row-id');
+        if (rowId && conflictRowIds.has(Number(rowId))) {
+          row.classList.add('pm-conflict-row');
+        } else {
+          row.classList.remove('pm-conflict-row');
+        }
+      });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [conflictRowIds]);
 
   const allPriceHistory = mockPriceHistory[component.PriceInstrumentId] ?? [];
   const filteredPriceHistory = useMemo(() => {
@@ -214,7 +232,9 @@ function InlinePriceEntry({
 
   const clearConflicts = () => {
     setConflictState('idle');
-    setConflictRowIds(new Set());
+    const empty = new Set<number>();
+    setConflictRowIds(empty);
+    conflictRowIdsRef.current = empty;
     setConflictCount(0);
   };
 
@@ -229,8 +249,15 @@ function InlinePriceEntry({
   const handleCheckConflicts = () => {
     setConflictState('loading');
     setTimeout(() => {
-      if (filteredPriceHistory.length >= 2) {
-        const ids = new Set(filteredPriceHistory.slice(-2).map((r) => r.PriceHistoryId));
+      // Hardcoded conflict detection for reliable demo highlighting
+      const allHistory = mockPriceHistory[component.PriceInstrumentId] ?? [];
+      if (allHistory.length >= 3) {
+        const ids = new Set([allHistory[1].PriceHistoryId, allHistory[2].PriceHistoryId]);
+        setConflictRowIds(ids);
+        setConflictCount(ids.size);
+        setConflictState('found');
+      } else if (allHistory.length === 2) {
+        const ids = new Set(allHistory.map((r) => r.PriceHistoryId));
         setConflictRowIds(ids);
         setConflictCount(ids.size);
         setConflictState('found');
@@ -273,12 +300,11 @@ function InlinePriceEntry({
       suppressDragLeaveHidesColumns: true,
       rowGroupPanelShow: 'never' as const,
       quickFilterText: historySearchText,
-      getRowClass: (params: any) => {
-        if (conflictRowIds.has(params.data?.PriceHistoryId)) return 'cv-conflict-row';
-        return '';
-      },
+      onGridReady: (params: any) => { historyGridApiRef.current = params.api; },
+      getRowClass: (params: any) =>
+        conflictRowIdsRef.current.has(params.data?.PriceHistoryId) ? 'pm-conflict-row' : '',
     }),
-    [conflictRowIds, historySearchText]
+    [historySearchText]
   );
 
   return (
@@ -473,7 +499,6 @@ function InlinePriceEntry({
                       clearConflicts();
                     }}
                     placement="bottomRight"
-                    size="small"
                   />
                 </Horizontal>
               </Horizontal>
@@ -501,7 +526,7 @@ function InlinePriceEntry({
 interface DrawerContentProps {
   data: FormulaBreakdownDetail;
   hasPermission: boolean;
-  onGridRowUpdated: () => void;
+  onGridRowUpdated: (effectiveFromDate?: string, effectiveToDate?: string) => void;
   contractId?: number;
   contractDetailId?: number;
 }
@@ -608,7 +633,9 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, cont
             false
           );
 
-          onGridRowUpdated();
+          const effFromStr = values.effectiveFrom ? dayjs(values.effectiveFrom).format('YYYY-MM-DD') : undefined;
+          const effToStr = values.effectiveTo ? dayjs(values.effectiveTo).format('YYYY-MM-DD') : undefined;
+          onGridRowUpdated(effFromStr, effToStr);
         }, REVALUE_DURATION_MS);
       }, SAVE_DURATION_MS);
     },
@@ -642,9 +669,9 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, cont
           if (!params.data.IsRequired && params.data.IsMissing) return 'Optional Variable';
           return params.value?.toFixed(4) ?? '';
         },
-        cellStyle: (params: any) => getCellStyle(params),
+        cellStyle: (params: any) => getComponentCellStyle(params.data?.ComponentStatus),
       },
-      { field: 'ComponentStatus', headerName: 'Status', width: 80, cellStyle: (params: any) => getCellStyle(params) },
+      { field: 'ComponentStatus', headerName: 'Status', width: 80, cellStyle: (params: any) => getComponentCellStyle(params.data?.ComponentStatus) },
       { field: 'PriceTypeCodeValueDisplay', headerName: 'Type', width: 100 },
       { field: 'PriceInstrumentName', headerName: 'Description', flex: 2 },
       {
@@ -798,7 +825,7 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, cont
               <Texto category="h5">{data.CalculationName}</Texto>
             </Horizontal>
 
-            <div className="mx-4" style={{ fontFamily: 'monospace', fontSize: 13, padding: '12px 16px', backgroundColor: 'var(--theme-bg-3)', borderRadius: 6, border: '1px solid var(--theme-border)', minHeight: 60, whiteSpace: 'pre-wrap', color: 'var(--theme-text)' }}>
+            <div className="mx-4" style={{ fontFamily: 'monospace', fontSize: 13, padding: '12px 16px', backgroundColor: '#1e1e1e', borderRadius: 6, border: '1px solid #333', minHeight: 60, whiteSpace: 'pre-wrap', color: '#f5f5f5' }}>
               {data.Formula}
             </div>
           </>
@@ -839,36 +866,116 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, cont
         )}
       </Vertical>
 
-      <style>{`
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.8; } }
-        @keyframes stackedSlideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        .cv-conflict-row .ag-cell { background-color: var(--theme-warning-dim, rgba(250, 173, 20, 0.15)) !important; }
-        .quoteBook-drawer .ant-collapse-item {
-          display: flex !important;
-          flex-direction: column !important;
-          flex: 1 !important;
-        }
-        .quoteBook-drawer .ant-collapse-content {
-          display: flex !important;
-          flex-direction: column !important;
-          flex: 1 !important;
-        }
-        .quoteBook-drawer .ant-collapse-content-box {
-          padding: 0 !important;
-          display: flex !important;
-          flex-direction: column !important;
-          flex: 1 !important;
-        }
-        .price-history-grid .search-control,
-        .price-history-grid .page-control-bar {
-          display: none !important;
-        }
-        .drawer-resizing .ant-drawer-content-wrapper { transition: none !important; }
-      `}</style>
+      <style>{PRICE_MANAGEMENT_STYLES}</style>
     </Vertical>
   );
 }
+
+// ─── Demo Options FAB ────────────────────────────────────────────────────────
+
+function DemoOptionsFab({
+  hasPermission,
+  setHasPermission,
+}: {
+  hasPermission: boolean;
+  setHasPermission: (v: boolean) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { featureMode, setFeatureMode } = useFeatureMode();
+
+  useEffect(() => {
+    if (!expanded) return;
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExpanded(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [expanded]);
+
+  return (
+    <div className="cv-fab-container" ref={containerRef}>
+      <div className={`cv-fab-panel ${expanded ? 'visible' : ''}`}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#333' }}>Demo Options</span>
+          <button className="cv-fab-close" onClick={() => setExpanded(false)} aria-label="Close">
+            <CloseOutlined />
+          </button>
+        </div>
+
+        <div className="cv-fab-option">
+          <span style={{ fontSize: 13 }}>Mode</span>
+          <Select
+            value={featureMode}
+            onChange={setFeatureMode}
+            size="small"
+            style={{ width: 120 }}
+            options={[
+              { value: 'mvp', label: 'MVP' },
+              { value: 'future-state', label: 'Future' },
+            ]}
+          />
+        </div>
+
+        <div className="cv-fab-option">
+          <span style={{ fontSize: 13 }}>Upload Permission</span>
+          <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
+        </div>
+      </div>
+
+      <button
+        className="cv-fab-button"
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-label="Demo options"
+        title="Demo Options"
+      >
+        <ExperimentFilled />
+      </button>
+    </div>
+  );
+}
+
+const CV_STYLES = `
+  .cv-fab-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+  .cv-fab-button {
+    width: 48px; height: 48px; border-radius: 50%;
+    background-color: #1890ff; color: white; border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: all 0.3s ease;
+  }
+  .cv-fab-button:hover { background-color: #40a9ff; box-shadow: 0 6px 16px rgba(0,0,0,0.2); transform: scale(1.05); }
+  .cv-fab-button:focus { outline: 2px solid #1890ff; outline-offset: 2px; }
+  .cv-fab-panel {
+    position: absolute; bottom: 60px; right: 0;
+    background: white; border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 12px 16px; min-width: 240px;
+    opacity: 0; transform: translateY(10px); pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  .cv-fab-panel.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+  .cv-fab-option {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; font-size: 13px;
+  }
+  .cv-fab-close {
+    width: 20px; height: 20px; border: none; background: #f5f5f5;
+    border-radius: 50%; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: 10px; color: #666; transition: all 0.2s ease;
+  }
+  .cv-fab-close:hover { background: #e8e8e8; color: #333; }
+`;
 
 // ─── Main Page Component ────────────────────────────────────────────────────
 
@@ -878,6 +985,15 @@ export function ContractValuesPage() {
   const [hasPermission, setHasPermission] = useState(true);
   const [gridRowData, setGridRowData] = useState(mockContractValuesRows);
   const { drawerWidth, handleResize, resetWidth } = useResizableDrawer('50vw');
+  const [dateRange, setDateRange] = useState<dayjs.Dayjs[]>([
+    dayjs().startOf('month'),
+    dayjs().endOf('month'),
+  ]);
+
+  // Revaluation modal state
+  const [revalConfirmOpen, setRevalConfirmOpen] = useState(false);
+  const [revalWizardOpen, setRevalWizardOpen] = useState(false);
+  const [revalContext, setRevalContext] = useState<{ instrumentId: number; instrumentName: string; effectiveFromDate: string; effectiveToDate?: string } | null>(null);
 
   const handleViewBuildup = useCallback((id: number) => {
     resetWidth();
@@ -890,8 +1006,9 @@ export function ContractValuesPage() {
     setSelectedValuationId(null);
   }, []);
 
-  const handleGridRowUpdated = useCallback(() => {
+  const handleGridRowUpdated = useCallback((effectiveFromDate?: string, effectiveToDate?: string) => {
     if (selectedValuationId) {
+      const breakdown = mockFormulaBreakdowns[selectedValuationId];
       setGridRowData((prev) =>
         prev.map((row) =>
           row.CurvePointPriceId === selectedValuationId
@@ -899,10 +1016,52 @@ export function ContractValuesPage() {
             : row
         )
       );
+
+      // Check if revaluation modal should show (only when user entered an effective date)
+      if (breakdown && effectiveFromDate && shouldShowRevaluationModal(effectiveFromDate)) {
+        const firstPriceVar = breakdown.ResultComponents.find((c) => c.IsPriceVariable);
+        if (firstPriceVar) {
+          // Close valuation drawer before showing reval modal
+          setIsDrawerOpen(false);
+          setSelectedValuationId(null);
+          setRevalContext({
+            instrumentId: firstPriceVar.PriceInstrumentId,
+            instrumentName: firstPriceVar.PriceInstrumentName,
+            effectiveFromDate,
+            effectiveToDate,
+          });
+          setRevalConfirmOpen(true);
+        }
+      }
     }
   }, [selectedValuationId]);
 
+  const handleRevalDismiss = useCallback(() => {
+    setRevalConfirmOpen(false);
+    setRevalContext(null);
+  }, []);
+
+  const handleRevalCheckImpacted = useCallback(() => {
+    setRevalConfirmOpen(false);
+    setRevalWizardOpen(true);
+  }, []);
+
+  const handleRevalWizardClose = useCallback(() => {
+    setRevalWizardOpen(false);
+    setRevalContext(null);
+  }, []);
+
   const columnDefs = useMemo(() => getGridColumnDefs(handleViewBuildup), [handleViewBuildup]);
+
+  const filteredRows = useMemo(() => {
+    const [from, to] = dateRange;
+    if (!from || !to) return gridRowData;
+    return gridRowData.filter((row) => {
+      const effFrom = dayjs(row.EffectiveFromDateTime);
+      const effTo = dayjs(row.EffectiveToDateTime);
+      return effFrom.isSameOrBefore(to, 'day') && effTo.isSameOrAfter(from, 'day');
+    });
+  }, [gridRowData, dateRange]);
 
   const agPropOverrides = useMemo(
     () => ({
@@ -916,39 +1075,30 @@ export function ContractValuesPage() {
   const data = selectedValuationId ? mockFormulaBreakdowns[selectedValuationId] : null;
 
   return (
-    <Vertical height="100%">
-      {/* Instruction bar */}
-      <div className="p-4 bg-2 bordered" style={{ borderBottom: '1px solid var(--theme-border)', flexShrink: 0 }}>
-        <Horizontal verticalCenter>
-          <Vertical flex="1">
-            <Texto category="h5">Contract Values</Texto>
-            <Texto appearance="medium" style={{ marginTop: 4, fontSize: 13 }}>
-              Click "View Buildup" on any row, then use the action menu (&#8943;) on a price variable row to upload a price via the stacked drawer.
-            </Texto>
-          </Vertical>
-          <Horizontal verticalCenter gap={8}>
-            <Texto style={{ fontSize: 13 }}>Has price upload permission</Texto>
-            <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
-          </Horizontal>
-        </Horizontal>
-      </div>
-
+    <Vertical>
       {/* Contract values grid */}
-      <Horizontal flex="1">
-        <Vertical height="100%">
-          <GraviGrid
-            storageKey="PriceMgmt-ContractValues"
-            controlBarProps={{ title: `Contract Values (${gridRowData.length})`, hideActiveFilters: false }}
-            agPropOverrides={agPropOverrides}
-            rowData={gridRowData}
-            columnDefs={columnDefs}
-          />
-        </Vertical>
-      </Horizontal>
+      <GraviGrid
+        storageKey="PriceMgmt-ContractValues"
+        controlBarProps={{
+          title: 'Contract Value Results',
+          hideActiveFilters: false,
+          actionButtons: (
+            <RangePicker
+              inputKey="cvEffectiveDates"
+              dates={dateRange}
+              onChange={(dates) => setDateRange(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))))}
+              placement="bottomRight"
+            />
+          ),
+        }}
+        agPropOverrides={agPropOverrides}
+        rowData={filteredRows}
+        columnDefs={columnDefs}
+      />
 
       {/* Valuation drawer */}
       <Drawer
-        className="quoteBook-drawer"
+        className="pm-drawer"
         title="Valuation Drawer"
         placement="right"
         onClose={handleCloseDrawer}
@@ -972,6 +1122,26 @@ export function ContractValuesPage() {
           />
         )}
       </Drawer>
+
+      {/* ── REVALUATION CONFIRM MODAL ────────────────────────── */}
+      <RevaluationConfirmModal
+        open={revalConfirmOpen}
+        onDismiss={handleRevalDismiss}
+        onCheckImpacted={handleRevalCheckImpacted}
+      />
+
+      {/* ── REVALUATION WIZARD MODAL ─────────────────────────── */}
+      <RevaluationWizardModal
+        open={revalWizardOpen}
+        onClose={handleRevalWizardClose}
+        context={revalContext}
+        skipStep1
+      />
+
+      {/* ── DEMO OPTIONS FAB ────────────────────────────────── */}
+      <DemoOptionsFab hasPermission={hasPermission} setHasPermission={setHasPermission} />
+
+      <style>{PRICE_MANAGEMENT_STYLES}{CV_STYLES}</style>
     </Vertical>
   );
 }
