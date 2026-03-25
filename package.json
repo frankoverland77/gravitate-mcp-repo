@@ -4,15 +4,12 @@
   "description": "Excalibrr MCP Server and Demo Workspace",
   "private": true,
   "workspaces": [
-    "mcp-server",
     "demo"
   ],
   "scripts": {
-    "setup": "yarn install && yarn build:mcp",
-    "build:mcp": "cd mcp-server && yarn build",
+    "setup": "yarn install",
     "dev": "cd demo && yarn dev",
     "dev:clean": "cd demo && yarn dev:clean",
-    "mcp": "node mcp-server/build/index.js",
     "prepare": "husky"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
