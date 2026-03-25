@@ -126,18 +126,13 @@ Themes are defined in `demo/src/components/shared/Theming/themeconfigs.ts`. Each
 
 ### Setting Theme for a Demo
 
-The recommended approach is to use the theme context. For demos that need a specific brand theme:
+Use the `useTheme` hook for demos that need a specific brand theme. It sets the theme on mount and restores the previous theme on unmount:
 
 ```tsx
-// In your demo component
-import { useEffect } from 'react'
+import { useTheme } from '@hooks/useTheme'
 
 export function BPContractDemo() {
-  useEffect(() => {
-    localStorage.setItem('TYPE_OF_THEME', 'BP')
-    // Trigger theme refresh
-    window.dispatchEvent(new Event('storage'))
-  }, [])
+  useTheme('BP')
 
   return (
     // ... demo content
@@ -186,6 +181,7 @@ The demo app uses these TypeScript path aliases:
 | `@api/*` | `src/api/*` |
 | `@styles/*` | `src/styles/*` |
 | `@assets/*` | `src/assets/*` |
+| `@hooks/*` | `src/hooks/*` |
 
 **Important:** Use `@components/...` not `@/components/...` — no slash after the `@`.
 

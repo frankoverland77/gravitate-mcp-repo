@@ -2,7 +2,7 @@ import { EyeOutlined } from '@ant-design/icons';
 import { GraviButton, GraviGrid, Horizontal, Vertical } from '@gravitate-js/excalibrr';
 import { ColDef } from 'ag-grid-community';
 import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTheme } from '@hooks/useTheme';
 
 import { ValuationDrawer } from './components/ValuationDrawer';

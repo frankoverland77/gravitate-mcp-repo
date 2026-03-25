@@ -91,6 +91,7 @@ ONE server per project — always kill existing, start fresh, use auto-detected 
 @api         → src/api
 @styles      → src/styles
 @assets      → src/assets
+@hooks       → src/hooks
 ```
 
 ---

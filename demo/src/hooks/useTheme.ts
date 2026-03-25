@@ -9,6 +9,8 @@ export function useTheme(theme: string) {
     return () => {
       if (previous) {
         localStorage.setItem('TYPE_OF_THEME', previous)
+      } else {
+        localStorage.removeItem('TYPE_OF_THEME')
       }
       window.dispatchEvent(new Event('storage'))
     }

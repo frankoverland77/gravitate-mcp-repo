@@ -5,7 +5,12 @@
       "Bash(cd /c/Workspace/excalibrr-mcp-server/demo && npx tsc --noEmit --pretty 2>&1 | head -40)",
       "Bash(npx --package typescript tsc --noEmit --pretty 2>&1 | head -40)",
       "Bash(npx --package typescript tsc --noEmit --pretty 2>&1 | grep -i \"CompetitorMapping\")",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(rm /Users/rebecca/repos/excalibrr-mcp-server/IMPLEMENTATION_PLAN.md)",
+      "Bash(rm /Users/rebecca/repos/excalibrr-mcp-server/demo/docs/DELIVERY-PLAN)",
+      "Bash(git add:*)",
+      "Bash(git hook:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
