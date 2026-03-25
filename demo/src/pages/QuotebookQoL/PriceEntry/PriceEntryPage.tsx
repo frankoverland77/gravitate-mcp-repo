@@ -13,6 +13,7 @@ import { BBDTag, GraviButton, GraviGrid, Horizontal, NotificationMessage, Texto,
 import { Alert, DatePicker, Drawer, Form, InputNumber, Modal, Select, Switch, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTheme } from '@hooks/useTheme';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
@@ -1008,9 +1009,7 @@ export function PriceEntryPage() {
   const [simulateConflicts, setSimulateConflicts] = useState(false);
   const [gridRowData, setGridRowData] = useState(mockContractValuesRows);
 
-  useEffect(() => {
-    localStorage.setItem('TYPE_OF_THEME', 'PE_LIGHT');
-  }, []);
+  useTheme('PE_LIGHT');
 
   const handleViewBuildup = useCallback((id: number) => {
     setSelectedValuationId(id);

@@ -3,16 +3,10 @@ import { Horizontal, Vertical, GraviButton, Texto, GraviGrid } from '@gravitate-
 import { Switch, Popover, Input, Select, Popconfirm, Drawer } from 'antd';
 import { FolderOutlined, FolderAddOutlined, FunctionOutlined, EditOutlined, DeleteOutlined, PlusOutlined, CheckOutlined, EllipsisOutlined, CloseOutlined, DownOutlined, RightOutlined, ExperimentOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useProductFormula } from '@contexts/ProductFormulaContext';
+import { useTheme } from '@hooks/useTheme';
 
 export function FormulaManager() {
-  /* MCP Theme Script */
-  // Set BP theme for this demo (follows ControlPanel pattern)
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem("TYPE_OF_THEME", "BP");
-    }
-  }, []);
-  /* End MCP Theme Script */
+  useTheme('BP');
 
   const {
     formulas,

@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import { UnorderedListOutlined, TeamOutlined, AimOutlined, DashboardOutlined, BarChartOutlined, SettingOutlined } from '@ant-design/icons';
 import { Horizontal, Vertical, Texto } from '@gravitate-js/excalibrr';
@@ -11,16 +10,10 @@ import { RouteManagement } from './components/RouteManagement';
 import { RealTimeTracking } from './components/RealTimeTracking';
 import { Analytics } from './components/Analytics';
 import { SimulationControlDrawer } from './components/SimulationControlDrawer';
+import { useTheme } from '@hooks/useTheme';
 
 export function DeliveryManager() {
-  /* MCP Theme Script */
-  // Set BP theme for this demo (follows ControlPanel pattern)
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem("TYPE_OF_THEME", "BP");
-    }
-  }, []);
-  /* End MCP Theme Script */
+  useTheme('BP');
 
   return (
     <DeliveryProvider>

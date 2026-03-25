@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
-import { Form, Input, Select, Switch } from 'antd';
+import { Form, Input, Switch } from 'antd';
+import { useTheme } from '@hooks/useTheme';
 
 export function CustomerForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  useTheme('BP');
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
@@ -13,15 +15,6 @@ export function CustomerForm() {
     console.log('Form submitted:', values);
     setLoading(false);
   };
-
-  /* MCP Theme Script */
-  // Set theme for this demo (follows ControlPanel pattern)
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem("TYPE_OF_THEME", "BP");
-    }
-  }, []);
-  /* End MCP Theme Script */
 
   return (
     <Vertical className="p-2" style={{ height: '100%', maxWidth: '600px' }}>

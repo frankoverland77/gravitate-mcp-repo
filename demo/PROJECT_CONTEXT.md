@@ -50,7 +50,7 @@ yarn check:pages      # Verify page registration
 - Use Excalibrr components (Horizontal, Vertical, Texto, GraviButton) over raw HTML
 - Use component props for layout, utility classes for spacing
 - GraviGrid requires `agPropOverrides={{}}` prop
-- Modal/Drawer use `visible` prop (not `open`)
+- Modal/Drawer use `open` prop (not `visible`) — AntD v5
 
 ---
 

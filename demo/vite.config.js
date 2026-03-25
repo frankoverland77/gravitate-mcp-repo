@@ -48,6 +48,7 @@ export default defineConfig({
       { find: "@api", replacement: getRootAlias("api") },
       { find: "@styles", replacement: getRootAlias("styles") },
       { find: "@assets", replacement: getRootAlias("assets") },
+      { find: "@hooks", replacement: getRootAlias("hooks") },
     ],
   },
   css: {

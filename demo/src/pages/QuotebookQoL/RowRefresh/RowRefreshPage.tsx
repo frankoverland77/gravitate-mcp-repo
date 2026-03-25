@@ -4,6 +4,7 @@ import { Alert, InputNumber, Modal, Switch } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTheme } from '@hooks/useTheme';
 
 import { QuotebookRow, mockQuotebookRows, getSpreadFamilyIds } from './mockData';
 
@@ -317,13 +318,7 @@ export function RowRefreshPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<QuotebookRow | null>(null);
 
-  /* MCP Theme Script */
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('TYPE_OF_THEME', 'PE_LIGHT');
-    }
-  }, []);
-  /* End MCP Theme Script */
+  useTheme('PE_LIGHT');
 
   // Find parent row for selected spread child
   const parentRow = useMemo(() => {

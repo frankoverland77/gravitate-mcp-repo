@@ -3,6 +3,7 @@ import { GraviButton, GraviGrid, Horizontal, Vertical } from '@gravitate-js/exca
 import { ColDef } from 'ag-grid-community';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTheme } from '@hooks/useTheme';
 
 import { ValuationDrawer } from './components/ValuationDrawer';
 import { ContractValuesRow, mockContractValuesRows } from './data/mockData';
@@ -101,13 +102,7 @@ export function QuotebookQoLPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedValuationId, setSelectedValuationId] = useState<number | null>(null);
 
-  /* MCP Theme Script */
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('TYPE_OF_THEME', 'PE_LIGHT');
-    }
-  }, []);
-  /* End MCP Theme Script */
+  useTheme('PE_LIGHT');
 
   const handleViewBuildup = useCallback((curvePointPriceId: number) => {
     setSelectedValuationId(curvePointPriceId);

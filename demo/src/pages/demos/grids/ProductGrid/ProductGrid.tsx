@@ -1,8 +1,9 @@
-import { useMemo, useEffect, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { GraviGrid, Vertical } from '@gravitate-js/excalibrr';
 import { useProductFormula } from '@contexts/ProductFormulaContext';
 import { getProductGridColumnDefs } from './ProductGrid.columnDefs';
 import { GetRowIdParams } from 'ag-grid-community';
+import { useTheme } from '@hooks/useTheme';
 
 type Product = {
   ProductId: string;
@@ -82,14 +83,7 @@ export function ProductGrid() {
     return Promise.resolve();
   };
 
-  /* MCP Theme Script */
-  // Set PE theme for this demo (follows ControlPanel pattern)
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('TYPE_OF_THEME', 'BP');
-    }
-  }, []);
-  /* End MCP Theme Script */
+  useTheme('BP');
 
   return (
     <Vertical height="100%">
