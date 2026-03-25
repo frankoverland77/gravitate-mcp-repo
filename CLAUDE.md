@@ -6,40 +6,14 @@
 
 **Before generating ANY Excalibrr component code, you MUST follow this workflow:**
 
-### Step 1: Call `preflight` tool
-```
-preflight({ task: "<describe what you're building>" })
-```
-Returns: critical conventions, component APIs, and examples.
-
-### Step 2: Generate code following the conventions
-
-### Step 3: Validate code before presenting
-```
-validate_code({ code: "<your generated code>" })
-```
-Then run the pre-commit hook:
+1. Read `demo/skills/solutions-demo-builder/SKILL.md` and follow its workflow
+2. Generate code following the conventions described in the skill
+3. Run the pre-commit hook before presenting:
 ```bash
 git add <your-files>
 git hook run pre-commit
 ```
-
-### Step 4: Fix ALL errors before presenting to user
-
-### Step 5: Call `register_demo` to add navigation (for new demos)
-```
-register_demo({
-  name: "ComponentName",
-  title: "Display Title",
-  description: "Brief description",
-  category: "grids",  // or "forms" or "dashboards"
-  componentPath: "./pages/demos/ComponentName"
-})
-```
-
-**NEVER skip the preflight step. It prevents 90% of common mistakes.**
-**ALWAYS call register_demo for new demos. Otherwise they won't appear in navigation.**
-**ALWAYS validate code with both validate_code AND pre-commit hook before presenting.**
+4. Fix ALL errors before presenting to user
 
 ---
 
@@ -61,17 +35,14 @@ register_demo({
 | `<Texto appearance="secondary">` for gray | `<Texto appearance="medium">` (secondary is BLUE!) |
 | `<GraviGrid />` without agPropOverrides | `<GraviGrid agPropOverrides={{}} />` |
 | `<Menu><Menu.Item key="x">Label</Menu.Item></Menu>` | `<Menu items={[{ key: 'x', label: 'Label' }]} />` |
+| `<Tabs.TabPane>` children | `<Tabs items={[...]}/>` |
 
 ---
 
 ## Repository & Dev Commands
 
-Yarn monorepo: **MCP Server** (`/mcp-server/`) + **Demo Project** (`/demo/`).
-
 ```bash
 yarn dev              # Start demo dev server
-yarn build:mcp        # Build MCP server
-cd mcp-server && npm run build   # Build MCP server directly
 cd demo && npx vite   # Alternative demo start
 ```
 
