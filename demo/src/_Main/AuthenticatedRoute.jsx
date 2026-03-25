@@ -27,9 +27,6 @@ const DEFAULT_SCOPES = {
   BakeryProducts: true,
   FormulaManager: true,
   DeliveryManagement: true,
-  ScheduleDemo: true,
-  CustomerList: true,
-  InventoryGrid: true,
   BulkChangeTest: true,
 
 
