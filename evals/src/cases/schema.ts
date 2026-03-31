@@ -18,6 +18,10 @@ export interface EvalCase {
   targetFiles: string[]
   /** The page directory name in demo/src/pages/ */
   pageDir: string
+  /** URL path for Playwright navigation (e.g., '/DeliveredPricing/QuoteBook') */
+  routePath?: string
+  /** Expected theme key (e.g., 'PE_LIGHT', 'OSP') */
+  theme?: string
   /** Expected demo type */
   expectedType: 'grid' | 'form' | 'dashboard' | 'full-feature' | 'design-system'
   /** Code quality expectations */

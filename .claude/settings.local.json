@@ -27,7 +27,12 @@
       "Bash(do echo:*)",
       "Read(//Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/**)",
       "Bash(done)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npx playwright:*)",
+      "Bash(yarn eval:quick)",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill:*)",
+      "Bash(open:*)"
     ]
   }
 }

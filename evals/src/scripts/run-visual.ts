@@ -1,15 +1,15 @@
 #!/usr/bin/env tsx
 /**
- * Run quick eval — Tier 1 smoke tests, code quality only (no screenshots).
+ * Run visual fidelity checks only (with screenshots).
  *
- * Usage: yarn eval:quick
+ * Usage: yarn eval:visual
  */
 
 import { tier1Cases } from '../cases/tier1-smoke/index.js'
 import { runEvals } from '../runners/eval-runner.js'
 import { printResult, printSummary } from '../reporters/console-reporter.js'
 
-const { results } = await runEvals(tier1Cases, { tiers: [1], noScreenshots: true })
+const { results } = await runEvals(tier1Cases, { visualOnly: true })
 
 for (const result of results) {
   printResult(result)

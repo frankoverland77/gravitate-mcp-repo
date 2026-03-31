@@ -11,6 +11,7 @@ export const tier1Cases: EvalCase[] = [
       'pages/GlobalTieredPricing/GlobalTieredPricing.data.ts',
     ],
     pageDir: 'GlobalTieredPricing',
+    routePath: '/GlobalTieredPricing',
     expectedType: 'grid',
     expectations: {
       mustContainComponents: ['GraviGrid'],
@@ -30,6 +31,7 @@ export const tier1Cases: EvalCase[] = [
       'pages/ContractManagement/ContractManagementPage.tsx',
     ],
     pageDir: 'ContractManagement',
+    routePath: '/Contracts/ContractsList',
     expectedType: 'full-feature',
     expectations: {
       mustContainComponents: ['GraviGrid', 'Modal'],
@@ -50,6 +52,8 @@ export const tier1Cases: EvalCase[] = [
       'pages/DeliveredPricing/DeliveredPricing.data.ts',
     ],
     pageDir: 'DeliveredPricing',
+    routePath: '/DeliveredPricing/QuoteBook',
+    theme: 'PE_LIGHT',
     expectedType: 'grid',
     expectations: {
       mustContainComponents: ['GraviGrid'],
@@ -68,6 +72,7 @@ export const tier1Cases: EvalCase[] = [
       'pages/ProjectHub/ProjectHub.tsx',
     ],
     pageDir: 'ProjectHub',
+    routePath: '/',
     expectedType: 'dashboard',
     expectations: {
       mustContainComponents: ['Vertical', 'Horizontal'],
@@ -86,6 +91,7 @@ export const tier1Cases: EvalCase[] = [
       'pages/SubscriptionManagement/SubscriptionManagement.tsx',
     ],
     pageDir: 'SubscriptionManagement',
+    routePath: '/SubscriptionManagement',
     expectedType: 'full-feature',
     expectations: {
       mustContainComponents: ['Vertical'],
@@ -104,6 +110,8 @@ export const tier1Cases: EvalCase[] = [
       'pages/OnlineSellingPlatform/IndexOfferManagement.tsx',
     ],
     pageDir: 'OnlineSellingPlatform',
+    routePath: '/MarketPlatform/IndexOfferManagement',
+    theme: 'OSP',
     expectedType: 'full-feature',
     expectations: {
       mustContainComponents: ['GraviGrid'],
@@ -123,6 +131,7 @@ export const tier1Cases: EvalCase[] = [
       'pages/DesignSystem/FormControlsShowcase.tsx',
     ],
     pageDir: 'DesignSystem',
+    routePath: '/DesignSystem/Buttons',
     expectedType: 'design-system',
     expectations: {
       mustContainComponents: ['GraviButton'],
@@ -140,6 +149,8 @@ export const tier1Cases: EvalCase[] = [
       'pages/ContractMeasurement/ContractMeasurementGrid.tsx',
     ],
     pageDir: 'ContractMeasurement',
+    routePath: '/ContractMeasurement/ContractMeasurementGrid',
+    theme: 'PE_LIGHT',
     expectedType: 'grid',
     expectations: {
       mustContainComponents: ['GraviGrid'],
@@ -158,6 +169,8 @@ export const tier1Cases: EvalCase[] = [
       'pages/QuotebookQoL/QuotebookQoLPage.tsx',
     ],
     pageDir: 'QuotebookQoL',
+    routePath: '/QuotebookQoL/AdHocValuation',
+    theme: 'PE_LIGHT',
     expectedType: 'full-feature',
     expectations: {
       mustBeRegistered: true,
@@ -175,6 +188,8 @@ export const tier1Cases: EvalCase[] = [
       'pages/PriceManagement/index.ts',
     ],
     pageDir: 'PriceManagement',
+    routePath: '/PriceManagement/AllPrices',
+    theme: 'PE_LIGHT',
     expectedType: 'full-feature',
     expectations: {
       mustBeRegistered: true,
