@@ -15,6 +15,9 @@ export interface ProjectHubEntry {
   description: string;
   activityLog: ActivityLogEntry[];
   lastModified: string; // ISO 8601
+  sortOrder?: number;
+  displayName?: string;
+  iconName?: string;
 }
 
 export interface ProjectHubState {

@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 .detail-tabs .ant-tabs-tab.ant-tabs-tab-active {
   background: var(--theme-color-2) !important;
   color: var(--gray-100) !important;

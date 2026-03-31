@@ -1,8 +1,8 @@
 import { ColDef, ColGroupDef, ICellRendererParams } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
-import { Badge } from 'antd'
 import { HistoryOutlined, StopFilled, WarningFilled } from '@ant-design/icons'
-import type { ExceptionProfile, EvaluationResult, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
+import { Tooltip } from 'antd'
+import type { ExceptionProfile, EvaluationResult, ComponentViolation, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
 import { PROPOSED_COMPONENTS, CURRENT_COMPONENTS } from './QuoteBook.types'
 
 type ColumnOptions = {
@@ -14,19 +14,59 @@ type ColumnOptions = {
   periodToggleValue?: PeriodToggleValue
 }
 
-function getViolationStyle(
+function getViolation(
   evaluationMap: Map<number, EvaluationResult> | undefined,
   rowId: number,
   component: string,
-): Record<string, string | number> | null {
+): ComponentViolation | null {
   if (!evaluationMap) return null
   const result = evaluationMap.get(rowId)
   if (!result) return null
-  const violation = result.violations.find(v => v.component === component)
-  if (!violation) return null
-  if (violation.severity === 'Hard') return { color: '#dc2626', fontWeight: 600 }
-  if (violation.severity === 'Soft') return { color: '#d97706', fontWeight: 600 }
-  return null
+  return result.violations.find(v => v.component === component) || null
+}
+
+const VIOLATION_STYLES = {
+  Hard: { color: '#dc2626', fontWeight: 600, bg: 'rgba(220, 38, 38, 0.15)' },
+  Soft: { color: '#d97706', fontWeight: 600, bg: 'rgba(217, 119, 6, 0.12)' },
+} as const
+
+function renderViolationCell(
+  params: ICellRendererParams,
+  component: string,
+  evaluationMap: Map<number, EvaluationResult> | undefined,
+  renderValue: (violation: ComponentViolation | null) => React.ReactNode,
+): React.ReactElement | null {
+  if (!params.data) return null
+  const violation = getViolation(evaluationMap, params.data.id, component)
+  const value = renderValue(violation)
+
+  if (!violation) {
+    return (
+      <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+        {value}
+      </span>
+    )
+  }
+
+  const style = VIOLATION_STYLES[violation.severity]
+  const Icon = violation.severity === 'Hard' ? StopFilled : WarningFilled
+  const tooltipText = `${violation.component}: ${violation.severity} — threshold ${violation.threshold}, value ${violation.value} (${violation.deviationPct > 0 ? '+' : ''}${violation.deviationPct.toFixed(1)}%)`
+
+  return (
+    <span style={{
+      display: 'flex',
+      alignItems: 'center',
+      height: '100%',
+      backgroundColor: style.bg,
+      padding: '0 4px',
+      margin: '0 -4px',
+    }}>
+      <Tooltip title={tooltipText} mouseEnterDelay={0.4}>
+        <Icon style={{ fontSize: 10, color: style.color, flexShrink: 0, marginRight: 4 }} />
+      </Tooltip>
+      {value}
+    </span>
+  )
 }
 
 export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGroupDef)[] => {
@@ -63,8 +103,8 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
     pinned: 'left',
   },
   {
-    field: 'location',
-    headerName: 'Location',
+    field: 'terminal',
+    headerName: 'Terminal',
     width: 140,
     pinned: 'left',
   },
@@ -83,36 +123,39 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
       children: [
         {
           headerName: '',
+          field: filterComponents ? `exceptionCount_${groupName}` : 'exceptionCount',
           colId: `exceptionCount_${groupName}`,
-          width: 70,
+          width: 100,
           suppressMenu: true,
-          valueGetter: (params: any) => {
+          cellRenderer: (params: ICellRendererParams) => {
             if (!params.data) return null
             const result = options.evaluationMap?.get(params.data.id)
             if (!result) return null
+
             const violations = filterSet
-              ? result.violations.filter((v: any) => filterSet.has(v.component))
+              ? result.violations.filter(v => filterSet.has(v.component))
               : result.violations
             if (violations.length === 0) return null
-            const hasHard = violations.some((v: any) => v.severity === 'Hard')
-            return hasHard ? 'Critical' : 'Warning'
-          },
-          cellRenderer: (params: ICellRendererParams) => {
-            if (!params.value) return null
-            const isUrgent = params.value === 'Critical'
-            const Icon = isUrgent ? StopFilled : WarningFilled
-            const iconColor = isUrgent ? '#dc2626' : '#d97706'
 
-            const result = params.data ? options.evaluationMap?.get(params.data.id) : null
-            const violations = result
-              ? (filterSet ? result.violations.filter(v => filterSet.has(v.component)) : result.violations)
-              : []
+            const hasHard = violations.some(v => v.severity === 'Hard')
+            const Icon = hasHard ? StopFilled : WarningFilled
+            const iconColor = hasHard ? '#dc2626' : '#d97706'
+            const label = hasHard ? 'Urgent' : 'Caution'
 
             return (
-              <span style={{ display: 'inline-flex', alignItems: 'center', height: '100%' }}>
-                <Badge count={violations.length} size="small" color={iconColor} offset={[-2, 2]}>
-                  <Icon style={{ color: iconColor, fontSize: 20 }} />
-                </Badge>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                whiteSpace: 'nowrap',
+              }}>
+                <Icon style={{ color: iconColor, fontSize: 14 }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#1f2937' }}>
+                  {violations.length}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>
+                  {label}
+                </span>
               </span>
             )
           },
@@ -199,131 +242,125 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
 
   const restCols: (ColDef | ColGroupDef)[] = [
   {
-    field: 'uom',
-    headerName: 'UOM',
-    width: 70,
-  },
-  {
-    headerName: 'Current Period',
-    children: [
-      {
-        field: 'prior_volume',
-        headerName: 'Sold Vol',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? value.toLocaleString() : '',
-      },
-      {
-        field: 'prior_cost',
-        headerName: 'Cost',
-        width: 110,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-      },
-      {
-        field: 'prior_lastDiff',
-        headerName: 'Diff',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? value.toFixed(4) : '',
-      },
-      {
-        field: 'prior_lastPrice',
-        headerName: 'Price',
-        width: 110,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-      },
-      {
-        field: 'prior_profit',
-        headerName: 'Profit',
-        width: 90,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-      },
-    ],
-  },
-  {
-    headerName: 'Proposed Period',
-    children: [
-      {
-        field: 'proposed_cost',
-        headerName: 'Cost',
-        width: 110,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-      },
-      {
-        field: 'proposed_diff',
-        headerName: 'Diff',
-        width: 100,
-        editable: true,
-        valueFormatter: ({ value }) => value != null ? value.toFixed(4) : '',
-      },
-      {
-        field: 'proposed_price',
-        headerName: 'Price',
-        width: 110,
-        editable: true,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-        cellStyle: (params) => {
-          if (!params.data) return null
-          if (params.data.proposed_price !== params.data.prior_lastPrice) {
-            return { backgroundColor: 'rgba(var(--theme-color-1-rgb, 24, 144, 255), 0.08)' }
-          }
-          return null
-        },
-      },
-      {
-        field: 'proposed_delta',
-        headerName: 'Price Delta',
-        width: 100,
-        cellRenderer: (params: ICellRendererParams) => {
-          if (!params.value && params.value !== 0) return null
-          const val = params.value as number
-          const violation = getViolationStyle(options.evaluationMap, params.data?.id, 'Price Delta')
-          const defaultColor = val > 0 ? '#52c41a' : val < 0 ? '#ff4d4f' : 'inherit'
-          const color = violation ? violation.color as string : defaultColor
-          const fontWeight = violation ? 600 : 600
-          const arrow = val > 0 ? '\u25B2' : val < 0 ? '\u25BC' : ''
-          return (
-            <span style={{ color, fontWeight }}>
-              {arrow} {Math.abs(val).toFixed(4)}
-            </span>
-          )
-        },
-      },
-      {
-        field: 'proposed_margin',
-        headerName: 'Margin',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
-        cellStyle: (params) => {
-          if (!params.data) return null
-          const val = params.data.proposed_margin
-          const violation = getViolationStyle(options.evaluationMap, params.data.id, 'Margin')
-          if (violation) return violation
-          if (val > 0) return { backgroundColor: 'rgba(82, 196, 26, 0.08)' }
-          if (val < 0) return { backgroundColor: 'rgba(255, 77, 79, 0.08)' }
-          return null
-        },
-      },
-      {
-        field: 'proposed_marketMove',
-        headerName: 'Mkt Move',
-        width: 100,
-        valueFormatter: ({ value }) => value != null ? value.toFixed(4) : '',
-        cellStyle: (params) => {
-          if (!params.data) return null
-          return getViolationStyle(options.evaluationMap, params.data.id, 'Market Move')
-        },
-      },
-    ],
-  },
-{
-    field: 'allocation',
-    headerName: 'Allocation',
-    width: 100,
-    valueFormatter: ({ value }) => value != null ? `${Math.round(value * 100)}%` : '',
-  },
-  {
-    field: 'strategy',
-    headerName: 'Strategy',
+    field: 'prior_lastPrice',
+    headerName: 'Cost',
     width: 110,
+    valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
+    cellRenderer: (params: ICellRendererParams) => renderViolationCell(
+      params, 'Cost', options.evaluationMap,
+      (violation) => {
+        const val = params.value
+        if (val == null) return null
+        const style = violation ? VIOLATION_STYLES[violation.severity] : null
+        return (
+          <span style={style ? { color: style.color, fontWeight: style.fontWeight } : undefined}>
+            ${val.toFixed(4)}
+          </span>
+        )
+      },
+    ),
+  },
+  {
+    field: 'proposed_price',
+    headerName: 'Proposed',
+    width: 110,
+    editable: true,
+    valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
+    cellStyle: (params) => {
+      if (!params.data) return null
+      if (params.data.proposed_price !== params.data.prior_lastPrice) {
+        return { backgroundColor: 'rgba(var(--theme-color-1-rgb, 24, 144, 255), 0.08)' }
+      }
+      return null
+    },
+  },
+  {
+    field: 'proposed_margin',
+    headerName: 'Margin',
+    width: 100,
+    valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
+    cellRenderer: (params: ICellRendererParams) => renderViolationCell(
+      params, 'Margin', options.evaluationMap,
+      (violation) => {
+        const val = params.value
+        if (val == null) return null
+        const style = violation ? VIOLATION_STYLES[violation.severity] : null
+        return (
+          <span style={style ? { color: style.color, fontWeight: style.fontWeight } : undefined}>
+            ${val.toFixed(4)}
+          </span>
+        )
+      },
+    ),
+  },
+  {
+    field: 'proposed_marketMove',
+    headerName: 'Mkt Move',
+    width: 100,
+    valueFormatter: ({ value }) => value != null ? value.toFixed(4) : '',
+    cellRenderer: (params: ICellRendererParams) => renderViolationCell(
+      params, 'Market Move', options.evaluationMap,
+      (violation) => {
+        const val = params.value
+        if (val == null) return null
+        const style = violation ? VIOLATION_STYLES[violation.severity] : null
+        return (
+          <span style={style ? { color: style.color, fontWeight: style.fontWeight } : undefined}>
+            {val.toFixed(4)}
+          </span>
+        )
+      },
+    ),
+  },
+  {
+    field: 'proposed_delta',
+    headerName: 'Price Δ',
+    width: 100,
+    cellRenderer: (params: ICellRendererParams) => renderViolationCell(
+      params, 'Price Delta', options.evaluationMap,
+      (violation) => {
+        if (!params.value && params.value !== 0) return null
+        const val = params.value as number
+        const defaultColor = val > 0 ? '#52c41a' : val < 0 ? '#ff4d4f' : 'inherit'
+        const style = violation ? VIOLATION_STYLES[violation.severity] : null
+        const color = style ? style.color : defaultColor
+        const arrow = val > 0 ? '\u25B2' : val < 0 ? '\u25BC' : ''
+        return (
+          <span style={{ color, fontWeight: 600 }}>
+            {arrow} {Math.abs(val).toFixed(4)}
+          </span>
+        )
+      },
+    ),
+  },
+  {
+    headerName: 'Bench Δ',
+    width: 100,
+    valueGetter: (params: any) => {
+      if (!params.data) return null
+      return Math.abs(params.data.benchmark_ulsd - params.data.proposed_price)
+    },
+    valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
+    cellRenderer: (params: ICellRendererParams) => renderViolationCell(
+      params, 'Ref Strategy to Price', options.evaluationMap,
+      (violation) => {
+        if (!params.data) return null
+        const val = Math.abs(params.data.benchmark_ulsd - params.data.proposed_price)
+        const style = violation ? VIOLATION_STYLES[violation.severity] : null
+        return (
+          <span style={style ? { color: style.color, fontWeight: style.fontWeight } : undefined}>
+            ${val.toFixed(4)}
+          </span>
+        )
+      },
+    ),
+  },
+  {
+    field: 'proposed_adjustment',
+    headerName: 'Adjustment',
+    width: 110,
+    editable: true,
+    valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
   },
   {
     field: 'group',

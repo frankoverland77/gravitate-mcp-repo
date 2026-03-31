@@ -29,15 +29,15 @@ const historyColumnDefs: ColDef[] = [
 ]
 
 interface QuoteBookHistoryDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
 }
 
-export function QuoteBookHistoryDrawer({ visible, onClose }: QuoteBookHistoryDrawerProps) {
+export function QuoteBookHistoryDrawer({ open, onClose }: QuoteBookHistoryDrawerProps) {
   return (
     <Drawer
       title="Quote History — Diesel #2 / Houston Term."
-      open={visible}
+      open={open}
       placement="bottom"
       height="70vh"
       onClose={onClose}

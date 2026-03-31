@@ -54,13 +54,8 @@ export function RevaluationWizardModal({ open, onClose, context, skipStep1 = tru
     setIsProcessing(true);
     setHasFailed(false);
     setTimeout(() => {
-      if (Math.random() < 0.2) {
-        setIsProcessing(false);
-        setHasFailed(true);
-      } else {
-        setIsProcessing(false);
-        setIsComplete(true);
-      }
+      setIsProcessing(false);
+      setIsComplete(true);
     }, 2000);
   }, []);
 

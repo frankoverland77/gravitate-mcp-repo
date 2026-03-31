@@ -119,7 +119,7 @@ export function QuoteBook() {
       offenders.push({
         rowId,
         quote: `QC-${String(rowId).padStart(3, '0')}`,
-        location: row.location,
+        location: row.terminal,
         deviation: `${maxDev.toFixed(0)}% ${dirLabel}`,
         excCount: result.exceptionCount,
         type: result.exceptionType as 'hard' | 'soft',
@@ -439,7 +439,7 @@ export function QuoteBook() {
               display: 'flex',
               justifyContent: 'space-between',
             }}>
-              <span style={{ fontWeight: 500 }}>QC-{String(row.id).padStart(3, '0')} — {row.product}, {row.location}</span>
+              <span style={{ fontWeight: 500 }}>QC-{String(row.id).padStart(3, '0')} — {row.product}, {row.terminal}</span>
               <span style={{ color: '#dc2626', fontWeight: 600 }}>{row.exceptionCount} exc</span>
             </div>
           ))}

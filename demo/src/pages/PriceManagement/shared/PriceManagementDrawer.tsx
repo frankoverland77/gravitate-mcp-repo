@@ -10,7 +10,7 @@ import {
   SearchOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
-import { GraviButton, GraviGrid, Horizontal, NotificationMessage, Texto, Vertical } from '@gravitate-js/excalibrr';
+import { GraviButton, GraviGrid, Horizontal, NotificationMessage, RangePicker, Texto, Vertical } from '@gravitate-js/excalibrr';
 import { Alert, DatePicker, Drawer, Form, Input, InputNumber, Modal, Select } from 'antd';
 import { ColDef } from 'ag-grid-community';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -252,11 +252,34 @@ export function PriceManagementDrawer({
         const ids = new Set([allPriceHistory[1].PriceHistoryId, allPriceHistory[2].PriceHistoryId]);
         setConflictRowIds(ids);
         setConflictCount(ids.size);
+
+        // Auto-expand date range to encompass conflict rows
+        const conflictRows = allPriceHistory.filter((r) => ids.has(r.PriceHistoryId));
+        const conflictDates = conflictRows.map((r) => dayjs(r.EffectiveFrom));
+        const [curFrom, curTo] = historyDates;
+        const allDates = [curFrom, curTo, ...conflictDates];
+        const newFrom = allDates.reduce((a, b) => (a.isBefore(b) ? a : b));
+        const newTo = allDates.reduce((a, b) => (a.isAfter(b) ? a : b));
+        if (!newFrom.isSame(curFrom, 'day') || !newTo.isSame(curTo, 'day')) {
+          setHistoryDates([newFrom.startOf('day'), newTo.endOf('day')]);
+        }
+
         setConflictState('found');
       } else if (allPriceHistory.length === 2) {
         const ids = new Set(allPriceHistory.map((r) => r.PriceHistoryId));
         setConflictRowIds(ids);
         setConflictCount(ids.size);
+
+        // Auto-expand date range to encompass conflict rows
+        const conflictDates = allPriceHistory.map((r) => dayjs(r.EffectiveFrom));
+        const [curFrom, curTo] = historyDates;
+        const allDates = [curFrom, curTo, ...conflictDates];
+        const newFrom = allDates.reduce((a, b) => (a.isBefore(b) ? a : b));
+        const newTo = allDates.reduce((a, b) => (a.isAfter(b) ? a : b));
+        if (!newFrom.isSame(curFrom, 'day') || !newTo.isSame(curTo, 'day')) {
+          setHistoryDates([newFrom.startOf('day'), newTo.endOf('day')]);
+        }
+
         setConflictState('found');
       } else {
         setConflictRowIds(new Set());
@@ -509,6 +532,16 @@ export function PriceManagementDrawer({
                 ]} />
               </Form.Item>
 
+              <GraviButton
+                theme1
+                size="small"
+                buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
+                icon={conflictState === 'loading' ? <LoadingOutlined spin /> : undefined}
+                onClick={handleCheckConflicts}
+                disabled={isSaving || conflictState === 'loading'}
+                style={{ alignSelf: 'flex-end', marginBottom: 8 }}
+              />
+
               {showEffectiveDates && (
                 <>
                   <Form.Item label="Effective From" style={{ width: 150, marginBottom: 8 }}>
@@ -541,15 +574,7 @@ export function PriceManagementDrawer({
               )}
             </Horizontal>
 
-            <Horizontal verticalCenter gap={8} style={{ marginTop: 4 }}>
-              <GraviButton
-                size="small"
-                buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
-                icon={conflictState === 'loading' ? <LoadingOutlined spin /> : undefined}
-                onClick={handleCheckConflicts}
-                disabled={isSaving || conflictState === 'loading'}
-              />
-              <div style={{ flex: 1 }} />
+            <Horizontal gap={8} style={{ marginTop: 4 }}>
               <GraviButton
                 size="small"
                 buttonText="Cancel"
@@ -613,15 +638,14 @@ export function PriceManagementDrawer({
                 style={{ width: 160 }}
               />
             </Horizontal>
-            <DatePicker.RangePicker
-              value={historyDates.length === 2 ? [historyDates[0], historyDates[1]] : undefined}
+            <RangePicker
+              inputKey="pmPriceHistoryDates"
+              dates={historyDates}
               onChange={(dates) => {
-                setHistoryDates(dates ? dates.filter(Boolean) : []);
+                setHistoryDates(dates.map((d: any) => (dayjs.isDayjs(d) ? d : dayjs(d))));
                 clearConflicts();
               }}
               placement="bottomRight"
-              size="small"
-              style={{ maxWidth: 240 }}
             />
           </Horizontal>
           <div className="price-history-grid" style={{ flex: 1, minHeight: 200 }}>

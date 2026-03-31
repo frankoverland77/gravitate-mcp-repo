@@ -525,7 +525,7 @@ function SingleRowState({
         fontSize: 12,
         color: 'var(--gray-600)',
       }}>
-        Showing: {row.location} · {row.product} — QC-0{row.id}
+        Showing: {row.terminal} · {row.product} — QC-0{row.id}
       </div>
 
       {/* Action mode toggle */}
@@ -580,7 +580,7 @@ function MultiRowState({
   }, [selectedRows.map(r => r.id).join(',')])
 
   // Compute aggregated info
-  const uniqueLocations = [...new Set(selectedRows.map(r => r.location))]
+  const uniqueLocations = [...new Set(selectedRows.map(r => r.terminal))]
   const uniqueProducts = [...new Set(selectedRows.map(r => r.product))]
   const subtitle = `${uniqueLocations.length === 1 ? uniqueLocations[0] : `${uniqueLocations.length} locations`} · ${uniqueProducts.length === 1 ? uniqueProducts[0] : 'Mixed products'}`
 

@@ -925,12 +925,12 @@ function DrawerContent({
               fontFamily: 'monospace',
               fontSize: 13,
               padding: '12px 16px',
-              backgroundColor: 'var(--theme-bg-3)',
+              backgroundColor: '#1e1e1e',
               borderRadius: 6,
-              border: '1px solid var(--theme-border)',
+              border: '1px solid #333',
               minHeight: 60,
               whiteSpace: 'pre-wrap',
-              color: 'var(--theme-text)',
+              color: '#f5f5f5',
             }}
           >
             {data.Formula}

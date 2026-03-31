@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Texto, GraviButton, Vertical, Horizontal } from '@gravitate-js/excalibrr';
+import { useState, useMemo, useEffect, useCallback, useRef, createElement } from 'react';
+import { Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { SaveOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import {
@@ -11,6 +11,7 @@ import {
   addActivityLogEntry,
   updateProject,
   getRouteCount,
+  reorderProjects,
 } from './ProjectHub.data';
 import {
   filterByTab,
@@ -18,12 +19,12 @@ import {
   filterByStatus,
   sortProjects,
 } from './ProjectHub.utils';
+import { getIconComponent } from './ProjectHub.icons';
 import { ProjectHubHeader } from './components/ProjectHubHeader';
 import { ProjectHubListRow } from './components/ProjectHubListRow';
 import { ProjectHubDetailDrawer } from './components/ProjectHubDetailDrawer';
 import type { ProjectHubState, ProjectStatus } from './ProjectHub.types';
 import { createPageConfig } from '../../pageConfig';
-import './ProjectHub.css';
 
 export function ProjectHub() {
   const [state, setState] = useState<ProjectHubState>(() => loadHubState());
@@ -33,6 +34,10 @@ export function ProjectHub() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const savedStateRef = useRef<ProjectHubState>(state);
+
+  // Drag state
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
 
   // Build a lookup for section titles and icons from pageConfig
   const pageConfig = useMemo(() => createPageConfig(), []);
@@ -48,9 +53,29 @@ export function ProjectHub() {
     return meta;
   }, [pageConfig]);
 
+  // Title resolution: prefer displayName, fall back to pageConfig title
   const getTitleForKey = useCallback(
+    (key: string) => state.projects[key]?.displayName || (sectionMeta[key]?.title ?? key),
+    [sectionMeta, state]
+  );
+
+  // Original title from pageConfig (for drawer helper text)
+  const getOriginalTitle = useCallback(
     (key: string) => sectionMeta[key]?.title ?? key,
     [sectionMeta]
+  );
+
+  // Icon resolution: prefer entry.iconName from registry, fall back to pageConfig icon
+  const getIconForKey = useCallback(
+    (key: string): React.ReactNode => {
+      const entry = state.projects[key];
+      if (entry?.iconName) {
+        const Comp = getIconComponent(entry.iconName);
+        if (Comp) return createElement(Comp);
+      }
+      return sectionMeta[key]?.icon ?? null;
+    },
+    [sectionMeta, state]
   );
 
   // Close drawer on Escape
@@ -117,12 +142,53 @@ export function ProjectHub() {
     setState(prev => updateProject(prev, key, { description }));
   };
 
-  const handleAddActivity = (key: string, message: string, author: string) => {
-    setState(prev => addActivityLogEntry(prev, key, message, author));
+  const handleDisplayNameChange = (key: string, displayName: string) => {
+    setState(prev => updateProject(prev, key, { displayName: displayName || undefined }));
+  };
+
+  const handleIconChange = (key: string, iconName: string) => {
+    setState(prev => updateProject(prev, key, { iconName: iconName || undefined }));
+  };
+
+  const handleAddActivity = (key: string, msg: string, author: string) => {
+    setState(prev => addActivityLogEntry(prev, key, msg, author));
+  };
+
+  // Drag handlers
+  const handleDragStart = (key: string, e: React.DragEvent) => {
+    setDragKey(key);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', key);
+  };
+
+  const handleDragOver = (key: string, e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (key !== dragKey) {
+      setDragOverKey(key);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverKey(null);
+  };
+
+  const handleDrop = (toKey: string, e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOverKey(null);
+    if (dragKey && dragKey !== toKey) {
+      setState(prev => reorderProjects(prev, dragKey, toKey));
+    }
+    setDragKey(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragKey(null);
+    setDragOverKey(null);
   };
 
   return (
-    <Vertical height='100%'>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <ProjectHubHeader
         activeCount={activeCount}
         draftCount={draftCount}
@@ -133,38 +199,50 @@ export function ProjectHub() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <Horizontal flex='1' className='project-hub-body'>
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Main list area */}
-        <Vertical flex='1' className='project-hub-list'>
-          <Horizontal
-            alignItems='center'
-            justifyContent='space-between'
-            className='project-hub-tabs'
-          >
-            <Horizontal alignItems='center'>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 24px',
+            borderBottom: '2px solid var(--gray-200)',
+            flexShrink: 0,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               {([
                 { key: 'active-draft' as const, label: 'Active & Draft' },
                 { key: 'archived' as const, label: `Archived (${archivedCount})` },
               ]).map(tab => (
-                <Texto
+                <span
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`project-hub-tab ${activeTab === tab.key ? 'project-hub-tab--active' : ''}`}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '13px',
+                    fontWeight: activeTab === tab.key ? 600 : 500,
+                    color: activeTab === tab.key ? 'var(--theme-color-1)' : 'var(--gray-500)',
+                    cursor: 'pointer',
+                    borderBottom: activeTab === tab.key ? '2px solid var(--theme-color-1)' : '2px solid transparent',
+                    marginBottom: '-2px',
+                    transition: 'all 0.15s ease',
+                  }}
                 >
-                  {tab.label}
-                </Texto>
+                  <Texto>{tab.label}</Texto>
+                </span>
               ))}
-            </Horizontal>
+            </div>
             {isDirty && (
               <GraviButton size="small" success onClick={handleSave}>
                 <SaveOutlined /> Save Changes
               </GraviButton>
             )}
-          </Horizontal>
+          </div>
 
-          <Vertical flex='1' className='project-hub-list-scroll'>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
             {displayedProjects.length === 0 ? (
-              <Vertical className='project-hub-empty'>
+              <div style={{ padding: '40px 24px', textAlign: 'center' }}>
                 <Texto appearance="medium">
                   {search || statusFilter !== 'all'
                     ? 'No projects match your filters'
@@ -172,42 +250,51 @@ export function ProjectHub() {
                     ? 'No archived projects'
                     : 'No projects found'}
                 </Texto>
-              </Vertical>
+              </div>
             ) : (
               displayedProjects.map((entry) => (
                 <ProjectHubListRow
                   key={entry.sectionKey}
                   entry={entry}
                   title={getTitleForKey(entry.sectionKey)}
-                  icon={sectionMeta[entry.sectionKey]?.icon ?? null}
+                  icon={getIconForKey(entry.sectionKey)}
                   routeCount={getRouteCount(entry.sectionKey)}
                   isSelected={selectedKey === entry.sectionKey}
                   onSelect={() => setSelectedKey(
                     selectedKey === entry.sectionKey ? null : entry.sectionKey
                   )}
                   onToggleSidebar={() => handleToggleSidebar(entry.sectionKey)}
+                  isDragOver={dragOverKey === entry.sectionKey}
+                  onDragStart={(e) => handleDragStart(entry.sectionKey, e)}
+                  onDragOver={(e) => handleDragOver(entry.sectionKey, e)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(entry.sectionKey, e)}
+                  onDragEnd={handleDragEnd}
                 />
               ))
             )}
-          </Vertical>
-        </Vertical>
+          </div>
+        </div>
 
         {/* Detail drawer */}
         <ProjectHubDetailDrawer
           entry={selectedEntry}
           title={selectedKey ? getTitleForKey(selectedKey) : ''}
-          icon={selectedKey ? sectionMeta[selectedKey]?.icon ?? null : null}
+          originalTitle={selectedKey ? getOriginalTitle(selectedKey) : ''}
+          icon={selectedKey ? getIconForKey(selectedKey) : null}
           routeCount={selectedKey ? getRouteCount(selectedKey) : 0}
           isOpen={!!selectedEntry}
           onClose={() => setSelectedKey(null)}
           onStatusChange={(status) => selectedKey && handleStatusChange(selectedKey, status)}
           onVersionChange={(v) => selectedKey && handleVersionChange(selectedKey, v)}
           onDescriptionChange={(d) => selectedKey && handleDescriptionChange(selectedKey, d)}
+          onDisplayNameChange={(name) => selectedKey && handleDisplayNameChange(selectedKey, name)}
+          onIconChange={(iconName) => selectedKey && handleIconChange(selectedKey, iconName)}
           onArchive={() => selectedKey && handleArchive(selectedKey)}
           onRestore={() => selectedKey && handleRestore(selectedKey)}
           onAddActivity={(msg, author) => selectedKey && handleAddActivity(selectedKey, msg, author)}
         />
-      </Horizontal>
-    </Vertical>
+      </div>
+    </div>
   );
 }

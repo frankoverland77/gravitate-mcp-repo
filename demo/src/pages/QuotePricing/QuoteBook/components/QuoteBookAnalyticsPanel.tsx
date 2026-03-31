@@ -157,7 +157,7 @@ export function QuoteBookAnalyticsPanel({ open, selectedRow, analyticsData, onSe
                     fontWeight: 600,
                   }}>
                     <span>Quote</span>
-                    <span>Location</span>
+                    <span>Terminal</span>
                     <span>Deviation</span>
                     <span>Exc</span>
                     <span>Type</span>

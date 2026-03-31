@@ -1,0 +1,93 @@
+.create-index-drawer .ant-drawer-header {
+  background-color: var(--theme-color-1);
+}
+
+.timing-window-container {
+  --pickup-bg: #dcfce7;
+  --visibility-bg: #dbeafe;
+  --pickup-border: #32ae5e;
+  --visibility-border: #4386f6;
+}
+
+.step-circle {
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-circle.active {
+  background-color: var(--theme-color-1);
+}
+
+.step-circle.inactive {
+  background-color: var(--bg-3);
+}
+
+.timing-window-calendar-day {
+  background-color: var(--bg-1) !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.timing-window-calendar-day:hover {
+  background-color: var(--bg-3) !important;
+}
+.timing-window-today {
+  background-color: var(--bg-1) !important;
+  border: 2px solid var(--gray-700) !important;
+}
+.timing-window-visibility-range {
+  background-color: var(--visibility-bg) !important;
+}
+.timing-window-pickup-range {
+  background-color: var(--pickup-bg) !important;
+}
+.timing-window-visibility-selected {
+  border: 2px solid var(--visibility-bg) !important;
+}
+.timing-window-pickup-selected {
+  border: 2px solid var(--pickup-bg) !important;
+}
+.timing-window-both {
+  background: linear-gradient(135deg, var(--pickup-bg) 50%, var(--visibility-bg) 50%) !important;
+}
+.text-wrap-whitespace {
+  white-space: break-spaces;
+}
+.timing-window-visibility-border {
+  border: 2px solid var(--visibility-border) !important;
+}
+.timing-window-pickup-border {
+  border: 2px solid var(--pickup-border) !important;
+}
+.timing-window-visibility-border-thin {
+  border: 1px solid var(--visibility-border) !important;
+}
+.timing-window-pickup-border-thin {
+  border: 1px solid var(--pickup-border) !important;
+}
+
+.cal-button {
+  height: 40px !important;
+}
+
+.index-pricing-icon-container {
+  max-width: 36px;
+  max-height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  background-color: var(--theme-color-1-dim);
+  border-radius: 5px;
+}
+
+.formula-text {
+  font-size: 13px;
+  font-family: monospace;
+  color: #595959;
+}
+
+.dotted-border {
+  border: 2px dashed var(--bg-3);
+}

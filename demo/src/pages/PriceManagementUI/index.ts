@@ -1,0 +1,1 @@
+export { PriceManagementUI } from './PriceManagementUI';

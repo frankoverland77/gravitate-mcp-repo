@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, createElement } from 'react';
 import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr';
 import { CloseOutlined, DeleteOutlined, UndoOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
-import { Input, Select } from 'antd';
+import { Input, Select, Popover, Tooltip } from 'antd';
 import { ProjectHubStatusBadge } from './ProjectHubStatusBadge';
 import { ProjectHubActivityLog } from './ProjectHubActivityLog';
 import { isPinned } from '../ProjectHub.data';
+import { searchIcons } from '../ProjectHub.icons';
 import type { ProjectHubEntry, ProjectStatus } from '../ProjectHub.types';
 
 interface ProjectHubDetailDrawerProps {
   entry: ProjectHubEntry | null;
   title: string;
+  originalTitle: string;
   icon: React.ReactNode;
   routeCount: number;
   isOpen: boolean;
@@ -17,6 +19,8 @@ interface ProjectHubDetailDrawerProps {
   onStatusChange: (status: ProjectStatus) => void;
   onVersionChange: (version: string) => void;
   onDescriptionChange: (desc: string) => void;
+  onDisplayNameChange: (name: string) => void;
+  onIconChange: (iconName: string) => void;
   onArchive: () => void;
   onRestore: () => void;
   onAddActivity: (message: string, author: string) => void;
@@ -25,6 +29,7 @@ interface ProjectHubDetailDrawerProps {
 export function ProjectHubDetailDrawer({
   entry,
   title,
+  originalTitle,
   icon,
   routeCount,
   isOpen,
@@ -32,6 +37,8 @@ export function ProjectHubDetailDrawer({
   onStatusChange,
   onVersionChange,
   onDescriptionChange,
+  onDisplayNameChange,
+  onIconChange,
   onArchive,
   onRestore,
   onAddActivity,
@@ -40,6 +47,10 @@ export function ProjectHubDetailDrawer({
   const [versionDraft, setVersionDraft] = useState('');
   const [editingDesc, setEditingDesc] = useState(false);
   const [descDraft, setDescDraft] = useState('');
+  const [editingDisplayName, setEditingDisplayName] = useState(false);
+  const [displayNameDraft, setDisplayNameDraft] = useState('');
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const [iconSearch, setIconSearch] = useState('');
 
   const pinned = entry ? isPinned(entry.sectionKey) : false;
 
@@ -62,6 +73,91 @@ export function ProjectHubDetailDrawer({
     onDescriptionChange(descDraft);
     setEditingDesc(false);
   };
+
+  const startEditDisplayName = () => {
+    setDisplayNameDraft(entry?.displayName ?? '');
+    setEditingDisplayName(true);
+  };
+
+  const saveDisplayName = () => {
+    onDisplayNameChange(displayNameDraft);
+    setEditingDisplayName(false);
+  };
+
+  const filteredIcons = searchIcons(iconSearch);
+
+  const iconPickerContent = (
+    <div style={{ width: 280 }}>
+      <Input
+        placeholder="Search icons..."
+        value={iconSearch}
+        onChange={(e) => setIconSearch(e.target.value)}
+        size="small"
+        style={{ marginBottom: 8 }}
+        autoFocus
+      />
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(6, 1fr)',
+        gap: 4,
+        maxHeight: 256,
+        overflowY: 'auto',
+      }}>
+        {filteredIcons.map(({ name, component }) => (
+          <Tooltip key={name} title={name.replace('Outlined', '').replace('Filled', '')} mouseEnterDelay={0.4}>
+            <div
+              onClick={() => {
+                onIconChange(name);
+                setIconPickerOpen(false);
+                setIconSearch('');
+              }}
+              style={{
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontSize: 18,
+                color: entry?.iconName === name ? 'var(--theme-color-1)' : 'var(--gray-600)',
+                background: entry?.iconName === name ? 'var(--theme-color-1-bg, rgba(24,144,255,0.08))' : 'transparent',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--gray-100)'; }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = entry?.iconName === name
+                  ? 'var(--theme-color-1-bg, rgba(24,144,255,0.08))'
+                  : 'transparent';
+              }}
+            >
+              {createElement(component)}
+            </div>
+          </Tooltip>
+        ))}
+      </div>
+      {entry?.iconName && (
+        <div
+          onClick={() => {
+            onIconChange('');
+            setIconPickerOpen(false);
+            setIconSearch('');
+          }}
+          style={{
+            marginTop: 8,
+            paddingTop: 8,
+            borderTop: '1px solid var(--gray-100)',
+            textAlign: 'center',
+            cursor: 'pointer',
+            color: 'var(--gray-400)',
+            fontSize: 12,
+          }}
+        >
+          Reset to default
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div style={{
@@ -88,7 +184,32 @@ export function ProjectHubDetailDrawer({
             }}
           >
             <Horizontal alignItems="center" gap={8}>
-              <span style={{ fontSize: 18, color: 'var(--gray-500)' }}>{icon}</span>
+              {!pinned ? (
+                <Popover
+                  content={iconPickerContent}
+                  trigger="click"
+                  open={iconPickerOpen}
+                  onOpenChange={setIconPickerOpen}
+                  placement="bottomLeft"
+                >
+                  <span
+                    style={{
+                      fontSize: 18,
+                      color: 'var(--gray-500)',
+                      cursor: 'pointer',
+                      padding: 4,
+                      borderRadius: 4,
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--gray-100)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    {icon}
+                  </span>
+                </Popover>
+              ) : (
+                <span style={{ fontSize: 18, color: 'var(--gray-500)' }}>{icon}</span>
+              )}
               <Texto category="h5" weight="600">{title}</Texto>
             </Horizontal>
             <span
@@ -112,10 +233,49 @@ export function ProjectHubDetailDrawer({
 
           {/* Body */}
           <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+            {/* Display Name */}
+            {!pinned && (
+              <div style={{ marginBottom: 16 }}>
+                <Horizontal alignItems="center" gap={8} style={{ marginBottom: 8 }}>
+                  <Texto appearance="medium" category="label" style={{ width: 80 }}>Display Name</Texto>
+                  {editingDisplayName ? (
+                    <Horizontal alignItems="center" gap={4}>
+                      <Input
+                        value={displayNameDraft}
+                        onChange={(e) => setDisplayNameDraft(e.target.value)}
+                        onPressEnter={saveDisplayName}
+                        size="small"
+                        style={{ width: 180 }}
+                        placeholder={originalTitle}
+                        autoFocus
+                      />
+                      <span onClick={saveDisplayName} style={{ cursor: 'pointer' }}>
+                        <CheckOutlined style={{ fontSize: 14, color: 'var(--success)' }} />
+                      </span>
+                    </Horizontal>
+                  ) : (
+                    <Horizontal alignItems="center" gap={4}>
+                      <Texto category="label">
+                        {entry.displayName || originalTitle}
+                      </Texto>
+                      <span onClick={startEditDisplayName} style={{ cursor: 'pointer' }}>
+                        <EditOutlined style={{ fontSize: 12, color: 'var(--gray-400)' }} />
+                      </span>
+                    </Horizontal>
+                  )}
+                </Horizontal>
+                {entry.displayName && (
+                  <Texto appearance="medium" category="label" style={{ fontSize: 11, marginLeft: 88 }}>
+                    Original: {originalTitle}
+                  </Texto>
+                )}
+              </div>
+            )}
+
             {/* Status & Version */}
             <div style={{ marginBottom: 16 }}>
               <Horizontal alignItems="center" gap={8} style={{ marginBottom: 8 }}>
-                <Texto appearance="medium" category="label" style={{ width: 60 }}>Status</Texto>
+                <Texto appearance="medium" category="label" style={{ width: 80 }}>Status</Texto>
                 {!pinned ? (
                   <Select
                     value={entry.status}
@@ -132,7 +292,7 @@ export function ProjectHubDetailDrawer({
                 )}
               </Horizontal>
               <Horizontal alignItems="center" gap={8} style={{ marginBottom: 8 }}>
-                <Texto appearance="medium" category="label" style={{ width: 60 }}>Version</Texto>
+                <Texto appearance="medium" category="label" style={{ width: 80 }}>Version</Texto>
                 {editingVersion ? (
                   <Horizontal alignItems="center" gap={4}>
                     <Input
@@ -160,7 +320,7 @@ export function ProjectHubDetailDrawer({
                 )}
               </Horizontal>
               <Horizontal alignItems="center" gap={8}>
-                <Texto appearance="medium" category="label" style={{ width: 60 }}>Routes</Texto>
+                <Texto appearance="medium" category="label" style={{ width: 80 }}>Routes</Texto>
                 <Texto category="label">{routeCount}</Texto>
               </Horizontal>
             </div>

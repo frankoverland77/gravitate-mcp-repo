@@ -120,3 +120,116 @@ export interface SavedPriceResult {
 }
 
 import dayjs from 'dayjs';
+
+// ─── Quotebook Types ────────────────────────────────────────────────────────
+
+export type PublicationMode = 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay';
+
+export interface QuotebookGroup {
+  GroupId: number;
+  GroupName: string;
+}
+
+/** Row in the Quotebook grid — matches production Quote shape */
+export interface QuotebookRow {
+  QuoteConfigurationMappingId: number;
+  QuoteConfigurationName: string;
+  QuoteConfigurationMappingGroup: string;
+  Description: string;
+  ProductName: string;
+  ProductGroup: string;
+  LocationName: string;
+  CounterPartyName: string;
+  EffectiveFrom: string;
+  EffectiveTo: string;
+
+  // Price Info
+  CostSourceTradeEntryId: number | null;
+  NetOrGrossDisplay: 'Net' | 'Gross' | 'N/A';
+  LatestQuoteDate: string | null;
+  Exceptions: { Severity: 'Warning' | 'Error'; Message: string }[];
+
+  // Current period
+  SoldVolume: number | null;
+  CurrentCost: number | null;
+  CurrentDiff: number | null;
+  CurrentDiffName: string;
+  CurrentPrice: number | null;
+  CurrentProfit: number | null;
+
+  // Proposed
+  Cost: number | null;
+  CostValuationId: number | null;
+  CostStatusSymbol: 'A' | 'M' | 'O' | 'E' | null;
+  Adjustment: number | null;
+  ProposedPrice: number | null;
+  ProposedPriceDelta: number | null;
+  Margin: number | null;
+  StrategyBase: number | null;
+  StrategyDiffName: string;
+  QuoteStrategyDiffName: string;
+  AdjustmentUpdatedDateTime: string | null;
+
+  // Spread row fields
+  IsSpreadRow: boolean;
+  SpreadParentMappingId: number | null;
+}
+
+// ─── Contract Detail Types ──────────────────────────────────────────────────
+
+/** Header for a single contract detail view */
+export interface ContractDetailHeader {
+  ContractNumber: string;
+  Counterparty: string;
+  Product: string;
+  Location: string;
+  ContractType: string;
+  FormulaName: string;
+  EffectiveFrom: string;
+  EffectiveTo: string;
+  TotalValue: number | null;
+  Status: 'Complete' | 'Missing Prices' | 'Stale' | 'Estimate';
+}
+
+/** Variable row in the contract detail grid */
+export interface ContractDetailVariableRow {
+  VariableId: number;
+  Component: string;
+  Source: 'Database' | 'Fixed' | 'ExternalProvider';
+  InstrumentName: string;
+  PriceInstrumentId: number;
+  Value: number | null;
+  PriceType: string;
+  EffectiveDate: string;
+  Status: 'Actual' | 'Missing' | 'Estimate' | 'Fixed' | 'External';
+}
+
+// ─── Contract Revaluation Types ─────────────────────────────────────────────
+
+/** Detail row for revaluation variable-level changes */
+export interface RevaluationDetailRow {
+  DetailId: number;
+  Component: string;
+  OldValue: number;
+  NewValue: number;
+  Change: number;
+  ChangePercent: number;
+}
+
+/** Row in the Contract Revaluation grid */
+export interface RevaluationRow {
+  RevaluationId: number;
+  ContractName: string;
+  Counterparty: string;
+  Product: string;
+  Location: string;
+  PriorValue: number;
+  CurrentValue: number;
+  ValueChange: number;
+  RevaluationStatus: 'Complete' | 'Pending' | 'Failed' | 'In Progress';
+  LastRevaluedDate: string;
+  details: RevaluationDetailRow[];
+}
+
+/** Wizard step for manual revaluation */
+export type RevaluationWizardStep = 'select' | 'parameters' | 'review' | 'confirm';

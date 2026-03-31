@@ -31,6 +31,7 @@ import { FormulaTemplates } from './pages/demos/grids/FormulaTemplates';
 
 import { ContractDetails } from './pages/demos/grids/ContractDetails';
 import { OnlineSellingPlatformHome } from './pages/OnlineSellingPlatform/OnlineSellingPlatformHome';
+import { ManageOffersPage } from './pages/ManageOffers';
 import { IndexOfferManagement } from './pages/OnlineSellingPlatform/IndexOfferManagement';
 import { IndexOfferBuyNow } from './pages/OnlineSellingPlatform/IndexOfferBuyNow';
 import { SupplierAnalysis } from './pages/OnlineSellingPlatform/SupplierAnalysis';
@@ -48,6 +49,7 @@ import { DeliveredPricing } from './pages/DeliveredPricing/DeliveredPricing';
 import { FreightManagement } from './pages/DeliveredPricing/FreightManagement/FreightManagement';
 import { TaxManagement } from './pages/DeliveredPricing/TaxManagement/TaxManagement';
 import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesale';
+import { PriceManagementUI } from './pages/PriceManagementUI';
 import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBook';
 import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRows';
 import { QuotebookQoLPage } from './pages/QuotebookQoL';
@@ -68,7 +70,7 @@ import {
   GridShowcase,
   ColorsShowcase,
 } from './pages/DesignSystem';
-import { AllPricesPage, ContractValuesPage } from './pages/PriceManagement';
+import { AllPricesPage, ContractValuesPage, QuotebookPage, ContractDetailPage, ContractRevaluationPage } from './pages/PriceManagement';
 
 // Demo registry - automatically populated by MCP server
 interface DemoRoute {
@@ -963,7 +965,69 @@ export const createPageConfig = (): PageConfig => {
         path: '/PriceManagement/ContractValues',
         description: 'Contract values with formula breakdown drawer and stacked price entry',
       },
+      {
+        hasPermission: () => true,
+        key: 'Quotebook',
+        title: 'Quotebook',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <QuotebookPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/PriceManagement/Quotebook',
+        description: 'Quotebook with benchmark price links to valuation breakdown',
+      },
+      {
+        hasPermission: () => true,
+        key: 'ContractDetail',
+        title: 'Contract Detail',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ContractDetailPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/PriceManagement/ContractDetail',
+        description: 'Single contract detail view with pricing variables grid',
+      },
+      {
+        hasPermission: () => true,
+        key: 'ContractReval',
+        title: 'Contract Revaluation',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <ContractRevaluationPage />
+          </ThemeRouteWrapper>
+        ),
+        path: '/PriceManagement/ContractRevaluation',
+        description: 'Contract revaluation with master-detail and manual revaluation wizard',
+      },
     ],
+  };
+
+  config.ManageOffers = {
+    hasPermission: () => true,
+    key: 'ManageOffers',
+    icon: <ShopOutlined />,
+    title: 'Manage Offers',
+    element: (
+      <ThemeRouteWrapper theme="OSP">
+        <ManageOffersPage />
+      </ThemeRouteWrapper>
+    ),
+    path: '/ManageOffers',
+  };
+
+  config.PriceManagementUI = {
+    hasPermission: () => true,
+    key: 'PriceManagementUI',
+    icon: <DollarOutlined />,
+    title: 'Price Management UI',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <PriceManagementUI />
+      </ThemeRouteWrapper>
+    ),
+    path: '/PriceManagementUI',
   };
 
   return config;

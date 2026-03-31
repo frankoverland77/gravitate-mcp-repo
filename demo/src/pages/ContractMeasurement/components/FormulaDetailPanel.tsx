@@ -408,7 +408,7 @@ export function FormulaDetailPanel({
           <div className={`${styles.formulaExpression} ${!expression ? styles.formulaExpressionEmpty : ''}`}>
             <Texto
               category="p2"
-              style={{ fontFamily: `'Menlo', 'Monaco', 'Courier New', monospace`, color: expression ? '#595959' : '#722ed1', fontStyle: expression ? 'normal' : 'italic' }}
+              style={{ fontFamily: `'Menlo', 'Monaco', 'Courier New', monospace`, color: expression ? '#f5f5f5' : '#722ed1', fontStyle: expression ? 'normal' : 'italic' }}
             >
               {expression || 'Add components below to build formula'}
             </Texto>

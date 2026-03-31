@@ -211,6 +211,47 @@ export function addActivityLogEntry(
   });
 }
 
+/** Reorder projects by moving fromKey to toKey's position */
+export function reorderProjects(
+  state: ProjectHubState,
+  fromKey: string,
+  toKey: string
+): ProjectHubState {
+  if (fromKey === toKey) return state;
+  if (isPinned(fromKey) || isPinned(toKey)) return state;
+
+  // Get non-pinned entries sorted by current sortOrder
+  const entries = Object.values(state.projects)
+    .filter(e => !isPinned(e.sectionKey))
+    .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+
+  const keys = entries.map(e => e.sectionKey);
+  const fromIdx = keys.indexOf(fromKey);
+  const toIdx = keys.indexOf(toKey);
+  if (fromIdx === -1 || toIdx === -1) return state;
+
+  // Remove from old position and insert at new position
+  keys.splice(fromIdx, 1);
+  keys.splice(toIdx, 0, fromKey);
+
+  // Reassign sortOrder
+  const updatedProjects = { ...state.projects };
+  keys.forEach((key, i) => {
+    updatedProjects[key] = {
+      ...updatedProjects[key],
+      sortOrder: i * 10,
+    };
+  });
+
+  const newState: ProjectHubState = {
+    ...state,
+    projects: updatedProjects,
+  };
+
+  saveHubState(newState);
+  return newState;
+}
+
 /** Get route count for a section from pageConfig */
 export function getRouteCount(sectionKey: string): number {
   const config = createPageConfig();

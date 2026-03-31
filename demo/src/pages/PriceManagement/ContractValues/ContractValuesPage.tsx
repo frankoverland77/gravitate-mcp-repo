@@ -130,17 +130,9 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
 function getPriceHistoryColumnDefs(): ColDef[] {
   return [
     { field: 'InstrumentName', headerName: 'Instrument', flex: 2, minWidth: 200 },
-    { field: 'PriceType', headerName: 'Type', width: 100 },
-    {
-      field: 'PriceValue',
-      headerName: 'Price',
-      width: 110,
-      cellStyle: { textAlign: 'right', fontWeight: '600' },
-      valueFormatter: ({ value }: any) =>
-        value != null
-          ? value.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
-          : '',
-    },
+    { field: 'Product', headerName: 'Product', width: 130 },
+    { field: 'Location', headerName: 'Location', flex: 1, minWidth: 130 },
+    { field: 'Counterparty', headerName: 'Counterparty', flex: 1, minWidth: 130 },
     {
       field: 'EffectiveFrom',
       headerName: 'Eff From',
@@ -156,9 +148,18 @@ function getPriceHistoryColumnDefs(): ColDef[] {
         return dayjs(value).year() >= 9999 ? 'max' : dayjs(value).format('MM/DD/YYYY');
       },
     },
+    {
+      field: 'PriceValue',
+      headerName: 'Price',
+      width: 110,
+      cellStyle: { textAlign: 'right', fontWeight: '600' },
+      valueFormatter: ({ value }: any) =>
+        value != null
+          ? value.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+          : '',
+    },
+    { field: 'PriceType', headerName: 'Type', width: 100 },
     { field: 'Publisher', headerName: 'Publisher', width: 100 },
-    { field: 'Product', headerName: 'Product', width: 120 },
-    { field: 'Location', headerName: 'Location', flex: 1 },
     {
       field: 'Updated',
       headerName: 'Updated',
@@ -255,12 +256,37 @@ function InlinePriceEntry({
         const ids = new Set([allHistory[1].PriceHistoryId, allHistory[2].PriceHistoryId]);
         setConflictRowIds(ids);
         setConflictCount(ids.size);
+
+        // Auto-expand date range to encompass conflict rows
+        const conflictRows = allHistory.filter((r) => ids.has(r.PriceHistoryId));
+        const conflictDates = conflictRows.map((r) => dayjs(r.EffectiveFrom));
+        const [curFrom, curTo] = historyDates;
+        const allDates = [curFrom, curTo, ...conflictDates];
+        const newFrom = allDates.reduce((a, b) => (a.isBefore(b) ? a : b));
+        const newTo = allDates.reduce((a, b) => (a.isAfter(b) ? a : b));
+        if (!newFrom.isSame(curFrom, 'day') || !newTo.isSame(curTo, 'day')) {
+          setHistoryDates([newFrom.startOf('day'), newTo.endOf('day')]);
+        }
+
         setConflictState('found');
+        setHistoryExpanded(true);
       } else if (allHistory.length === 2) {
         const ids = new Set(allHistory.map((r) => r.PriceHistoryId));
         setConflictRowIds(ids);
         setConflictCount(ids.size);
+
+        // Auto-expand date range to encompass conflict rows
+        const conflictDates = allHistory.map((r) => dayjs(r.EffectiveFrom));
+        const [curFrom, curTo] = historyDates;
+        const allDates = [curFrom, curTo, ...conflictDates];
+        const newFrom = allDates.reduce((a, b) => (a.isBefore(b) ? a : b));
+        const newTo = allDates.reduce((a, b) => (a.isAfter(b) ? a : b));
+        if (!newFrom.isSame(curFrom, 'day') || !newTo.isSame(curTo, 'day')) {
+          setHistoryDates([newFrom.startOf('day'), newTo.endOf('day')]);
+        }
+
         setConflictState('found');
+        setHistoryExpanded(true);
       } else {
         setConflictRowIds(new Set());
         setConflictCount(0);
@@ -384,6 +410,16 @@ function InlinePriceEntry({
               ]} />
             </Form.Item>
 
+            <GraviButton
+              theme1
+              size="small"
+              buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
+              icon={conflictState === 'loading' ? <LoadingOutlined spin /> : undefined}
+              onClick={handleCheckConflicts}
+              disabled={isSaving || conflictState === 'loading'}
+              style={{ alignSelf: 'flex-end', marginBottom: 8 }}
+            />
+
             {showEffectiveDates && (
               <>
                 <Form.Item label="Effective From" style={{ width: 150, marginBottom: 8 }}>
@@ -416,15 +452,7 @@ function InlinePriceEntry({
             )}
           </Horizontal>
 
-          <Horizontal verticalCenter gap={8} style={{ marginTop: 4 }}>
-            <GraviButton
-              size="small"
-              buttonText={conflictState === 'loading' ? 'Checking...' : 'Check Conflicts'}
-              icon={conflictState === 'loading' ? <LoadingOutlined spin /> : undefined}
-              onClick={handleCheckConflicts}
-              disabled={isSaving || conflictState === 'loading'}
-            />
-            <div style={{ flex: 1 }} />
+          <Horizontal gap={8} style={{ marginTop: 4 }}>
             <GraviButton
               size="small"
               buttonText="Cancel"
@@ -487,10 +515,10 @@ function InlinePriceEntry({
                     value={historySearchText}
                     onChange={(e) => setHistorySearchText(e.target.value)}
                     allowClear
-                    style={{ width: 200 }}
+                    style={{ width: 160 }}
                   />
                 </Horizontal>
-                <Horizontal verticalCenter style={{ marginLeft: 'auto' }} onClick={(e: any) => e.stopPropagation()}>
+                <Horizontal verticalCenter gap={8} style={{ marginLeft: 'auto' }} onClick={(e: any) => e.stopPropagation()}>
                   <RangePicker
                     inputKey="cvPriceHistoryDates"
                     dates={historyDates}
@@ -561,20 +589,13 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, cont
     setRevalueState('loading');
     setErrorMessage(null);
     setTimeout(() => {
-      const isSuccess = Math.random() > 0.2;
-      if (isSuccess) {
-        const priceShift = (Math.random() - 0.5) * 0.02;
-        setDisplayResult(data.Result + priceShift);
-        setDisplayDate(new Date().toISOString());
-        setShowSuccessTimestamp(true);
-        setRevalueState('cooldown');
-        successLabelTimer.current = setTimeout(() => setShowSuccessTimestamp(false), 5000);
-        cooldownTimer.current = setTimeout(() => setRevalueState('idle'), REVALUE_COOLDOWN_MS);
-      } else {
-        setRevalueState('error');
-        setErrorMessage('Lock conflict: Scheduled valuation is currently running. Try again shortly.');
-        setTimeout(() => setRevalueState('idle'), 500);
-      }
+      const priceShift = (Math.random() - 0.5) * 0.02;
+      setDisplayResult(data.Result + priceShift);
+      setDisplayDate(new Date().toISOString());
+      setShowSuccessTimestamp(true);
+      setRevalueState('cooldown');
+      successLabelTimer.current = setTimeout(() => setShowSuccessTimestamp(false), 5000);
+      cooldownTimer.current = setTimeout(() => setRevalueState('idle'), REVALUE_COOLDOWN_MS);
     }, 1500);
   }, [data.Result]);
 
@@ -600,12 +621,6 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, cont
       const editingComp = resultComponents.find((c) => c.FormulaResultComponentId === editingComponentId);
 
       setTimeout(() => {
-        if (Math.random() < 0.1) {
-          setIsSaving(false);
-          setSaveError('This instrument is currently being updated. Please try again shortly.');
-          return;
-        }
-
         setTimeout(() => {
           setResultComponents((prev) =>
             prev.map((c) =>

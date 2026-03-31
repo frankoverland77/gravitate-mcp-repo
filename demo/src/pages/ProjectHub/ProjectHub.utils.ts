@@ -14,14 +14,45 @@ export function getScopesFromHubState(): Record<string, boolean> {
     const state: ProjectHubState = JSON.parse(raw);
     const scopes: Record<string, boolean> = {};
 
-    for (const [key, entry] of Object.entries(state.projects)) {
-      if (isPinned(key) || (entry.showInSidebar && entry.status !== 'archived')) {
-        scopes[key] = true;
+    // Sort entries so scope key insertion order matches sidebar order
+    const sortedEntries = Object.values(state.projects).sort((a, b) => {
+      const aPinned = isPinned(a.sectionKey) ? 0 : 1;
+      const bPinned = isPinned(b.sectionKey) ? 0 : 1;
+      if (aPinned !== bPinned) return aPinned - bPinned;
+      const aOrder = a.sortOrder ?? 999;
+      const bOrder = b.sortOrder ?? 999;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return a.sectionKey.localeCompare(b.sectionKey);
+    });
+
+    for (const entry of sortedEntries) {
+      if (isPinned(entry.sectionKey) || (entry.showInSidebar && entry.status !== 'archived')) {
+        scopes[entry.sectionKey] = true;
       }
-      // Keys where showInSidebar=false are simply not added — getValidPages checks key existence
     }
 
     return scopes;
+  } catch {
+    return {};
+  }
+}
+
+/** Get display name + icon overrides from hub state for sidebar */
+export function getDisplayOverrides(): Record<string, { displayName?: string; iconName?: string }> {
+  const raw = localStorage.getItem('project-hub-state');
+  if (!raw) return {};
+  try {
+    const state: ProjectHubState = JSON.parse(raw);
+    const overrides: Record<string, { displayName?: string; iconName?: string }> = {};
+    for (const [key, entry] of Object.entries(state.projects)) {
+      if (entry.displayName || entry.iconName) {
+        overrides[key] = {
+          displayName: entry.displayName,
+          iconName: entry.iconName,
+        };
+      }
+    }
+    return overrides;
   } catch {
     return {};
   }
@@ -66,7 +97,7 @@ export function filterByStatus(
   return projects.filter(p => p.status === status);
 }
 
-/** Sort projects: pinned first, then alphabetical by title */
+/** Sort projects: pinned first, then by sortOrder, then alphabetical */
 export function sortProjects(
   projects: ProjectHubEntry[],
   getTitleForKey: (key: string) => string
@@ -75,6 +106,9 @@ export function sortProjects(
     const aPinned = isPinned(a.sectionKey) ? 0 : 1;
     const bPinned = isPinned(b.sectionKey) ? 0 : 1;
     if (aPinned !== bPinned) return aPinned - bPinned;
+    const aOrder = a.sortOrder ?? 999;
+    const bOrder = b.sortOrder ?? 999;
+    if (aOrder !== bOrder) return aOrder - bOrder;
     return getTitleForKey(a.sectionKey).localeCompare(getTitleForKey(b.sectionKey));
   });
 }

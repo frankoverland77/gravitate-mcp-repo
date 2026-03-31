@@ -1,13 +1,20 @@
-import { MoreOutlined } from '@ant-design/icons';
-import { GraviButton, GraviGrid, Horizontal, Texto, Vertical } from '@gravitate-js/excalibrr';
-import { Menu, Popover, Switch, Tooltip } from 'antd';
+import { CloseOutlined, ExperimentFilled, MoreOutlined } from '@ant-design/icons';
+import { GraviButton, GraviGrid, Vertical } from '@gravitate-js/excalibrr';
+import { Menu, Popover, Select, Switch, Tooltip } from 'antd';
 import { ColDef } from 'ag-grid-community';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { useFeatureMode } from '@contexts/FeatureModeContext';
 import dayjs from 'dayjs';
 
 import type { AllPricesRow, PriceInstrumentContext } from '../shared/types';
 import { mockAllPricesRows } from '../shared/mockData';
 import { PriceManagementDrawer } from '../shared/PriceManagementDrawer';
+import { RevaluationConfirmModal } from '../shared/RevaluationConfirmModal';
+import { RevaluationWizardModal } from '../shared/RevaluationWizardModal';
+import { shouldShowRevaluationModal } from '../shared/shouldShowRevaluationModal';
+import { getStatusCellStyle } from '../shared/statusStyles';
+import { PRICE_MANAGEMENT_STYLES } from '../shared/priceManagement.styles';
 
 // ─── All Prices Grid Column Defs ────────────────────────────────────────────
 
@@ -51,10 +58,7 @@ function getAllPricesColumnDefs(
       field: 'Status',
       headerName: 'Status',
       width: 90,
-      cellStyle: (params: any) => ({
-        color: params.value === 'Estimate' ? 'var(--theme-color-1)' : 'var(--theme-text)',
-        fontStyle: params.value === 'Estimate' ? 'italic' : 'normal',
-      }),
+      cellStyle: (params: any) => getStatusCellStyle(params.value),
     },
     {
       field: 'UpdatedDateTime',
@@ -138,6 +142,109 @@ function ActionMenu({
   );
 }
 
+// ─── Demo Options FAB ────────────────────────────────────────────────────────
+
+function DemoOptionsFab({
+  hasPermission,
+  setHasPermission,
+}: {
+  hasPermission: boolean;
+  setHasPermission: (v: boolean) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { featureMode, setFeatureMode } = useFeatureMode();
+
+  useEffect(() => {
+    if (!expanded) return;
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExpanded(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [expanded]);
+
+  return (
+    <div className="ap-fab-container" ref={containerRef}>
+      <div className={`ap-fab-panel ${expanded ? 'visible' : ''}`}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#333' }}>Demo Options</span>
+          <button className="ap-fab-close" onClick={() => setExpanded(false)} aria-label="Close">
+            <CloseOutlined />
+          </button>
+        </div>
+        <div className="ap-fab-option">
+          <span style={{ fontSize: 13 }}>Mode</span>
+          <Select
+            value={featureMode}
+            onChange={setFeatureMode}
+            size="small"
+            style={{ width: 120 }}
+            options={[
+              { value: 'mvp', label: 'MVP' },
+              { value: 'future-state', label: 'Future' },
+            ]}
+          />
+        </div>
+        <div className="ap-fab-option">
+          <span style={{ fontSize: 13 }}>Upload Permission</span>
+          <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
+        </div>
+      </div>
+      <button
+        className="ap-fab-button"
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-label="Demo options"
+        title="Demo Options"
+      >
+        <ExperimentFilled />
+      </button>
+    </div>
+  );
+}
+
+const AP_FAB_STYLES = `
+  .ap-fab-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
+  .ap-fab-button {
+    width: 48px; height: 48px; border-radius: 50%;
+    background-color: #1890ff; color: white; border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: all 0.3s ease;
+  }
+  .ap-fab-button:hover { background-color: #40a9ff; box-shadow: 0 6px 16px rgba(0,0,0,0.2); transform: scale(1.05); }
+  .ap-fab-button:focus { outline: 2px solid #1890ff; outline-offset: 2px; }
+  .ap-fab-panel {
+    position: absolute; bottom: 60px; right: 0;
+    background: white; border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 12px; min-width: 220px;
+    opacity: 0; transform: translateY(10px); pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  .ap-fab-panel.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+  .ap-fab-option {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; font-size: 13px;
+  }
+  .ap-fab-close {
+    width: 20px; height: 20px; border: none; background: #f5f5f5;
+    border-radius: 50%; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: 10px; color: #666; transition: all 0.2s ease;
+  }
+  .ap-fab-close:hover { background: #e8e8e8; color: #333; }
+`;
+
 // ─── Main Page Component ────────────────────────────────────────────────────
 
 export function AllPricesPage() {
@@ -147,6 +254,14 @@ export function AllPricesPage() {
   // Drawer state
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedInstrumentContext, setSelectedInstrumentContext] = useState<PriceInstrumentContext | null>(null);
+
+  // Post-save green highlight
+  const [highlightedRowId, setHighlightedRowId] = useState<number | null>(null);
+
+  // Revaluation modal state
+  const [revalConfirmOpen, setRevalConfirmOpen] = useState(false);
+  const [revalWizardOpen, setRevalWizardOpen] = useState(false);
+  const [revalContext, setRevalContext] = useState<{ instrumentId: number; instrumentName: string; effectiveFromDate: string; effectiveToDate?: string } | null>(null);
 
   // Handle "Upload Price" action from grid
   const handleUploadPrice = useCallback((row: AllPricesRow) => {
@@ -166,8 +281,8 @@ export function AllPricesPage() {
     setDrawerVisible(true);
   }, []);
 
-  // Handle successful save — refresh grid row
-  const handleSaveSuccess = useCallback((instrumentId: number, newPrice: number) => {
+  // Handle successful save — refresh grid row, green highlight, check revaluation trigger
+  const handleSaveSuccess = useCallback((instrumentId: number, newPrice: number, effectiveFromDate?: string, effectiveToDate?: string) => {
     setGridRowData((prev) =>
       prev.map((row) =>
         row.PriceInstrumentId === instrumentId
@@ -181,12 +296,47 @@ export function AllPricesPage() {
       )
     );
     setDrawerVisible(false);
+
+    // Green highlight for 3 seconds
+    const updatedRow = gridRowData.find((r) => r.PriceInstrumentId === instrumentId);
+    if (updatedRow) {
+      setHighlightedRowId(updatedRow.PriceId);
+      setTimeout(() => setHighlightedRowId(null), 3000);
+    }
+
+    // Check if revaluation modal should show (only when user entered an effective date)
+    const ctx = selectedInstrumentContext;
+    if (ctx && effectiveFromDate && shouldShowRevaluationModal(effectiveFromDate)) {
+      setRevalContext({
+        instrumentId: ctx.instrumentId,
+        instrumentName: ctx.instrumentName,
+        effectiveFromDate,
+        effectiveToDate,
+      });
+      setRevalConfirmOpen(true);
+    }
+
     setSelectedInstrumentContext(null);
-  }, []);
+  }, [selectedInstrumentContext, gridRowData]);
 
   const handleCloseDrawer = useCallback(() => {
     setDrawerVisible(false);
     setSelectedInstrumentContext(null);
+  }, []);
+
+  const handleRevalDismiss = useCallback(() => {
+    setRevalConfirmOpen(false);
+    setRevalContext(null);
+  }, []);
+
+  const handleRevalCheckImpacted = useCallback(() => {
+    setRevalConfirmOpen(false);
+    setRevalWizardOpen(true);
+  }, []);
+
+  const handleRevalWizardClose = useCallback(() => {
+    setRevalWizardOpen(false);
+    setRevalContext(null);
   }, []);
 
   const columnDefs = useMemo(
@@ -199,52 +349,54 @@ export function AllPricesPage() {
       getRowId: (params: any) => params.data.PriceId.toString(),
       suppressDragLeaveHidesColumns: true,
       rowGroupPanelShow: 'never' as const,
+      getRowClass: (params: any) => {
+        if (params.data?.PriceId === highlightedRowId) return 'pm-save-highlight';
+        return '';
+      },
     }),
-    []
+    [highlightedRowId]
   );
 
   return (
-    <Vertical height="100%">
-      {/* ── INSTRUCTION BAR ──────────────────────────────────── */}
-      <div className="p-4 bg-2 bordered" style={{ borderBottom: '1px solid var(--theme-border)', flexShrink: 0 }}>
-        <Horizontal verticalCenter>
-          <Vertical flex="1">
-            <Texto category="h5">All Prices</Texto>
-            <Texto appearance="medium" style={{ marginTop: 4, fontSize: 13 }}>
-              View all price instruments. Click the action menu (&#8943;) on any database-sourced row to upload or correct a price inline.
-            </Texto>
-          </Vertical>
-          <Horizontal verticalCenter gap={8}>
-            <Texto style={{ fontSize: 13 }}>Has price upload permission</Texto>
-            <Switch checked={hasPermission} onChange={setHasPermission} size="small" />
-          </Horizontal>
-        </Horizontal>
-      </div>
-
+    <Vertical>
       {/* ── ALL PRICES GRID ──────────────────────────────────── */}
-      <Horizontal flex="1">
-        <Vertical height="100%">
-          <GraviGrid
-            storageKey="PriceMgmt-AllPrices"
-            controlBarProps={{
-              title: `All Prices (${gridRowData.length})`,
-              hideActiveFilters: false,
-            }}
-            agPropOverrides={agPropOverrides}
-            rowData={gridRowData}
-            columnDefs={columnDefs}
-          />
-        </Vertical>
-      </Horizontal>
+      <GraviGrid
+        storageKey="PriceMgmt-AllPrices"
+        controlBarProps={{
+          title: `All Prices (${gridRowData.length})`,
+          hideActiveFilters: false,
+          actionButtons: null,
+        }}
+        agPropOverrides={agPropOverrides}
+        rowData={gridRowData}
+        columnDefs={columnDefs}
+      />
 
       {/* ── PRICE MANAGEMENT DRAWER ──────────────────────────── */}
       <PriceManagementDrawer
         open={drawerVisible}
-
         instrumentContext={selectedInstrumentContext}
         onSaveSuccess={handleSaveSuccess}
         onClose={handleCloseDrawer}
       />
+
+      {/* ── REVALUATION CONFIRM MODAL ────────────────────────── */}
+      <RevaluationConfirmModal
+        open={revalConfirmOpen}
+        onDismiss={handleRevalDismiss}
+        onCheckImpacted={handleRevalCheckImpacted}
+      />
+
+      {/* ── REVALUATION WIZARD MODAL ─────────────────────────── */}
+      <RevaluationWizardModal
+        open={revalWizardOpen}
+        onClose={handleRevalWizardClose}
+        context={revalContext}
+        skipStep1
+      />
+
+      <DemoOptionsFab hasPermission={hasPermission} setHasPermission={setHasPermission} />
+      <style>{PRICE_MANAGEMENT_STYLES}{AP_FAB_STYLES}</style>
     </Vertical>
   );
 }

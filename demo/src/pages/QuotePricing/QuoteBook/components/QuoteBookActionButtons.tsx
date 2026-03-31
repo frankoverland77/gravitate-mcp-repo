@@ -31,7 +31,7 @@ export function QuoteBookActionButtons({
   periodToggleValue,
   onPeriodToggleChange,
 }: QuoteBookActionButtonsProps) {
-  const { isFutureMode: _isFutureMode } = useFeatureMode()
+  const { isFutureMode } = useFeatureMode()
 
   return (
     <Horizontal gap={16} alignItems="center">
@@ -77,7 +77,7 @@ export function QuoteBookActionButtons({
           onChange={(val) => onPeriodToggleChange(val as PeriodToggleValue)}
         />
       )}
-      {onManageThresholds && (
+      {isFutureMode && (
         <GraviButton
           buttonText="Manage Thresholds"
           icon={<SettingOutlined />}
