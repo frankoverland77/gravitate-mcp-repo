@@ -4,12 +4,16 @@
   "description": "Excalibrr MCP Server and Demo Workspace",
   "private": true,
   "workspaces": [
-    "demo"
+    "demo",
+    "evals"
   ],
   "scripts": {
     "setup": "yarn install",
     "dev": "cd demo && yarn dev",
     "dev:clean": "cd demo && yarn dev:clean",
+    "eval": "yarn workspace excalibrr-evals run eval",
+    "eval:quick": "yarn workspace excalibrr-evals run eval:quick",
+    "eval:report": "yarn workspace excalibrr-evals run eval:report",
     "prepare": "husky"
   },
   "packageManager": "yarn@4.9.1",

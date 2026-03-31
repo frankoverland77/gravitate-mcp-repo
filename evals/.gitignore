@@ -1,0 +1,5 @@
+node_modules/
+dist/
+reports/*.html
+reports/*.json
+!reports/.gitkeep

@@ -19,7 +19,15 @@
       "WebSearch",
       "WebFetch(domain:viteplus.dev)",
       "WebFetch(domain:vite.dev)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "mcp__Notion__notion-fetch",
+      "Bash(ls /Users/rebecca/repos/excalibrr-mcp-server/tsconfig*.json)",
+      "Bash(ls -la /Users/rebecca/repos/excalibrr-mcp-server/.yarnrc*)",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/**)",
+      "Bash(done)",
+      "Bash(ls:*)"
     ]
   }
 }

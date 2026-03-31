@@ -1,0 +1,17 @@
+{
+  "name": "excalibrr-evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "eval": "tsx src/scripts/run-eval.ts",
+    "eval:quick": "tsx src/scripts/run-quick.ts",
+    "eval:report": "tsx src/scripts/generate-report.ts"
+  },
+  "devDependencies": {
+    "chalk": "^5.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
