@@ -122,8 +122,8 @@ export function QuoteBookAnalyticsPanel({ open, selectedRow, analyticsData, onSe
                 </div>
                 {/* Right: severity cards */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 110 }}>
-                  <SeverityCard label="Hard" count={hardCount} color="#dc2626" />
-                  <SeverityCard label="Soft" count={softCount} color="#d97706" />
+                  <SeverityCard label="Critical" count={hardCount} color="#dc2626" />
+                  <SeverityCard label="Warning" count={softCount} color="#d97706" />
                   <SeverityCard label="Clean" count={cleanCount} color="#16a34a" />
                 </div>
               </div>
@@ -193,7 +193,7 @@ export function QuoteBookAnalyticsPanel({ open, selectedRow, analyticsData, onSe
                         textTransform: 'uppercase',
                         letterSpacing: '0.3px',
                       }}>
-                        {row.type}
+                        {row.type === 'hard' ? 'critical' : 'warning'}
                       </span>
                     </div>
                   ))}

@@ -7,8 +7,8 @@ const decimalFormatter = (params: any) => {
   return Number(params.value).toFixed(4)
 }
 
-const HARD_CELL_STYLE = { backgroundColor: 'rgba(255, 77, 79, 0.06)' }
-const SOFT_CELL_STYLE = { backgroundColor: 'rgba(250, 173, 20, 0.06)' }
+const CRITICAL_CELL_STYLE = { backgroundColor: 'rgba(255, 77, 79, 0.06)' }
+const WARNING_CELL_STYLE = { backgroundColor: 'rgba(250, 173, 20, 0.06)' }
 const DISABLED_CELL_STYLE = {
   backgroundColor: 'rgba(0, 0, 0, 0.04)',
   color: '#bfbfbf',
@@ -26,43 +26,43 @@ function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
   const children: ColDef[] = [
     {
       field: `${prefix}_hardLow`,
-      headerName: 'Hard Low',
+      headerName: 'Critical Low',
       width: 85,
       editable: !isAbsolute,
       valueFormatter: decimalFormatter,
       headerClass: HEADER_CLASS,
       type: 'rightAligned',
-      cellStyle: isAbsolute ? DISABLED_CELL_STYLE : HARD_CELL_STYLE,
+      cellStyle: isAbsolute ? DISABLED_CELL_STYLE : CRITICAL_CELL_STYLE,
     },
     {
       field: `${prefix}_softLow`,
-      headerName: 'Soft Low',
+      headerName: 'Warning Low',
       width: 85,
       editable: !isAbsolute,
       valueFormatter: decimalFormatter,
       headerClass: HEADER_CLASS,
       type: 'rightAligned',
-      cellStyle: isAbsolute ? DISABLED_CELL_STYLE : SOFT_CELL_STYLE,
+      cellStyle: isAbsolute ? DISABLED_CELL_STYLE : WARNING_CELL_STYLE,
     },
     {
       field: `${prefix}_softHigh`,
-      headerName: 'Soft High',
+      headerName: 'Warning High',
       width: 85,
       editable: true,
       valueFormatter: decimalFormatter,
       headerClass: HEADER_CLASS,
       type: 'rightAligned',
-      cellStyle: SOFT_CELL_STYLE,
+      cellStyle: WARNING_CELL_STYLE,
     },
     {
       field: `${prefix}_hardHigh`,
-      headerName: 'Hard High',
+      headerName: 'Critical High',
       width: 85,
       editable: true,
       valueFormatter: decimalFormatter,
       headerClass: HEADER_CLASS,
       type: 'rightAligned',
-      cellStyle: HARD_CELL_STYLE,
+      cellStyle: CRITICAL_CELL_STYLE,
     },
   ]
 

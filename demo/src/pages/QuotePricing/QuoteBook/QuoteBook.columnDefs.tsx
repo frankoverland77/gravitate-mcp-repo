@@ -94,11 +94,11 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
               : result.violations
             if (violations.length === 0) return null
             const hasHard = violations.some((v: any) => v.severity === 'Hard')
-            return hasHard ? 'Urgent' : 'Caution'
+            return hasHard ? 'Critical' : 'Warning'
           },
           cellRenderer: (params: ICellRendererParams) => {
             if (!params.value) return null
-            const isUrgent = params.value === 'Urgent'
+            const isUrgent = params.value === 'Critical'
             const Icon = isUrgent ? StopFilled : WarningFilled
             const iconColor = isUrgent ? '#dc2626' : '#d97706'
 

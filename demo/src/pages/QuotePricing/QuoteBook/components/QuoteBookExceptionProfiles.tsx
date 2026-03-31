@@ -377,8 +377,8 @@ function ProfileViewMode({
 function ThresholdSummaryCard({ threshold }: { threshold: ThresholdComponent }) {
   const status = getComponentStatus(threshold)
   const statusDisplay: Record<string, { bg: string; color: string; label: string }> = {
-    hard: { bg: '#fef2f2', color: '#dc2626', label: 'Hard' },
-    soft: { bg: '#fffbeb', color: '#d97706', label: 'Soft' },
+    hard: { bg: '#fef2f2', color: '#dc2626', label: 'Critical' },
+    soft: { bg: '#fffbeb', color: '#d97706', label: 'Warning' },
     off: { bg: 'var(--gray-100)', color: 'var(--gray-400)', label: 'Off' },
   }
   const sc = statusDisplay[status]
@@ -697,8 +697,8 @@ function ThresholdEditorCard({
 function StatusBadge({ threshold }: { threshold: ThresholdComponent }) {
   const status = getComponentStatus(threshold)
   const display: Record<string, { bg: string; color: string; label: string }> = {
-    hard: { bg: '#fef2f2', color: '#dc2626', label: 'Hard' },
-    soft: { bg: '#fffbeb', color: '#d97706', label: 'Soft' },
+    hard: { bg: '#fef2f2', color: '#dc2626', label: 'Critical' },
+    soft: { bg: '#fffbeb', color: '#d97706', label: 'Warning' },
     off: { bg: 'var(--gray-100)', color: 'var(--gray-400)', label: 'Off' },
   }
   const d = display[status]
