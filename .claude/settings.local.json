@@ -10,7 +10,15 @@
       "Bash(rm /Users/rebecca/repos/excalibrr-mcp-server/demo/docs/DELIVERY-PLAN)",
       "Bash(git add:*)",
       "Bash(git hook:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git log:*)",
+      "Bash(yarn --version)",
+      "Bash(yarn config:*)",
+      "Bash(yarn install:*)",
+      "Bash(cd:*)",
+      "WebSearch",
+      "WebFetch(domain:viteplus.dev)",
+      "WebFetch(domain:vite.dev)"
     ]
   }
 }
