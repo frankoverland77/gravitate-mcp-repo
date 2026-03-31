@@ -434,7 +434,7 @@ function InlinePriceEntry({
                   <Texto category="h4" style={{ fontWeight: 600 }}>
                     Price History
                   </Texto>
-                  <Texto category="h6" style={{ color: 'var(--theme-color-2)', fontWeight: 600 }}>
+                  <Texto category="h5" style={{ color: 'var(--theme-color-2)', fontWeight: 600 }}>
                     {filteredPriceHistory.length} Result{filteredPriceHistory.length !== 1 ? 's' : ''}
                   </Texto>
                   <Input

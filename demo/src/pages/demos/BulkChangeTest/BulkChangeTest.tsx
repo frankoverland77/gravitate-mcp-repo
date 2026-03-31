@@ -108,7 +108,7 @@ export function BulkChangeTest() {
         field: 'Price',
         headerName: 'Price',
         maxWidth: 120,
-        valueFormatter: ({ value }: { value: number }) => `$${value.toFixed(2)}`,
+        valueFormatter: ({ value }: { value: number }) => value != null ? `$${value.toFixed(2)}` : '',
       },
       {
         field: 'IsActive',

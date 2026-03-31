@@ -23,7 +23,7 @@ const mockHistoryRows = [
 const historyColumnDefs: ColDef[] = [
   { field: 'date', headerName: 'Date', width: 100 },
   { field: 'diff', headerName: 'Diff', width: 90, valueFormatter: ({ value }) => value?.toFixed(4) },
-  { field: 'price', headerName: 'Price', width: 100, valueFormatter: ({ value }) => `$${value?.toFixed(4)}` },
+  { field: 'price', headerName: 'Price', width: 100, valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '' },
   { field: 'publishedBy', headerName: 'Published By', width: 130 },
   { field: 'period', headerName: 'Period', width: 80 },
 ]

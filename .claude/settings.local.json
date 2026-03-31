@@ -18,7 +18,8 @@
       "Bash(cd:*)",
       "WebSearch",
       "WebFetch(domain:viteplus.dev)",
-      "WebFetch(domain:vite.dev)"
+      "WebFetch(domain:vite.dev)",
+      "Bash(git:*)"
     ]
   }
 }

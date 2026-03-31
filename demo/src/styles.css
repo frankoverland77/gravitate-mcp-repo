@@ -107,3 +107,18 @@
   height: 100%;
   overflow-y: auto; /* Tabpane itself scrolls */
 }
+
+/* Top nav scroll fix (PE-5026) — prevent title wrapping and enable horizontal scrolling */
+.gravi-page-group-title {
+  white-space: nowrap;
+}
+
+.gravi-menu-links {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: calc(100vw - 300px);
+}
+
+.gravi-profile-controls {
+  flex-shrink: 0;
+}

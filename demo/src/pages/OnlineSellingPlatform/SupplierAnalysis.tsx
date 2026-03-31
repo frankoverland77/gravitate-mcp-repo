@@ -75,7 +75,7 @@ export function SupplierAnalysis() {
             sortable: true,
             filter: true,
             type: 'numericColumn',
-            valueFormatter: (params: any) => `${params.value}%`
+            valueFormatter: (params: any) => params.value != null ? `${params.value}%` : ''
         },
         {
             field: 'consistency',

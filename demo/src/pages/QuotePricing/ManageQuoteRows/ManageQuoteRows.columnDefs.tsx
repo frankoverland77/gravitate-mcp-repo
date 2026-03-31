@@ -71,7 +71,7 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
     field: 'allocation',
     headerName: 'Allocation',
     width: 100,
-    valueFormatter: ({ value }: { value: number }) => `${value}%`,
+    valueFormatter: ({ value }: { value: number }) => value != null ? `${value}%` : '',
   },
   {
     headerName: '',

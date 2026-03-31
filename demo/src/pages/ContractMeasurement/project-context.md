@@ -759,9 +759,9 @@ export function getDetailedAnalysisData(record: ProductPerformanceRecord): Detai
 
 **Key Learnings:**
 
-- Ant Design v4 Modal uses `visible` prop, NOT `open` (v5 uses `open`)
+- Ant Design v5 Modal uses `open` prop (v4 used `visible`)
 - Modal needs to be in DOM even when not shown (don't early return null)
-- Use `destroyOnClose` to reset modal state between opens
+- Use `destroyOnHidden` to reset modal state between opens (v4 used `destroyOnHidden`)
 - Mini sparkline pattern: flex container with absolute-positioned bars
 - Progress bar conditional coloring based on status thresholds
 - Custom chart visualizations work well for simple displays (no need for chart library)
@@ -1088,7 +1088,7 @@ The correct pattern for a drawer with fixed header/tabs and scrolling content:
     height: '100%',
   }}
   zIndex={2000}
-  destroyOnClose
+  destroyOnHidden
 >
   {/* HEADER - Fixed at top */}
   <div
@@ -1923,7 +1923,7 @@ const handleSave = () => {
   headerStyle={{ display: 'none' }}
   bodyStyle={{ backgroundColor: '#f5f5f5', padding: 0, display: 'flex', flexDirection: 'column', height: '100%' }}
   zIndex={2000}
-  destroyOnClose
+  destroyOnHidden
 >
   {/* Header - teal (#0c5a58) */}
   <div className={styles.header}>

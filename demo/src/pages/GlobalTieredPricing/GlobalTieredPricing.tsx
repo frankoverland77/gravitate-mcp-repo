@@ -35,7 +35,7 @@ export function GlobalTieredPricing() {
     // Calculation utility functions (now using state-based spreads)
     const calculateTier2 = (tier1: number) => tier1 + tier2Spread;
     const calculateTier3 = (tier2: number) => tier2 + tier3Spread;
-    const formatPrice = (value: number) => `$${value.toFixed(4)}`;
+    const formatPrice = (value: number) => value != null ? `$${value.toFixed(4)}` : '';
     const parsePrice = (value: string) => {
         if (typeof value === 'number') return value;
         return parseFloat(value.replace('$', '').replace(',', ''));

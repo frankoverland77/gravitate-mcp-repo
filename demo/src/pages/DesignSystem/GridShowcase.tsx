@@ -36,7 +36,7 @@ const columnDefs = [
     width: 140,
     sortable: true,
     type: 'numericColumn',
-    valueFormatter: (params: any) => `$${params.value?.toFixed(4)}`,
+    valueFormatter: (params: any) => params.value != null ? `$${params.value.toFixed(4)}` : '',
   },
 ]
 
