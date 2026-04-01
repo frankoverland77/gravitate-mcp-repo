@@ -1,0 +1,63 @@
+.clickableLink {
+  color: #52c41a;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dottedUnderline {
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+
+.textSuccess {
+  color: #52c41a;
+}
+
+.textDanger {
+  color: #cf1322;
+}
+
+.textNeutral {
+  color: #595959;
+}
+
+.actionIcon {
+  font-size: 16px;
+  color: #595959;
+  cursor: pointer;
+}
+
+.tilesContainer {
+  flex-wrap: wrap;
+}
+
+.tile {
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-width: 0;
+  max-width: 300px;
+}
+
+.tileIcon {
+  font-size: 16px;
+  color: #8c8c8c;
+}
+
+.tileLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.floatingButton {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  z-index: 9999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

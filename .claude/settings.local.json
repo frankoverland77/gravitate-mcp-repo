@@ -32,7 +32,16 @@
       "Bash(yarn eval:quick)",
       "Bash(lsof -ti:3000)",
       "Bash(xargs kill:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(grep -v \"^/Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages$\")",
+      "Bash(xargs -I {} basename {})",
+      "Bash(python3:*)",
+      "Bash(find /Users/rebecca/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr -type f \\\\\\(-name *.tsx -o -name *.jsx \\\\\\))",
+      "Bash(grep -o gravi-[a-z-]* /Users/rebecca/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
+      "Bash(find /Users/rebecca/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr -type f \\\\\\(-name *.css -o -name *.less \\\\\\))",
+      "Bash(tr '{' '\\\\n{')",
+      "Bash(tr '}' '}\\\\n')",
+      "Bash(wc -l /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.tsx /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.ts)"
     ]
   }
 }

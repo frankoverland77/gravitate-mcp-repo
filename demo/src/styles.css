@@ -109,16 +109,18 @@
 }
 
 /* Top nav scroll fix (PE-5026) — prevent title wrapping and enable horizontal scrolling */
-.gravi-page-group-title {
-  white-space: nowrap;
+.site-toolbar {
+  flex-wrap: nowrap;
+  padding-left: 1em !important;
+  padding-right: 1em !important;
 }
 
-.gravi-menu-links {
+.site-toolbar > .flex-1.flex {
   overflow-x: auto;
   overflow-y: hidden;
-  max-width: calc(100vw - 300px);
 }
 
-.gravi-profile-controls {
+.site-toolbar > .flex-1.flex > .flex {
   flex-shrink: 0;
+  white-space: nowrap;
 }

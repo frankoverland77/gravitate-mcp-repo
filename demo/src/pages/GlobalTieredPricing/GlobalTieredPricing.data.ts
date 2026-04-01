@@ -7,8 +7,8 @@
 
 import { generateTieredPricingData, type GeneratedTieredPricingRow } from '../../shared/data'
 
-// Type for tiered pricing row - extends generated type for backward compatibility
-export interface TieredPricingRow extends GeneratedTieredPricingRow {}
+// Re-export the type for backward compatibility
+export type { GeneratedTieredPricingRow as TieredPricingRow } from '../../shared/data'
 
 // Generate tiered pricing data from shared products and locations
 // Creates 30 rows with 5 locations per product

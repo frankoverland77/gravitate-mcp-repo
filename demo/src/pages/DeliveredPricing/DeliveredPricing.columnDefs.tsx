@@ -5,18 +5,20 @@
  * Groups: Price Info | Current Period | Proposed
  */
 
-import type { ColDef, ColGroupDef } from 'ag-grid-community'
+import type { CellClassParams, ColDef, ColGroupDef, ICellRendererParams, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community'
 import { Popover, Tooltip } from 'antd'
 import { Horizontal, Texto, Vertical } from '@gravitate-js/excalibrr'
 import { DELIVERED_PRICING_STRATEGIES, type SupplyException, type ExceptionSeverity } from '../../shared/data'
 
-const currencyFormatter = (params: any) => {
-  if (params.value == null) return ''
+import styles from './DeliveredPricing.module.css'
+
+const currencyFormatter = (params: ValueFormatterParams) => {
+  if (params.value === null || params.value === undefined) return ''
   return `$${Number(params.value).toFixed(4)}`
 }
 
-const integerFormatter = (params: any) => {
-  if (params.value == null) return ''
+const integerFormatter = (params: ValueFormatterParams) => {
+  if (params.value === null || params.value === undefined) return ''
   return Number(params.value).toLocaleString('en-US', { maximumFractionDigits: 0 })
 }
 
@@ -82,11 +84,11 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           },
           width: 195,
           // Plain text for copy/export — renderer handles visual display
-          valueFormatter: (params: any) => {
+          valueFormatter: (params: ValueFormatterParams) => {
             if (!params.value) return ''
             return params.value
           },
-          cellRenderer: (params: any) => {
+          cellRenderer: (params: ICellRendererParams) => {
             if (!params.value) return null
             const strategy: string = params.value
             const isOverridden = params.data?.IsStrategyOverridden
@@ -103,31 +105,23 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             const config = strategyConfig[strategy] ?? { color: '#595959', bg: '#f5f5f5', abbrev: strategy }
 
             return (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: '100%' }}>
-                <span
+              <Horizontal alignItems="center" gap={4} height="100%">
+                <Texto
+                  className={styles.strategyBadge}
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontSize: 11,
-                    fontWeight: 500,
                     color: isOverridden ? '#d48806' : config.color,
                     backgroundColor: isOverridden ? 'rgba(250, 173, 20, 0.08)' : config.bg,
-                    padding: '1px 6px',
-                    borderRadius: 3,
-                    lineHeight: '18px',
-                    whiteSpace: 'nowrap',
                     border: isOverridden ? '1px dashed rgba(212, 136, 6, 0.3)' : '1px solid transparent',
                   }}
                 >
                   {isOverridden && (
-                    <span style={{ fontSize: 10, lineHeight: 1 }}>{'\u270E'}</span>
+                    <Texto className={styles.overrideIcon}>{'\u270E'}</Texto>
                   )}
                   {config.abbrev}
-                </span>
+                </Texto>
                 {/* Edit affordance — subtle dropdown arrow */}
-                <span style={{ color: '#bfbfbf', fontSize: 9, marginLeft: 'auto' }}>{'\u25BE'}</span>
-              </div>
+                <Texto className={styles.dropdownArrow}>{'\u25BE'}</Texto>
+              </Horizontal>
             )
           },
         },
@@ -150,15 +144,15 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             return bMax - aMax
           },
           // Filter on the labels joined as text
-          valueFormatter: (params: any) => {
+          valueFormatter: (params: ValueFormatterParams) => {
             const exceptions: SupplyException[] | null = params.value
             if (!exceptions?.length) return '\u2014'
             return exceptions.map((e) => e.label).join(', ')
           },
-          cellRenderer: (params: any) => {
+          cellRenderer: (params: ICellRendererParams) => {
             const exceptions: SupplyException[] | null = params.value
             if (!exceptions?.length) {
-              return <span style={{ color: '#bfbfbf' }}>{'\u2014'}</span>
+              return <Texto className={styles.dashPlaceholder}>{'\u2014'}</Texto>
             }
 
             const severityConfig: Record<ExceptionSeverity, { bg: string; color: string; icon: string }> = {
@@ -168,34 +162,25 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             }
 
             return (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: '100%', overflow: 'hidden' }}>
+              <Horizontal alignItems="center" gap={4} height="100%" style={{ overflow: 'hidden' }}>
                 {exceptions.map((exc, i) => {
                   const config = severityConfig[exc.severity]
                   return (
                     <Tooltip key={i} title={exc.detail ?? exc.label} mouseEnterDelay={0.2}>
-                      <span
+                      <Texto
+                        className={styles.exceptionBadge}
                         style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 3,
-                          fontSize: 11,
-                          fontWeight: 500,
                           color: config.color,
                           backgroundColor: config.bg,
-                          padding: '1px 5px',
-                          borderRadius: 3,
-                          lineHeight: '16px',
-                          whiteSpace: 'nowrap',
-                          cursor: 'default',
                         }}
                       >
-                        <span style={{ fontSize: 9 }}>{config.icon}</span>
+                        <Texto className={styles.exceptionIcon}>{config.icon}</Texto>
                         {exc.label}
-                      </span>
+                      </Texto>
                     </Tooltip>
                   )
                 })}
-              </div>
+              </Horizontal>
             )
           },
         },
@@ -250,7 +235,7 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           type: 'rightAligned',
           width: 110,
           valueFormatter: currencyFormatter,
-          cellStyle: (params: any) => {
+          cellStyle: (params: CellClassParams) => {
             if (params.value < 0) return { color: 'var(--theme-error, #ff4d4f)', fontWeight: 'bold' }
             if (params.value > 0) return { color: '#389e0d', fontWeight: 'bold' }
             return {}
@@ -263,9 +248,9 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           editable: false,
           type: 'rightAligned',
           width: 110,
-          cellRenderer: (params: any) => {
+          cellRenderer: (params: ICellRendererParams) => {
             const data = params.data
-            if (!data || data.Freight == null) return null
+            if (!data || data.Freight === null || data.Freight === undefined) return null
             const freightDisplay = `$${Number(data.Freight).toFixed(4)}`
 
             const popoverContent = (
@@ -299,9 +284,9 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
 
             return (
               <Popover placement="top" content={popoverContent}>
-                <span style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '3px' }}>
+                <Texto className={styles.clickableValue}>
                   {freightDisplay}
-                </span>
+                </Texto>
               </Popover>
             )
           },
@@ -313,9 +298,9 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           editable: false,
           type: 'rightAligned',
           width: 100,
-          cellRenderer: (params: any) => {
+          cellRenderer: (params: ICellRendererParams) => {
             const data = params.data
-            if (!data || data.Tax == null) return null
+            if (!data || data.Tax === null || data.Tax === undefined) return null
             const totalTax = Number(data.Tax)
             const taxDisplay = `$${totalTax.toFixed(4)}`
 
@@ -328,24 +313,6 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
             const destState = data.DestinationState ?? 'TX'
             const commodity = data.ProductGroup === 'gasoline' ? 'Gasoline' : 'Diesel'
             const productName = data.ProductName ?? commodity
-
-            const sectionHeader = (label: string, color: string, bg: string) => (
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color,
-                  backgroundColor: bg,
-                  padding: '1px 5px',
-                  borderRadius: 2,
-                  lineHeight: '16px',
-                  letterSpacing: '0.03em',
-                  textTransform: 'uppercase' as const,
-                }}
-              >
-                {label}
-              </span>
-            )
 
             const popoverContent = (
               <Vertical gap={4} style={{ width: 280 }}>
@@ -364,9 +331,11 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
                 </Horizontal>
 
                 {/* Federal taxes */}
-                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 4, paddingTop: 6 }}>
-                  {sectionHeader('Federal', '#722ed1', 'rgba(114, 46, 209, 0.08)')}
-                </div>
+                <Vertical className={styles.taxSection}>
+                  <Texto className={styles.taxSectionHeader} style={{ color: '#722ed1', backgroundColor: 'rgba(114, 46, 209, 0.08)' }}>
+                    Federal
+                  </Texto>
+                </Vertical>
                 <Horizontal justifyContent="space-between">
                   <Texto size={12}>Motor Fuel Excise Tax</Texto>
                   <Texto weight={600}>${Number(federalExcise).toFixed(4)}</Texto>
@@ -381,38 +350,42 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
                 </Horizontal>
 
                 {/* State taxes */}
-                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 4, paddingTop: 6 }}>
-                  {sectionHeader('State — Texas', '#1890ff', 'rgba(24, 144, 255, 0.08)')}
-                </div>
+                <Vertical className={styles.taxSection}>
+                  <Texto className={styles.taxSectionHeader} style={{ color: '#1890ff', backgroundColor: 'rgba(24, 144, 255, 0.08)' }}>
+                    State — Texas
+                  </Texto>
+                </Vertical>
                 <Horizontal justifyContent="space-between">
                   <Texto size={12}>Motor Fuel Tax</Texto>
                   <Texto weight={600}>${Number(stateTax).toFixed(4)}</Texto>
                 </Horizontal>
 
                 {/* Local taxes */}
-                <div style={{ borderTop: '1px solid var(--theme-border, #e8e8e8)', marginTop: 4, paddingTop: 6 }}>
-                  {sectionHeader('Local', '#fa8c16', 'rgba(250, 140, 22, 0.08)')}
-                </div>
+                <Vertical className={styles.taxSection}>
+                  <Texto className={styles.taxSectionHeader} style={{ color: '#fa8c16', backgroundColor: 'rgba(250, 140, 22, 0.08)' }}>
+                    Local
+                  </Texto>
+                </Vertical>
                 <Horizontal justifyContent="space-between">
                   <Texto size={12} color="#8c8c8c">No local fuel tax in TX</Texto>
                   <Texto weight={600}>${Number(localTax).toFixed(4)}</Texto>
                 </Horizontal>
 
                 {/* Total */}
-                <div style={{ borderTop: '1px solid var(--theme-border, #d9d9d9)', marginTop: 6, paddingTop: 6 }}>
+                <Vertical className={styles.taxTotal}>
                   <Horizontal justifyContent="space-between">
                     <Texto weight={600}>Total Tax / Gal</Texto>
                     <Texto weight={700} size={14}>{taxDisplay}</Texto>
                   </Horizontal>
-                </div>
+                </Vertical>
               </Vertical>
             )
 
             return (
               <Popover placement="top" content={popoverContent}>
-                <span style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '3px' }}>
+                <Texto className={styles.clickableValue}>
                   {taxDisplay}
-                </span>
+                </Texto>
               </Popover>
             )
           },
@@ -426,7 +399,7 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           type: 'rightAligned',
           width: 120,
           cellStyle: () => ({ fontWeight: 'bold' }),
-          valueGetter: (params: any) => {
+          valueGetter: (params: ValueGetterParams) => {
             const data = params.data
             if (!data) return null
             const cost = data.Cost ?? 0
@@ -441,7 +414,7 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           editable: false,
           type: 'rightAligned',
           width: 120,
-          cellStyle: (params: any) => {
+          cellStyle: (params: CellClassParams) => {
             // Buyer perspective: negative delta = savings (green), positive = cost increase (red)
             if (params.value < 0) return { color: '#389e0d' }
             if (params.value > 0) return { color: '#cf1322' }
@@ -456,13 +429,13 @@ export function getDeliveredPricingColumnDefs(): (ColDef | ColGroupDef)[] {
           editable: false,
           type: 'rightAligned',
           width: 110,
-          valueGetter: (params: any) => {
+          valueGetter: (params: ValueGetterParams) => {
             const data = params.data
             if (!data) return null
             const price = Number(((data.Cost ?? 0) + (data.Freight ?? 0) + (data.Tax ?? 0) + (data.Diff ?? 0)).toFixed(4))
             return Number((price - (data.Cost ?? 0)).toFixed(4))
           },
-          cellStyle: (params: any) => {
+          cellStyle: (params: CellClassParams) => {
             if (params.value < 0)
               return { backgroundColor: 'var(--theme-error-dim)', fontWeight: 'bold' }
             if (params.value > 0)

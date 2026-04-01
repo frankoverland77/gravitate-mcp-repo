@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { GraviButton, GraviGrid } from '@gravitate-js/excalibrr';
-import { ColDef } from 'ag-grid-community';
+import type { ColDef, GetRowIdParams, ICellRendererParams } from 'ag-grid-community';
 import { Tag } from 'antd';
 import { useMemo } from 'react';
 
@@ -32,7 +32,7 @@ const columnDefs: ColDef<OfferGridRow>[] = [
     field: 'PricingMechanism',
     headerName: 'Pricing',
     width: 100,
-    cellRenderer: (params: any) => {
+    cellRenderer: (params: ICellRendererParams) => {
       const color = params.value === 'Index' ? 'purple' : 'blue';
       return <Tag color={color}>{params.value}</Tag>;
     },
@@ -49,13 +49,13 @@ const columnDefs: ColDef<OfferGridRow>[] = [
     field: 'FixedPrice',
     headerName: 'Price',
     width: 100,
-    valueFormatter: (params) => (params.value != null ? '$' + params.value.toFixed(4) : 'Index'),
+    valueFormatter: (params) => (params.value !== null && params.value !== undefined ? '$' + params.value.toFixed(4) : 'Index'),
   },
   {
     field: 'Status',
     headerName: 'Status',
     width: 100,
-    cellRenderer: (params: any) => <Tag color={getStatusColor(params.value)}>{params.value}</Tag>,
+    cellRenderer: (params: ICellRendererParams) => <Tag color={getStatusColor(params.value)}>{params.value}</Tag>,
   },
   { field: 'CustomerCount', headerName: 'Customers', width: 110 },
   { field: 'CreatedDate', headerName: 'Created', width: 120 },
@@ -80,7 +80,7 @@ export function OffersGrid({ rowData, onCreateNew }: OffersGridProps) {
 
   const agPropOverrides = useMemo(
     () => ({
-      getRowId: (params: any) => params.data.SpecialOfferId.toString(),
+      getRowId: (params: GetRowIdParams<OfferGridRow>) => params.data.SpecialOfferId.toString(),
     }),
     [],
   );

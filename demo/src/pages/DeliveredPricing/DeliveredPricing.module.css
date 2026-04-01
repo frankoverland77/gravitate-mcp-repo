@@ -1,0 +1,108 @@
+.strategyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 3px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.overrideIcon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.dropdownArrow {
+  color: #bfbfbf;
+  font-size: 9px;
+  margin-left: auto;
+}
+
+.dashPlaceholder {
+  color: #bfbfbf;
+}
+
+.exceptionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 5px;
+  border-radius: 3px;
+  line-height: 16px;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.exceptionIcon {
+  font-size: 9px;
+}
+
+.clickableValue {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.taxSection {
+  border-top: 1px solid var(--theme-border, #e8e8e8);
+  margin-top: 4px;
+  padding-top: 6px;
+}
+
+.taxSectionHeader {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 2px;
+  line-height: 16px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.taxTotal {
+  border-top: 1px solid var(--theme-border, #d9d9d9);
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.contextPill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 8px;
+  border-radius: 3px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.contextPillPrimary {
+  composes: contextPill;
+  color: var(--theme-primary, #1890ff);
+  background-color: rgba(24, 144, 255, 0.08);
+}
+
+.contextPillNeutral {
+  composes: contextPill;
+  color: #595959;
+  background-color: #f5f5f5;
+}
+
+.errorBanner {
+  padding: 6px 12px;
+  background-color: var(--theme-error-dim, rgba(255, 77, 79, 0.08));
+  border-left: 3px solid var(--theme-error, #ff4d4f);
+  color: var(--theme-error, #ff4d4f);
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.analyticsPanel {
+  transition: height 0.3s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}

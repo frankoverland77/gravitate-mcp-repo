@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { GraviGrid, Horizontal } from '@gravitate-js/excalibrr'
+import { GraviGrid, Horizontal, Texto, Vertical } from '@gravitate-js/excalibrr'
 import { Switch, Tooltip } from 'antd'
 import { BarChartOutlined } from '@ant-design/icons'
+import type { CellValueChangedEvent, GridApi, GridReadyEvent, GetRowIdParams, RowSelectedEvent } from 'ag-grid-community'
 import { getDeliveredPricingColumnDefs } from './DeliveredPricing.columnDefs'
 import { deliveredPricingData, type DeliveredPricingQuoteRow } from './DeliveredPricing.data'
 import { DeliveredPricingAnalytics } from './components/Analytics'
@@ -12,6 +13,8 @@ import {
   resolveStrategyDefault,
   type SupplyOptionRow,
 } from './supplyOptions.data'
+
+import styles from './DeliveredPricing.module.css'
 
 /**
  * Check whether a quote row's origin location matches a supply option's origin.
@@ -127,11 +130,11 @@ function computeExceptionForRow(
   // Determine active option: for exception computation, use the first override or strategy default
   const overrideIds = overrides[row.id] ?? null
   const activeId = overrideIds?.[0] ?? strategyDefault?.id ?? null
-  const activeOption = activeId != null ? options.find((o) => o.id === activeId) ?? null : null
+  const activeOption = activeId !== null && activeId !== undefined ? options.find((o) => o.id === activeId) ?? null : null
 
   // Overridden = user picked different supply option(s) than the strategy default
   const isOverridden =
-    overrideIds != null &&
+    overrideIds !== null && overrideIds !== undefined &&
     (overrideIds.length !== 1 || overrideIds[0] !== strategyDefault?.id)
 
   const exception = computeQuoteRowExceptions(row, options, activeOption)
@@ -168,7 +171,7 @@ export function DeliveredPricing() {
   }, [originValidationError])
 
   // AG Grid API ref for programmatic cell updates
-  const gridApiRef = useRef<any>(null)
+  const gridApiRef = useRef<GridApi | null>(null)
 
   // Stable ref for overrides — used inside agPropOverrides callbacks to avoid re-memoization
   const overridesRef = useRef(overrides)
@@ -251,7 +254,7 @@ export function DeliveredPricing() {
       setSelectedRow(row)
 
       // If no user override exists, apply the strategy default Cost (with freight/tax adjustment)
-      if (overridesRef.current[row.id] == null) {
+      if (overridesRef.current[row.id] === null || overridesRef.current[row.id] === undefined) {
         const options = generateSupplyOptionsData(row)
         const lifting = getMonthlyToDatePctBySupplyOption(row)
         const defaultOption = resolveStrategyDefault(row.Strategy, options, lifting)
@@ -277,14 +280,14 @@ export function DeliveredPricing() {
   const columnDefs = useMemo(() => getDeliveredPricingColumnDefs(), [])
 
   // Stable row selection handler that reads from ref
-  const handleRowSelected = useCallback((event: any) => {
+  const handleRowSelected = useCallback((event: RowSelectedEvent) => {
     if (event.node.isSelected() && event.data) {
       handleQuoteRowSelected(event.data)
     }
   }, [handleQuoteRowSelected])
 
   // Stable cell value changed handler that reads overrides from ref
-  const handleCellValueChanged = useCallback((event: any) => {
+  const handleCellValueChanged = useCallback((event: CellValueChangedEvent) => {
     if (event.colDef.field === 'Strategy') {
       const updatedRow = event.data as DeliveredPricingQuoteRow
       // Clear any user override(s) so strategy default takes effect
@@ -317,7 +320,7 @@ export function DeliveredPricing() {
 
   const agPropOverrides = useMemo(
     () => ({
-      getRowId: (params: any) => String(params.data?.id),
+      getRowId: (params: GetRowIdParams) => String(params.data?.id),
       domLayout: 'normal' as const,
       groupDefaultExpanded: -1,
       rowSelection: 'single' as const,
@@ -328,7 +331,7 @@ export function DeliveredPricing() {
           suppressCount: false,
         },
       },
-      onGridReady: (params: any) => {
+      onGridReady: (params: GridReadyEvent) => {
         gridApiRef.current = params.api
       },
       onRowSelected: handleRowSelected,
@@ -344,52 +347,19 @@ export function DeliveredPricing() {
         'End of Day quote book — review and adjust delivered pricing by origin, destination, and product.',
       hideActiveFilters: false,
       actionButtons: (
-        <Horizontal gap="0.75rem" verticalCenter>
+        <Horizontal gap={12} verticalCenter>
           {/* Context pills — which quote row is linked to analytics */}
           {selectedRow && (
             <Horizontal gap={6} verticalCenter>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: 'var(--theme-primary, #1890ff)',
-                  backgroundColor: 'rgba(24, 144, 255, 0.08)',
-                  padding: '1px 8px',
-                  borderRadius: 3,
-                  lineHeight: '18px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <Texto className={styles.contextPillPrimary}>
                 {selectedRow.LocationName} → {selectedRow.DestinationLocationName}
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: '#595959',
-                  backgroundColor: '#f5f5f5',
-                  padding: '1px 8px',
-                  borderRadius: 3,
-                  lineHeight: '18px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              </Texto>
+              <Texto className={styles.contextPillNeutral}>
                 {selectedRow.ProductName}
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: '#595959',
-                  backgroundColor: '#f5f5f5',
-                  padding: '1px 8px',
-                  borderRadius: 3,
-                  lineHeight: '18px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              </Texto>
+              <Texto className={styles.contextPillNeutral}>
                 {selectedRow.Strategy}
-              </span>
+              </Texto>
             </Horizontal>
           )}
 
@@ -413,36 +383,19 @@ export function DeliveredPricing() {
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Vertical height="100%">
       {/* Origin validation error banner */}
       {originValidationError && (
-        <div
-          style={{
-            padding: '6px 12px',
-            backgroundColor: 'var(--theme-error-dim, rgba(255, 77, 79, 0.08))',
-            borderLeft: '3px solid var(--theme-error, #ff4d4f)',
-            color: 'var(--theme-error, #ff4d4f)',
-            fontSize: '13px',
-            fontWeight: 500,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            flexShrink: 0,
-          }}
-        >
-          <span>⚠</span>
-          <span>{originValidationError}</span>
-        </div>
+        <Horizontal alignItems="center" gap={6} className={styles.errorBanner}>
+          <Texto>{'\u26A0'}</Texto>
+          <Texto>{originValidationError}</Texto>
+        </Horizontal>
       )}
 
       {/* Analytics Panel */}
-      <div
-        style={{
-          height: showAnalytics ? '400px' : '0px',
-          transition: 'height 0.3s ease',
-          overflow: 'hidden',
-          flexShrink: 0,
-        }}
+      <Vertical
+        className={styles.analyticsPanel}
+        style={{ height: showAnalytics ? '400px' : '0px' }}
       >
         <DeliveredPricingAnalytics
           selectedRow={selectedRow}
@@ -450,10 +403,10 @@ export function DeliveredPricing() {
           strategyDefaultId={strategyDefault?.id ?? null}
           onSupplyOptionsSelected={handleSupplyOptionsSelected}
         />
-      </div>
+      </Vertical>
 
       {/* Grid */}
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <Vertical flex="1" style={{ minHeight: 0 }}>
         <GraviGrid
           storageKey="delivered-pricing-grid"
           rowData={rowData}
@@ -464,7 +417,7 @@ export function DeliveredPricing() {
           headerHeight={33}
           className="quotebook-grid"
         />
-      </div>
-    </div>
+      </Vertical>
+    </Vertical>
   )
 }

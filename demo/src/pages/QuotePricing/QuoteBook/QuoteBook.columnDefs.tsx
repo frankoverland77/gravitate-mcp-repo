@@ -1,5 +1,6 @@
 import { ColDef, ColGroupDef, ICellRendererParams } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
+import { Badge } from 'antd'
 import { HistoryOutlined, StopFilled, WarningFilled } from '@ant-design/icons'
 import type { ExceptionProfile, EvaluationResult, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
 import { PROPOSED_COMPONENTS, CURRENT_COMPONENTS } from './QuoteBook.types'
@@ -83,7 +84,7 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
         {
           headerName: '',
           colId: `exceptionCount_${groupName}`,
-          width: 100,
+          width: 70,
           suppressMenu: true,
           valueGetter: (params: any) => {
             if (!params.data) return null
@@ -108,19 +109,10 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
               : []
 
             return (
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                whiteSpace: 'nowrap',
-              }}>
-                <Icon style={{ color: iconColor, fontSize: 14 }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#1f2937' }}>
-                  {violations.length}
-                </span>
-                <span style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>
-                  {params.value}
-                </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', height: '100%' }}>
+                <Badge count={violations.length} size="small" color={iconColor} offset={[-2, 2]}>
+                  <Icon style={{ color: iconColor, fontSize: 20 }} />
+                </Badge>
               </span>
             )
           },

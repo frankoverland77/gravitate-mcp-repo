@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraviGrid, Vertical, Horizontal, Texto, GraviButton, NotificationMessage } from '@gravitate-js/excalibrr';
-import { RightOutlined, WarningOutlined, MoreOutlined, FileTextOutlined, LineChartOutlined, DollarOutlined, SettingOutlined, EyeOutlined, LinkOutlined } from '@ant-design/icons';
-import { Popover, Menu, Button, Segmented } from 'antd';
+import { RightOutlined, MoreOutlined, FileTextOutlined, LineChartOutlined, DollarOutlined, SettingOutlined, EyeOutlined, LinkOutlined } from '@ant-design/icons';
+import { Popover, Menu, Segmented } from 'antd';
+import type { ColDef, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
 import { MEASUREMENT_DATA } from './ContractMeasurement.data';
+import type { ContractMeasurementRecord } from './ContractMeasurement.data';
 import { RatabilitySettingsDrawer } from './components/RatabilitySettingsDrawer';
 import { CMViewSettingsDrawer } from './components/CMViewSettingsDrawer';
 import { useFeatureMode } from '../../contexts/FeatureModeContext';
+
+import styles from './ContractMeasurementGrid.module.css';
 
 export function ContractMeasurementGrid() {
   const navigate = useNavigate();
@@ -41,18 +45,18 @@ export function ContractMeasurementGrid() {
   };
 
   const columnDefs = useMemo(() => {
-    const cols: any[] = [
+    const cols: ColDef<ContractMeasurementRecord>[] = [
       {
         field: 'contractId',
         headerName: 'Id',
         width: 100,
-        cellRenderer: (params: any) => (
-          <span
-            style={{ color: '#52c41a', cursor: 'pointer', fontWeight: 600 }}
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => (
+          <Texto
+            className={styles.clickableLink}
             onClick={() => navigate('/ContractMeasurement/ContractMeasurementDetails', { state: params.data })}
           >
             {params.value}
-          </span>
+          </Texto>
         ),
       },
       {
@@ -64,19 +68,19 @@ export function ContractMeasurementGrid() {
         field: 'createdDate',
         headerName: 'Created',
         width: 120,
-        valueFormatter: (params: any) => formatDate(params.value),
+        valueFormatter: (params: ValueFormatterParams) => formatDate(params.value),
       },
       {
         field: 'startDate',
         headerName: 'Contract From',
         width: 130,
-        valueFormatter: (params: any) => formatDate(params.value),
+        valueFormatter: (params: ValueFormatterParams) => formatDate(params.value),
       },
       {
         field: 'endDate',
         headerName: 'Contract To',
         width: 130,
-        valueFormatter: (params: any) => formatDate(params.value),
+        valueFormatter: (params: ValueFormatterParams) => formatDate(params.value),
       },
       {
         field: 'externalCounterparty',
@@ -98,7 +102,7 @@ export function ContractMeasurementGrid() {
         field: 'locations',
         headerName: 'Locations',
         minWidth: 180,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => {
           const locations: string[] = params.value;
           if (!locations || locations.length === 0) return 'N/A';
           if (locations.length === 1) return locations[0];
@@ -113,7 +117,7 @@ export function ContractMeasurementGrid() {
                 </Vertical>
               }
             >
-              <span style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}>Multiple Locations</span>
+              <Texto className={styles.dottedUnderline}>Multiple Locations</Texto>
             </Popover>
           );
         },
@@ -123,7 +127,7 @@ export function ContractMeasurementGrid() {
         headerName: 'Products',
         minWidth: 180,
         flex: 1,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => {
           const products: string[] = params.value;
           if (!products || products.length === 0) return 'N/A';
           if (products.length <= 2) return products.join(', ');
@@ -138,7 +142,7 @@ export function ContractMeasurementGrid() {
                 </Vertical>
               }
             >
-              <span style={{ cursor: 'pointer', textDecoration: 'underline dotted' }}>Multiple Products</span>
+              <Texto className={styles.dottedUnderline}>Multiple Products</Texto>
             </Popover>
           );
         },
@@ -152,17 +156,17 @@ export function ContractMeasurementGrid() {
         field: 'benchmarkImpactCpg',
         headerName: 'Benchmark Impact',
         width: 160,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => {
           const value = params.value;
-          if (value == null) return '';
+          if (value === null || value === undefined) return '';
           const type = params.data?.type;
           const isFavorable = type === 'Purchase' ? value < 0 : value > 0;
-          const color = value === 0 ? '#595959' : isFavorable ? '#52c41a' : '#cf1322';
+          const colorClass = value === 0 ? styles.textNeutral : isFavorable ? styles.textSuccess : styles.textDanger;
           const formatted = `$ .${Math.abs(value).toFixed(4).split('.')[1]}`;
           return (
-            <span style={{ color, fontWeight: 600 }}>
+            <Texto weight="600" className={colorClass}>
               {value < 0 ? `-${formatted}` : formatted}
-            </span>
+            </Texto>
           );
         },
       },
@@ -185,24 +189,24 @@ export function ContractMeasurementGrid() {
         field: 'daysLeft',
         headerName: 'Days Left',
         width: 100,
-        cellRenderer: (params: any) => (
-          <span style={{ color: params.value < 30 ? '#cf1322' : '#52c41a', fontWeight: 600 }}>
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => (
+          <Texto weight="600" className={params.value < 30 ? styles.textDanger : styles.textSuccess}>
             {params.value} days
-          </span>
+          </Texto>
         ),
       });
       cols.push({
         field: 'financialImpact',
         headerName: 'Benchmark Impact',
         width: 150,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => {
           const value = params.value;
-          const color = value >= 0 ? '#52c41a' : '#cf1322';
+          const colorClass = value >= 0 ? styles.textSuccess : styles.textDanger;
           const prefix = value > 0 ? '+' : '';
           return (
-            <span style={{ color, fontWeight: 600 }}>
+            <Texto weight="600" className={colorClass}>
               {prefix}${Math.abs(value).toLocaleString()}
-            </span>
+            </Texto>
           );
         },
       });
@@ -214,8 +218,8 @@ export function ContractMeasurementGrid() {
         headerName: '',
         width: 80,
         pinned: 'right',
-        cellRenderer: (params: any) => {
-          const isArchivedRow = params.data.isArchived;
+        cellRenderer: (params: ICellRendererParams<ContractMeasurementRecord>) => {
+          const isArchivedRow = params.data?.isArchived;
           const menuContent = (
             <Menu
               style={{ border: 'none', boxShadow: 'none' }}
@@ -223,50 +227,50 @@ export function ContractMeasurementGrid() {
                 ...(!isArchivedRow ? [{
                   key: 'edit',
                   label: 'Edit Contract',
-                  onClick: () => console.log('Edit', params.data),
+                  onClick: () => { /* noop for demo */ },
                 }] : []),
                 {
                   key: 'open-contract',
                   icon: <LinkOutlined />,
                   label: 'Open Contract',
                   onClick: () =>
-                    navigate(`/ContractFormulas/ContractDetails/${params.data.contractId}`, {
-                      state: { id: params.data.contractId, externalCompany: params.data.externalCounterparty },
+                    navigate(`/ContractFormulas/ContractDetails/${params.data?.contractId}`, {
+                      state: { id: params.data?.contractId, externalCompany: params.data?.externalCounterparty },
                     }),
                 },
                 {
                   key: 'download',
                   label: 'Download Report',
-                  onClick: () => console.log('Download', params.data),
+                  onClick: () => { /* noop for demo */ },
                 },
                 ...(isFutureMode ? [{ type: 'divider' as const }] : []),
                 ...(isFutureMode && !isArchivedRow && !isReadOnly ? [{
                   key: 'archive',
                   label: 'Archive',
-                  onClick: () => handleArchive(params.data.id),
+                  onClick: () => handleArchive(params.data!.id),
                 }] : []),
                 ...(isFutureMode && isArchivedRow && !isReadOnly ? [{
                   key: 'restore',
                   label: 'Restore',
-                  onClick: () => handleRestore(params.data.id),
+                  onClick: () => handleRestore(params.data!.id),
                 }] : []),
                 ...(isFutureMode ? [{
                   key: 'delete',
                   label: 'Delete',
                   danger: true,
-                  onClick: () => console.log('Delete', params.data),
+                  onClick: () => { /* noop for demo */ },
                 }] : []),
               ]}
             />
           );
 
           return (
-            <Horizontal gap={12} style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Horizontal gap={12} justifyContent="center" alignItems="center" height="100%">
               <Popover content={menuContent} trigger="click" placement="bottomRight">
-                <MoreOutlined style={{ fontSize: '16px', color: '#595959', cursor: 'pointer' }} />
+                <MoreOutlined className={styles.actionIcon} />
               </Popover>
               <RightOutlined
-                style={{ fontSize: '16px', color: '#595959', cursor: 'pointer' }}
+                className={styles.actionIcon}
                 onClick={() => navigate('/ContractMeasurement/ContractMeasurementDetails', { state: params.data })}
               />
             </Horizontal>
@@ -276,7 +280,7 @@ export function ContractMeasurementGrid() {
     );
 
     return cols;
-  }, [navigate, isFutureMode, isReadOnly, viewMode]);
+  }, [navigate, isFutureMode, isReadOnly]);
 
   const controlBarProps = useMemo(() => ({
     title: viewMode === 'archived' ? 'Archived Measurements' : 'Measurements',
@@ -289,23 +293,22 @@ export function ContractMeasurementGrid() {
     rowHeight: 50,
   }), []);
 
-  const updateEP = async (params: any) => {
-    console.log('Update called with:', params);
+  const updateEP = async () => {
     return Promise.resolve();
   };
 
   return (
-    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', minHeight: '100%' }}>
+    <Vertical padding="24px" gap={24} style={{ minHeight: '100%' }}>
       {/* Page Header */}
-      <Horizontal style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <Horizontal justifyContent="space-between" alignItems="flex-start">
+        <Vertical gap={8}>
           <Texto category="h3" weight="600">
             Contract Measurement
           </Texto>
           <Texto category="p1" appearance="medium">
             Track and manage contract performance metrics
           </Texto>
-        </div>
+        </Vertical>
         {isFutureMode && (
           <GraviButton
             icon={<SettingOutlined />}
@@ -317,23 +320,13 @@ export function ContractMeasurementGrid() {
       </Horizontal>
 
       {/* Tiles Section */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: isFutureMode ? 'repeat(3, minmax(0, 300px))' : 'minmax(0, 300px)',
-        gap: '20px'
-      }}>
+      <Horizontal gap={20} className={styles.tilesContainer}>
         {/* Tile 1: Total Contracts */}
-        <div style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #e8e8e8',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-        }}>
+        <Vertical className={styles.tile}>
           <Vertical gap={12}>
-            <Horizontal gap={8} style={{ alignItems: 'center' }}>
-              <FileTextOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
-              <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <Horizontal gap={8} alignItems="center">
+              <FileTextOutlined className={styles.tileIcon} />
+              <Texto category="p2" appearance="medium" className={styles.tileLabel}>
                 Total Contracts
               </Texto>
             </Horizontal>
@@ -344,29 +337,23 @@ export function ContractMeasurementGrid() {
               2 active
             </Texto>
           </Vertical>
-        </div>
+        </Vertical>
 
         {/* Tile 2: Total Volume (Future State only) */}
         {isFutureMode && (
-          <div style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e8e8e8',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
+          <Vertical className={styles.tile}>
             <Vertical gap={12}>
-              <Horizontal gap={8} style={{ alignItems: 'center' }}>
-                <LineChartOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
-                <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <Horizontal gap={8} alignItems="center">
+                <LineChartOutlined className={styles.tileIcon} />
+                <Texto category="p2" appearance="medium" className={styles.tileLabel}>
                   Total Volume
                 </Texto>
               </Horizontal>
-              <Horizontal gap={12} style={{ alignItems: 'baseline' }}>
+              <Horizontal gap={12} alignItems="baseline">
                 <Texto category="h3" weight="600">
                   650,000
                 </Texto>
-                <Texto category="p2" style={{ color: '#52c41a' }}>
+                <Texto category="p2" className={styles.textSuccess}>
                   ↗ 8.2% vs last month
                 </Texto>
               </Horizontal>
@@ -374,30 +361,24 @@ export function ContractMeasurementGrid() {
                 Units across all contracts
               </Texto>
             </Vertical>
-          </div>
+          </Vertical>
         )}
 
-        {/* Tile 4: Benchmark Impact (Future State only) */}
+        {/* Tile 3: Benchmark Impact (Future State only) */}
         {isFutureMode && (
-          <div style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e8e8e8',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
+          <Vertical className={styles.tile}>
             <Vertical gap={12}>
-              <Horizontal gap={8} style={{ alignItems: 'center' }}>
-                <DollarOutlined style={{ fontSize: '16px', color: '#8c8c8c' }} />
-                <Texto category="p2" appearance="medium" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <Horizontal gap={8} alignItems="center">
+                <DollarOutlined className={styles.tileIcon} />
+                <Texto category="p2" appearance="medium" className={styles.tileLabel}>
                   Benchmark Impact
                 </Texto>
               </Horizontal>
-              <Horizontal gap={12} style={{ alignItems: 'baseline' }}>
-                <Texto category="h3" weight="600" style={{ color: '#52c41a' }}>
+              <Horizontal gap={12} alignItems="baseline">
+                <Texto category="h3" weight="600" className={styles.textSuccess}>
                   +$14,832
                 </Texto>
-                <Texto category="p2" style={{ color: '#52c41a' }}>
+                <Texto category="p2" className={styles.textSuccess}>
                   ↗ 12.5% vs last month
                 </Texto>
               </Horizontal>
@@ -405,13 +386,13 @@ export function ContractMeasurementGrid() {
                 Net impact this period
               </Texto>
             </Vertical>
-          </div>
+          </Vertical>
         )}
-      </div>
+      </Horizontal>
 
       {/* Active / Archived Toggle (Future State only) */}
       {isFutureMode && (
-        <div style={{ alignSelf: 'flex-start' }}>
+        <Vertical alignItems="flex-start">
           <Segmented
             size='large'
             options={[
@@ -421,11 +402,11 @@ export function ContractMeasurementGrid() {
             value={viewMode}
             onChange={(v) => setViewMode(v as 'active' | 'archived')}
           />
-        </div>
+        </Vertical>
       )}
 
       {/* Grid Section */}
-      <div style={{ height: '500px' }}>
+      <Vertical height="500px">
         <GraviGrid
           rowData={filteredData}
           columnDefs={columnDefs}
@@ -433,31 +414,20 @@ export function ContractMeasurementGrid() {
           controlBarProps={controlBarProps}
           updateEP={updateEP}
         />
-      </div>
+      </Vertical>
 
       {/* Ratability Settings Drawer */}
       <RatabilitySettingsDrawer
         open={isRatabilitySettingsOpen}
         onClose={() => setIsRatabilitySettingsOpen(false)}
-        onSettingsChange={(settings) => console.log('Ratability settings updated:', settings)}
+        onSettingsChange={() => { /* noop for demo */ }}
       />
 
       {/* View Settings Floating Button */}
-      <Button
-        type='primary'
-        shape='circle'
+      <GraviButton
         icon={<EyeOutlined />}
-        size='large'
         onClick={() => setSettingsDrawerVisible(true)}
-        style={{
-          position: 'fixed',
-          right: '24px',
-          bottom: '96px',
-          zIndex: 9999,
-          width: '48px',
-          height: '48px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        }}
+        className={styles.floatingButton}
       />
 
       {/* View Settings Drawer */}
@@ -467,6 +437,6 @@ export function ContractMeasurementGrid() {
         isReadOnly={isReadOnly}
         onReadOnlyChange={setIsReadOnly}
       />
-    </div>
+    </Vertical>
   );
 }

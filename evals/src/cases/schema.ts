@@ -18,6 +18,8 @@ export interface EvalCase {
   targetFiles: string[]
   /** The page directory name in demo/src/pages/ */
   pageDir: string
+  /** The navigation key in pageConfig.tsx if different from pageDir (e.g., 'ContractFormulas' for ContractManagement) */
+  navKey?: string
   /** URL path for Playwright navigation (e.g., '/DeliveredPricing/QuoteBook') */
   routePath?: string
   /** Expected theme key (e.g., 'PE_LIGHT', 'OSP') */

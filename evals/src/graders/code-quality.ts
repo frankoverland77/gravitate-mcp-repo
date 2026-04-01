@@ -328,8 +328,9 @@ function translateEslintMessage(msg: EslintMessage): string {
 // Page registration check
 // ---------------------------------------------------------------------------
 
-function checkPageRegistration(pageDir: string): Finding[] {
+function checkPageRegistration(pageDir: string, navKey?: string): Finding[] {
   const findings: Finding[] = []
+  const configKey = navKey ?? pageDir
 
   // Directly check the two files for this specific page (instead of running the global script)
   const pageConfigPath = path.join(DEMO_ROOT, 'src/pageConfig.tsx')
@@ -339,9 +340,12 @@ function checkPageRegistration(pageDir: string): Finding[] {
     const pageConfig = fs.readFileSync(pageConfigPath, 'utf-8')
     const authRoute = fs.readFileSync(authRoutePath, 'utf-8')
 
-    const hasImport = new RegExp(`from\\s+["']\\./pages/${pageDir}/`).test(pageConfig)
-    const hasConfig = new RegExp(`config\\.${pageDir}\\s*=`).test(pageConfig)
-    const hasScope = new RegExp(`${pageDir}:\\s*true`).test(authRoute)
+    // Match both `from './pages/X/File'` and barrel `from './pages/X'`
+    const hasImport = new RegExp(`from\\s+["']\\./pages/${pageDir}[/'"]`).test(pageConfig)
+    // Match both `config.Key = {` and object literal `Key: {`
+    const hasConfig = new RegExp(`(?:config\\.${configKey}\\s*=|\\b${configKey}\\s*:\\s*\\{)`).test(pageConfig)
+    // Match scope entry — check both pageDir and configKey
+    const hasScope = new RegExp(`(?:${configKey}|${pageDir}):\\s*true`).test(authRoute)
 
     const missing: string[] = []
     if (!hasImport) missing.push('pageConfig.tsx import')
@@ -376,6 +380,7 @@ export function gradeCodeQuality(evalCase: EvalCase): DimensionScore {
   const allFindings: Finding[] = []
 
   // 1. Anti-pattern checks on each target file
+  const allCode: string[] = []
   for (const targetFile of evalCase.targetFiles) {
     const fullPath = path.join(DEMO_ROOT, 'src', targetFile)
     if (!fs.existsSync(fullPath)) {
@@ -390,6 +395,7 @@ export function gradeCodeQuality(evalCase: EvalCase): DimensionScore {
     }
 
     const code = fs.readFileSync(fullPath, 'utf-8')
+    allCode.push(code)
 
     // Anti-pattern checks
     if (evalCase.expectations.zeroCriticalAntiPatterns !== false) {
@@ -401,14 +407,24 @@ export function gradeCodeQuality(evalCase: EvalCase): DimensionScore {
       allFindings.push(...findRawHtmlElements(code, targetFile))
     }
 
-    // Component usage checks
-    if (evalCase.expectations.mustContainComponents) {
-      allFindings.push(...checkComponentUsage(code, targetFile, evalCase.expectations.mustContainComponents))
-    }
-
     // Must-not-contain checks
     if (evalCase.expectations.mustNotContain) {
       allFindings.push(...checkMustNotContain(code, targetFile, evalCase.expectations.mustNotContain))
+    }
+  }
+
+  // Component usage checks — across all target files collectively
+  if (evalCase.expectations.mustContainComponents) {
+    const combinedCode = allCode.join('\n')
+    for (const component of evalCase.expectations.mustContainComponents) {
+      if (!new RegExp(`\\b${component}\\b`).test(combinedCode)) {
+        allFindings.push({
+          ruleId: 'missing-expected-component',
+          message: `Expected component "${component}" not found in any target file`,
+          plainEnglish: `This page should use the ${component} component but doesn't seem to.`,
+          severity: 'major',
+        })
+      }
     }
   }
 
@@ -417,7 +433,7 @@ export function gradeCodeQuality(evalCase: EvalCase): DimensionScore {
 
   // 3. Page registration check
   if (evalCase.expectations.mustBeRegistered) {
-    allFindings.push(...checkPageRegistration(evalCase.pageDir))
+    allFindings.push(...checkPageRegistration(evalCase.pageDir, evalCase.navKey))
   }
 
   // Separate anti-pattern/convention findings from ESLint findings

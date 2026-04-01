@@ -60,10 +60,10 @@ function formatNumber(value: number): string {
  * Locations renderer - shows single location or popover for multiple
  */
 function LocationsRenderer({ value }: { value: string[] }) {
-  if (!value || value.length === 0) return <span>-</span>
+  if (!value || value.length === 0) return <Texto category='p2'>-</Texto>
 
   if (value.length === 1) {
-    return <span>{value[0]}</span>
+    return <Texto category='p2'>{value[0]}</Texto>
   }
 
   const content = (
@@ -78,9 +78,9 @@ function LocationsRenderer({ value }: { value: string[] }) {
 
   return (
     <Popover content={content} title='Locations' trigger='hover'>
-      <span style={{ cursor: 'pointer', color: 'var(--theme-color-link)' }}>
+      <Texto category='p2' className={styles.popoverLink}>
         {value[0]} (+{value.length - 1})
-      </span>
+      </Texto>
     </Popover>
   )
 }
@@ -89,10 +89,10 @@ function LocationsRenderer({ value }: { value: string[] }) {
  * Products renderer - shows single product or popover for multiple
  */
 function ProductsRenderer({ value }: { value: string[] }) {
-  if (!value || value.length === 0) return <span>-</span>
+  if (!value || value.length === 0) return <Texto category='p2'>-</Texto>
 
   if (value.length === 1) {
-    return <span>{value[0]}</span>
+    return <Texto category='p2'>{value[0]}</Texto>
   }
 
   const content = (
@@ -107,9 +107,9 @@ function ProductsRenderer({ value }: { value: string[] }) {
 
   return (
     <Popover content={content} title='Products' trigger='hover'>
-      <span style={{ cursor: 'pointer', color: 'var(--theme-color-link)' }}>
+      <Texto category='p2' className={styles.popoverLink}>
         {value[0]} (+{value.length - 1})
-      </span>
+      </Texto>
     </Popover>
   )
 }
@@ -127,7 +127,7 @@ function ActionsRenderer({ data }: ICellRendererParams<ContractListItem>) {
   }, [data?.id, navigate])
 
   const handleDelete = useCallback(() => {
-    console.log('Delete contract:', data?.id)
+    // Delete contract action placeholder
   }, [data?.id])
 
   return (
@@ -175,12 +175,13 @@ export function ContractManagementPage() {
         minWidth: 200,
         flex: 1,
         cellRenderer: ({ value, data }: { value: string; data: ContractListItem }) => (
-          <span
-            style={{ cursor: 'pointer', color: 'var(--theme-color-link)', fontWeight: 500 }}
+          <Texto
+            category='p2'
+            className={styles.contractLink}
             onClick={() => handleContractClick(data)}
           >
             {value}
-          </span>
+          </Texto>
         ),
       },
       // Counterparty

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { CheckCard, CheckCardGroup, Texto, Vertical, Horizontal } from '@gravitate-js/excalibrr'
+import { useState } from 'react'
+import { CheckCard, CheckCardGroup, Texto, Vertical } from '@gravitate-js/excalibrr'
 import { Input, Select, Switch, DatePicker, Checkbox, InputNumber, Radio } from 'antd'
 import { ShowcaseShell, SpecimenCard, SectionDivider } from './ShowcaseShell'
 
@@ -21,7 +21,7 @@ export function FormControlsShowcase() {
 
       <SectionDivider title="CheckCardGroup" />
       <SpecimenCard label="CheckCardGroup" props='value={selected} onChange={setSelected}' wide>
-        <CheckCardGroup value={checkCardValue} onChange={setCheckCardValue as any}>
+        <CheckCardGroup value={checkCardValue} onChange={(values: string[]) => setCheckCardValue(values)}>
           <CheckCard title="Monthly" description="Billed monthly" value="monthly" />
           <CheckCard title="Quarterly" description="Billed quarterly" value="quarterly" />
           <CheckCard title="Annual" description="Billed annually" value="annual" />
