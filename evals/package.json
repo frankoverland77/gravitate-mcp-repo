@@ -7,7 +7,11 @@
     "eval": "tsx src/scripts/run-eval.ts",
     "eval:quick": "tsx src/scripts/run-quick.ts",
     "eval:report": "tsx src/scripts/generate-report.ts",
-    "eval:visual": "tsx src/scripts/run-visual.ts"
+    "eval:visual": "tsx src/scripts/run-visual.ts",
+    "eval:compare": "tsx src/scripts/compare-reference.ts",
+    "transcript": "tsx src/scripts/analyze-transcript.ts",
+    "transcript:latest": "tsx src/scripts/analyze-transcript.ts --latest",
+    "transcript:trends": "tsx src/scripts/transcript-trends.ts"
   },
   "devDependencies": {
     "chalk": "^5.4.0",

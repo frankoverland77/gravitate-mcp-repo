@@ -41,7 +41,8 @@
       "Bash(find /Users/rebecca/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr -type f \\\\\\(-name *.css -o -name *.less \\\\\\))",
       "Bash(tr '{' '\\\\n{')",
       "Bash(tr '}' '}\\\\n')",
-      "Bash(wc -l /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.tsx /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.ts)"
+      "Bash(wc -l /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.tsx /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.ts)",
+      "Bash(npm run:*)"
     ]
   }
 }

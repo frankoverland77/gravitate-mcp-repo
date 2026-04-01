@@ -109,6 +109,73 @@ const ANTI_PATTERN_RULES: AntiPatternRule[] = [
     message: 'Using htmlType="submit" — use onClick={() => form.submit()} instead',
     plainEnglish: 'GraviButton should use onClick with form.submit() instead of htmlType="submit".',
   },
+
+  // --- Added: AntD v5 + export/import conventions ---
+
+  // MAJOR: GraviGrid data={} instead of rowData={}
+  {
+    id: 'gravigrid-data-not-rowdata',
+    severity: 'major',
+    pattern: /<GraviGrid\s[^>]*(?<!\w)data\s*=\s*\{/g,
+    message: 'Using data={} on GraviGrid — should be rowData={}',
+    plainEnglish: 'GraviGrid uses the "rowData" prop to pass data, not "data".',
+  },
+  // MAJOR: Old AntD v4 Tabs.TabPane / TabPane children pattern
+  {
+    id: 'antd-tabs-tabpane-children',
+    severity: 'major',
+    pattern: /<(?:Tabs\.)?TabPane[\s>]/g,
+    message: 'Using <Tabs.TabPane> children — use <Tabs items={[...]}/> instead',
+    plainEnglish: 'Tabs should use the "items" prop with an array, not <TabPane> children (changed in AntD v5).',
+  },
+  // MAJOR: Old AntD v4 Menu.Item children pattern
+  {
+    id: 'antd-menu-item-children',
+    severity: 'major',
+    pattern: /<Menu\.Item[\s>]/g,
+    message: 'Using <Menu.Item> children — use <Menu items={[...]}/> instead',
+    plainEnglish: 'Menu should use the "items" prop with an array, not <Menu.Item> children (changed in AntD v5).',
+  },
+  // MAJOR: Old AntD v4 Select.Option children pattern
+  {
+    id: 'antd-select-option-children',
+    severity: 'major',
+    pattern: /<Select\.Option[\s>]/g,
+    message: 'Using <Select.Option> children — use <Select options={[...]}/> instead',
+    plainEnglish: 'Select should use the "options" prop with an array, not <Select.Option> children (changed in AntD v5).',
+  },
+  // MAJOR: Import path with slash after @ (e.g., @/components instead of @components)
+  {
+    id: 'import-path-slash-after-at',
+    severity: 'major',
+    pattern: /from\s+['"]@\//g,
+    message: 'Using @/ import path — should be @ without slash (e.g., @components)',
+    plainEnglish: 'Import paths use @components, not @/components — no slash after the @.',
+  },
+  // MINOR: Default exports in demo files
+  {
+    id: 'no-default-export',
+    severity: 'minor',
+    pattern: /export\s+default\b/g,
+    message: 'Using export default — demos should use named exports only',
+    plainEnglish: 'Demo files use named exports like "export function MyPage()" instead of "export default".',
+  },
+  // MINOR: React.lazy or lazy() imports
+  {
+    id: 'no-react-lazy',
+    severity: 'minor',
+    pattern: /\bReact\.lazy\s*\(|(?<![.\w])lazy\s*\(/g,
+    message: 'Using React.lazy() — demos do not use lazy loading',
+    plainEnglish: 'Demo pages are not lazy-loaded — import components directly.',
+  },
+  // MAJOR: GraviGrid with style prop
+  {
+    id: 'gravigrid-style-prop',
+    severity: 'major',
+    pattern: /<GraviGrid\s[^>]*\bstyle\s*=\s*\{/g,
+    message: 'Using style={} on GraviGrid — wrap in a Vertical/div instead',
+    plainEnglish: 'GraviGrid does not accept a style prop — wrap it in a <Vertical> for styling.',
+  },
 ]
 
 // ---------------------------------------------------------------------------
@@ -131,7 +198,7 @@ function stripStringsAndComments(code: string): string {
   return result
 }
 
-function findRawHtmlElements(code: string, filePath: string): Finding[] {
+export function findRawHtmlElements(code: string, filePath: string): Finding[] {
   const cleaned = stripStringsAndComments(code)
   const findings: Finding[] = []
   const lines = cleaned.split('\n')
@@ -206,7 +273,7 @@ function checkMustNotContain(code: string, filePath: string, forbidden: string[]
 // Anti-pattern checks
 // ---------------------------------------------------------------------------
 
-function checkAntiPatterns(code: string, filePath: string): Finding[] {
+export function checkAntiPatterns(code: string, filePath: string): Finding[] {
   const cleaned = stripStringsAndComments(code)
   const findings: Finding[] = []
 
@@ -227,6 +294,67 @@ function checkAntiPatterns(code: string, filePath: string): Finding[] {
           line: i + 1,
         })
       }
+    }
+  }
+
+  return findings
+}
+
+// ---------------------------------------------------------------------------
+// Import order check (React → Excalibrr → AntD → local)
+// ---------------------------------------------------------------------------
+
+export function checkImportOrder(code: string, filePath: string): Finding[] {
+  const findings: Finding[] = []
+  const lines = code.split('\n')
+
+  // Category order: 0=react, 1=excalibrr/library, 2=antd, 3=local
+  let lastCategory = -1
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line.startsWith('import ')) continue
+    if (!line.includes('from ')) continue
+
+    let category: number
+    if (/from\s+['"]react['"]/.test(line)) {
+      category = 0
+    } else if (/from\s+['"]@gravitate/.test(line)) {
+      category = 1
+    } else if (/from\s+['"](?:antd|@ant-design)/.test(line)) {
+      category = 2
+    } else if (/from\s+['"][.]/.test(line)) {
+      category = 3
+    } else {
+      // Other libraries group with excalibrr
+      category = 1
+    }
+
+    if (lastCategory !== -1 && category < lastCategory) {
+      if (category <= 1 && lastCategory === 2) {
+        findings.push({
+          ruleId: 'import-order',
+          message: 'Excalibrr imports should come before AntD imports',
+          plainEnglish: 'Import order should be: React → Excalibrr → AntD → local files.',
+          severity: 'minor',
+          file: filePath,
+          line: i + 1,
+        })
+      }
+      if (category < 3 && lastCategory === 3) {
+        findings.push({
+          ruleId: 'import-order',
+          message: 'Library imports should come before local imports',
+          plainEnglish: 'Import order should be: React → Excalibrr → AntD → local files.',
+          severity: 'minor',
+          file: filePath,
+          line: i + 1,
+        })
+      }
+    }
+
+    if (category > lastCategory) {
+      lastCategory = category
     }
   }
 
@@ -405,6 +533,7 @@ export function gradeCodeQuality(evalCase: EvalCase): DimensionScore {
     // Raw HTML element detection (only in JSX files)
     if (targetFile.endsWith('.tsx')) {
       allFindings.push(...findRawHtmlElements(code, targetFile))
+      allFindings.push(...checkImportOrder(code, targetFile))
     }
 
     // Must-not-contain checks
