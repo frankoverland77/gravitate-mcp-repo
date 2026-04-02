@@ -395,7 +395,21 @@ export function IndexOfferBuyNow() {
         </div>
 
         <Spin spinning={isSubmitting} size="large">
-          <Form form={form} name="indexOfferBuyNowForm" layout="vertical">
+          <style>{`
+        .bid-differential-input .ant-input-number {
+          height: 52px;
+        }
+        .bid-differential-input .ant-input-number-input {
+          font-size: 24px !important;
+          font-weight: 700 !important;
+          height: 50px !important;
+        }
+        .bid-differential-input .ant-input-number-prefix {
+          font-size: 24px !important;
+          font-weight: 700 !important;
+        }
+      `}</style>
+      <Form form={form} name="indexOfferBuyNowForm" layout="vertical">
             {/* ---- PURCHASE TYPE BAR ---- */}
             <Horizontal
               gap={12} style={{ padding: '12px 24px',
@@ -432,9 +446,9 @@ export function IndexOfferBuyNow() {
             <Vertical>
               <Horizontal gap={32} style={{ padding: '24px' }}>
                 {/* ============================================ */}
-                {/* COLUMN 1 — DETAILS (flex 2)                  */}
+                {/* COLUMN 1 — DETAILS                           */}
                 {/* ============================================ */}
-                <Vertical flex={2}>
+                <Vertical flex={3}>
                   <Texto
                     category="h5"
                     weight={900}
@@ -550,9 +564,9 @@ export function IndexOfferBuyNow() {
                 </Vertical>
 
                 {/* ============================================ */}
-                {/* COLUMN 2 — PRICING (flex 3)                  */}
+                {/* COLUMN 2 — PRICING                           */}
                 {/* ============================================ */}
-                <Vertical flex={3} style={{ borderLeft: '1px solid #f0f0f0', paddingLeft: 32 }}>
+                <Vertical flex={4} style={{ borderLeft: '1px solid #f0f0f0', paddingLeft: 32 }}>
                   <Texto
                     category="h5"
                     weight={900}
@@ -569,44 +583,68 @@ export function IndexOfferBuyNow() {
                   </Texto>
 
                   {/* Formula name */}
-                  <Texto category="p1" weight="bold" style={{ marginBottom: 16 }}>
-                    {selectedOffer?.formulaName ?? '-'}
-                  </Texto>
+                  <div style={{ marginBottom: 20 }}>
+                    <Texto category="p1" weight="bold" style={{ lineHeight: '1.5' }}>
+                      {selectedOffer?.formulaName ?? '-'}
+                    </Texto>
+                  </div>
 
                   {/* Contract Differential box */}
-                  <div
-                    style={{
-                      backgroundColor: '#fafafa',
-                      borderLeft: '3px solid #1890ff',
-                      borderRadius: 4,
-                      padding: '14px 18px',
-                      display: 'inline-block',
-                      minWidth: 180,
-                      minHeight: 110,
-                      marginBottom: 24,
-                    }}
-                  >
-                    <Texto
-                      category="p2"
-                      style={{ marginBottom: 10, color: '#595959' }}
+                  {isBid ? (
+                    <div
+                      style={{
+                        backgroundColor: '#f0f5ff',
+                        border: '1px solid #adc6ff',
+                        borderLeft: '3px solid #1890ff',
+                        borderRadius: 6,
+                        padding: '20px 24px',
+                        marginBottom: 24,
+                        maxWidth: 320,
+                      }}
                     >
-                      Contract Differential
-                    </Texto>
-                    {isBid ? (
-                      <Form.Item name="BidPrice" style={{ margin: 0 }}>
+                      <Horizontal style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                        <Texto category="p2" style={{ color: '#595959' }}>
+                          Your Bid Differential
+                        </Texto>
+                        <BBDTag style={{ backgroundColor: '#1890ff', color: '#fff', fontSize: 11 }}>BID</BBDTag>
+                      </Horizontal>
+                      <Form.Item name="BidPrice" style={{ margin: 0 }} className="bid-differential-input">
                         <InputNumber
                           placeholder={selectedOffer?.formulaDifferential?.toFixed(4)}
                           precision={4}
                           step={0.0001}
-                          style={{ width: '100%', fontSize: 24, fontWeight: 'bold' }}
+                          size="large"
+                          prefix="$"
+                          style={{ width: '100%' }}
                         />
                       </Form.Item>
-                    ) : (
-                      <Texto category="h3" style={{ whiteSpace: 'nowrap' }}>
+                      <Texto category="p2" style={{ color: '#8c8c8c', marginTop: 10, fontSize: 12 }}>
+                        Offer differential: {formatDifferential(selectedOffer?.formulaDifferential)}
+                      </Texto>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: '#f6ffed',
+                        border: '1px solid #b7eb8f',
+                        borderLeft: '3px solid #52c41a',
+                        borderRadius: 6,
+                        padding: '20px 24px',
+                        marginBottom: 24,
+                        maxWidth: 320,
+                      }}
+                    >
+                      <Texto category="p2" style={{ color: '#595959', marginBottom: 6 }}>
+                        Contract Differential
+                      </Texto>
+                      <Texto style={{ fontSize: 28, fontWeight: 700, whiteSpace: 'nowrap', color: '#262626', letterSpacing: '-0.5px' }}>
                         {formatDifferential(selectedOffer?.formulaDifferential)}
                       </Texto>
-                    )}
-                  </div>
+                      <Texto category="p2" style={{ color: '#8c8c8c', marginTop: 6, fontSize: 12 }}>
+                        per gallon
+                      </Texto>
+                    </div>
+                  )}
 
                   {/* Bid Expiration — only visible in bid mode */}
                   {isBid && (
@@ -636,41 +674,69 @@ export function IndexOfferBuyNow() {
                   )}
 
                   {/* Formula Components */}
-                  <Texto category="p2" weight="bold" style={{ marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#595959' }}>
-                    FORMULA COMPONENTS
-                  </Texto>
-                  <List
-                    dataSource={selectedOffer?.formulaVariables ?? []}
-                    footer={
-                      <Texto weight="bold">
-                        Contract Differential:{' '}
-                        {isBid ? 'Bid' : formatDifferential(selectedOffer?.formulaDifferential)}
+                  <div
+                    style={{
+                      border: '1px solid #e8e8e8',
+                      borderRadius: 6,
+                      overflow: 'hidden',
+                      maxWidth: 440,
+                    }}
+                  >
+                    <div
+                      style={{
+                        backgroundColor: '#fafafa',
+                        padding: '10px 16px',
+                        borderBottom: '1px solid #e8e8e8',
+                      }}
+                    >
+                      <Texto category="p2" weight="bold" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#595959', fontSize: 12 }}>
+                        Formula Components
                       </Texto>
-                    }
-                    renderItem={(item) => (
-                      <List.Item
+                    </div>
+                    {(selectedOffer?.formulaVariables ?? []).map((item, idx) => (
+                      <div
+                        key={idx}
                         style={{
-                          justifyContent: 'flex-start',
-                          gap: 8,
-                          border: '1px solid #f0f0f0',
-                          padding: '8px 16px',
-                          lineHeight: '1.6',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          padding: '10px 16px',
+                          borderBottom: '1px solid #f0f0f0',
                         }}
                       >
-                        <Texto weight="bold" style={{ width: 50, color: item.percentage.startsWith('-') ? '#ff4d4f' : undefined }}>
+                        <Texto
+                          weight="bold"
+                          style={{
+                            width: 48,
+                            flexShrink: 0,
+                            color: item.percentage.startsWith('-') ? '#ff4d4f' : '#1890ff',
+                            fontSize: 13,
+                          }}
+                        >
                           {item.percentage}
                         </Texto>
-                        <Texto>{item.name}</Texto>
-                      </List.Item>
-                    )}
-                    style={{
-                      maxWidth: 400,
-                    }}
-                  />
+                        <Texto style={{ fontSize: 13, color: '#434343' }}>{item.name}</Texto>
+                      </div>
+                    ))}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 16px',
+                        backgroundColor: isBid ? '#f0f5ff' : '#f6ffed',
+                      }}
+                    >
+                      <Texto style={{ fontSize: 13, color: '#595959' }}>Contract Differential</Texto>
+                      <Texto weight="bold" style={{ fontSize: 13, color: isBid ? '#1890ff' : '#52c41a' }}>
+                        {isBid ? 'Your Bid' : formatDifferential(selectedOffer?.formulaDifferential)}
+                      </Texto>
+                    </div>
+                  </div>
                 </Vertical>
 
                 {/* ============================================ */}
-                {/* COLUMN 3 — ADDITIONAL TERMS (flex 3)         */}
+                {/* COLUMN 3 — ADDITIONAL TERMS                  */}
                 {/* ============================================ */}
                 <Vertical flex={3} style={{ borderLeft: '1px solid #f0f0f0', paddingLeft: 32 }}>
                   <Texto
