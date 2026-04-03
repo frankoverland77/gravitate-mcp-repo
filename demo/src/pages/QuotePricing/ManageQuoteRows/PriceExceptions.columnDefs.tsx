@@ -26,7 +26,7 @@ function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
   const children: ColDef[] = [
     {
       field: `${prefix}_hardLow`,
-      headerName: 'Critical Low',
+      headerName: 'Critical Below',
       width: 85,
       editable: !isAbsolute,
       valueFormatter: decimalFormatter,
@@ -36,7 +36,7 @@ function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
     },
     {
       field: `${prefix}_softLow`,
-      headerName: 'Warning Low',
+      headerName: 'Warning Below',
       width: 85,
       editable: !isAbsolute,
       valueFormatter: decimalFormatter,
@@ -46,7 +46,7 @@ function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
     },
     {
       field: `${prefix}_softHigh`,
-      headerName: 'Warning High',
+      headerName: 'Warning Above',
       width: 85,
       editable: true,
       valueFormatter: decimalFormatter,
@@ -56,7 +56,7 @@ function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
     },
     {
       field: `${prefix}_hardHigh`,
-      headerName: 'Critical High',
+      headerName: 'Critical Above',
       width: 85,
       editable: true,
       valueFormatter: decimalFormatter,
