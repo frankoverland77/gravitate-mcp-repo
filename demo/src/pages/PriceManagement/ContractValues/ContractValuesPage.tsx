@@ -4,6 +4,8 @@ import {
   EditOutlined,
   EnvironmentFilled,
   ExperimentFilled,
+  ExportOutlined,
+
   HistoryOutlined,
   LoadingOutlined,
   SearchOutlined,
@@ -75,17 +77,33 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
     },
     {
       field: '_actions',
-      headerName: '',
-      width: 140,
+      headerName: 'Actions',
+      width: 200,
       sortable: false,
       filter: false,
       cellRenderer: ({ data }: any) => (
-        <GraviButton
-          size="small"
-          theme1
-          buttonText="View Buildup"
-          onClick={() => onViewBuildup(data.CurvePointPriceId)}
-        />
+        <Horizontal verticalCenter gap={6} className="h-100">
+          <GraviButton
+            size="small"
+            theme1
+            buttonText="View Buildup"
+            onClick={() => onViewBuildup(data.CurvePointPriceId)}
+          />
+          <Tooltip title={`Open Contract ${data.TradeEntryId}, Detail ${data.TradeEntryDetailId} in a new tab`}>
+            <GraviButton
+              size="small"
+              appearance="outline"
+              icon={<ExportOutlined />}
+              onClick={() => {
+                window.open(
+                  `/ContractFormulas/CreateContract?contractId=${data.TradeEntryId}&detailId=${data.TradeEntryDetailId}&expandPrice=true`,
+                  '_blank',
+                  'noopener,noreferrer'
+                );
+              }}
+            />
+          </Tooltip>
+        </Horizontal>
       ),
     },
   ];
@@ -484,11 +502,13 @@ interface DrawerContentProps {
   data: FormulaBreakdownDetail;
   hasPermission: boolean;
   onGridRowUpdated: () => void;
+  contractId?: number;
+  contractDetailId?: number;
 }
 
 type RevalueState = 'idle' | 'loading' | 'cooldown' | 'error';
 
-function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentProps) {
+function DrawerContent({ data, hasPermission, onGridRowUpdated, contractId, contractDetailId }: DrawerContentProps) {
   const [revalueState, setRevalueState] = useState<RevalueState>('idle');
   const [displayResult, setDisplayResult] = useState(data.Result);
   const [displayDate, setDisplayDate] = useState(data.CalculationDate);
@@ -731,7 +751,23 @@ function DrawerContent({ data, hasPermission, onGridRowUpdated }: DrawerContentP
               {showSuccessTimestamp ? 'Revalued just now' : dayjs(displayDate).format('MM/DD/YYYY hh:mm A')}
             </Texto>
           </Horizontal>
-          <Horizontal justifyContent="flex-end" style={{ marginTop: 4 }}>
+          <Horizontal justifyContent="flex-end" verticalCenter gap={8} style={{ marginTop: 4 }}>
+            {contractId && contractDetailId && (
+              <Tooltip title={`View Contract ${contractId}, Detail ${contractDetailId} — opens in new tab`}>
+                <a
+                  href={`/ContractFormulas/CreateContract?contractId=${contractId}&detailId=${contractDetailId}&expandPrice=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <GraviButton
+                    size="small"
+                    appearance="outlined"
+                    icon={<ExportOutlined />}
+                    buttonText="View Contract Detail"
+                  />
+                </a>
+              </Tooltip>
+            )}
             <GraviButton
               size="small"
               theme1={revalueState === 'idle'}
@@ -926,7 +962,14 @@ export function ContractValuesPage() {
             <Texto className="bg-3 p-4" category="h5" style={{ borderRadius: 10 }}>No valuation details found</Texto>
           </Horizontal>
         ) : (
-          <DrawerContent key={selectedValuationId} data={data} hasPermission={hasPermission} onGridRowUpdated={handleGridRowUpdated} />
+          <DrawerContent
+            key={selectedValuationId}
+            data={data}
+            hasPermission={hasPermission}
+            onGridRowUpdated={handleGridRowUpdated}
+            contractId={gridRowData.find((r) => r.CurvePointPriceId === selectedValuationId)?.TradeEntryId}
+            contractDetailId={gridRowData.find((r) => r.CurvePointPriceId === selectedValuationId)?.TradeEntryDetailId}
+          />
         )}
       </Drawer>
     </Vertical>
