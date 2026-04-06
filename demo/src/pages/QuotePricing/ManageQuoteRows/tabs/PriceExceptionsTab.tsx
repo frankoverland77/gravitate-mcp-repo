@@ -1,7 +1,9 @@
-import { useState, useMemo, useCallback } from 'react'
-import { GraviGrid, Vertical } from '@gravitate-js/excalibrr'
+import { useState, useMemo, useCallback, useRef } from 'react'
+import type { MutableRefObject } from 'react'
+import type { GridApi } from 'ag-grid-community'
+import { GraviGrid, Vertical, NotificationMessage } from '@gravitate-js/excalibrr'
 import { priceExceptionData } from '../PriceExceptions.data'
-import { getPriceExceptionColumnDefs } from '../PriceExceptions.columnDefs'
+import { getPriceExceptionColumnDefs, validateThresholdOrdering } from '../PriceExceptions.columnDefs'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
 import { QuoteBookExceptionProfiles } from '../../QuoteBook/components/QuoteBookExceptionProfiles'
 import { exceptionProfiles as seedProfiles } from '../../QuoteBook/QuoteBook.exceptions.data'
@@ -9,8 +11,10 @@ import type { ExceptionProfile } from '../../QuoteBook/QuoteBook.types'
 
 export function PriceExceptionsTab() {
   const { isFutureMode } = useFeatureMode()
+  const gridRef = useRef() as MutableRefObject<GridApi>
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isBulkChangeVisible, setIsBulkChangeVisible] = useState(false)
-  const [rowData] = useState(priceExceptionData)
+  const [rowData, setRowData] = useState(priceExceptionData)
   const [activeSubTab, setActiveSubTab] = useState<'configuration' | 'profiles'>('configuration')
   const [profiles, setProfiles] = useState<ExceptionProfile[]>(() =>
     seedProfiles.map(p => ({ ...p, thresholds: p.thresholds.map(t => ({ ...t })) }))
@@ -18,11 +22,36 @@ export function PriceExceptionsTab() {
 
   const columnDefs = useMemo(() => getPriceExceptionColumnDefs(), [])
 
-  const handleSelectionChanged = useCallback((_event: any) => {}, [])
-
-  const handleBulkUpdate = useCallback(async (_rows: any | any[]) => {
-    return Promise.resolve()
+  const handleSelectionChanged = useCallback((event: any) => {
+    const ids = event.api.getSelectedRows().map((r: any) => String(r.id))
+    setSelectedIds(ids)
   }, [])
+
+  const reselectRows = useCallback(() => {
+    if (!gridRef.current || selectedIds.length === 0) return
+    setTimeout(() => {
+      gridRef.current.forEachNode((node: any) => {
+        if (node.data && selectedIds.includes(String(node.data.id))) {
+          node.setSelected(true)
+        }
+      })
+    }, 0)
+  }, [selectedIds])
+
+  const handleBulkUpdate = useCallback(async (rows: any | any[]) => {
+    const updatedRows = Array.isArray(rows) ? rows : [rows]
+    for (const row of updatedRows) {
+      const error = validateThresholdOrdering(row)
+      if (error) {
+        NotificationMessage('Validation Error', error, true)
+        reselectRows()
+        return
+      }
+    }
+    const updatedMap = new Map(updatedRows.map((u: any) => [u.id, u]))
+    setRowData((prev) => prev.map((row) => updatedMap.get(row.id) || row))
+    NotificationMessage('Success', `Updated ${updatedRows.length} row(s)`, false)
+  }, [reselectRows])
 
   const handleCreateProfile = useCallback((profile: ExceptionProfile) => {
     setProfiles(prev => [...prev, profile])
@@ -82,6 +111,7 @@ export function PriceExceptionsTab() {
       {/* Configuration sub-tab (or default in MVP mode) */}
       {(!isFutureMode || activeSubTab === 'configuration') && (
         <GraviGrid
+          externalRef={gridRef}
           storageKey="price-exceptions-grid"
           rowData={rowData}
           columnDefs={columnDefs}

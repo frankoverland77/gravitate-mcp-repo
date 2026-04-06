@@ -1,6 +1,11 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community'
+import { BulkNumberEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
+import { NotificationMessage } from '@gravitate-js/excalibrr'
 
 const HEADER_CLASS = 'price-exception-header'
+
+const THRESHOLD_FIELDS = ['hardLow', 'softLow', 'softHigh', 'hardHigh'] as const
+const THRESHOLD_LABELS = ['Critical Below', 'Warning Below', 'Warning Above', 'Critical Above'] as const
 
 const decimalFormatter = (params: any) => {
   if (params.value == null) return ''
@@ -9,61 +14,61 @@ const decimalFormatter = (params: any) => {
 
 const CRITICAL_CELL_STYLE = { backgroundColor: 'rgba(255, 77, 79, 0.06)' }
 const WARNING_CELL_STYLE = { backgroundColor: 'rgba(250, 173, 20, 0.06)' }
-const DISABLED_CELL_STYLE = {
-  backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  color: '#bfbfbf',
-}
-
 type ThresholdGroupConfig = {
   headerName: string
   prefix: string
-  isAbsolute?: boolean
 }
 
 function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
-  const { headerName, prefix, isAbsolute } = config
+  const { headerName, prefix } = config
+
+  const validateThresholdOrder = (data: any, fieldBeingSet: string, newValue: number) => {
+    const vals = THRESHOLD_FIELDS.map((f) => {
+      const fullField = `${prefix}_${f}`
+      return fullField === fieldBeingSet ? newValue : data[fullField]
+    })
+    for (let i = 0; i < vals.length - 1; i++) {
+      if (vals[i] != null && vals[i + 1] != null && vals[i] >= vals[i + 1]) {
+        const leftLabel = `${headerName} ${THRESHOLD_LABELS[i]}`
+        const rightLabel = `${headerName} ${THRESHOLD_LABELS[i + 1]}`
+        NotificationMessage('Validation Error', `${leftLabel} must be less than ${rightLabel}`, true)
+        return false
+      }
+    }
+    return true
+  }
+
+  const thresholdCol = (field: string, shortName: string, style: Record<string, string>) => ({
+    field: `${prefix}_${field}`,
+    headerName: `${headerName} ${shortName}`,
+    headerValueGetter: () => shortName,
+    width: 85,
+    editable: true,
+    isBulkEditable: true,
+    bulkCellEditor: BulkNumberEditor,
+    bulkCellEditorParams: {
+      propKey: `${prefix}_${field}`,
+      precision: 4,
+      step: 0.0001,
+    },
+    valueSetter: (params: any) => {
+      const newVal = Number(params.newValue)
+      if (isNaN(newVal)) return false
+      if (!validateThresholdOrder(params.data, `${prefix}_${field}`, newVal)) return false
+      params.data[`${prefix}_${field}`] = newVal
+      return true
+    },
+    valueFormatter: decimalFormatter,
+    headerClass: HEADER_CLASS,
+    type: 'rightAligned',
+    cellStyle: style,
+  })
 
   const children: ColDef[] = [
-    {
-      field: `${prefix}_hardLow`,
-      headerName: 'Critical Below',
-      width: 85,
-      editable: !isAbsolute,
-      valueFormatter: decimalFormatter,
-      headerClass: HEADER_CLASS,
-      type: 'rightAligned',
-      cellStyle: isAbsolute ? DISABLED_CELL_STYLE : CRITICAL_CELL_STYLE,
-    },
-    {
-      field: `${prefix}_softLow`,
-      headerName: 'Warning Below',
-      width: 85,
-      editable: !isAbsolute,
-      valueFormatter: decimalFormatter,
-      headerClass: HEADER_CLASS,
-      type: 'rightAligned',
-      cellStyle: isAbsolute ? DISABLED_CELL_STYLE : WARNING_CELL_STYLE,
-    },
-    {
-      field: `${prefix}_softHigh`,
-      headerName: 'Warning Above',
-      width: 85,
-      editable: true,
-      valueFormatter: decimalFormatter,
-      headerClass: HEADER_CLASS,
-      type: 'rightAligned',
-      cellStyle: WARNING_CELL_STYLE,
-    },
-    {
-      field: `${prefix}_hardHigh`,
-      headerName: 'Critical Above',
-      width: 85,
-      editable: true,
-      valueFormatter: decimalFormatter,
-      headerClass: HEADER_CLASS,
-      type: 'rightAligned',
-      cellStyle: CRITICAL_CELL_STYLE,
-    },
+    thresholdCol('hardLow', 'Critical Below', CRITICAL_CELL_STYLE),
+    thresholdCol('softLow', 'Warning Below', WARNING_CELL_STYLE),
+    thresholdCol('softHigh', 'Warning Above', WARNING_CELL_STYLE),
+    thresholdCol('hardHigh', 'Critical Above', CRITICAL_CELL_STYLE),
   ]
 
   return {
@@ -77,12 +82,24 @@ function makeThresholdGroup(config: ThresholdGroupConfig): ColGroupDef {
 const COMPONENT_GROUPS: ThresholdGroupConfig[] = [
   { headerName: 'Margin', prefix: 'margin' },
   { headerName: 'Cost', prefix: 'cost' },
-  { headerName: 'Market Move', prefix: 'marketMove', isAbsolute: true },
+  { headerName: 'Market Move', prefix: 'marketMove' },
   { headerName: 'Price Delta', prefix: 'priceDelta' },
   { headerName: 'Price', prefix: 'price' },
-  { headerName: 'Ref Strategy to Price', prefix: 'benchDelta', isAbsolute: true },
+  { headerName: 'Ref Strategy to Price', prefix: 'benchDelta' },
   { headerName: 'Bench Value', prefix: 'benchValue' },
 ]
+
+export function validateThresholdOrdering(row: any): string | null {
+  for (const { headerName, prefix } of COMPONENT_GROUPS) {
+    const vals = THRESHOLD_FIELDS.map((f) => row[`${prefix}_${f}`])
+    for (let i = 0; i < vals.length - 1; i++) {
+      if (vals[i] != null && vals[i + 1] != null && vals[i] >= vals[i + 1]) {
+        return `${headerName}: ${THRESHOLD_LABELS[i]} must be less than ${THRESHOLD_LABELS[i + 1]}`
+      }
+    }
+  }
+  return null
+}
 
 export function getPriceExceptionColumnDefs(): (ColDef | ColGroupDef)[] {
   return [

@@ -36,6 +36,8 @@ git hook run pre-commit
 | `<GraviGrid />` without agPropOverrides | `<GraviGrid agPropOverrides={{}} />` |
 | `<Menu><Menu.Item key="x">Label</Menu.Item></Menu>` | `<Menu items={[{ key: 'x', label: 'Label' }]} />` |
 | `<Tabs.TabPane>` children | `<Tabs items={[...]}/>` |
+| `editable: true` without `isBulkEditable` | Add `isBulkEditable: true` to columns that need bulk editing |
+| `updateEP` as a no-op (`Promise.resolve()`) | Must call `setRowData` to merge updated rows back into state |
 
 ---
 

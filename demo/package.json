@@ -1,7 +1,7 @@
 {
-  "name": "excalibrr-demo",
+  "name": "solutions-demo",
   "version": "1.0.1",
-  "description": "Excalibrr Component Demo Project",
+  "description": "Solutions Demo Project",
   "type": "module",
   "scripts": {
     "dev": "vite",
