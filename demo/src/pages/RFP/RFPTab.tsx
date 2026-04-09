@@ -6,8 +6,22 @@ import {
   Horizontal,
   NotificationMessage,
 } from '@gravitate-js/excalibrr';
-import { LeftOutlined, BulbOutlined, StarFilled, TrophyOutlined, DownOutlined } from '@ant-design/icons';
-import { Tabs, Alert, Drawer, Dropdown, Menu } from 'antd';
+import {
+  LeftOutlined,
+  BulbOutlined,
+  StarFilled,
+  TrophyOutlined,
+  DownOutlined,
+  ThunderboltOutlined,
+  BarChartOutlined,
+  SafetyCertificateOutlined,
+  WarningFilled,
+  CheckCircleFilled,
+  RiseOutlined,
+  DashboardOutlined,
+  FireOutlined,
+} from '@ant-design/icons';
+import { Tabs, Alert, Drawer, Dropdown, Menu, Progress, Tag } from 'antd';
 import type {
   RFPScreen,
   RFP,
@@ -31,7 +45,7 @@ import {
   LOCATION_OPTIONS,
 } from './rfp.types';
 import { ThresholdsModal, EliminationModal, EditBidsDrawer, BidLogDrawer } from './components';
-import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS, SAMPLE_DETAILS_EXTENDED, AI_RECOMMENDATIONS } from './rfp.data';
+import { SAMPLE_SUPPLIERS, sortSuppliers, TERMINAL_HISTORY_DATA, SAMPLE_DETAILS, SAMPLE_DETAILS_EXTENDED, AI_RECOMMENDATIONS, formatPrice, formatVolume, formatPenalties, formatRatability } from './rfp.data';
 import {
   RFPListSection,
   RoundStepper,
@@ -1157,7 +1171,7 @@ export function RFPTab() {
     <div style={{ height: '100%' }}>
       {renderScreen()}
       <ThresholdsModal
-        open={state.isThresholdsModalOpen}
+        visible={state.isThresholdsModalOpen}
         thresholds={state.thresholds}
         parameters={state.parameters}
         importanceRanking={state.importanceRanking}
@@ -1171,7 +1185,7 @@ export function RFPTab() {
         onCancel={handleCloseEliminationModal}
       />
       <EditBidsDrawer
-        open={state.isEditBidsDrawerOpen}
+        visible={state.isEditBidsDrawerOpen}
         onClose={handleCloseEditBids}
         rfp={state.selectedRFP}
         round={state.currentRound}
@@ -1180,59 +1194,79 @@ export function RFPTab() {
         onSave={handleSaveEditedBids}
       />
       <BidLogDrawer
-        open={state.isBidLogOpen}
+        visible={state.isBidLogOpen}
         onClose={handleCloseBidLog}
         bidEdits={state.bidEdits}
         onRevert={handleRevert}
       />
       <Drawer
-        title="Key Insights"
+        title={
+          <Horizontal gap={8} alignItems="center">
+            <BulbOutlined style={{ color: '#722ed1' }} />
+            <span>Key Insights</span>
+            <Tag color="purple" style={{ marginLeft: 'auto', fontSize: '10px' }}>AI-POWERED</Tag>
+          </Horizontal>
+        }
         placement="right"
-        width={400}
+        width={460}
         open={state.isInsightsPanelOpen}
         onClose={handleCloseInsightsPanel}
         mask={false}
       >
-        <Vertical gap={24} className="p-3">
-          {/* Top Recommendation Section */}
-          <Vertical gap={12}>
-            <Horizontal gap={8} alignItems="center">
-              <StarFilled style={{ color: '#faad14', fontSize: '16px' }} />
-              <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <Vertical gap={20}>
+          {/* Top Recommendation - hero card */}
+          <div style={{
+            background: 'linear-gradient(135deg, #722ed1 0%, #1890ff 100%)',
+            borderRadius: '12px',
+            padding: '20px',
+            color: '#fff',
+          }}>
+            <Horizontal gap={8} alignItems="center" style={{ marginBottom: '12px' }}>
+              <StarFilled style={{ color: '#ffd666', fontSize: '18px' }} />
+              <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.85 }}>
                 Top Recommendation
-              </Texto>
+              </span>
             </Horizontal>
-            <Vertical gap={8}>
-              <Texto category="h4" weight="600">
-                {AI_RECOMMENDATIONS[0]?.supplierName}
-              </Texto>
-              <Texto category="p1" appearance="medium">
-                {AI_RECOMMENDATIONS[0]?.price}
-              </Texto>
-              <Horizontal gap={6} style={{ flexWrap: 'wrap' }}>
-                {AI_RECOMMENDATIONS[0]?.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    style={{
-                      display: 'inline-block',
-                      padding: '2px 8px',
-                      backgroundColor: '#e6f4ff',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      color: '#1890ff',
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </Horizontal>
-            </Vertical>
-          </Vertical>
+            <Texto category="h3" weight="600" style={{ color: '#fff', marginBottom: '4px' }}>
+              {AI_RECOMMENDATIONS[0]?.supplierName}
+            </Texto>
+            <Texto category="h4" style={{ color: 'rgba(255,255,255,0.9)', marginBottom: '12px' }}>
+              {AI_RECOMMENDATIONS[0]?.price}
+            </Texto>
+            <Horizontal gap={6} style={{ flexWrap: 'wrap' }}>
+              {AI_RECOMMENDATIONS[0]?.tags.map((tag) => (
+                <Tag key={tag} style={{ backgroundColor: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '12px', fontSize: '11px' }}>
+                  {tag}
+                </Tag>
+              ))}
+            </Horizontal>
+          </div>
+
+          {/* Quick Stats Row */}
+          <Horizontal gap={12}>
+            {[
+              { label: 'Avg Spread', value: '$0.07', icon: <RiseOutlined />, color: '#52c41a', bg: '#f6ffed' },
+              { label: 'Total Vol.', value: formatVolume(SAMPLE_SUPPLIERS.reduce((sum, s) => sum + s.metrics.totalVolume, 0)), icon: <BarChartOutlined />, color: '#1890ff', bg: '#e6f7ff' },
+              { label: 'Compliance', value: `${Math.round((SAMPLE_SUPPLIERS.filter(s => s.metrics.issues === 0).length / SAMPLE_SUPPLIERS.length) * 100)}%`, icon: <SafetyCertificateOutlined />, color: '#722ed1', bg: '#f9f0ff' },
+            ].map((stat) => (
+              <div key={stat.label} style={{
+                flex: 1,
+                backgroundColor: stat.bg,
+                borderRadius: '8px',
+                padding: '12px',
+                textAlign: 'center',
+              }}>
+                <div style={{ color: stat.color, fontSize: '18px', marginBottom: '4px' }}>{stat.icon}</div>
+                <Texto category="h5" weight="600">{stat.value}</Texto>
+                <Texto category="p2" appearance="medium" style={{ fontSize: '10px' }}>{stat.label}</Texto>
+              </div>
+            ))}
+          </Horizontal>
 
           {/* Divider */}
-          <div style={{ borderTop: '1px solid #e8e8e8' }} />
+          <div style={{ borderTop: '1px solid #f0f0f0' }} />
 
-          {/* Supplier Rankings Section */}
+          {/* Supplier Rankings */}
           <Vertical gap={12}>
             <Horizontal gap={8} alignItems="center">
               <TrophyOutlined style={{ color: '#722ed1', fontSize: '16px' }} />
@@ -1240,33 +1274,200 @@ export function RFPTab() {
                 Supplier Rankings
               </Texto>
             </Horizontal>
-            <Vertical gap={10}>
-              {AI_RECOMMENDATIONS.map((rec) => (
-                <Horizontal gap={12} key={rec.supplierId} alignItems="center">
-                  <div
-                    style={{
+            <Vertical gap={8}>
+              {SAMPLE_SUPPLIERS.slice().sort((a, b) => a.rank - b.rank).slice(0, 5).map((supplier) => {
+                const isTop = supplier.rank === 1;
+                return (
+                  <div key={supplier.id} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 12px',
+                    backgroundColor: isTop ? '#fffbe6' : '#fafafa',
+                    borderRadius: '8px',
+                    border: isTop ? '1px solid #ffe58f' : '1px solid #f0f0f0',
+                  }}>
+                    <div style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      minWidth: '32px',
-                      padding: '4px 8px',
-                      backgroundColor: rec.rank === 1 ? '#fff7e6' : '#f5f5f5',
-                      borderRadius: '4px',
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: isTop ? '#faad14' : '#e8e8e8',
+                      color: isTop ? '#fff' : '#595959',
                       fontSize: '12px',
-                      fontWeight: 600,
-                      color: rec.rank === 1 ? '#d46b08' : '#595959',
-                    }}
-                  >
-                    #{rec.rank}
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}>
+                      {supplier.rank}
+                    </div>
+                    <Vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
+                      <Horizontal gap={6} alignItems="center">
+                        <Texto weight="600" style={{ fontSize: '13px' }}>{supplier.name}</Texto>
+                        {supplier.isIncumbent && <Tag color="blue" style={{ fontSize: '10px', lineHeight: '16px', padding: '0 4px' }}>INC</Tag>}
+                      </Horizontal>
+                      <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
+                        Score: {supplier.score}/100
+                      </Texto>
+                    </Vertical>
+                    <Vertical gap={2} style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <Texto weight="600" style={{ fontSize: '13px' }}>{formatPrice(supplier.metrics.avgPrice)}</Texto>
+                      <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
+                        {supplier.metrics.issues === 0 ? (
+                          <span style={{ color: '#52c41a' }}><CheckCircleFilled /> Clear</span>
+                        ) : (
+                          <span style={{ color: '#faad14' }}><WarningFilled /> {supplier.metrics.issues} issue{supplier.metrics.issues !== 1 ? 's' : ''}</span>
+                        )}
+                      </Texto>
+                    </Vertical>
                   </div>
-                  <Texto weight={rec.rank === 1 ? '600' : '400'}>{rec.supplierName}</Texto>
-                  <Texto category="p2" appearance="medium" style={{ marginLeft: 'auto' }}>
-                    {rec.price}
-                  </Texto>
+                );
+              })}
+            </Vertical>
+          </Vertical>
+
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #f0f0f0' }} />
+
+          {/* Volume Analysis */}
+          <Vertical gap={12}>
+            <Horizontal gap={8} alignItems="center">
+              <BarChartOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
+              <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Volume Capacity
+              </Texto>
+            </Horizontal>
+            <Vertical gap={10}>
+              {SAMPLE_SUPPLIERS.slice().sort((a, b) => b.metrics.totalVolume - a.metrics.totalVolume).slice(0, 4).map((supplier) => {
+                const maxVol = Math.max(...SAMPLE_SUPPLIERS.map(s => s.metrics.totalVolume));
+                const pct = Math.round((supplier.metrics.totalVolume / maxVol) * 100);
+                return (
+                  <Vertical key={supplier.id} gap={4}>
+                    <Horizontal justifyContent="space-between">
+                      <Texto category="p2" weight="500">{supplier.name}</Texto>
+                      <Texto category="p2" appearance="medium">{formatVolume(supplier.metrics.totalVolume)}</Texto>
+                    </Horizontal>
+                    <Progress
+                      percent={pct}
+                      showInfo={false}
+                      strokeColor={pct > 80 ? '#52c41a' : pct > 50 ? '#1890ff' : '#faad14'}
+                      size="small"
+                    />
+                  </Vertical>
+                );
+              })}
+            </Vertical>
+          </Vertical>
+
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #f0f0f0' }} />
+
+          {/* Ratability Constraints */}
+          <Vertical gap={12}>
+            <Horizontal gap={8} alignItems="center">
+              <DashboardOutlined style={{ color: '#13c2c2', fontSize: '16px' }} />
+              <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Ratability Constraints
+              </Texto>
+            </Horizontal>
+            <Vertical gap={8}>
+              {SAMPLE_SUPPLIERS.slice().sort((a, b) => a.rank - b.rank).slice(0, 5).map((supplier) => (
+                <Horizontal key={supplier.id} justifyContent="space-between" alignItems="center" style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  backgroundColor: supplier.metrics.ratabilityStatus === 'fail' ? '#fff2f0' : '#f6ffed',
+                  border: `1px solid ${supplier.metrics.ratabilityStatus === 'fail' ? '#ffccc7' : '#d9f7be'}`,
+                }}>
+                  <Horizontal gap={8} alignItems="center">
+                    {supplier.metrics.ratabilityStatus === 'pass' ? (
+                      <CheckCircleFilled style={{ color: '#52c41a' }} />
+                    ) : (
+                      <WarningFilled style={{ color: '#ff4d4f' }} />
+                    )}
+                    <Texto category="p2" weight="500">{supplier.name}</Texto>
+                  </Horizontal>
+                  <Texto category="p2" weight="600">{formatRatability(supplier.metrics.ratability)}</Texto>
                 </Horizontal>
               ))}
             </Vertical>
           </Vertical>
+
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #f0f0f0' }} />
+
+          {/* Penalty Simulation */}
+          <Vertical gap={12}>
+            <Horizontal gap={8} alignItems="center">
+              <FireOutlined style={{ color: '#fa541c', fontSize: '16px' }} />
+              <Texto category="p2" appearance="medium" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Penalty Risk Simulation
+              </Texto>
+              <Tag color="orange" style={{ fontSize: '9px', lineHeight: '16px', padding: '0 4px', marginLeft: 'auto' }}>SIMULATED</Tag>
+            </Horizontal>
+            <Texto category="p2" appearance="medium" style={{ fontSize: '12px', lineHeight: '18px' }}>
+              Projected annual penalty exposure based on current terms and historical shortfall patterns.
+            </Texto>
+            <Vertical gap={8}>
+              {SAMPLE_SUPPLIERS.slice().sort((a, b) => a.rank - b.rank).slice(0, 5).map((supplier) => {
+                const annualPenalty = supplier.metrics.penalties * supplier.metrics.totalVolume * 0.05;
+                const maxPenalty = Math.max(...SAMPLE_SUPPLIERS.map(s => s.metrics.penalties * s.metrics.totalVolume * 0.05));
+                const riskLevel = annualPenalty < maxPenalty * 0.3 ? 'low' : annualPenalty < maxPenalty * 0.65 ? 'medium' : 'high';
+                const riskColors = { low: { text: '#52c41a', bg: '#f6ffed' }, medium: { text: '#faad14', bg: '#fffbe6' }, high: { text: '#ff4d4f', bg: '#fff2f0' } };
+
+                return (
+                  <div key={supplier.id} style={{
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: riskColors[riskLevel].bg,
+                    border: '1px solid #f0f0f0',
+                  }}>
+                    <Horizontal justifyContent="space-between" alignItems="center" style={{ marginBottom: '6px' }}>
+                      <Horizontal gap={8} alignItems="center">
+                        <Texto category="p2" weight="600">{supplier.name}</Texto>
+                        <Tag
+                          color={riskLevel === 'low' ? 'success' : riskLevel === 'medium' ? 'warning' : 'error'}
+                          style={{ fontSize: '9px', lineHeight: '16px', padding: '0 4px', textTransform: 'uppercase' }}
+                        >
+                          {riskLevel} risk
+                        </Tag>
+                      </Horizontal>
+                      <Texto weight="600" style={{ color: riskColors[riskLevel].text }}>
+                        ${Math.round(annualPenalty).toLocaleString()}
+                      </Texto>
+                    </Horizontal>
+                    <Horizontal justifyContent="space-between">
+                      <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
+                        Rate: {formatPenalties(supplier.metrics.penalties)}/gal
+                      </Texto>
+                      <Texto category="p2" appearance="medium" style={{ fontSize: '11px' }}>
+                        Est. shortfall: 5%
+                      </Texto>
+                    </Horizontal>
+                  </div>
+                );
+              })}
+            </Vertical>
+          </Vertical>
+
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #f0f0f0' }} />
+
+          {/* AI Summary */}
+          <div style={{
+            padding: '16px',
+            borderRadius: '8px',
+            backgroundColor: '#f9f0ff',
+            border: '1px solid #d3adf7',
+          }}>
+            <Horizontal gap={8} alignItems="center" style={{ marginBottom: '8px' }}>
+              <ThunderboltOutlined style={{ color: '#722ed1' }} />
+              <Texto category="p2" weight="600" style={{ color: '#722ed1' }}>AI Analysis Summary</Texto>
+            </Horizontal>
+            <Texto category="p2" appearance="medium" style={{ lineHeight: '20px' }}>
+              P66 offers the lowest average price with minimal penalty exposure. Marathon, as incumbent, provides the most flexible allocation terms and zero compliance issues. Shell balances competitive pricing with the highest volume capacity at 2.6M gal. Consider Marathon for risk-adjusted value or P66 for pure cost optimization.
+            </Texto>
+          </div>
         </Vertical>
       </Drawer>
     </div>
