@@ -6,21 +6,21 @@ import { ExclamationCircleOutlined } from '@ant-design/icons'
 const { TextArea } = Input
 
 interface EliminationModalProps {
-  visible: boolean
+  open: boolean
   supplierNames: string[]
   onConfirm: (reason: string) => void
   onCancel: () => void
 }
 
-export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }: EliminationModalProps) {
+export function EliminationModal({ open, supplierNames, onConfirm, onCancel }: EliminationModalProps) {
   const [reason, setReason] = useState('')
 
   // Reset reason when modal opens
   useEffect(() => {
-    if (visible) {
+    if (open) {
       setReason('')
     }
-  }, [visible])
+  }, [open])
 
   const handleConfirm = useCallback(() => {
     onConfirm(reason.trim())
@@ -28,7 +28,7 @@ export function EliminationModal({ visible, supplierNames, onConfirm, onCancel }
 
   return (
     <Modal
-      open={visible}
+      open={open}
       title={
         <Horizontal gap={8} alignItems='center'>
           <ExclamationCircleOutlined style={{ color: '#faad14' }} />

@@ -66,6 +66,7 @@ interface DetailDailyData {
 
 // Per-detail palette (first is blue to match existing "Entire Deal" appearance)
 const DETAIL_COLORS = ['#1890ff', '#722ed1', '#fa8c16', '#13c2c2', '#eb2f96', '#a0d911', '#2f54eb']
+const SCENARIO_COLORS = ['#52c41a', '#f5222d', '#faad14', '#1890ff', '#722ed1', '#eb2f96', '#13c2c2']
 const SCENARIO_DASH_PATTERNS = ['8 4', '5 3', '12 3', '3 3']
 
 // ============================================================================
