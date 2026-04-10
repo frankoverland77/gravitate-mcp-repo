@@ -58,7 +58,7 @@ export function VisibilityWindow({ data, canWrite }: VisibilityWindowProps) {
               )}
 
               {canEditVisibility && isEditingVisibility && (
-                <Horizontal verticalCenter style={{ gap: 10 }}>
+                <Horizontal verticalCenter gap={10}>
                   <CloseCircleOutlined
                     style={{
                       cursor: isSaving ? 'not-allowed' : 'pointer',

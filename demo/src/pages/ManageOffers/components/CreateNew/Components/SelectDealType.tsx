@@ -66,7 +66,7 @@ export function SelectDealType({
         <Texto className={'text-14'}>Choose how you want to sell your fuel inventory</Texto>
       </Vertical>
 
-      <Horizontal className={'mt-1'} flex={2} style={{ gap: '16px', overflow: 'visible' }}>
+      <Horizontal className={'mt-1'} flex={2} gap="16px" style={{ overflow: 'visible' }}>
         {categoryItems.map((item) => (
           <DealSelectionButtons
             key={item.id}
@@ -81,7 +81,7 @@ export function SelectDealType({
       <Vertical className={'mt-4 mb-2'} style={{ overflow: 'visible' }}>
         <Texto category={'h4'}>Template</Texto>
       </Vertical>
-      <Horizontal flex={1} style={{ gap: '16px', flexWrap: 'wrap', overflow: 'visible', alignItems: 'flex-start' }}>
+      <Horizontal flex={1} gap="16px" style={{ flexWrap: 'wrap', overflow: 'visible', alignItems: 'flex-start' }}>
         {templateItems.map((item) => (
           <DealSelectionButtons
             key={item.id}

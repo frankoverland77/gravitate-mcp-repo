@@ -203,7 +203,7 @@ export function SelectTimingWindows({
                 {showCheck(window.title) && <CheckOutlined style={{ color: 'var(--theme-success)' }} />}
               </Horizontal>
               <Texto className={'mb-2'}>{window.description}</Texto>
-              <Horizontal className={'mb-2'} verticalCenter style={{ gap: '10px', overflow: 'visible' }}>
+              <Horizontal className={'mb-2'} verticalCenter gap="10px" style={{ overflow: 'visible' }}>
                 <Texto className={'text-14'}>Start: </Texto>
                 <Form.Item name={window.startDateName} rules={[{ required: true, message: 'Start date is required' }]} style={{ marginBottom: 0 }}>
                   <DatePicker format={dateFormat.DATE_SLASH} disabledDate={(current) => getDisabledDate(current, window.startDateName)} className={'border-radius-5'} />
@@ -213,7 +213,7 @@ export function SelectTimingWindows({
                   <TimePicker format={'h:mm A'} className={'border-radius-5'} disabledTime={() => createDisabledTimeForDate(getDateForTimeField(window.startTimeName))} />
                 </Form.Item>
               </Horizontal>
-              <Horizontal verticalCenter style={{ gap: '10px', overflow: 'visible' }}>
+              <Horizontal verticalCenter gap="10px" style={{ overflow: 'visible' }}>
                 <Texto className={'mr-2 text-14'}>End: </Texto>
                 <Form.Item name={window.endDateName} rules={[{ required: true, message: 'End date is required' }]} style={{ marginBottom: 0 }}>
                   <DatePicker format={dateFormat.DATE_SLASH} disabledDate={(current) => getDisabledDate(current, window.endDateName)} className={'border-radius-5'} />
@@ -241,7 +241,7 @@ export function SelectTimingWindows({
             </Horizontal>
 
             <Vertical className={'p-2 mb-2 border-radius-5'}>
-              <Horizontal className={'mb-2'} verticalCenter style={{ gap: '20px', overflow: 'visible' }}>
+              <Horizontal className={'mb-2'} verticalCenter gap="20px" style={{ overflow: 'visible' }}>
                 <Horizontal verticalCenter>
                   <div style={{ width: 15, height: 15, border: '1px solid var(--visibility-border)' }} className={'timing-window-visibility-selected timing-window-visibility-range border-radius-5 timing-window-visibility-border-thin'} />
                   <Texto className={'ml-2 text-14'}>Visibility</Texto>
@@ -253,7 +253,7 @@ export function SelectTimingWindows({
               </Horizontal>
 
               <Vertical className={'p-4 bordered border-radius-5'}>
-                <Horizontal className={'mb-1'} style={{ gap: '10px', overflow: 'visible' }}>
+                <Horizontal className={'mb-1'} gap="10px" style={{ overflow: 'visible' }}>
                   {weekDays.map((day) => (
                     <Vertical key={day}>
                       <Texto className={'text-14'} category={'p2'} weight='bold' align={'center'}>{day}</Texto>

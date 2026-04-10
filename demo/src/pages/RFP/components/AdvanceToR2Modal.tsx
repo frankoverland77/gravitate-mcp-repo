@@ -3,7 +3,7 @@ import { Modal, Alert } from 'antd'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
 interface AdvanceToR2ModalProps {
-  visible: boolean
+  open: boolean
   selectedCount: number
   totalCount: number
   onClose: () => void
@@ -11,7 +11,7 @@ interface AdvanceToR2ModalProps {
 }
 
 export function AdvanceToR2Modal({
-  visible,
+  open,
   selectedCount,
   totalCount,
   onClose,
@@ -21,7 +21,7 @@ export function AdvanceToR2Modal({
 
   return (
     <Modal
-      open={visible}
+      open={open}
       title="Advance to Round 2"
       onCancel={onClose}
       footer={

@@ -16,7 +16,7 @@ export const renderCustomPriceDiscoveryLegend = (bidPrices?: SpecialOfferBreakdo
 
   return (
     <div style={{ display: 'flex', gap: 16, marginBottom: 8, justifyContent: 'space-between', width: '100%' }}>
-      <Horizontal style={{ gap: 20 }}>
+      <Horizontal gap={20}>
         <LegendItem color='#14a349' label='Accepted' />
         <LegendItem color='#f59e0c' label='Pending' />
         <LegendItem color='red' label='Declined' />

@@ -112,7 +112,7 @@ export function ViewSettingsDrawer({ open, onClose, periodDisplay, onPeriodDispl
               onChange={(e) => onPeriodDisplayChange(e.target.value)}
               style={{ width: '100%' }}
             >
-              <Vertical style={{ gap: '12px' }}>
+              <Vertical gap="12px">
                 <div
                   style={getOptionCardStyle(periodDisplay === 'neither' || !periodDisplay)}
                   onClick={() => onPeriodDisplayChange('neither')}

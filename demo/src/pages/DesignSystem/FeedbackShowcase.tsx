@@ -15,7 +15,7 @@ export function FeedbackShowcase() {
       </SpecimenCard>
 
       <SectionDivider title="Overlay" />
-      <SpecimenCard label="Overlay (inline demo)" props='visible={true}'>
+      <SpecimenCard label="Overlay (inline demo)" props='open={true}'>
         <div style={{ position: 'relative', height: '100px', width: '100%', background: '#fafafa', borderRadius: '4px' }}>
           <div style={{ padding: '16px', fontSize: '14px', color: '#595959' }}>Content underneath the overlay</div>
           <Overlay open={true} />

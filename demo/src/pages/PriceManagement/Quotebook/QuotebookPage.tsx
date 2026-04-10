@@ -111,9 +111,9 @@ function QuotebookActionButtons({
   lastSaveDate: string | null;
 }) {
   return (
-    <Horizontal alignItems="center" style={{ gap: '1rem' }}>
+    <Horizontal alignItems="center" gap="1rem">
       {hasPermission && publicationMode !== 'IntraDay' && (
-        <Horizontal alignItems="center" style={{ gap: '0.5rem' }}>
+        <Horizontal alignItems="center" gap="0.5rem">
           <Texto>Publishing For</Texto>
           <Select
             options={PUBLICATION_MODE_OPTIONS}
@@ -178,13 +178,13 @@ function QuotebookPublishFooter({
       className="px-4 py-2"
       style={{ borderTop: '1px solid var(--theme-border)', backgroundColor: 'var(--theme-bg-1)', flexShrink: 0 }}
     >
-      <Horizontal alignItems="center" style={{ gap: '0.5rem' }}>
+      <Horizontal alignItems="center" gap="0.5rem">
         <FileTextOutlined />
         <Texto appearance="medium">Quote Publisher</Texto>
       </Horizontal>
 
       {hasPermission && (
-        <Horizontal style={{ gap: '8px' }}>
+        <Horizontal gap="8px">
           <GraviButton buttonText="Reset" icon={<SyncOutlined />} size="large" onClick={onReset} />
           <GraviButton
             buttonText="Save Adjustments"
@@ -320,7 +320,7 @@ function ValuationDrawerContent({
     <Vertical height="100%">
       {/* ── Header (production layout: flex 5/2, h6 typography, tooltips) ── */}
       <Horizontal className="p-4 bg-2 bordered" style={{ flexShrink: 0 }}>
-        <Vertical flex="5" style={{ gap: 10 }}>
+        <Vertical flex="5" gap={10}>
           <Horizontal alignItems="center">
             <Tooltip title="Product">
               <BBDTag className="py-1" success>
@@ -346,7 +346,7 @@ function ValuationDrawerContent({
           </Horizontal>
         </Vertical>
 
-        <Vertical flex="2" style={{ gap: 10 }}>
+        <Vertical flex="2" gap={10}>
           <Horizontal alignItems="center" justifyContent="flex-end">
             <Texto category="p2" className="px-3">PRICE:</Texto>
             <Texto category="h4">
@@ -507,7 +507,7 @@ function getQuotebookColumnDefs(
               : 'Not published';
             return (
               <Tooltip title={tooltip}>
-                <Horizontal alignItems="center" style={{ gap: 4 }}>
+                <Horizontal alignItems="center" gap={4}>
                   <ClockCircleFilled style={{ color, fontSize: 12 }} />
                   <span>{data.NetOrGrossDisplay}</span>
                 </Horizontal>
@@ -1016,7 +1016,7 @@ export function QuotebookPage() {
         placement="right"
         onClose={handleCloseValuationDrawer}
         width="50vw"
-        visible={valuationDrawerOpen}
+        open={valuationDrawerOpen}
       >
         {breakdownData ? (
           <ValuationDrawerContent
@@ -1048,11 +1048,11 @@ export function QuotebookPage() {
         placement="right"
         onClose={() => { setQuoteHistoryOpen(false); setQuoteHistoryRow(null); }}
         width="50vw"
-        visible={quoteHistoryOpen}
+        open={quoteHistoryOpen}
       >
         {quoteHistoryRow && (
-          <Vertical className="p-4" style={{ gap: 16 }}>
-            <Horizontal className="p-4 bg-2 bordered" style={{ gap: 16 }} alignItems="center">
+          <Vertical className="p-4" gap={16}>
+            <Horizontal className="p-4 bg-2 bordered" gap={16} alignItems="center">
               <Tooltip title="Product">
                 <BBDTag className="py-1" success>
                   <Horizontal alignItems="center">
@@ -1071,11 +1071,11 @@ export function QuotebookPage() {
                 </BBDTag>
               </Tooltip>
             </Horizontal>
-            <Horizontal alignItems="center" style={{ gap: 8 }}>
+            <Horizontal alignItems="center" gap={8}>
               <Texto appearance="medium">Counterparty:</Texto>
               <Texto category="h6">{quoteHistoryRow.CounterPartyName}</Texto>
             </Horizontal>
-            <Horizontal alignItems="center" style={{ gap: 8 }}>
+            <Horizontal alignItems="center" gap={8}>
               <Texto appearance="medium">Description:</Texto>
               <Texto category="h6">{quoteHistoryRow.Description}</Texto>
             </Horizontal>
@@ -1091,7 +1091,7 @@ export function QuotebookPage() {
                 border: '1px dashed var(--theme-border)',
               }}
             >
-              <Vertical style={{ gap: 8, alignItems: 'center' }}>
+              <Vertical gap={8} style={{ alignItems: 'center' }}>
                 <LineChartOutlined style={{ fontSize: 48, color: 'var(--gray-400)' }} />
                 <Texto appearance="medium" category="h6">Quote History Chart</Texto>
                 <Texto appearance="medium">Historical pricing chart and grid will appear here</Texto>

@@ -27,7 +27,7 @@ import {
 } from '../rfp.types'
 
 interface ThresholdsModalProps {
-  visible: boolean
+  open: boolean
   thresholds: ThresholdConfig
   parameters: ParameterConfig
   importanceRanking: ImportanceRankingConfig
@@ -106,7 +106,7 @@ function RankingItem({ factor, rank, totalRanks, onMoveUp, onMoveDown }: Ranking
 }
 
 export function ThresholdsModal({
-  visible,
+  open,
   thresholds,
   parameters,
   importanceRanking,
@@ -119,12 +119,12 @@ export function ThresholdsModal({
 
   // Reset local state when modal opens
   useEffect(() => {
-    if (visible) {
+    if (open) {
       setLocalThresholds(thresholds)
       setLocalParameters(parameters)
       setLocalImportance(importanceRanking)
     }
-  }, [visible, thresholds, parameters, importanceRanking])
+  }, [open, thresholds, parameters, importanceRanking])
 
   const handleSave = () => {
     onSave(localThresholds, localParameters, localImportance)
@@ -184,7 +184,7 @@ export function ThresholdsModal({
 
   return (
     <Modal
-      open={visible}
+      open={open}
       title="Parameters"
       onCancel={onClose}
       width={480}

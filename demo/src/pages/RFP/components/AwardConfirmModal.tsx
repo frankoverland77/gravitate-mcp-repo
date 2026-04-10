@@ -3,7 +3,7 @@ import { Modal } from 'antd'
 import type { Supplier, ContractPreview } from '../rfp.types'
 
 interface AwardConfirmModalProps {
-  visible: boolean
+  open: boolean
   winner?: Supplier
   contractPreview?: ContractPreview
   onClose: () => void
@@ -11,7 +11,7 @@ interface AwardConfirmModalProps {
 }
 
 export function AwardConfirmModal({
-  visible,
+  open,
   winner,
   contractPreview,
   onClose,
@@ -19,7 +19,7 @@ export function AwardConfirmModal({
 }: AwardConfirmModalProps) {
   return (
     <Modal
-      open={visible}
+      open={open}
       title="Create Contract"
       onCancel={onClose}
       footer={

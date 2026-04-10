@@ -30,7 +30,7 @@ const Price = (reservePrice: number | undefined): ColDef => ({
     const color = isAbove ? 'var(--theme-success)' : 'var(--theme-error)'
 
     return (
-      <Horizontal style={{ width: '100%', justifyContent: 'center', gap: 5, alignItems: 'center' }}>
+      <Horizontal gap={5} style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
         <Texto style={{ color, fontWeight: 500 }}>{fmt.currency(value, 4)}</Texto>
       </Horizontal>
     )
@@ -48,7 +48,7 @@ const Status = (): ColDef => ({
   field: 'OrderStatus',
   cellRenderer: ({ value }: { value: string }) => {
     return (
-      <Horizontal horizontalCenter className='width-100%' style={{ gap: 10, justifyContent: 'center' }}>
+      <Horizontal horizontalCenter className='width-100%' gap={10} style={{ justifyContent: 'center' }}>
         {getStatus(value)}
       </Horizontal>
     )
@@ -73,7 +73,7 @@ const Actions = (
   cellRenderer: ({ data }: { data: SpecialOfferBreakdownSubmittedOrder }) => {
     if (data.OrderStatus === 'Pending')
       return (
-        <Horizontal horizontalCenter className='width-100%' style={{ gap: 5, justifyContent: 'center' }}>
+        <Horizontal horizontalCenter className='width-100%' gap={5} style={{ justifyContent: 'center' }}>
           <Button type='link' title='Accept' onClick={() => onApprove(data)}>
             Accept
           </Button>

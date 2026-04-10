@@ -213,7 +213,7 @@ export function CreateNewSpecialOffer({
             <GraviButton
               className={'ghost-gravi-button p-0'}
               buttonText={
-                <Horizontal verticalCenter style={{ gap: '8px', padding: 0 }}>
+                <Horizontal verticalCenter gap="8px" style={{ padding: 0 }}>
                   <ArrowLeftOutlined />
                   <Texto className={'text-14'} weight={'normal'}>Back to Offers</Texto>
                 </Horizontal>
@@ -222,8 +222,8 @@ export function CreateNewSpecialOffer({
             />
           </div>
 
-          <Horizontal style={{ maxWidth: '1216px', minWidth: '1216px', margin: '0 auto', overflow: 'visible', gap: '20px' }}>
-            <Vertical flex="2" style={{ minWidth: '802px', maxWidth: '802px', overflow: 'visible', gap: '20px' }}>
+          <Horizontal gap="20px" style={{ maxWidth: '1216px', minWidth: '1216px', margin: '0 auto', overflow: 'visible' }}>
+            <Vertical flex="2" gap="20px" style={{ minWidth: '802px', maxWidth: '802px', overflow: 'visible' }}>
               <Vertical className={'bg-1 border-radius-10 bordered pb-4'}>
                 <Vertical className={'p-4'} style={{ maxHeight: 'fit-content' }}>
                   <Texto category={'h3'} className={'text-24'}>Create New Offer</Texto>

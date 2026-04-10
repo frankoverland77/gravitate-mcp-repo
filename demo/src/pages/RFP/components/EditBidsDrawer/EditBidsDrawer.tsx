@@ -25,7 +25,7 @@ const { Step } = Steps
 type WizardStep = 'download' | 'upload' | 'validate' | 'confirm'
 
 interface EditBidsDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   rfp: RFP | null
   round: number
@@ -35,7 +35,7 @@ interface EditBidsDrawerProps {
 }
 
 export function EditBidsDrawer({
-  visible,
+  open,
   onClose,
   rfp,
   round,
@@ -112,7 +112,7 @@ export function EditBidsDrawer({
 
   return (
     <Drawer
-      open={visible}
+      open={open}
       onClose={handleClose}
       placement='bottom'
       height='80vh'

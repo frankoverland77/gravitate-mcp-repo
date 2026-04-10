@@ -14,7 +14,7 @@ export const renderCustomLegend = (isOver?: boolean, overPct?: number) => {
         marginTop: 35,
       }}
     >
-      <Horizontal style={{ gap: 20 }}>
+      <Horizontal gap={20}>
         <LegendItem color='#14a349' label='Accepted' />
         <LegendItem color='#f59e0c' label='Pending' />
         <LegendItem color='#e4e6ea' label='Remaining' />

@@ -15,7 +15,7 @@ import styles from './BidLogDrawer.module.css'
 
 
 interface BidLogDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   bidEdits: BidEdit[]
   onRevert: (editId: string) => void
@@ -30,7 +30,7 @@ interface BulkUploadGroup {
   isExpanded: boolean
 }
 
-export function BidLogDrawer({ visible, onClose, bidEdits, onRevert }: BidLogDrawerProps) {
+export function BidLogDrawer({ open, onClose, bidEdits, onRevert }: BidLogDrawerProps) {
   const [filter, setFilter] = useState<BidEditFilter>('all')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [cascadeWarning, setCascadeWarning] = useState<{
@@ -138,7 +138,7 @@ export function BidLogDrawer({ visible, onClose, bidEdits, onRevert }: BidLogDra
   return (
     <>
       <Drawer
-        open={visible}
+        open={open}
         onClose={onClose}
         placement='right'
         width={420}

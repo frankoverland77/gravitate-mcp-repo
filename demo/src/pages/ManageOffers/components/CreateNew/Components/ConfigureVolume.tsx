@@ -108,7 +108,7 @@ export function ConfigureVolume({ form, metadata, dealType }: ConfigureVolumePro
             </Texto>
           )}
         </Horizontal>
-        <Horizontal className={'pb-2'} style={{ gap: '20px', overflow: 'visible' }}>
+        <Horizontal className={'pb-2'} gap="20px" style={{ overflow: 'visible' }}>
           {volumeInputList.map((item) => {
             return (
               <Vertical key={item.title} flex="1" style={{ overflow: 'visible' }}>

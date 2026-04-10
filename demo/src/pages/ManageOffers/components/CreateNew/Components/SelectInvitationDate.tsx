@@ -148,7 +148,7 @@ export function SelectInvitationDate({
       <Horizontal justifyContent='space-between' verticalCenter>
         <Texto category={'h5'}>Send Invites</Texto>
       </Horizontal>
-      <Horizontal className={'mb-2'} verticalCenter style={{ gap: '10px', overflow: 'visible' }}>
+      <Horizontal className={'mb-2'} verticalCenter gap="10px" style={{ overflow: 'visible' }}>
         <Form.Item name={'SendInvitesOnCreate'} valuePropName='checked' style={{ marginBottom: 0 }}>
           <Checkbox
             onChange={(check) => {
@@ -158,11 +158,11 @@ export function SelectInvitationDate({
         </Form.Item>
         <Texto className={'text-14'}>Send Invites on Create</Texto>
       </Horizontal>
-      <Horizontal className={'mb-2'} style={{ width: '100%', gap: '10px', overflow: 'visible' }}>
+      <Horizontal className={'mb-2'} gap="10px" style={{ width: '100%', overflow: 'visible' }}>
         <Texto className={`text-14 pt-1`} appearance={sendOnCreate ? 'hint' : 'default'}>
           Invite Trigger Date:
         </Texto>
-        <Horizontal style={{ gap: '10px', overflow: 'visible' }}>
+        <Horizontal gap="10px" style={{ overflow: 'visible' }}>
           <Form.Item name={'InviteTriggerDate'} rules={[{ validator: validateTriggerDate }]} style={{ marginBottom: 0 }}>
             <DatePicker
               disabled={sendOnCreate}

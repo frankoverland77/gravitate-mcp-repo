@@ -52,7 +52,7 @@ export function Volume({ data, canWrite }: VolumeProps) {
               )}
 
               {canEditVolume && isEditingVolume && (
-                <Horizontal verticalCenter style={{ gap: 10 }}>
+                <Horizontal verticalCenter gap={10}>
                   <CloseCircleOutlined
                     style={{
                       cursor: isSaving ? 'not-allowed' : 'pointer',

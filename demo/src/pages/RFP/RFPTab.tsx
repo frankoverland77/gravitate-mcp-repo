@@ -1171,7 +1171,7 @@ export function RFPTab() {
     <div style={{ height: '100%' }}>
       {renderScreen()}
       <ThresholdsModal
-        visible={state.isThresholdsModalOpen}
+        open={state.isThresholdsModalOpen}
         thresholds={state.thresholds}
         parameters={state.parameters}
         importanceRanking={state.importanceRanking}
@@ -1185,7 +1185,7 @@ export function RFPTab() {
         onCancel={handleCloseEliminationModal}
       />
       <EditBidsDrawer
-        visible={state.isEditBidsDrawerOpen}
+        open={state.isEditBidsDrawerOpen}
         onClose={handleCloseEditBids}
         rfp={state.selectedRFP}
         round={state.currentRound}
@@ -1194,7 +1194,7 @@ export function RFPTab() {
         onSave={handleSaveEditedBids}
       />
       <BidLogDrawer
-        visible={state.isBidLogOpen}
+        open={state.isBidLogOpen}
         onClose={handleCloseBidLog}
         bidEdits={state.bidEdits}
         onRevert={handleRevert}
