@@ -1,12 +1,12 @@
 import { Horizontal, Texto } from '@gravitate-js/excalibrr'
-import { quoteGroups } from '../QuoteBook.data'
+import { quoteGroups } from '../Api/mockData'
 
-interface QuoteBookGroupTabsProps {
+interface GroupTabsProps {
   activeTab: string
   onTabChange: (tab: string) => void
 }
 
-export function QuoteBookGroupTabs({ activeTab, onTabChange }: QuoteBookGroupTabsProps) {
+export function GroupTabs({ activeTab, onTabChange }: GroupTabsProps) {
   return (
     <Horizontal gap={4} style={{ padding: '8px 16px', borderBottom: '1px solid var(--gray-200)' }}>
       {quoteGroups.map(group => (

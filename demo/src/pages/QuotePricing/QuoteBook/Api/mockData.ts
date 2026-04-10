@@ -1,4 +1,4 @@
-import type { ExceptionType, ThresholdOverride } from './QuoteBook.types'
+import type { ExceptionType, ThresholdOverride } from './types.schema'
 
 export type QuoteRow = {
   id: number

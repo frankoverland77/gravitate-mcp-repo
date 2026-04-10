@@ -2,9 +2,9 @@ import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Select, Switch, Tooltip, Segmented } from 'antd'
 import { BarChartOutlined, ShrinkOutlined, ArrowsAltOutlined, SettingOutlined } from '@ant-design/icons'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
-import type { PeriodDisplay, PeriodToggleValue } from '../QuoteBook.types'
+import type { PeriodDisplay, PeriodToggleValue } from '../Api/types.schema'
 
-interface QuoteBookActionButtonsProps {
+interface ActionButtonsProps {
   publicationMode: 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay'
   setPublicationMode: (mode: 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay') => void
   showAnalytics: boolean
@@ -18,7 +18,7 @@ interface QuoteBookActionButtonsProps {
   onPeriodToggleChange?: (v: PeriodToggleValue) => void
 }
 
-export function QuoteBookActionButtons({
+export function ActionButtons({
   publicationMode,
   setPublicationMode,
   showAnalytics,
@@ -30,7 +30,7 @@ export function QuoteBookActionButtons({
   periodDisplay,
   periodToggleValue,
   onPeriodToggleChange,
-}: QuoteBookActionButtonsProps) {
+}: ActionButtonsProps) {
   const { isFutureMode } = useFeatureMode()
 
   return (

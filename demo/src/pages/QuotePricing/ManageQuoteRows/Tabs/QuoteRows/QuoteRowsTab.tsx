@@ -12,8 +12,8 @@ import {
   EditOutlined,
   PlusOutlined,
 } from '@ant-design/icons'
-import { quoteConfigData, mockGroups } from '../ManageQuoteRows.data'
-import { getManageQuoteRowsColumnDefs } from '../ManageQuoteRows.columnDefs'
+import { quoteConfigData, mockGroups } from './Grid/mockData'
+import { getManageQuoteRowsColumnDefs } from './Grid/columnDefs'
 
 export function QuoteRowsTab() {
   const [isGroupsDrawerOpen, setIsGroupsDrawerOpen] = useState(false)

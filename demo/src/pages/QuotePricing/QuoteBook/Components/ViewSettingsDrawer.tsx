@@ -2,7 +2,7 @@ import React from 'react'
 import { Drawer, Radio } from 'antd'
 import { Vertical, Texto } from '@gravitate-js/excalibrr'
 import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
-import type { PeriodDisplay } from '../QuoteBook.types'
+import type { PeriodDisplay } from '../Api/types.schema'
 
 const COLORS = {
   DARK_TEXT: '#262626',
@@ -12,14 +12,14 @@ const COLORS = {
   PRIMARY_BLUE: '#0958d9',
 }
 
-interface QuoteBookViewSettingsDrawerProps {
+interface ViewSettingsDrawerProps {
   open: boolean
   onClose: () => void
   periodDisplay?: PeriodDisplay
   onPeriodDisplayChange?: (v: PeriodDisplay) => void
 }
 
-export function QuoteBookViewSettingsDrawer({ open, onClose, periodDisplay, onPeriodDisplayChange }: QuoteBookViewSettingsDrawerProps) {
+export function ViewSettingsDrawer({ open, onClose, periodDisplay, onPeriodDisplayChange }: ViewSettingsDrawerProps) {
   const { featureMode, setFeatureMode } = useFeatureMode()
 
   const getOptionCardStyle = (isSelected: boolean): React.CSSProperties => ({

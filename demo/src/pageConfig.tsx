@@ -50,8 +50,8 @@ import { FreightManagement } from './pages/DeliveredPricing/FreightManagement/Fr
 import { TaxManagement } from './pages/DeliveredPricing/TaxManagement/TaxManagement';
 import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesale';
 import { PriceManagementUI } from './pages/PriceManagementUI';
-import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBook';
-import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRows';
+import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBookPage';
+import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRowsPage';
 import { QuotebookQoLPage } from './pages/QuotebookQoL';
 import { RowRefreshPage } from './pages/QuotebookQoL/RowRefresh';
 import { PriceEntryPage } from './pages/QuotebookQoL/PriceEntry';

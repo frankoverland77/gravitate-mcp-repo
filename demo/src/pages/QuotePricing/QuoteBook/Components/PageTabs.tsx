@@ -1,11 +1,11 @@
 import { Segmented } from 'antd'
 
-interface QuoteBookPageTabsProps {
+interface PageTabsProps {
   activeTab: 'configuration' | 'profiles'
   onTabChange: (tab: 'configuration' | 'profiles') => void
 }
 
-export function QuoteBookPageTabs({ activeTab, onTabChange }: QuoteBookPageTabsProps) {
+export function PageTabs({ activeTab, onTabChange }: PageTabsProps) {
   return (
     <div style={{ padding: '8px 16px' }}>
       <Segmented

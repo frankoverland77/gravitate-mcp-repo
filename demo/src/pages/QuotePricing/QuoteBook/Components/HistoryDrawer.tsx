@@ -28,12 +28,12 @@ const historyColumnDefs: ColDef[] = [
   { field: 'period', headerName: 'Period', width: 80 },
 ]
 
-interface QuoteBookHistoryDrawerProps {
+interface HistoryDrawerProps {
   open: boolean
   onClose: () => void
 }
 
-export function QuoteBookHistoryDrawer({ open, onClose }: QuoteBookHistoryDrawerProps) {
+export function HistoryDrawer({ open, onClose }: HistoryDrawerProps) {
   return (
     <Drawer
       title="Quote History — Diesel #2 / Houston Term."

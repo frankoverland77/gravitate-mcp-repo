@@ -2,20 +2,20 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { GraviGrid, Vertical, Horizontal } from '@gravitate-js/excalibrr'
 import { Modal, message, Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { quoteBookData } from './QuoteBook.data'
-import type { QuoteRow } from './QuoteBook.data'
-import { exceptionProfiles as seedProfiles } from './QuoteBook.exceptions.data'
-import { getQuoteBookColumnDefs } from './QuoteBook.columnDefs'
-import { evaluateAllRows } from './QuoteBook.evaluation'
-import { QuoteBookGroupTabs } from './components/QuoteBookGroupTabs'
-import { QuoteBookActionButtons } from './components/QuoteBookActionButtons'
-import { QuoteBookAnalyticsPanel } from './components/QuoteBookAnalyticsPanel'
-import { QuoteBookFooter } from './components/QuoteBookFooter'
-import { QuoteBookHistoryDrawer } from './components/QuoteBookHistoryDrawer'
-import { QuoteBookProfileChip } from './components/QuoteBookProfileChip'
-import { QuoteBookExceptionDrawer } from './components/QuoteBookExceptionDrawer'
-import { QuoteBookViewSettingsDrawer } from './components/QuoteBookViewSettingsDrawer'
-import type { DrawerState, ExceptionProfile, ThresholdOverride, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
+import { quoteBookData } from './Api/mockData'
+import type { QuoteRow } from './Api/mockData'
+import { exceptionProfiles as seedProfiles } from './Api/exceptionProfiles.data'
+import { getQuoteBookColumnDefs } from './Grid/columnDefs'
+import { evaluateAllRows } from './Grid/evaluation'
+import { GroupTabs } from './Components/GroupTabs'
+import { ActionButtons } from './Components/ActionButtons'
+import { AnalyticsPanel } from './Components/AnalyticsPanel'
+import { Footer } from './Components/Footer'
+import { HistoryDrawer } from './Components/HistoryDrawer'
+import { ProfileChip } from './Components/ProfileChip'
+import { ExceptionDrawer } from './Components/ExceptionDrawer'
+import { ViewSettingsDrawer } from './Components/ViewSettingsDrawer'
+import type { DrawerState, ExceptionProfile, ThresholdOverride, PeriodDisplay, PeriodToggleValue } from './Api/types.schema'
 import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 
 export function QuoteBook() {
@@ -307,10 +307,10 @@ export function QuoteBook() {
 
   return (
     <Vertical height="100%">
-      <QuoteBookGroupTabs activeTab={activeGroupTab} onTabChange={setActiveGroupTab} />
+      <GroupTabs activeTab={activeGroupTab} onTabChange={setActiveGroupTab} />
 
       {/* Analytics panel (quote-level + exceptions) */}
-      <QuoteBookAnalyticsPanel open={showAnalytics} selectedRow={selectedRow} analyticsData={analyticsData} onSelectRow={handleSelectRowById} />
+      <AnalyticsPanel open={showAnalytics} selectedRow={selectedRow} analyticsData={analyticsData} onSelectRow={handleSelectRowById} />
 
       {/* Main content area — fills remaining space */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -343,8 +343,8 @@ export function QuoteBook() {
                 hideActiveFilters: true,
                 actionButtons: (
                   <Horizontal alignItems="center" gap={8}>
-                    {isFutureMode && <QuoteBookProfileChip profileName={mostCommonProfileName} />}
-                    <QuoteBookActionButtons
+                    {isFutureMode && <ProfileChip profileName={mostCommonProfileName} />}
+                    <ActionButtons
                       publicationMode={publicationMode}
                       setPublicationMode={setPublicationMode}
                       showAnalytics={showAnalytics}
@@ -365,7 +365,7 @@ export function QuoteBook() {
 
           {/* Right drawer (Future State only) */}
           {isFutureMode && (
-            <QuoteBookExceptionDrawer
+            <ExceptionDrawer
               drawerState={drawerState}
               selectedRows={selectedRows}
               profiles={profiles}
@@ -388,7 +388,7 @@ export function QuoteBook() {
         overflow: 'hidden',
         transition: 'max-height 300ms ease, opacity 300ms ease, transform 300ms ease',
       }}>
-        <QuoteBookFooter
+        <Footer
           publicationMode={publicationMode}
           publishMode={publishMode}
           setPublishMode={setPublishMode}
@@ -398,7 +398,7 @@ export function QuoteBook() {
           hardExceptionCount={isFutureMode ? hardExceptionCount : 0}
         />
       </div>
-      <QuoteBookHistoryDrawer
+      <HistoryDrawer
         open={isHistoryDrawerOpen}
         onClose={() => setIsHistoryDrawerOpen(false)}
       />
@@ -464,7 +464,7 @@ export function QuoteBook() {
         }}
       />
 
-      <QuoteBookViewSettingsDrawer
+      <ViewSettingsDrawer
         open={settingsDrawerVisible}
         onClose={() => setSettingsDrawerVisible(false)}
         periodDisplay={periodDisplay}

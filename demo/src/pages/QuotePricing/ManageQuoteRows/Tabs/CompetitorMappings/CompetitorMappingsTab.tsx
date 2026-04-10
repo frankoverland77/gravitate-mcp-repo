@@ -29,16 +29,16 @@ import {
   locationHierarchyOptions,
   getLocationName,
   getProductName,
-} from '../CompetitorMappings.data'
+} from './Grid/mockData'
 import type {
   CompetitorQuoteRow,
   CompetitorAssociation,
   MatchResult,
-} from '../CompetitorMappings.data'
+} from './Grid/mockData'
 import {
   getCompetitorMappingsColumnDefs,
   getCompetitorDetailColumnDefs,
-} from '../CompetitorMappings.columnDefs'
+} from './Grid/columnDefs'
 
 export function CompetitorMappingsTab() {
   const [quoteRows, setQuoteRows] = useState<CompetitorQuoteRow[]>(initialQuoteRows)

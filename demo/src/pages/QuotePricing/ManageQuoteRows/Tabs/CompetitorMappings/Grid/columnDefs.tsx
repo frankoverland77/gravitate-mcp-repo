@@ -1,8 +1,8 @@
 import { ColDef } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
 import { Tooltip } from 'antd'
-import { getLocationName, getProductName } from './CompetitorMappings.data'
-import type { CompetitorQuoteRow, CompetitorAssociation } from './CompetitorMappings.data'
+import { getLocationName, getProductName } from './mockData'
+import type { CompetitorQuoteRow, CompetitorAssociation } from './mockData'
 
 export const getCompetitorMappingsColumnDefs = (): ColDef[] => [
   {

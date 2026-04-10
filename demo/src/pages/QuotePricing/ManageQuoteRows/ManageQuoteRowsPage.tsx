@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Vertical, Texto } from '@gravitate-js/excalibrr'
 import { Tabs } from 'antd'
-import { QuoteRowsTab } from './tabs/QuoteRowsTab'
-import { QuoteSpreadsTab } from './tabs/QuoteSpreadsTab'
-import { PriceExceptionsTab } from './tabs/PriceExceptionsTab'
-import { CompetitorMappingsTab } from './tabs/CompetitorMappingsTab'
+import { QuoteRowsTab } from './Tabs/QuoteRows/QuoteRowsTab'
+import { QuoteSpreadsTab } from './Tabs/QuoteSpreads/QuoteSpreadsTab'
+import { PriceExceptionsTab } from './Tabs/PriceExceptions/PriceExceptionsTab'
+import { CompetitorMappingsTab } from './Tabs/CompetitorMappings/CompetitorMappingsTab'
 import { useFeatureMode } from '../../../contexts/FeatureModeContext'
 
 export function ManageQuoteRows() {

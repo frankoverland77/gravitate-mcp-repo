@@ -1,15 +1,15 @@
-import type { QuoteRow } from './QuoteBook.data'
-import type { ExceptionProfile, ThresholdComponent, EvaluationResult, ComponentViolation } from './QuoteBook.types'
+import type { QuoteRow } from '../Api/mockData'
+import type { ExceptionProfile, ThresholdComponent, EvaluationResult, ComponentViolation } from '../Api/types.schema'
 
 const FIELD_MAP: Record<string, (row: QuoteRow) => number | null> = {
   'Margin': (row) => row.proposed_margin,
   'Cost': (row) => row.prior_lastPrice,
   'Market Move': (row) => row.proposed_marketMove,
   'Price Delta': (row) => row.proposed_delta,
-  'Ref Strategy to Price': (row) => Math.abs(row.benchmark_ulsd - row.proposed_price),
+  'Reference Strategy Delta': (row) => Math.abs(row.benchmark_ulsd - row.proposed_price),
 }
 
-const ABSOLUTE_COMPONENTS = new Set(['Market Move', 'Ref Strategy to Price'])
+const ABSOLUTE_COMPONENTS = new Set(['Market Move', 'Reference Strategy Delta'])
 
 function evaluateComponent(
   row: QuoteRow,

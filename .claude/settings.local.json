@@ -42,7 +42,10 @@
       "Bash(tr '{' '\\\\n{')",
       "Bash(tr '}' '}\\\\n')",
       "Bash(wc -l /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.tsx /Users/rebecca/repos/excalibrr-mcp-server/demo/src/pages/OnlineSellingPlatform/*.ts)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(mkdir:*)",
+      "Bash(xargs sed:*)",
+      "Bash(npx vite:*)"
     ]
   }
 }

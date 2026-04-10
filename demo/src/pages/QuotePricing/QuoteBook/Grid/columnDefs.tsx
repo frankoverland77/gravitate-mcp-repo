@@ -2,8 +2,8 @@ import { ColDef, ColGroupDef, ICellRendererParams } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
 import { HistoryOutlined, StopFilled, WarningFilled } from '@ant-design/icons'
 import { Tooltip } from 'antd'
-import type { ExceptionProfile, EvaluationResult, ComponentViolation, PeriodDisplay, PeriodToggleValue } from './QuoteBook.types'
-import { PROPOSED_COMPONENTS, CURRENT_COMPONENTS } from './QuoteBook.types'
+import type { ExceptionProfile, EvaluationResult, ComponentViolation, PeriodDisplay, PeriodToggleValue } from '../Api/types.schema'
+import { PROPOSED_COMPONENTS, CURRENT_COMPONENTS } from '../Api/types.schema'
 
 type ColumnOptions = {
   onHistoryClick: () => void
@@ -342,7 +342,7 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
     },
     valueFormatter: ({ value }) => value != null ? `$${value.toFixed(4)}` : '',
     cellRenderer: (params: ICellRendererParams) => renderViolationCell(
-      params, 'Ref Strategy to Price', options.evaluationMap,
+      params, 'Reference Strategy Delta', options.evaluationMap,
       (violation) => {
         if (!params.data) return null
         const val = Math.abs(params.data.benchmark_ulsd - params.data.proposed_price)

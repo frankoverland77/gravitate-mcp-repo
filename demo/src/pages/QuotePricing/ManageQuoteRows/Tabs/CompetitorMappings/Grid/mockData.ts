@@ -1,4 +1,4 @@
-import { getProductById, getLocationById } from '../../../shared/data'
+import { getProductById, getLocationById } from '../../../../../../shared/data'
 
 export type CompetitorAssociation = {
   id: number

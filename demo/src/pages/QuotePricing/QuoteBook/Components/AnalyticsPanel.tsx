@@ -21,7 +21,7 @@ type AnalyticsData = {
   worstOffenders: { rowId: number; quote: string; location: string; deviation: string; excCount: number; type: 'hard' | 'soft' }[]
 }
 
-interface QuoteBookAnalyticsPanelProps {
+interface AnalyticsPanelProps {
   open: boolean
   selectedRow?: any
   analyticsData: AnalyticsData
@@ -42,7 +42,7 @@ function SeverityCard({ label, count, color }: { label: string; count: number; c
   )
 }
 
-export function QuoteBookAnalyticsPanel({ open, selectedRow, analyticsData, onSelectRow }: QuoteBookAnalyticsPanelProps) {
+export function AnalyticsPanel({ open, selectedRow, analyticsData, onSelectRow }: AnalyticsPanelProps) {
   const [selectedView, setSelectedView] = useState('liftings_vs_benchmark')
 
   const isExceptions = selectedView === 'exceptions'

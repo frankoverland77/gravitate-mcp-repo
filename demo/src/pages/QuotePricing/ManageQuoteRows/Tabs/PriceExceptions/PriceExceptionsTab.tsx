@@ -2,12 +2,12 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import type { MutableRefObject } from 'react'
 import type { GridApi } from 'ag-grid-community'
 import { GraviGrid, Vertical, NotificationMessage } from '@gravitate-js/excalibrr'
-import { priceExceptionData } from '../PriceExceptions.data'
-import { getPriceExceptionColumnDefs, validateThresholdOrdering } from '../PriceExceptions.columnDefs'
-import { useFeatureMode } from '../../../../contexts/FeatureModeContext'
-import { QuoteBookExceptionProfiles } from '../../QuoteBook/components/QuoteBookExceptionProfiles'
-import { exceptionProfiles as seedProfiles } from '../../QuoteBook/QuoteBook.exceptions.data'
-import type { ExceptionProfile } from '../../QuoteBook/QuoteBook.types'
+import { priceExceptionData } from './Grid/mockData'
+import { getPriceExceptionColumnDefs, validateThresholdOrdering } from './Grid/columnDefs'
+import { useFeatureMode } from '../../../../../contexts/FeatureModeContext'
+import { ExceptionProfiles } from '../../../QuoteBook/Components/ExceptionProfiles'
+import { exceptionProfiles as seedProfiles } from '../../../QuoteBook/Api/exceptionProfiles.data'
+import type { ExceptionProfile } from '../../../QuoteBook/Api/types.schema'
 
 export function PriceExceptionsTab() {
   const { isFutureMode } = useFeatureMode()
@@ -20,7 +20,7 @@ export function PriceExceptionsTab() {
     seedProfiles.map(p => ({ ...p, thresholds: p.thresholds.map(t => ({ ...t })) }))
   )
 
-  const columnDefs = useMemo(() => getPriceExceptionColumnDefs(), [])
+  const columnDefs = useMemo(() => getPriceExceptionColumnDefs({ canWrite: true }), [])
 
   const handleSelectionChanged = useCallback((event: any) => {
     const ids = event.api.getSelectedRows().map((r: any) => String(r.id))
@@ -136,7 +136,7 @@ export function PriceExceptionsTab() {
 
       {/* Exception Profiles sub-tab (Future State only) */}
       {isFutureMode && activeSubTab === 'profiles' && (
-        <QuoteBookExceptionProfiles
+        <ExceptionProfiles
           profiles={profiles}
           onCreateProfile={handleCreateProfile}
           onUpdateProfile={handleUpdateProfile}

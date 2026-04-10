@@ -1,11 +1,11 @@
 import { Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { SafetyCertificateOutlined } from '@ant-design/icons'
 
-type QuoteBookProfileChipProps = {
+type ProfileChipProps = {
   profileName?: string
 }
 
-export function QuoteBookProfileChip({ profileName = 'Standard Day' }: QuoteBookProfileChipProps) {
+export function ProfileChip({ profileName = 'Standard Day' }: ProfileChipProps) {
   return (
     <Horizontal
       alignItems="center"

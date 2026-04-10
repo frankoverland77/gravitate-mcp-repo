@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { PlusOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Input, InputNumber, Select, message } from 'antd'
-import type { ExceptionProfile, ThresholdComponent } from '../QuoteBook.types'
-import { getComponentStatus } from '../QuoteBook.types'
+import type { ExceptionProfile, ThresholdComponent } from '../Api/types.schema'
+import { getComponentStatus } from '../Api/types.schema'
 
 type EditMode = 'view' | 'edit' | 'create'
 
@@ -17,19 +17,19 @@ type EditForm = {
   scopeProduct: string
 }
 
-interface QuoteBookExceptionProfilesProps {
+interface ExceptionProfilesProps {
   profiles: ExceptionProfile[]
   onCreateProfile: (profile: ExceptionProfile) => void
   onUpdateProfile: (profile: ExceptionProfile) => void
   onDeleteProfile: (profileKey: string) => void
 }
 
-export function QuoteBookExceptionProfiles({
+export function ExceptionProfiles({
   profiles,
   onCreateProfile,
   onUpdateProfile,
   onDeleteProfile,
-}: QuoteBookExceptionProfilesProps) {
+}: ExceptionProfilesProps) {
   const [selectedProfileKey, setSelectedProfileKey] = useState('standard')
   const [editMode, setEditMode] = useState<EditMode>('view')
   const [editForm, setEditForm] = useState<EditForm>(() => makeDefaultEditForm(profiles))
@@ -632,7 +632,7 @@ function ThresholdEditorCard({
   threshold: ThresholdComponent
   onBoundaryChange: (field: string, value: number | null) => void
 }) {
-  const isAbsolute = threshold.component === 'Market Move' || threshold.component === 'Ref Strategy to Price'
+  const isAbsolute = threshold.component === 'Market Move' || threshold.component === 'Reference Strategy Delta'
 
   const boundaryRow = (field: string, label: string, color: string, value: number | null, orgValue: number | null, disabled?: boolean) => (
     <Horizontal alignItems="center" gap={6} style={{ marginBottom: 4 }}>

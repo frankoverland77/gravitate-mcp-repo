@@ -2,7 +2,7 @@ import { Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { Alert } from 'antd'
 import { SyncOutlined, SaveOutlined, CloseOutlined, CloudUploadOutlined, FileTextOutlined, WarningOutlined } from '@ant-design/icons'
 
-interface QuoteBookFooterProps {
+interface FooterProps {
   publicationMode: 'EndOfDay' | 'EndOfDayCurrentPeriod' | 'IntraDay'
   publishMode: boolean
   setPublishMode: (v: boolean) => void
@@ -12,7 +12,7 @@ interface QuoteBookFooterProps {
   hardExceptionCount: number
 }
 
-export function QuoteBookFooter({
+export function Footer({
   publicationMode,
   publishMode,
   setPublishMode,
@@ -20,7 +20,7 @@ export function QuoteBookFooter({
   onPublish,
   onReset,
   hardExceptionCount,
-}: QuoteBookFooterProps) {
+}: FooterProps) {
   return (
     <Horizontal
       alignItems="center"

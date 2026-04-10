@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { CloseOutlined, InboxOutlined, SafetyCertificateOutlined, EditOutlined } from '@ant-design/icons'
 import { InputNumber, Select, message } from 'antd'
-import type { DrawerState, ExceptionProfile, ThresholdOverride } from '../QuoteBook.types'
-import { getComponentStatus } from '../QuoteBook.types'
-import type { QuoteRow } from '../QuoteBook.data'
+import type { DrawerState, ExceptionProfile, ThresholdOverride } from '../Api/types.schema'
+import { getComponentStatus } from '../Api/types.schema'
+import type { QuoteRow } from '../Api/mockData'
 
-interface QuoteBookExceptionDrawerProps {
+interface ExceptionDrawerProps {
   drawerState: DrawerState
   selectedRows: QuoteRow[]
   profiles: ExceptionProfile[]
@@ -19,7 +19,7 @@ interface QuoteBookExceptionDrawerProps {
   onClearSelection: () => void
 }
 
-export function QuoteBookExceptionDrawer({
+export function ExceptionDrawer({
   drawerState,
   selectedRows,
   profiles,
@@ -30,7 +30,7 @@ export function QuoteBookExceptionDrawer({
   onApplyOverride,
   onResetToDefaults,
   onClearSelection,
-}: QuoteBookExceptionDrawerProps) {
+}: ExceptionDrawerProps) {
   const { isOpen, mode, selectedRowIds, actionMode } = drawerState
   const selectedCount = selectedRowIds.length
 
@@ -394,10 +394,10 @@ function OverrideForm({
   const [overwriteExisting, setOverwriteExisting] = useState(false)
 
   const componentOptions = [
-    'Margin', 'Cost', 'Market Move', 'Price Delta', 'Ref Strategy to Price',
+    'Margin', 'Cost', 'Market Move', 'Price Delta', 'Reference Strategy Delta',
   ]
 
-  const isAbsolute = component === 'Market Move' || component === 'Ref Strategy to Price'
+  const isAbsolute = component === 'Market Move' || component === 'Reference Strategy Delta'
 
   const handleSubmit = () => {
     if (!component) {
@@ -453,7 +453,7 @@ function OverrideForm({
           onChange={val => {
             setComponent(val)
             // Reset below fields for absolute components
-            if (val === 'Market Move' || val === 'Ref Strategy to Price') {
+            if (val === 'Market Move' || val === 'Reference Strategy Delta') {
               setCriticalBelow(null)
               setWarningBelow(null)
             }
