@@ -29,11 +29,13 @@ export function CompetitorDetailPanel({
   associations,
   detailColDefs,
   onAddAssociation,
+  highlightedAssocIds,
 }: {
   parentRow: CompetitorQuoteRow
   associations: CompetitorAssociation[]
   detailColDefs: any[]
   onAddAssociation?: (quoteRowId: number, newAssoc: Omit<CompetitorAssociation, 'id'>) => void
+  highlightedAssocIds?: Set<number>
 }) {
   const [isAdding, setIsAdding] = useState(false)
   const [form, setForm] = useState<NewRowForm>(emptyForm)
@@ -236,7 +238,8 @@ export function CompetitorDetailPanel({
           suppressMovableColumns: true,
           getRowId: (p: any) => String(p.data.id),
           getRowStyle: (params: any) => {
-            if (params.data?.id === highlightedRowId) {
+            const id = params.data?.id
+            if (id === highlightedRowId || highlightedAssocIds?.has(id)) {
               return { backgroundColor: '#dcfce7', borderLeft: '3px solid #10b981' }
             }
             return undefined

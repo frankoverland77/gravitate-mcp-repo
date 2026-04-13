@@ -49,8 +49,11 @@ export function CompetitorMappingsTab() {
   const [searchText, setSearchText] = useState('')
   const [configFilter, setConfigFilter] = useState<string | undefined>(undefined)
   const [allExpanded, setAllExpanded] = useState(false)
+  const highlightedAssocIdsRef = useRef<Set<number>>(new Set())
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Bulk change popover state
+  // Bulk change state
+  const [bulkBarVisible, setBulkBarVisible] = useState(false)
   const [bulkMatchBy, setBulkMatchBy] = useState<'name' | 'publisher' | 'terminal'>('name')
   const [bulkMatchValues, setBulkMatchValues] = useState<string[]>([])
   const [bulkVisibility, setBulkVisibility] = useState<'Show' | 'Hide' | 'Highlight'>('Show')
@@ -86,6 +89,7 @@ export function CompetitorMappingsTab() {
     const rows = event.api.getSelectedRows() as CompetitorQuoteRow[]
     setSelectedRows(rows)
     if (rows.length === 0) {
+      setBulkBarVisible(false)
       setBulkMatchValues([])
       setBulkMatchBy('name')
       setBulkVisibility('Show')
@@ -102,10 +106,44 @@ export function CompetitorMappingsTab() {
   }, [selectedRows, publisher])
 
   const handleConfirm = useCallback(() => {
-    const totalNew = matchResults.reduce(
-      (sum, r) => sum + r.instruments.filter((i) => !i.alreadyExists).length,
-      0,
-    )
+    // Build new associations from match results and add them to quote rows
+    const newAssocIds = new Set<number>()
+    const affectedQuoteRowIds = new Set<number>()
+
+    setQuoteRows((prev) => {
+      return prev.map((row) => {
+        const result = matchResults.find((r) => r.quoteRowId === row.id)
+        if (!result) return row
+        const newInstruments = result.instruments.filter((i) => !i.alreadyExists)
+        if (newInstruments.length === 0) return row
+
+        affectedQuoteRowIds.add(row.id)
+        const maxId = row.competitorAssociations.reduce((max, a) => Math.max(max, a.id), 0)
+        const newAssocs = newInstruments.map((inst, idx) => {
+          const id = maxId + 1 + idx
+          newAssocIds.add(id)
+          return {
+            id,
+            name: inst.competitor,
+            publisher: inst.publisher,
+            region: '',
+            terminal: inst.terminal,
+            productGroup: '',
+            product: inst.product,
+            visibility: 'Show' as const,
+          }
+        })
+
+        return {
+          ...row,
+          competitorAssociations: [...row.competitorAssociations, ...newAssocs],
+          existingCompetitorCount: row.existingCompetitorCount + newAssocs.length,
+          existingCompetitors: [...row.existingCompetitors, ...newAssocs.map((a) => a.name)],
+        }
+      })
+    })
+
+    const totalNew = newAssocIds.size
     setPreviewVisible(false)
     setMatchResults([])
     setSelectedRows([])
@@ -113,6 +151,29 @@ export function CompetitorMappingsTab() {
     setProductHierarchy(undefined)
     setLocationHierarchy(undefined)
     message.success(`Successfully created ${totalNew} new competitor mappings`)
+
+    // Highlight the new child association rows
+    highlightedAssocIdsRef.current = newAssocIds
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
+
+    // Expand affected parent rows so new children are visible
+    setTimeout(() => {
+      const api = gridApiRef.current
+      if (api) {
+        api.forEachNode((node: any) => {
+          if (node.data && affectedQuoteRowIds.has(node.data.id)) {
+            node.setExpanded(true)
+          }
+        })
+      }
+    }, 100)
+
+    // Clear highlights after 4 seconds
+    highlightTimerRef.current = setTimeout(() => {
+      highlightedAssocIdsRef.current = new Set()
+      // Force detail panels to re-render by toggling a trivial state update
+      setQuoteRows((prev) => [...prev])
+    }, 4000)
   }, [matchResults])
 
   // Expand All / Collapse All
@@ -173,6 +234,7 @@ export function CompetitorMappingsTab() {
     setQuoteRows((prev) => bulkSetVisibilityAcrossRows(prev, ids, bulkMatchBy, bulkMatchValues, bulkVisibility))
     const preview = bulkPreview
     message.success(`Updated visibility on ${preview?.affectedAssocs ?? 0} associations across ${preview?.affectedRows ?? 0} quote rows`)
+    setBulkBarVisible(false)
     setBulkMatchValues([])
     setBulkVisibility('Show')
   }, [selectedRows, bulkMatchBy, bulkMatchValues, bulkVisibility, bulkPreview])
@@ -212,6 +274,7 @@ export function CompetitorMappingsTab() {
         associations={associations}
         detailColDefs={detailColDefs}
         onAddAssociation={handleAddAssociation}
+        highlightedAssocIds={highlightedAssocIdsRef.current}
       />
     },
     [handleSetVisibility, handleAddAssociation],
@@ -289,13 +352,17 @@ export function CompetitorMappingsTab() {
           right: 0;
         }
         .bulk-clear-link {
-          color: #93c5fd;
+          color: #ffffff;
           cursor: pointer;
           margin-left: 12px;
           font-size: 13px;
+          border: 1px solid rgba(255,255,255,0.4);
+          padding: 2px 10px;
+          border-radius: 4px;
+          background: transparent;
         }
         .bulk-clear-link:hover {
-          text-decoration: underline;
+          background: rgba(255,255,255,0.1);
         }
         .bulk-change-bar .ant-select-selector {
           background: rgba(255,255,255,0.15) !important;
@@ -504,18 +571,25 @@ export function CompetitorMappingsTab() {
                 hideActiveFilters: true,
                 hideSearch: true,
                 actionButtons: (
-                  <GraviButton
-                    buttonText={allExpanded ? 'Collapse All' : 'Expand All'}
-                    icon={allExpanded ? <ShrinkOutlined /> : <ExpandAltOutlined />}
-                    onClick={handleToggleExpandAll}
-                  />
+                  <Horizontal gap={8}>
+                    <GraviButton
+                      buttonText={allExpanded ? 'Collapse All' : 'Expand All'}
+                      icon={allExpanded ? <ShrinkOutlined /> : <ExpandAltOutlined />}
+                      onClick={handleToggleExpandAll}
+                    />
+                    <GraviButton
+                      buttonText={bulkBarVisible ? 'Exit Bulk Change' : 'Bulk Change'}
+                      disabled={selectedRows.length === 0}
+                      onClick={() => setBulkBarVisible((v) => !v)}
+                    />
+                  </Horizontal>
                 ),
               }}
             />
           </Vertical>
 
           {/* Floating Bulk Change Bar */}
-          <div className={`bulk-change-bar${selectedRows.length > 0 ? '' : ' bulk-change-bar-hidden'}`}>
+          <div className={`bulk-change-bar${bulkBarVisible ? '' : ' bulk-change-bar-hidden'}`}>
             <Horizontal alignItems="center">
               <Texto category="p2" weight="600" style={{ color: '#fff' }}>
                 {selectedRows.length} row{selectedRows.length !== 1 ? 's' : ''} selected
@@ -525,11 +599,12 @@ export function CompetitorMappingsTab() {
                 role="button"
                 tabIndex={0}
                 onClick={() => {
+                  setBulkBarVisible(false)
                   setSelectedRows([])
                   gridApiRef.current?.deselectAll()
                 }}
               >
-                <Texto category="p2">Clear</Texto>
+                <Texto category="p2" style={{ color: '#fff' }}>Clear</Texto>
               </span>
             </Horizontal>
             <Horizontal alignItems="center" gap={10}>
@@ -842,6 +917,7 @@ export function CompetitorMappingsTab() {
             ]}
             agPropOverrides={{
               groupDisplayType: 'groupRows',
+              groupDefaultExpanded: -1,
               getRowId: (p: any) => String(p.data?.id ?? p.id),
               getRowStyle: (params: any) => {
                 if (params.data?.status === 'New') {
