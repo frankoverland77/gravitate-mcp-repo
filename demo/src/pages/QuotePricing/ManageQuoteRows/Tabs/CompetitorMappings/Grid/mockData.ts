@@ -8,7 +8,7 @@ export type CompetitorAssociation = {
   terminal: string
   productGroup: string
   product: string
-  visibility: 'Show' | 'Hide'
+  visibility: 'Show' | 'Hide' | 'Highlight'
 }
 
 export type CompetitorQuoteRow = {
@@ -203,7 +203,7 @@ const _rawQuoteRows: Omit<CompetitorQuoteRow, 'competitorAssociations'>[] = [
   },
 ]
 
-const allCompetitors: { name: string; fullName: string; publisher: string }[] = [
+export const allCompetitors: { name: string; fullName: string; publisher: string }[] = [
   { name: 'CHEVRON', fullName: 'CHEVRON PRODUCTS CO', publisher: 'OPIS Competitor BR' },
   { name: 'EXXONMOBIL', fullName: 'EXXONMOBIL ARC', publisher: 'OPIS Competitor BR' },
   { name: 'MARATHON', fullName: 'MARATHON PETROLEUM', publisher: 'OPIS Competitor BR' },
@@ -294,11 +294,12 @@ export function generateMatchResults(
   })
 }
 
-/** Toggle a single association's visibility (immutable update) */
-export function toggleAssociationVisibility(
+/** Set a single association's visibility to a specific value (immutable update) */
+export function setAssociationVisibility(
   rows: CompetitorQuoteRow[],
   quoteRowId: number,
   associationId: number,
+  value: 'Show' | 'Hide' | 'Highlight',
 ): CompetitorQuoteRow[] {
   return rows.map((row) => {
     if (row.id !== quoteRowId) return row
@@ -306,7 +307,7 @@ export function toggleAssociationVisibility(
       ...row,
       competitorAssociations: row.competitorAssociations.map((a) => {
         if (a.id !== associationId) return a
-        return { ...a, visibility: a.visibility === 'Show' ? 'Hide' : 'Show' }
+        return { ...a, visibility: value }
       }),
     }
   })
@@ -317,7 +318,7 @@ export function bulkSetVisibility(
   rows: CompetitorQuoteRow[],
   quoteRowId: number,
   associationIds: number[],
-  value: 'Show' | 'Hide',
+  value: 'Show' | 'Hide' | 'Highlight',
 ): CompetitorQuoteRow[] {
   const idSet = new Set(associationIds)
   return rows.map((row) => {
@@ -348,3 +349,49 @@ export const locationHierarchyOptions = [
   { value: 'opis', label: 'OPIS City' },
   { value: 'primary', label: 'Primary Hierarchy' },
 ]
+
+export const competitorSelectOptions = allCompetitors.map((c) => ({
+  value: c.fullName,
+  label: c.fullName,
+}))
+
+/** Add a new association to a specific quote row (immutable update) */
+export function addAssociationToRow(
+  rows: CompetitorQuoteRow[],
+  quoteRowId: number,
+  newAssoc: Omit<CompetitorAssociation, 'id'>,
+): CompetitorQuoteRow[] {
+  return rows.map((row) => {
+    if (row.id !== quoteRowId) return row
+    const maxId = row.competitorAssociations.reduce((max, a) => Math.max(max, a.id), 0)
+    const association: CompetitorAssociation = { ...newAssoc, id: maxId + 1 }
+    return {
+      ...row,
+      competitorAssociations: [...row.competitorAssociations, association],
+      existingCompetitorCount: row.existingCompetitorCount + 1,
+      existingCompetitors: [...row.existingCompetitors, newAssoc.name],
+    }
+  })
+}
+
+/** Set visibility on matching associations across multiple quote rows (immutable update) */
+export function bulkSetVisibilityAcrossRows(
+  rows: CompetitorQuoteRow[],
+  quoteRowIds: number[],
+  matchBy: 'name' | 'publisher' | 'terminal',
+  matchValues: string[],
+  visibility: 'Show' | 'Hide' | 'Highlight',
+): CompetitorQuoteRow[] {
+  const idSet = new Set(quoteRowIds)
+  const valueSet = new Set(matchValues)
+  return rows.map((row) => {
+    if (!idSet.has(row.id)) return row
+    return {
+      ...row,
+      competitorAssociations: row.competitorAssociations.map((a) => {
+        if (!valueSet.has(a[matchBy])) return a
+        return { ...a, visibility }
+      }),
+    }
+  })
+}

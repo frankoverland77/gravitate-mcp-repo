@@ -58,7 +58,7 @@ export const getCompetitorMappingsColumnDefs = (): ColDef[] => [
       return (
         <Tooltip title={`${names}${suffix}`}>
           <span>
-            <BBDTag theme1 style={{ margin: 0, width: 'fit-content' }}>
+            <BBDTag style={{ margin: 0, width: 'fit-content', background: 'var(--gray-100)', color: 'var(--gray-600)' }}>
               {value}
             </BBDTag>
           </span>
@@ -78,24 +78,17 @@ export const getCompetitorMappingsColumnDefs = (): ColDef[] => [
     minWidth: 130,
     valueGetter: ({ data }: any) => (data ? getProductName(data.productId) : ''),
   },
-  {
-    field: 'costType',
-    headerName: 'Cost Type',
-    width: 100,
-  },
+]
+
+const visibilityOptions = [
+  { value: 'Show', label: 'Show' },
+  { value: 'Hide', label: 'Hide' },
+  { value: 'Highlight', label: 'Highlight' },
 ]
 
 export const getCompetitorDetailColumnDefs = (
-  onToggleVisibility?: (associationId: number) => void,
+  onSetVisibility?: (associationId: number, value: 'Show' | 'Hide' | 'Highlight') => void,
 ): ColDef<CompetitorAssociation>[] => [
-  {
-    headerName: '',
-    width: 40,
-    checkboxSelection: true,
-    headerCheckboxSelection: true,
-    sortable: false,
-    suppressMenu: true,
-  },
   {
     field: 'name',
     headerName: 'Name',
@@ -131,29 +124,14 @@ export const getCompetitorDetailColumnDefs = (
   {
     field: 'visibility',
     headerName: 'Visibility',
-    width: 110,
-    cellRenderer: ({
-      value,
-      data,
-    }: {
-      value: 'Show' | 'Hide'
-      data: CompetitorAssociation
-    }) => (
-      <span
-        onClick={(e) => {
-          e.stopPropagation()
-          onToggleVisibility?.(data.id)
-        }}
-        style={{ cursor: onToggleVisibility ? 'pointer' : 'default' }}
-      >
-        <BBDTag
-          success={value === 'Show'}
-          warning={value === 'Hide'}
-          style={{ margin: 0, width: 'fit-content' }}
-        >
-          {value}
-        </BBDTag>
-      </span>
-    ),
+    width: 140,
+    editable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: {
+      values: ['Show', 'Hide', 'Highlight'],
+    },
+    onCellValueChanged: ({ data, newValue }: any) => {
+      onSetVisibility?.(data.id, newValue)
+    },
   },
 ]

@@ -6,24 +6,21 @@ import {
   Texto,
   GraviButton,
 } from '@gravitate-js/excalibrr'
-import { Input, Modal, Select, message } from 'antd'
+import { Input, Drawer, Select, message } from 'antd'
 import {
   SearchOutlined,
   ThunderboltOutlined,
   CheckCircleOutlined,
-  InfoCircleOutlined,
   WarningOutlined,
-  CloseOutlined,
   ExpandAltOutlined,
   ShrinkOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined,
 } from '@ant-design/icons'
 import {
   competitorQuoteRows as initialQuoteRows,
   generateMatchResults,
-  toggleAssociationVisibility,
-  bulkSetVisibility,
+  setAssociationVisibility,
+  addAssociationToRow,
+  bulkSetVisibilityAcrossRows,
   publisherOptions,
   productHierarchyOptions,
   locationHierarchyOptions,
@@ -39,6 +36,7 @@ import {
   getCompetitorMappingsColumnDefs,
   getCompetitorDetailColumnDefs,
 } from './Grid/columnDefs'
+import { CompetitorDetailPanel } from './CompetitorDetailPanel'
 
 export function CompetitorMappingsTab() {
   const [quoteRows, setQuoteRows] = useState<CompetitorQuoteRow[]>(initialQuoteRows)
@@ -51,6 +49,11 @@ export function CompetitorMappingsTab() {
   const [searchText, setSearchText] = useState('')
   const [configFilter, setConfigFilter] = useState<string | undefined>(undefined)
   const [allExpanded, setAllExpanded] = useState(false)
+
+  // Bulk change popover state
+  const [bulkMatchBy, setBulkMatchBy] = useState<'name' | 'publisher' | 'terminal'>('name')
+  const [bulkMatchValues, setBulkMatchValues] = useState<string[]>([])
+  const [bulkVisibility, setBulkVisibility] = useState<'Show' | 'Hide' | 'Highlight'>('Show')
 
   const gridApiRef = useRef<any>(null)
 
@@ -82,6 +85,11 @@ export function CompetitorMappingsTab() {
   const handleSelectionChanged = useCallback((event: any) => {
     const rows = event.api.getSelectedRows() as CompetitorQuoteRow[]
     setSelectedRows(rows)
+    if (rows.length === 0) {
+      setBulkMatchValues([])
+      setBulkMatchBy('name')
+      setBulkVisibility('Show')
+    }
   }, [])
 
   const canFindMatches = publisher && productHierarchy && locationHierarchy
@@ -107,10 +115,6 @@ export function CompetitorMappingsTab() {
     message.success(`Successfully created ${totalNew} new competitor mappings`)
   }, [matchResults])
 
-  const handleClearSelection = useCallback(() => {
-    setSelectedRows([])
-  }, [])
-
   // Expand All / Collapse All
   const handleToggleExpandAll = useCallback(() => {
     const api = gridApiRef.current
@@ -122,31 +126,75 @@ export function CompetitorMappingsTab() {
     setAllExpanded(next)
   }, [allExpanded])
 
-  // Single visibility toggle
-  const handleToggleVisibility = useCallback(
-    (quoteRowId: number, associationId: number) => {
-      setQuoteRows((prev) => {
-        const next = toggleAssociationVisibility(prev, quoteRowId, associationId)
-        const row = next.find((r) => r.id === quoteRowId)
-        const assoc = row?.competitorAssociations.find((a) => a.id === associationId)
-        if (assoc) {
-          message.success(`${assoc.name} set to ${assoc.visibility}`)
-        }
-        return next
-      })
+  // Set visibility on a single association
+  const handleSetVisibility = useCallback(
+    (quoteRowId: number, associationId: number, value: 'Show' | 'Hide' | 'Highlight') => {
+      setQuoteRows((prev) => setAssociationVisibility(prev, quoteRowId, associationId, value))
     },
     [],
   )
 
-  // Bulk visibility set
-  const handleBulkVisibility = useCallback(
-    (quoteRowId: number, associations: CompetitorAssociation[], value: 'Show' | 'Hide') => {
-      const ids = associations.map((a) => a.id)
-      setQuoteRows((prev) => bulkSetVisibility(prev, quoteRowId, ids, value))
-      message.success(`Set ${ids.length} associations to ${value}`)
+  // Add single association
+  const handleAddAssociation = useCallback(
+    (quoteRowId: number, newAssoc: Omit<CompetitorAssociation, 'id'>) => {
+      setQuoteRows((prev) => addAssociationToRow(prev, quoteRowId, newAssoc))
     },
     [],
   )
+
+  // Bulk change across rows — dynamic options based on selected rows and match dimension
+  const bulkMatchOptions = useMemo(() => {
+    const allAssocs = selectedRows.flatMap((r) => r.competitorAssociations)
+    const values = [...new Set(allAssocs.map((a) => a[bulkMatchBy]))]
+    return values.sort().map((v) => ({ value: v, label: v }))
+  }, [selectedRows, bulkMatchBy])
+
+  // Bulk change impact preview
+  const bulkPreview = useMemo(() => {
+    if (bulkMatchValues.length === 0) return null
+    const valueSet = new Set(bulkMatchValues)
+    let affectedAssocs = 0
+    let affectedRows = 0
+    let noMatchRows: string[] = []
+    for (const row of selectedRows) {
+      const matching = row.competitorAssociations.filter((a) => valueSet.has(a[bulkMatchBy]))
+      if (matching.length > 0) {
+        affectedAssocs += matching.length
+        affectedRows++
+      } else {
+        noMatchRows.push(`${getProductName(row.productId)} — ${row.counterparty}`)
+      }
+    }
+    return { affectedAssocs, affectedRows, totalRows: selectedRows.length, noMatchRows }
+  }, [selectedRows, bulkMatchBy, bulkMatchValues])
+
+  const handleBulkApply = useCallback(() => {
+    const ids = selectedRows.map((r) => r.id)
+    setQuoteRows((prev) => bulkSetVisibilityAcrossRows(prev, ids, bulkMatchBy, bulkMatchValues, bulkVisibility))
+    const preview = bulkPreview
+    message.success(`Updated visibility on ${preview?.affectedAssocs ?? 0} associations across ${preview?.affectedRows ?? 0} quote rows`)
+    setBulkMatchValues([])
+    setBulkVisibility('Show')
+  }, [selectedRows, bulkMatchBy, bulkMatchValues, bulkVisibility, bulkPreview])
+
+  const matchByLabels: Record<string, string> = { name: 'Counterparty', publisher: 'Publisher', terminal: 'Terminal' }
+
+  // Flat data for preview GraviGrid
+  const previewGridData = useMemo(() => {
+    return matchResults.flatMap((result) => {
+      const quoteRow = quoteRows.find((r) => r.id === result.quoteRowId)
+      if (!quoteRow) return []
+      return result.instruments.map((inst) => ({
+        id: `${result.quoteRowId}-${inst.id}`,
+        quoteRowContext: `${getProductName(quoteRow.productId)} — ${quoteRow.counterparty} · ${getLocationName(quoteRow.locationId)}`,
+        status: inst.alreadyExists ? 'Exists' : 'New',
+        competitor: inst.competitor,
+        publisher: inst.publisher,
+        terminal: inst.terminal,
+        product: inst.product,
+      }))
+    })
+  }, [matchResults, quoteRows])
 
   // Custom detail cell renderer
   const CompetitorDetailRenderer = useCallback(
@@ -155,18 +203,18 @@ export function CompetitorMappingsTab() {
       if (!parentRow) return null
       const associations = parentRow.competitorAssociations ?? []
 
-      const detailColDefs = getCompetitorDetailColumnDefs((associationId) =>
-        handleToggleVisibility(parentRow.id, associationId),
+      const detailColDefs = getCompetitorDetailColumnDefs((associationId, value) =>
+        handleSetVisibility(parentRow.id, associationId, value),
       )
 
       return <CompetitorDetailPanel
         parentRow={parentRow}
         associations={associations}
         detailColDefs={detailColDefs}
-        onBulkVisibility={handleBulkVisibility}
+        onAddAssociation={handleAddAssociation}
       />
     },
-    [handleToggleVisibility, handleBulkVisibility],
+    [handleSetVisibility, handleAddAssociation],
   )
 
   // Compute stats for selected rows
@@ -218,6 +266,58 @@ export function CompetitorMappingsTab() {
           flex-direction: column;
           border-right: 1px solid #e8e8e8;
         }
+        .bulk-change-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #1e3a5f;
+          color: #fff;
+          padding: 10px 20px;
+          border-radius: 8px 8px 0 0;
+          transition: transform 0.2s ease, opacity 0.2s ease;
+          transform: translateY(0);
+          opacity: 1;
+          flex-shrink: 0;
+        }
+        .bulk-change-bar-hidden {
+          transform: translateY(100%);
+          opacity: 0;
+          pointer-events: none;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+        }
+        .bulk-clear-link {
+          color: #93c5fd;
+          cursor: pointer;
+          margin-left: 12px;
+          font-size: 13px;
+        }
+        .bulk-clear-link:hover {
+          text-decoration: underline;
+        }
+        .bulk-change-bar .ant-select-selector {
+          background: rgba(255,255,255,0.15) !important;
+          border-color: rgba(255,255,255,0.3) !important;
+          color: #fff !important;
+        }
+        .bulk-change-bar .ant-select-selection-item {
+          color: #fff !important;
+        }
+        .bulk-change-bar .ant-select-selection-placeholder {
+          color: rgba(255,255,255,0.6) !important;
+        }
+        .bulk-change-bar .ant-select-arrow {
+          color: rgba(255,255,255,0.6) !important;
+        }
+        .bulk-change-bar .ant-select-multiple .ant-select-selection-item {
+          background: rgba(255,255,255,0.2) !important;
+          border-color: rgba(255,255,255,0.3) !important;
+        }
+        .bulk-change-bar .ant-select-multiple .ant-select-selection-item-remove {
+          color: rgba(255,255,255,0.6) !important;
+        }
         .competitor-mappings-right {
           width: 440px;
           flex-shrink: 0;
@@ -236,6 +336,7 @@ export function CompetitorMappingsTab() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 8px;
         }
         .config-section {
           padding: 14px 16px;
@@ -273,14 +374,6 @@ export function CompetitorMappingsTab() {
           text-overflow: ellipsis;
           white-space: nowrap;
         }
-        .selection-banner {
-          padding: 8px 16px;
-          background: var(--success-light, #ecfdf5);
-          border-bottom: 1px solid #a7f3d0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
         .current-mappings-row {
           display: flex;
           align-items: center;
@@ -292,104 +385,44 @@ export function CompetitorMappingsTab() {
         .current-mappings-row:last-child {
           border-bottom: none;
         }
-        .preview-stat-cards {
+        .preview-summary-strip {
           display: flex;
-          gap: 12px;
-          padding: 16px 20px;
-        }
-        .preview-stat-card {
-          flex: 1;
-          padding: 14px;
+          align-items: center;
+          gap: 24px;
+          padding: 12px 24px;
           background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          text-align: center;
+          border-bottom: 1px solid #e5e7eb;
         }
-        .preview-stat-card .stat-number {
-          font-size: 22px;
+        .preview-summary-strip .summary-metric {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .preview-summary-strip .summary-metric .metric-value {
+          font-size: 18px;
           font-weight: 700;
           color: #333;
         }
-        .preview-stat-card .stat-label {
+        .preview-summary-strip .summary-metric .metric-label {
           font-size: 11px;
           color: #999;
-          margin-top: 2px;
         }
-        .preview-warning {
-          margin: 0 20px 12px;
-          padding: 10px 14px;
+        .preview-summary-strip .metric-divider {
+          width: 1px;
+          height: 28px;
+          background: #e5e7eb;
+        }
+        .preview-summary-strip .summary-warning {
+          font-size: 11px;
+          color: #92400e;
           background: #fffbeb;
           border: 1px solid #fcd34d;
-          border-radius: 6px;
-          font-size: 12px;
-          color: #92400e;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .preview-group {
-          margin: 0 20px 16px;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          overflow: hidden;
-        }
-        .preview-group-header {
-          padding: 10px 14px;
-          background: #f9fafb;
-          border-bottom: 1px solid #e5e7eb;
-          font-size: 12px;
+          padding: 4px 10px;
+          border-radius: 12px;
           font-weight: 600;
           display: flex;
           align-items: center;
-          gap: 8px;
-        }
-        .preview-group-header .qr-detail {
-          font-weight: 400;
-          color: #999;
-          font-size: 11px;
-        }
-        .preview-group-header .badges {
-          margin-left: auto;
-          display: flex;
           gap: 4px;
-        }
-        .preview-table {
-          width: 100%;
-          font-size: 11px;
-          border-collapse: collapse;
-        }
-        .preview-table th {
-          padding: 6px 10px;
-          text-align: left;
-          font-weight: 600;
-          color: #666;
-          background: #fff;
-          border-bottom: 1px solid #e5e7eb;
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.3px;
-        }
-        .preview-table td {
-          padding: 6px 10px;
-          border-bottom: 1px solid #f3f4f6;
-        }
-        .preview-table tr.existing td {
-          color: #999;
-        }
-        .preview-table tr.new-mapping {
-          background: #f0fdf4;
-        }
-        .preview-table tr.new-mapping td:first-child {
-          font-weight: 500;
-        }
-        .status-new {
-          color: var(--success-color, #10b981);
-          font-weight: 600;
-          font-size: 10px;
-        }
-        .status-exists {
-          color: #999;
-          font-size: 10px;
         }
         .empty-state {
           padding: 40px 24px;
@@ -444,39 +477,6 @@ export function CompetitorMappingsTab() {
       <div className="competitor-mappings-layout">
         {/* Left Panel — Quote Row Selection Grid */}
         <div className="competitor-mappings-left">
-          {/* Selection banner */}
-          {selectedRows.length > 0 && (
-            <div className="selection-banner">
-              <Horizontal alignItems="center" className="gap-8">
-                <span
-                  style={{
-                    background: 'var(--success-color, #10b981)',
-                    color: '#fff',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    minWidth: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0 6px',
-                  }}
-                >
-                  {selectedRows.length}
-                </span>
-                <Texto style={{ fontSize: 12, fontWeight: 600, color: '#065f46' }}>
-                  rows selected
-                </Texto>
-              </Horizontal>
-              <GraviButton
-                buttonText="Clear All"
-                onClick={handleClearSelection}
-                style={{ fontSize: 11, padding: '2px 8px' }}
-              />
-            </div>
-          )}
-
           {/* Grid */}
           <Vertical flex="1">
             <GraviGrid
@@ -513,6 +513,72 @@ export function CompetitorMappingsTab() {
               }}
             />
           </Vertical>
+
+          {/* Floating Bulk Change Bar */}
+          <div className={`bulk-change-bar${selectedRows.length > 0 ? '' : ' bulk-change-bar-hidden'}`}>
+            <Horizontal alignItems="center">
+              <Texto category="p2" weight="600" style={{ color: '#fff' }}>
+                {selectedRows.length} row{selectedRows.length !== 1 ? 's' : ''} selected
+              </Texto>
+              <span
+                className="bulk-clear-link"
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setSelectedRows([])
+                  gridApiRef.current?.deselectAll()
+                }}
+              >
+                <Texto category="p2">Clear</Texto>
+              </span>
+            </Horizontal>
+            <Horizontal alignItems="center" gap={10}>
+              <Select
+                value={bulkMatchBy}
+                onChange={(val) => { setBulkMatchBy(val); setBulkMatchValues([]) }}
+                options={[
+                  { value: 'name', label: 'Counterparty' },
+                  { value: 'publisher', label: 'Publisher' },
+                  { value: 'terminal', label: 'Terminal' },
+                ]}
+                style={{ minWidth: 150 }}
+                placeholder="Match by"
+                size="small"
+              />
+              <Select
+                mode="multiple"
+                value={bulkMatchValues}
+                onChange={setBulkMatchValues}
+                options={bulkMatchOptions}
+                style={{ minWidth: 220 }}
+                placeholder={`Select ${matchByLabels[bulkMatchBy]?.toLowerCase()}...`}
+                size="small"
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                maxTagCount={2}
+              />
+              <Select
+                value={bulkVisibility}
+                onChange={(val) => setBulkVisibility(val)}
+                options={[
+                  { value: 'Show', label: 'Show' },
+                  { value: 'Hide', label: 'Hide' },
+                  { value: 'Highlight', label: 'Highlight' },
+                ]}
+                style={{ minWidth: 120 }}
+                size="small"
+              />
+              <GraviButton
+                success
+                buttonText="Apply"
+                onClick={handleBulkApply}
+                disabled={bulkMatchValues.length === 0}
+                style={{ background: '#10b981', borderColor: '#10b981', color: '#fff' }}
+              />
+            </Horizontal>
+          </div>
         </div>
 
         {/* Right Panel — Configuration */}
@@ -666,7 +732,7 @@ export function CompetitorMappingsTab() {
                         {getLocationName(row.locationId)}
                       </div>
                     </div>
-                    <Horizontal alignItems="center" className="gap-8">
+                    <Horizontal alignItems="center" gap={8}>
                       <span
                         style={{
                           background:
@@ -677,6 +743,7 @@ export function CompetitorMappingsTab() {
                           fontWeight: 600,
                           padding: '2px 8px',
                           borderRadius: 10,
+                          flexShrink: 0,
                         }}
                       >
                         {row.existingCompetitorCount}
@@ -701,232 +768,122 @@ export function CompetitorMappingsTab() {
         </div>
       </div>
 
-      {/* Preview Modal */}
-      <Modal
+      {/* Preview Drawer */}
+      <Drawer
         open={previewVisible}
-        title={null}
-        footer={null}
-        width={900}
-        onCancel={() => setPreviewVisible(false)}
-        styles={{ body: { padding: 0, maxHeight: '75vh', display: 'flex', flexDirection: 'column' } }}
-        closable={false}
+        placement="bottom"
+        height="80vh"
+        title="Review New Competitor Mappings"
+        closable={true}
+        destroyOnHidden
+        onClose={() => setPreviewVisible(false)}
+        styles={{ body: { padding: 0, display: 'flex', flexDirection: 'column', height: '100%' } }}
       >
-        {/* Modal header */}
+        {/* Summary strip */}
+        {previewStats && (
+          <div className="preview-summary-strip">
+            <div className="summary-metric">
+              <span className="metric-value">{previewStats.quoteRowCount}</span>
+              <span className="metric-label">Quote Rows</span>
+            </div>
+            <div className="metric-divider" />
+            <div className="summary-metric">
+              <span className="metric-value">{previewStats.competitorsFound}</span>
+              <span className="metric-label">Competitors Found</span>
+            </div>
+            <div className="metric-divider" />
+            <div className="summary-metric">
+              <span className="metric-value">{previewStats.newMappings}</span>
+              <span className="metric-label">New Mappings</span>
+            </div>
+            <div className="metric-divider" />
+            <div className="summary-metric">
+              <span className="metric-value">{previewStats.alreadyExist}</span>
+              <span className="metric-label">Already Exist</span>
+            </div>
+            {previewStats.alreadyExist > 0 && (
+              <span className="summary-warning">
+                <WarningOutlined /> {previewStats.alreadyExist} will be skipped
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Preview GraviGrid */}
+        <div style={{ flex: 1 }} className="p-3">
+          <GraviGrid
+            storageKey="competitor-preview-results"
+            rowData={previewGridData}
+            columnDefs={[
+              {
+                field: 'quoteRowContext',
+                headerName: 'Quote Row',
+                rowGroup: true,
+                hide: true,
+              },
+              {
+                field: 'status',
+                headerName: 'Status',
+                width: 100,
+                cellRenderer: ({ value }: any) => (
+                  <span style={{
+                    color: value === 'New' ? 'var(--success-color, #10b981)' : '#999',
+                    fontWeight: value === 'New' ? 600 : 400,
+                    fontSize: 12,
+                  }}>
+                    {value === 'New' ? '● New' : 'Already exists'}
+                  </span>
+                ),
+              },
+              { field: 'competitor', headerName: 'Competitor', minWidth: 180 },
+              { field: 'publisher', headerName: 'Publisher', minWidth: 160 },
+              { field: 'terminal', headerName: 'Terminal', minWidth: 160 },
+              { field: 'product', headerName: 'Product', minWidth: 140 },
+            ]}
+            agPropOverrides={{
+              groupDisplayType: 'groupRows',
+              getRowId: (p: any) => String(p.data?.id ?? p.id),
+              getRowStyle: (params: any) => {
+                if (params.data?.status === 'New') {
+                  return { background: '#f0fdf4' }
+                }
+                return undefined
+              },
+            }}
+            controlBarProps={{
+              title: 'Matching Results',
+              hideActiveFilters: true,
+            }}
+          />
+        </div>
+
+        {/* Footer */}
         <Horizontal
           justifyContent="space-between"
           alignItems="center"
-          style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}
+          className="p-3"
+          style={{ borderTop: '1px solid #e5e7eb' }}
         >
-          <Texto category="h5">Review New Competitor Mappings</Texto>
-          <GraviButton
-            icon={<CloseOutlined />}
-            onClick={() => setPreviewVisible(false)}
-          />
+          <Texto appearance="medium" style={{ fontSize: 13 }}>
+            {previewStats?.newMappings ?? 0} new mappings will be created
+            {previewStats && previewStats.alreadyExist > 0 && ` (${previewStats.alreadyExist} existing skipped)`}
+          </Texto>
+          <Horizontal gap={8}>
+            <GraviButton
+              buttonText="Cancel"
+              onClick={() => setPreviewVisible(false)}
+            />
+            <GraviButton
+              success
+              buttonText={`Create ${previewStats?.newMappings ?? 0} Mappings`}
+              icon={<CheckCircleOutlined />}
+              onClick={handleConfirm}
+            />
+          </Horizontal>
         </Horizontal>
+      </Drawer>
 
-        {previewStats && (
-          <>
-            {/* Stat cards */}
-            <div className="preview-stat-cards">
-              <div className="preview-stat-card">
-                <div className="stat-number">{previewStats.quoteRowCount}</div>
-                <div className="stat-label">Quote Rows</div>
-              </div>
-              <div className="preview-stat-card">
-                <div className="stat-number">{previewStats.competitorsFound}</div>
-                <div className="stat-label">Competitors Found</div>
-              </div>
-              <div className="preview-stat-card">
-                <div className="stat-number">{previewStats.newMappings}</div>
-                <div className="stat-label">New Mappings</div>
-              </div>
-              <div className="preview-stat-card">
-                <div className="stat-number">{previewStats.alreadyExist}</div>
-                <div className="stat-label">Already Exist (skipped)</div>
-              </div>
-            </div>
-
-            {/* Warning banner */}
-            {previewStats.alreadyExist > 0 && (
-              <div className="preview-warning">
-                <WarningOutlined />
-                <span>
-                  <strong>{previewStats.alreadyExist} mappings</strong> already exist
-                  and will be skipped. Only{' '}
-                  <strong>{previewStats.newMappings} new mappings</strong> will be
-                  created.
-                </span>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Scrollable body */}
-        <div style={{ flex: 1, overflowY: 'auto', paddingTop: 8, paddingBottom: 8 }}>
-          {matchResults.map((result) => {
-            const quoteRow = quoteRows.find(
-              (r) => r.id === result.quoteRowId,
-            )
-            if (!quoteRow) return null
-            const newCount = result.instruments.filter((i) => !i.alreadyExists).length
-            const existCount = result.instruments.filter((i) => i.alreadyExists).length
-
-            return (
-              <div className="preview-group" key={result.quoteRowId}>
-                <div className="preview-group-header">
-                  <InfoCircleOutlined style={{ color: 'var(--success-color, #10b981)' }} />
-                  <span>{getProductName(quoteRow.productId)}</span>
-                  <span className="qr-detail">
-                    {quoteRow.counterparty} · {getLocationName(quoteRow.locationId)} ·{' '}
-                    {quoteRow.costType}
-                  </span>
-                  <span className="badges">
-                    <span
-                      style={{
-                        background: '#e0edff',
-                        color: '#1d4ed8',
-                        fontSize: 9,
-                        fontWeight: 600,
-                        padding: '2px 6px',
-                        borderRadius: 10,
-                      }}
-                    >
-                      +{newCount} new
-                    </span>
-                    {existCount > 0 && (
-                      <span
-                        style={{
-                          background: '#f3f4f6',
-                          color: '#999',
-                          fontSize: 9,
-                          fontWeight: 600,
-                          padding: '2px 6px',
-                          borderRadius: 10,
-                        }}
-                      >
-                        {existCount} exist
-                      </span>
-                    )}
-                  </span>
-                </div>
-                <table className="preview-table">
-                  <thead>
-                    <tr>
-                      <th>Competitor</th>
-                      <th>Publisher</th>
-                      <th>Terminal</th>
-                      <th>Product</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.instruments.map((inst) => (
-                      <tr
-                        key={inst.id}
-                        className={inst.alreadyExists ? 'existing' : 'new-mapping'}
-                      >
-                        <td>{inst.competitor}</td>
-                        <td>{inst.publisher}</td>
-                        <td>{inst.terminal}</td>
-                        <td>{inst.product}</td>
-                        <td>
-                          {inst.alreadyExists ? (
-                            <span className="status-exists">Already exists</span>
-                          ) : (
-                            <span className="status-new">● New</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Fixed footer */}
-        <Horizontal
-          justifyContent="flex-end"
-          alignItems="center"
-          className="gap-8"
-          style={{
-            padding: '12px 20px',
-            borderTop: '1px solid #e5e7eb',
-            background: '#fff',
-          }}
-        >
-          <GraviButton
-            buttonText="Cancel"
-            onClick={() => setPreviewVisible(false)}
-          />
-          <GraviButton
-            success
-            buttonText={`Create ${previewStats?.newMappings ?? 0} Mappings`}
-            icon={<CheckCircleOutlined />}
-            onClick={handleConfirm}
-          />
-        </Horizontal>
-      </Modal>
     </Vertical>
   )
 }
 
-/** Detail panel rendered inside each expanded master row */
-function CompetitorDetailPanel({
-  parentRow,
-  associations,
-  detailColDefs,
-  onBulkVisibility,
-}: {
-  parentRow: CompetitorQuoteRow
-  associations: CompetitorAssociation[]
-  detailColDefs: any[]
-  onBulkVisibility: (quoteRowId: number, associations: CompetitorAssociation[], value: 'Show' | 'Hide') => void
-}) {
-  const [selectedDetailRows, setSelectedDetailRows] = useState<CompetitorAssociation[]>([])
-
-  const handleDetailSelection = useCallback((event: any) => {
-    setSelectedDetailRows(event.api.getSelectedRows() as CompetitorAssociation[])
-  }, [])
-
-  return (
-    <div className="competitor-detail-panel">
-      <div className="competitor-detail-toolbar">
-        <Texto appearance="medium" style={{ fontSize: 11 }}>
-          {associations.length} competitor associations
-        </Texto>
-        {selectedDetailRows.length > 0 && (
-          <Horizontal className="gap-8">
-            <GraviButton
-              success
-              buttonText={`Show (${selectedDetailRows.length})`}
-              icon={<EyeOutlined />}
-              onClick={() => onBulkVisibility(parentRow.id, selectedDetailRows, 'Show')}
-              style={{ fontSize: 11, padding: '2px 8px' }}
-            />
-            <GraviButton
-              buttonText={`Hide (${selectedDetailRows.length})`}
-              icon={<EyeInvisibleOutlined />}
-              onClick={() => onBulkVisibility(parentRow.id, selectedDetailRows, 'Hide')}
-              style={{ fontSize: 11, padding: '2px 8px' }}
-            />
-          </Horizontal>
-        )}
-      </div>
-      <GraviGrid
-        storageKey={`competitor-detail-${parentRow.id}`}
-        rowData={associations}
-        columnDefs={detailColDefs}
-        agPropOverrides={{
-          domLayout: 'autoHeight',
-          rowSelection: 'multiple',
-          suppressRowClickSelection: true,
-          getRowId: (p: any) => String(p.data.id),
-        }}
-        onSelectionChanged={handleDetailSelection}
-        hideControlBar={true}
-      />
-    </div>
-  )
-}
