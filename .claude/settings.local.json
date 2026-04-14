@@ -4,7 +4,9 @@
       "Bash(git rebase:*)",
       "Bash(git add:*)",
       "Bash(GIT_EDITOR=true git rebase:*)",
-      "Bash(git -c core.editor=true rebase --continue)"
+      "Bash(git -c core.editor=true rebase --continue)",
+      "Bash(ls demo/src/pages/QuotePricing/QuoteBook/QuoteBook*.tsx)",
+      "Bash(ls demo/src/pages/QuotePricing/ManageQuoteRows/ManageQuoteRows*.tsx)"
     ]
   }
 }

@@ -52,6 +52,7 @@ import { QuotebookWholesale } from './pages/QuotebookWholesale/QuotebookWholesal
 import { PriceManagementUI } from './pages/PriceManagementUI';
 import { QuoteBook } from './pages/QuotePricing/QuoteBook/QuoteBookPage';
 import { ManageQuoteRows } from './pages/QuotePricing/ManageQuoteRows/ManageQuoteRowsPage';
+import { InventoryAnalytics } from './pages/QuotePricing/InventoryAnalytics';
 import { QuotebookQoLPage } from './pages/QuotebookQoL';
 import { RowRefreshPage } from './pages/QuotebookQoL/RowRefresh';
 import { PriceEntryPage } from './pages/QuotebookQoL/PriceEntry';
@@ -886,6 +887,18 @@ export const createPageConfig = (): PageConfig => {
         ),
         path: '/QuotePricing/QuotebookWholesale',
         description: 'Wholesale quotebook pricing',
+      },
+      {
+        hasPermission: () => true,
+        key: 'InventoryAnalytics',
+        title: 'Inventory Analytics',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <InventoryAnalytics />
+          </ThemeRouteWrapper>
+        ),
+        path: '/QuotePricing/InventoryAnalytics',
+        description: 'Quotebook with inventory analytics for pricing decisions based on supply levels',
       },
     ],
   };
