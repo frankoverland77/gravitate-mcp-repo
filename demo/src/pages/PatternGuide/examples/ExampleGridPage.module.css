@@ -1,0 +1,67 @@
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #8c8c8c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.backLink:hover {
+  color: #1890ff;
+}
+
+.controlBar {
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.filterPanel {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-end;
+}
+
+.sectionCard {
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+.sectionCardHeader {
+  padding: var(--space-4);
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.sectionCardBody {
+  padding: var(--space-5);
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.divider {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.drawerFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

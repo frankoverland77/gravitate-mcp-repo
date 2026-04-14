@@ -1,0 +1,120 @@
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #8c8c8c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.backLink:hover {
+  color: #1890ff;
+}
+
+.splitPanel {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.leftPanel {
+  width: 320px;
+  min-width: 320px;
+  border-right: 1px solid #e8e8e8;
+  background: #fafafa;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelHeader {
+  padding: var(--space-4);
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.panelSection {
+  padding: var(--space-4);
+}
+
+.panelDivider {
+  height: 1px;
+  background: #e8e8e8;
+  margin: 0 var(--space-4);
+}
+
+.panelFooter {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid #e8e8e8;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.rightPanel {
+  flex: 1;
+  padding: var(--space-5);
+  overflow-y: auto;
+  background: #f5f5f5;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.filterTag {
+  padding: 2px 10px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #595959;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.contractCard {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: var(--space-5);
+}
+
+.switchRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.datePlaceholder {
+  height: 32px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+}
+
+.fullWidth {
+  width: 100%;
+}

@@ -37,6 +37,7 @@ import { IndexOfferBuyNow } from './pages/OnlineSellingPlatform/IndexOfferBuyNow
 import { SupplierAnalysis } from './pages/OnlineSellingPlatform/SupplierAnalysis';
 import { SupplierDetails } from './pages/OnlineSellingPlatform/SupplierDetails';
 import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
+import { TierGroupManagement } from './pages/GlobalTieredPricing/TierGroupManagement';
 import { ContractMeasurementGrid } from './pages/ContractMeasurement/ContractMeasurementGrid';
 import { ContractMeasurementDetails } from './pages/ContractMeasurement/ContractMeasurementDetails';
 import { ThemeRouteWrapper } from './components/shared/ThemeRouteWrapper';
@@ -71,6 +72,26 @@ import {
   GridShowcase,
   ColorsShowcase,
 } from './pages/DesignSystem';
+import {
+  SpacingTokensPattern,
+  FormsPattern,
+  ModalsPattern,
+  SectionsPattern,
+  RightDrawersPattern,
+  BottomDrawersPattern,
+  PageLayoutsPattern,
+  PanelsPattern,
+  CardsPattern,
+  ButtonGroupsPattern,
+  FeedbackPattern,
+  NavigationPattern,
+  ExamplesPattern,
+  ExampleFullWidth,
+  ExampleSidebarMain,
+  ExampleDashboard,
+  ExampleGridPage,
+  PatternGuideLayout,
+} from './pages/PatternGuide';
 import { AllPricesPage, ContractValuesPage, QuotebookPage, ContractDetailPage, ContractRevaluationPage } from './pages/PriceManagement';
 
 // Demo registry - automatically populated by MCP server
@@ -81,7 +102,7 @@ interface DemoRoute {
   path: string;
   description: string;
   created: string;
-  category: 'grids' | 'forms' | 'dashboards' | 'contract-management';
+  category: 'grids' | 'forms' | 'dashboards' | 'contract-management' | 'pattern-guide';
 }
 
 interface RouteConfig {
@@ -646,6 +667,47 @@ export const createPageConfig = (): PageConfig => {
     ],
   };
 
+  // Helper to wrap pattern pages in the shared sidebar layout
+  const pg = (child: JSX.Element) => <PatternGuideLayout>{child}</PatternGuideLayout>;
+
+  config.PatternGuide = {
+    hasPermission: () => true,
+    key: 'PatternGuide',
+    icon: <BookOutlined />,
+    title: 'Pattern Guide',
+    routes: [
+      // Pattern pages
+      { hasPermission: () => true, key: 'SpacingTokens', title: 'Spacing & Tokens', element: pg(<SpacingTokensPattern />), path: '/PatternGuide/SpacingTokens', hidden: true },
+      { hasPermission: () => true, key: 'Forms', title: 'Forms', element: pg(<FormsPattern />), path: '/PatternGuide/Forms', hidden: true },
+      { hasPermission: () => true, key: 'Modals', title: 'Modals', element: pg(<ModalsPattern />), path: '/PatternGuide/Modals', hidden: true },
+      { hasPermission: () => true, key: 'Sections', title: 'Sections & Content', element: pg(<SectionsPattern />), path: '/PatternGuide/Sections', hidden: true },
+      { hasPermission: () => true, key: 'RightDrawers', title: 'Right Drawers', element: pg(<RightDrawersPattern />), path: '/PatternGuide/RightDrawers', hidden: true },
+      { hasPermission: () => true, key: 'BottomDrawers', title: 'Bottom Drawers', element: pg(<BottomDrawersPattern />), path: '/PatternGuide/BottomDrawers', hidden: true },
+      { hasPermission: () => true, key: 'PageLayouts', title: 'Page Layouts', element: pg(<PageLayoutsPattern />), path: '/PatternGuide/PageLayouts', hidden: true },
+      { hasPermission: () => true, key: 'Panels', title: 'Panels', element: pg(<PanelsPattern />), path: '/PatternGuide/Panels', hidden: true },
+      { hasPermission: () => true, key: 'Cards', title: 'Cards', element: pg(<CardsPattern />), path: '/PatternGuide/Cards', hidden: true },
+      { hasPermission: () => true, key: 'ButtonGroups', title: 'Button Groups', element: pg(<ButtonGroupsPattern />), path: '/PatternGuide/ButtonGroups', hidden: true },
+      { hasPermission: () => true, key: 'Feedback', title: 'Feedback & Messaging', element: pg(<FeedbackPattern />), path: '/PatternGuide/Feedback', hidden: true },
+      { hasPermission: () => true, key: 'PGNavigation', title: 'Navigation', element: pg(<NavigationPattern />), path: '/PatternGuide/Navigation', hidden: true },
+      // Examples
+      { hasPermission: () => true, key: 'Examples', title: 'Examples', element: pg(<ExamplesPattern />), path: '/PatternGuide/Examples', hidden: true },
+    ],
+  };
+
+  // Separate section for standalone example pages (PatternGuide has 13 route max)
+  config.PatternExamples = {
+    hasPermission: () => true,
+    key: 'PatternExamples',
+    icon: <BookOutlined />,
+    title: 'Pattern Examples',
+    routes: [
+      { hasPermission: () => true, key: 'ExFullWidth', title: 'Full-Width Page', element: pg(<ExampleFullWidth />), path: '/PatternExamples/ExFullWidth' },
+      { hasPermission: () => true, key: 'ExSidebarMain', title: 'Sidebar + Main', element: pg(<ExampleSidebarMain />), path: '/PatternExamples/ExSidebarMain' },
+      { hasPermission: () => true, key: 'ExDashboard', title: 'Dashboard', element: pg(<ExampleDashboard />), path: '/PatternExamples/ExDashboard' },
+      { hasPermission: () => true, key: 'ExGridPage', title: 'Grid Page', element: pg(<ExampleGridPage />), path: '/PatternExamples/ExGridPage' },
+    ],
+  };
+
   if (gridsRoutes.length > 0) {
     config.Bakery = {
       hasPermission: () => true,
@@ -762,12 +824,30 @@ export const createPageConfig = (): PageConfig => {
     key: 'GlobalTieredPricing',
     icon: <TableOutlined />,
     title: 'Global Tiered Diff',
-    element: (
-      <ThemeRouteWrapper theme="PE_LIGHT">
-        <GlobalTieredPricing />
-      </ThemeRouteWrapper>
-    ),
-    path: '/GlobalTieredPricing',
+    routes: [
+      {
+        hasPermission: () => true,
+        key: 'TierDiffEntry',
+        title: 'Tier Diff Entry',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <GlobalTieredPricing />
+          </ThemeRouteWrapper>
+        ),
+        path: '/GlobalTieredPricing/TierDiffEntry',
+      },
+      {
+        hasPermission: () => true,
+        key: 'TierGroupManagement',
+        title: 'Tier Management',
+        element: (
+          <ThemeRouteWrapper theme="PE_LIGHT">
+            <TierGroupManagement />
+          </ThemeRouteWrapper>
+        ),
+        path: '/GlobalTieredPricing/TierGroupManagement',
+      },
+    ],
   };
 
   // Add Subscription Management section

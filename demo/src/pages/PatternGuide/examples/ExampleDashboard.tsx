@@ -2,14 +2,8 @@ import { useState } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { useNavigate } from 'react-router-dom'
 import { Drawer, Checkbox } from 'antd'
-import { LeftOutlined, ReloadOutlined, HomeOutlined, FileTextOutlined, BarChartOutlined, TeamOutlined, CloseOutlined, DownloadOutlined } from '@ant-design/icons'
-
-const NAV_ITEMS = [
-  { key: 'home', label: 'Dashboard', icon: <HomeOutlined />, active: true },
-  { key: 'contracts', label: 'Contracts', icon: <FileTextOutlined /> },
-  { key: 'analytics', label: 'Analytics', icon: <BarChartOutlined /> },
-  { key: 'team', label: 'Team', icon: <TeamOutlined /> },
-]
+import { LeftOutlined, ReloadOutlined, CloseOutlined, DownloadOutlined } from '@ant-design/icons'
+import styles from './ExampleDashboard.module.css'
 
 const COUNTERS = [
   { label: 'Total Quotes', value: '142' },
@@ -79,121 +73,91 @@ export function ExampleDashboard() {
   const [exportOpen, setExportOpen] = useState(false)
 
   return (
-    <div style={{ height: '100vh', display: 'flex' }}>
-      {/* Fake sidebar */}
-      <div style={{ width: 220, minWidth: 220, background: '#1a1a2e', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '20px 16px 12px' }}>
-          <Texto style={{ color: '#fff', fontSize: 18, fontWeight: 700, letterSpacing: 0.5 }}>Gravitate</Texto>
-        </div>
-        <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {NAV_ITEMS.map((item) => (
-            <div
-              key={item.key}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 6, cursor: 'pointer',
-                background: item.active ? 'rgba(255,255,255,0.12)' : 'transparent',
-                color: item.active ? '#fff' : 'rgba(255,255,255,0.6)', fontSize: 14,
-              }}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Main area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Header */}
-        <Horizontal justifyContent="space-between" alignItems="center" style={{ height: 56, minHeight: 56, padding: '0 24px', borderBottom: '1px solid #e8e8e8' }}>
-          <Horizontal gap={12} alignItems="center">
-            <GraviButton type="text" icon={<LeftOutlined />} onClick={() => navigate('/PatternGuide/Examples')} />
-            <Texto category="h3" weight="600">Dashboard</Texto>
-            <span style={{ padding: '2px 10px', borderRadius: 4, fontSize: 12, fontWeight: 500, background: '#f6ffed', color: '#52c41a', border: '1px solid #b7eb8f' }}>Live</span>
-          </Horizontal>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <Horizontal justifyContent="space-between" alignItems="center">
+          <Vertical gap={4}>
+            <button className={styles.backLink} onClick={() => navigate('/PatternGuide/Examples')}>
+              <LeftOutlined /> Back to Examples
+            </button>
+            <Horizontal gap={12} alignItems="center">
+              <Texto category="h3" weight="600">Dashboard</Texto>
+              <span className={styles.badge}>Live</span>
+            </Horizontal>
+          </Vertical>
           <Horizontal gap={8}>
             <GraviButton buttonText="Refresh" icon={<ReloadOutlined />} />
             <GraviButton buttonText="Export" icon={<DownloadOutlined />} onClick={() => setExportOpen(true)} />
           </Horizontal>
         </Horizontal>
-
-        {/* Content */}
-        <div style={{ flex: 1, overflow: 'auto', padding: 'var(--space-5)', background: '#f5f5f5' }}>
-          <Vertical gap={24}>
-            {/* Multi-counter card */}
-            <div style={{ display: 'flex', borderRadius: 8, border: '1px solid #e8e8e8', overflow: 'hidden', background: '#fff' }}>
-              {COUNTERS.map((c, i) => (
-                <div key={c.label} style={{ flex: 1, padding: 'var(--space-5)', textAlign: 'center', borderRight: i < COUNTERS.length - 1 ? '1px solid #e8e8e8' : 'none' }}>
-                  <Texto category="p2" weight="500" style={{ fontSize: 14 }}>{c.label}</Texto>
-                  <Texto category="h2" weight="700" style={{ marginTop: 'var(--space-1)' }}>{c.value}</Texto>
-                </div>
-              ))}
-            </div>
-
-            {/* Stats row */}
-            <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
-              {STATS.map((s) => (
-                <div
-                  key={s.label}
-                  onClick={() => setDetailOpen(s.label)}
-                  style={{ flex: 1, background: '#fff', border: '1px solid #e8e8e8', borderRadius: 8, padding: 'var(--space-5)', cursor: 'pointer' }}
-                >
-                  <Texto category="p2" weight="500" style={{ fontSize: 14 }}>{s.label}</Texto>
-                  <Texto category="h2" weight="700" style={{ marginTop: 'var(--space-1)' }}>{s.value}</Texto>
-                  <Texto category="p2" appearance={s.up ? 'success' : 'error'} style={{ marginTop: 'var(--space-1)' }}>{s.delta}</Texto>
-                </div>
-              ))}
-            </div>
-
-            {/* Two-column section */}
-            <div style={{ display: 'flex', gap: 'var(--space-5)' }}>
-              {/* Recent Activity */}
-              <div style={{ flex: 1, borderRadius: 8, border: '1px solid #e8e8e8', overflow: 'hidden', background: '#fff' }}>
-                <div style={{ padding: 'var(--space-4)', background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
-                  <Texto category="h5" weight="600">Recent Activity</Texto>
-                </div>
-                <div style={{ padding: 'var(--space-5)' }}>
-                  <Vertical gap={16}>
-                    {ACTIVITY.map((a, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: a.color, marginTop: 6, flexShrink: 0 }} />
-                        <div style={{ flex: 1 }}>
-                          <Texto category="p2">{a.text}</Texto>
-                          <Texto category="p2" appearance="medium" style={{ fontSize: 12, marginTop: 2 }}>{a.time}</Texto>
-                        </div>
-                      </div>
-                    ))}
-                  </Vertical>
-                </div>
-              </div>
-
-              {/* Top Commodities */}
-              <div style={{ flex: 1, borderRadius: 8, border: '1px solid #e8e8e8', overflow: 'hidden', background: '#fff' }}>
-                <div style={{ padding: 'var(--space-4)', background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
-                  <Texto category="h5" weight="600">Top Commodities</Texto>
-                </div>
-                <div style={{ padding: 'var(--space-5)' }}>
-                  <Vertical gap={20}>
-                    {COMMODITIES.map((c) => (
-                      <div key={c.name}>
-                        <Horizontal justifyContent="space-between" style={{ marginBottom: 6 }}>
-                          <Texto category="p2" weight="500">{c.name}</Texto>
-                          <Texto category="p2" appearance="medium">{c.volume}</Texto>
-                        </Horizontal>
-                        <div style={{ height: 8, background: '#f0f0f0', borderRadius: 4, overflow: 'hidden' }}>
-                          <div style={{ width: `${c.pct}%`, height: '100%', background: '#1890ff', borderRadius: 4 }} />
-                        </div>
-                      </div>
-                    ))}
-                  </Vertical>
-                </div>
-              </div>
-            </div>
-          </Vertical>
-        </div>
       </div>
 
-      {/* Right Drawer — stat detail */}
+      <div className={styles.content}>
+          <div className={styles.counterCard}>
+            {COUNTERS.map((c, i) => (
+              <>
+                <div key={c.label} className={styles.counterColumn}>
+                  <Texto category="p2" weight="500">{c.label}</Texto>
+                  <Texto category="h2" weight="700">{c.value}</Texto>
+                </div>
+                {i < COUNTERS.length - 1 && <div className={styles.counterDivider} />}
+              </>
+            ))}
+          </div>
+
+          <div className={styles.statsRow}>
+            {STATS.map((s) => (
+              <div key={s.label} className={styles.statCard} onClick={() => setDetailOpen(s.label)}>
+                <Texto category="p2" weight="500">{s.label}</Texto>
+                <Texto category="h2" weight="700">{s.value}</Texto>
+                <Texto category="p2" appearance={s.up ? 'success' : 'error'}>{s.delta}</Texto>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.twoCol}>
+            <div className={styles.sectionCard}>
+              <div className={styles.sectionCardHeader}>
+                <Texto category="h5" weight="600">Recent Activity</Texto>
+              </div>
+              <div className={styles.sectionCardBody}>
+                <Vertical gap={16}>
+                  {ACTIVITY.map((a, i) => (
+                    <Horizontal key={i} gap={12} alignItems="flex-start">
+                      <div className={styles.activityDot} style={{ background: a.color }} />
+                      <Vertical flex="1">
+                        <Texto category="p2">{a.text}</Texto>
+                        <Texto category="p2" appearance="medium">{a.time}</Texto>
+                      </Vertical>
+                    </Horizontal>
+                  ))}
+                </Vertical>
+              </div>
+            </div>
+
+            <div className={styles.sectionCard}>
+              <div className={styles.sectionCardHeader}>
+                <Texto category="h5" weight="600">Top Commodities</Texto>
+              </div>
+              <div className={styles.sectionCardBody}>
+                <Vertical gap={20}>
+                  {COMMODITIES.map((c) => (
+                    <div key={c.name}>
+                      <Horizontal justifyContent="space-between">
+                        <Texto category="p2" weight="500">{c.name}</Texto>
+                        <Texto category="p2" appearance="medium">{c.volume}</Texto>
+                      </Horizontal>
+                      <div className={styles.barTrack}>
+                        <div className={styles.barFill} style={{ width: `${c.pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </Vertical>
+              </div>
+            </div>
+          </div>
+      </div>
+
       <Drawer
         open={!!detailOpen}
         onClose={() => setDetailOpen(null)}
@@ -202,30 +166,28 @@ export function ExampleDashboard() {
         destroyOnHidden
       >
         <Vertical gap={24}>
-          {/* Breakdown section */}
-          <div style={{ borderRadius: 8, border: '1px solid #e8e8e8', overflow: 'hidden' }}>
-            <div style={{ padding: 'var(--space-4)', background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
+          <div className={styles.sectionCard}>
+            <div className={styles.sectionCardHeader}>
               <Texto category="h5" weight="600">Breakdown</Texto>
             </div>
-            <div style={{ padding: 'var(--space-5)' }}>
+            <div className={styles.sectionCardBody}>
               <Vertical gap={12}>
                 {(DETAIL_DATA[detailOpen ?? 'Revenue'] ?? DETAIL_DATA.Revenue).map((row) => (
-                  <Horizontal key={row.label} justifyContent="space-between" alignItems="center" style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <div key={row.label} className={styles.breakdownRow}>
                     <Texto category="p2" weight="500">{row.label}</Texto>
                     <Texto category="p2">{row.value}</Texto>
-                  </Horizontal>
+                  </div>
                 ))}
               </Vertical>
             </div>
           </div>
 
-          {/* Trend section */}
-          <div style={{ borderRadius: 8, border: '1px solid #e8e8e8', overflow: 'hidden' }}>
-            <div style={{ padding: 'var(--space-4)', background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
+          <div className={styles.sectionCard}>
+            <div className={styles.sectionCardHeader}>
               <Texto category="h5" weight="600">Trend</Texto>
             </div>
-            <div style={{ padding: 'var(--space-5)' }}>
-              <div style={{ height: 200, background: '#fafafa', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className={styles.sectionCardBody}>
+              <div className={styles.chartPlaceholder}>
                 <Texto category="p2" appearance="medium">Chart placeholder</Texto>
               </div>
             </div>
@@ -233,7 +195,6 @@ export function ExampleDashboard() {
         </Vertical>
       </Drawer>
 
-      {/* Bottom Drawer — export options */}
       <Drawer
         open={exportOpen}
         onClose={() => setExportOpen(false)}
@@ -243,39 +204,26 @@ export function ExampleDashboard() {
         closable={false}
         styles={{ body: { padding: 0 } }}
       >
-        {/* Custom header */}
-        <Horizontal justifyContent="space-between" alignItems="center" style={{ padding: '12px 24px', borderBottom: '1px solid #e8e8e8' }}>
+        <Horizontal justifyContent="space-between" alignItems="center" className={styles.drawerHeader}>
           <Texto category="h4" weight="600">Export Dashboard</Texto>
           <GraviButton type="text" icon={<CloseOutlined />} onClick={() => setExportOpen(false)} />
         </Horizontal>
-
-        {/* Content */}
-        <div style={{ padding: 24 }}>
+        <div className={styles.drawerBody}>
           <Vertical gap={24}>
-            {/* Format section */}
             <div>
-              <Texto category="h5" weight="600" style={{ marginBottom: 12 }}>Format</Texto>
-              <div style={{ display: 'flex', gap: 12 }}>
+              <Texto category="h5" weight="600">Format</Texto>
+              <div className={styles.formatRow}>
                 {EXPORT_FORMATS.map((fmt) => (
-                  <div
-                    key={fmt.key}
-                    style={{
-                      flex: 1, border: '1px solid #e8e8e8', borderRadius: 8, padding: '16px 12px',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <DownloadOutlined style={{ fontSize: 18, color: '#8c8c8c' }} />
-                    </div>
+                  <div key={fmt.key} className={styles.formatCard}>
+                    <DownloadOutlined style={{ fontSize: 18, color: '#8c8c8c' }} />
                     <Texto category="p2" weight="500">{fmt.label}</Texto>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Sections to include */}
             <div>
-              <Texto category="h5" weight="600" style={{ marginBottom: 12 }}>Sections to Include</Texto>
+              <Texto category="h5" weight="600">Sections to Include</Texto>
               <Vertical gap={10}>
                 {EXPORT_SECTIONS.map((section) => (
                   <Checkbox key={section.key} defaultChecked>{section.label}</Checkbox>
@@ -283,7 +231,6 @@ export function ExampleDashboard() {
               </Vertical>
             </div>
 
-            {/* Footer */}
             <Horizontal justifyContent="flex-end" gap={8}>
               <GraviButton buttonText="Cancel" onClick={() => setExportOpen(false)} />
               <GraviButton buttonText="Export" theme1 />

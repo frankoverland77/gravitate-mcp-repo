@@ -1,0 +1,72 @@
+.container {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.label-bar {
+  padding: var(--space-2) var(--space-3);
+  background: #f0f0f0;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 11px;
+  font-weight: 600;
+  color: #595959;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diagram {
+  padding: var(--space-5);
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+}
+
+.swatch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.swatch-block {
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.swatch-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #595959;
+  white-space: nowrap;
+}
+
+.swatch-value {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11px;
+  color: #8c8c8c;
+}
+
+/* Nesting diagram */
+.nesting-box {
+  border: 2px dashed;
+  border-radius: 6px;
+  position: relative;
+}
+
+.nesting-label {
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  background: #ffffff;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}

@@ -1,0 +1,326 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic:
+          - img "search" [ref=e11]:
+            - img [ref=e12]
+          - text: Search
+          - img "mac-command" [ref=e16]:
+            - img [ref=e17]
+          - generic [ref=e20]: K
+      - generic [ref=e21]:
+        - link "smile Sandbox" [ref=e23] [cursor=pointer]:
+          - /url: /Sandbox
+          - img "smile" [ref=e25]:
+            - img [ref=e26]
+          - paragraph [ref=e28]: Sandbox
+        - link "appstore Project Hub" [ref=e30] [cursor=pointer]:
+          - /url: /ProjectHub
+          - img "appstore" [ref=e32]:
+            - img [ref=e33]
+          - paragraph [ref=e35]: Project Hub
+        - generic [ref=e36]:
+          - generic [ref=e37] [cursor=pointer]:
+            - img "bg-colors" [ref=e39]:
+              - img [ref=e40]
+            - paragraph [ref=e42]: Design System
+          - generic:
+            - link "Typography" [ref=e45] [cursor=pointer]:
+              - /url: /DesignSystem/Typography
+              - paragraph: Typography
+            - link "Buttons" [ref=e47] [cursor=pointer]:
+              - /url: /DesignSystem/Buttons
+              - paragraph: Buttons
+            - link "Tags" [ref=e49] [cursor=pointer]:
+              - /url: /DesignSystem/Tags
+              - paragraph: Tags
+            - link "Data Display" [ref=e51] [cursor=pointer]:
+              - /url: /DesignSystem/DataDisplay
+              - paragraph: Data Display
+            - link "Headers" [ref=e53] [cursor=pointer]:
+              - /url: /DesignSystem/Headers
+              - paragraph: Headers
+            - link "Layout" [ref=e55] [cursor=pointer]:
+              - /url: /DesignSystem/Layout
+              - paragraph: Layout
+            - link "Date & Time" [ref=e57] [cursor=pointer]:
+              - /url: /DesignSystem/DateTime
+              - paragraph: Date & Time
+            - link "Form Controls" [ref=e59] [cursor=pointer]:
+              - /url: /DesignSystem/FormControls
+              - paragraph: Form Controls
+            - link "Feedback" [ref=e61] [cursor=pointer]:
+              - /url: /DesignSystem/Feedback
+              - paragraph: Feedback
+            - link "Navigation" [ref=e63] [cursor=pointer]:
+              - /url: /DesignSystem/DSNavigation
+              - paragraph: Navigation
+            - link "Cell Renderers" [ref=e65] [cursor=pointer]:
+              - /url: /DesignSystem/CellRenderers
+              - paragraph: Cell Renderers
+            - link "Grid" [ref=e67] [cursor=pointer]:
+              - /url: /DesignSystem/Grid
+              - paragraph: Grid
+            - link "Colors" [ref=e69] [cursor=pointer]:
+              - /url: /DesignSystem/Colors
+              - paragraph: Colors
+        - generic [ref=e70]:
+          - generic [ref=e71] [cursor=pointer]:
+            - img "book" [ref=e73]:
+              - img [ref=e74]
+            - paragraph [ref=e76]: Pattern Guide
+          - generic:
+            - link "Spacing & Tokens" [ref=e79] [cursor=pointer]:
+              - /url: /PatternGuide/SpacingTokens
+              - paragraph: Spacing & Tokens
+            - link "Forms" [ref=e81] [cursor=pointer]:
+              - /url: /PatternGuide/Forms
+              - paragraph: Forms
+            - link "Modals" [ref=e83] [cursor=pointer]:
+              - /url: /PatternGuide/Modals
+              - paragraph: Modals
+            - link "Sections & Content" [ref=e85] [cursor=pointer]:
+              - /url: /PatternGuide/Sections
+              - paragraph: Sections & Content
+            - link "Right Drawers" [ref=e87] [cursor=pointer]:
+              - /url: /PatternGuide/RightDrawers
+              - paragraph: Right Drawers
+            - link "Bottom Drawers" [ref=e89] [cursor=pointer]:
+              - /url: /PatternGuide/BottomDrawers
+              - paragraph: Bottom Drawers
+            - link "Page Layouts" [ref=e91] [cursor=pointer]:
+              - /url: /PatternGuide/PageLayouts
+              - paragraph: Page Layouts
+            - link "Panels" [ref=e93] [cursor=pointer]:
+              - /url: /PatternGuide/Panels
+              - paragraph: Panels
+            - link "Cards" [ref=e95] [cursor=pointer]:
+              - /url: /PatternGuide/Cards
+              - paragraph: Cards
+            - link "Button Groups" [ref=e97] [cursor=pointer]:
+              - /url: /PatternGuide/ButtonGroups
+              - paragraph: Button Groups
+            - link "Feedback & Messaging" [ref=e99] [cursor=pointer]:
+              - /url: /PatternGuide/Feedback
+              - paragraph: Feedback & Messaging
+            - link "Navigation" [ref=e101] [cursor=pointer]:
+              - /url: /PatternGuide/PGNavigation
+              - paragraph: Navigation
+            - link "Examples" [ref=e103] [cursor=pointer]:
+              - /url: /PatternGuide/Examples
+              - paragraph: Examples
+        - generic [ref=e104]:
+          - generic [ref=e105] [cursor=pointer]:
+            - img "shop" [ref=e107]:
+              - img [ref=e108]
+            - paragraph [ref=e110]: Bakery
+          - generic:
+            - link "Bakery Products" [ref=e113] [cursor=pointer]:
+              - /url: /Bakery/BakeryProducts
+              - paragraph: Bakery Products
+            - link "Formula Manager" [ref=e115] [cursor=pointer]:
+              - /url: /Bakery/FormulaManager
+              - paragraph: Formula Manager
+            - link "Delivery Management" [ref=e117] [cursor=pointer]:
+              - /url: /Bakery/DeliveryManagement
+              - paragraph: Delivery Management
+            - link "Competitor Price Analysis" [ref=e119] [cursor=pointer]:
+              - /url: /Bakery/SupplierAnalysis
+              - paragraph: Competitor Price Analysis
+            - link "Competitor Details" [ref=e121] [cursor=pointer]:
+              - /url: /Bakery/SupplierDetails
+              - paragraph: Competitor Details
+            - link "Contract Measurement" [ref=e123] [cursor=pointer]:
+              - /url: /Bakery/ContractMeasurementGrid
+              - paragraph: Contract Measurement
+            - link "Measurement Details" [ref=e125] [cursor=pointer]:
+              - /url: /Bakery/ContractMeasurementDetails
+              - paragraph: Measurement Details
+            - link "Delivered Pricing" [ref=e127] [cursor=pointer]:
+              - /url: /Bakery/DeliveredPricingQuoteBook
+              - paragraph: Delivered Pricing
+            - link "Quotebook Wholesale" [ref=e129] [cursor=pointer]:
+              - /url: /Bakery/QuotebookWholesale
+              - paragraph: Quotebook Wholesale
+            - link "Ad-Hoc Valuation (Story 1)" [ref=e131] [cursor=pointer]:
+              - /url: /Bakery/QuotebookQoLAdHoc
+              - paragraph: Ad-Hoc Valuation (Story 1)
+            - link "Row Refresh (Story 2)" [ref=e133] [cursor=pointer]:
+              - /url: /Bakery/QuotebookQoLRowRefresh
+              - paragraph: Row Refresh (Story 2)
+            - link "Price Entry (Story 4)" [ref=e135] [cursor=pointer]:
+              - /url: /Bakery/QuotebookQoLPriceEntry
+              - paragraph: Price Entry (Story 4)
+        - link "table Bulk Change Test" [ref=e137] [cursor=pointer]:
+          - /url: /BulkChangeTest
+          - img "table" [ref=e139]:
+            - img [ref=e140]
+          - paragraph [ref=e142]: Bulk Change Test
+        - link "edit Customer Form" [ref=e144] [cursor=pointer]:
+          - /url: /CustomerForm
+          - img "edit" [ref=e146]:
+            - img [ref=e147]
+          - paragraph [ref=e149]: Customer Form
+        - generic [ref=e150]:
+          - generic [ref=e151] [cursor=pointer]:
+            - img "calculator" [ref=e153]:
+              - img [ref=e154]
+            - paragraph [ref=e156]: Contract Management
+          - generic:
+            - link "Contracts" [ref=e159] [cursor=pointer]:
+              - /url: /ContractFormulas/PromptsGrid
+              - paragraph: Contracts
+            - link "Formula Templates" [ref=e161] [cursor=pointer]:
+              - /url: /ContractFormulas/FormulaTemplates
+              - paragraph: Formula Templates
+            - link "Contract Details" [ref=e163] [cursor=pointer]:
+              - /url: /ContractFormulas/ContractDetails
+              - paragraph: Contract Details
+            - link "RFP Management" [ref=e165] [cursor=pointer]:
+              - /url: /ContractFormulas/RFPManagement
+              - paragraph: RFP Management
+            - link "Seller RFP Response" [ref=e167] [cursor=pointer]:
+              - /url: /ContractFormulas/SellerRFPResponse
+              - paragraph: Seller RFP Response
+            - link "Measurements" [ref=e169] [cursor=pointer]:
+              - /url: /ContractFormulas/ContractMeasurementGrid
+              - paragraph: Measurements
+            - link "Measurement Details" [ref=e171] [cursor=pointer]:
+              - /url: /ContractFormulas/ContractMeasurementDetails
+              - paragraph: Measurement Details
+            - link "Contracts - New" [ref=e173] [cursor=pointer]:
+              - /url: /ContractFormulas/ContractsList
+              - paragraph: Contracts - New
+            - link "Create Contract - New" [ref=e175] [cursor=pointer]:
+              - /url: /ContractFormulas/CreateContract
+              - paragraph: Create Contract - New
+            - link "Edit Contract - New" [ref=e177] [cursor=pointer]:
+              - /url: /ContractFormulas/EditContract
+              - paragraph: Edit Contract - New
+        - generic [ref=e178]:
+          - generic [ref=e179] [cursor=pointer]:
+            - img "shop" [ref=e181]:
+              - img [ref=e182]
+            - paragraph [ref=e184]: Online Selling Platform
+          - generic:
+            - link "Buy Now" [ref=e187] [cursor=pointer]:
+              - /url: /MarketPlatform/OnlineSellingPlatform
+              - paragraph: Buy Now
+            - link "Index Offer Management" [ref=e189] [cursor=pointer]:
+              - /url: /MarketPlatform/IndexOfferManagement
+              - paragraph: Index Offer Management
+            - link "Index Offer Buy Now" [ref=e191] [cursor=pointer]:
+              - /url: /MarketPlatform/IndexOfferBuyNow
+              - paragraph: Index Offer Buy Now
+            - link "Negotiation Mode" [ref=e193] [cursor=pointer]:
+              - /url: /MarketPlatform/NegotiationMode
+              - paragraph: Negotiation Mode
+        - generic [ref=e194]:
+          - generic [ref=e195] [cursor=pointer]:
+            - img "dashboard" [ref=e197]:
+              - img [ref=e198]
+            - paragraph [ref=e200]: Competitor Profile
+          - generic:
+            - link "Competitor Price Analysis" [ref=e203] [cursor=pointer]:
+              - /url: /SupplierAnalysis/SupplierProfileAnalysis
+              - paragraph: Competitor Price Analysis
+            - link "Competitor Details" [ref=e205] [cursor=pointer]:
+              - /url: /SupplierAnalysis/SupplierDetails
+              - paragraph: Competitor Details
+        - link "table Global Tiered Diff" [ref=e207] [cursor=pointer]:
+          - /url: /GlobalTieredPricing
+          - img "table" [ref=e209]:
+            - img [ref=e210]
+          - paragraph [ref=e212]: Global Tiered Diff
+        - link "credit-card Price Notifications" [ref=e214] [cursor=pointer]:
+          - /url: /SubscriptionManagement
+          - img "credit-card" [ref=e216]:
+            - img [ref=e217]
+          - paragraph [ref=e219]: Price Notifications
+        - generic [ref=e220]:
+          - generic [ref=e221] [cursor=pointer]:
+            - img "dollar" [ref=e223]:
+              - img [ref=e224]
+            - paragraph [ref=e226]: Delivered Pricing
+          - generic:
+            - link "Quote Book" [ref=e229] [cursor=pointer]:
+              - /url: /DeliveredPricing/DeliveredPricingQuoteBook
+              - paragraph: Quote Book
+            - link "Freight Management" [ref=e231] [cursor=pointer]:
+              - /url: /DeliveredPricing/FreightManagement
+              - paragraph: Freight Management
+            - link "Tax Management" [ref=e233] [cursor=pointer]:
+              - /url: /DeliveredPricing/TaxManagement
+              - paragraph: Tax Management
+        - link "line-chart Price Elasticity - Needs work" [ref=e235] [cursor=pointer]:
+          - /url: /PriceElasticity
+          - img "line-chart" [ref=e237]:
+            - img [ref=e238]
+          - paragraph [ref=e240]: Price Elasticity - Needs work
+        - generic [ref=e241]:
+          - generic [ref=e242] [cursor=pointer]:
+            - img "book" [ref=e244]:
+              - img [ref=e245]
+            - paragraph [ref=e247]: Pricing Engine (exceptions)
+          - generic:
+            - link "Quote Book Exceptions" [ref=e250] [cursor=pointer]:
+              - /url: /QuotePricing/QuoteBook
+              - paragraph: Quote Book Exceptions
+            - link "Quote Rows" [ref=e252] [cursor=pointer]:
+              - /url: /QuotePricing/ManageQuoteRows
+              - paragraph: Quote Rows
+            - link "Quotebook Wholesale" [ref=e254] [cursor=pointer]:
+              - /url: /QuotePricing/QuotebookWholesale
+              - paragraph: Quotebook Wholesale
+        - generic [ref=e255]:
+          - generic [ref=e256] [cursor=pointer]:
+            - img "sync" [ref=e258]:
+              - img [ref=e259]
+            - paragraph [ref=e261]: Valuation, Refresh, Entry
+          - generic:
+            - link "Ad-Hoc Valuation (Story 1)" [ref=e264] [cursor=pointer]:
+              - /url: /QuotebookQoL/QuotebookQoLAdHoc
+              - paragraph: Ad-Hoc Valuation (Story 1)
+            - link "Row Refresh (Story 2)" [ref=e266] [cursor=pointer]:
+              - /url: /QuotebookQoL/QuotebookQoLRowRefresh
+              - paragraph: Row Refresh (Story 2)
+            - link "Price Entry (Story 4)" [ref=e268] [cursor=pointer]:
+              - /url: /QuotebookQoL/QuotebookQoLPriceEntry
+              - paragraph: Price Entry (Story 4)
+        - generic [ref=e269]:
+          - generic [ref=e270] [cursor=pointer]:
+            - img "dollar" [ref=e272]:
+              - img [ref=e273]
+            - paragraph [ref=e275]: Price Management
+          - generic:
+            - link "All Prices" [ref=e278] [cursor=pointer]:
+              - /url: /PriceManagement/AllPrices
+              - paragraph: All Prices
+            - link "Contract Values" [ref=e280] [cursor=pointer]:
+              - /url: /PriceManagement/ContractValues
+              - paragraph: Contract Values
+            - link "Quotebook" [ref=e282] [cursor=pointer]:
+              - /url: /PriceManagement/Quotebook
+              - paragraph: Quotebook
+            - link "Contract Detail" [ref=e284] [cursor=pointer]:
+              - /url: /PriceManagement/ContractDetail
+              - paragraph: Contract Detail
+            - link "Contract Revaluation" [ref=e286] [cursor=pointer]:
+              - /url: /PriceManagement/ContractReval
+              - paragraph: Contract Revaluation
+        - link "shop Manage Offers" [ref=e288] [cursor=pointer]:
+          - /url: /ManageOffers
+          - img "shop" [ref=e290]:
+            - img [ref=e291]
+          - paragraph [ref=e293]: Manage Offers
+        - link "dollar Price Management UI" [ref=e295] [cursor=pointer]:
+          - /url: /PriceManagementUI
+          - img "dollar" [ref=e297]:
+            - img [ref=e298]
+          - paragraph [ref=e300]: Price Management UI
+  - main [ref=e301]:
+    - generic [ref=e303]:
+      - img [ref=e307]
+      - heading "Page Not Found" [level=1] [ref=e327]
+      - heading "We are a little lost. Sorry, we could not find that page." [level=5] [ref=e328]

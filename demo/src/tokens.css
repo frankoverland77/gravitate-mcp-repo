@@ -1,0 +1,28 @@
+:root {
+  /* Spacing scale — 8-based with 4 and 12 half-steps */
+  --space-0: 0px;
+  --space-1: 4px;   /* Tight: icon-to-text, label-to-input */
+  --space-2: 8px;   /* Compact: button group gaps, inline pairs */
+  --space-3: 12px;  /* Snug: card inner padding, footer padding */
+  --space-4: 16px;  /* Default: form field gaps, section inner padding */
+  --space-5: 24px;  /* Comfortable: section-to-section, card padding, page content */
+  --space-6: 32px;  /* Spacious: major section breaks, page section dividers */
+  --space-7: 40px;  /* Page: top-level padding, hero spacing */
+  --space-8: 48px;  /* Canvas: showcase-level wrapper */
+
+  /* Modal size tiers */
+  --modal-sm: 480px;
+  --modal-md: 640px;
+  --modal-lg: 800px;
+  --modal-xl: 1080px;
+
+  /* Right drawer size tiers */
+  --drawer-right-narrow: 400px;
+  --drawer-right-standard: 520px;
+  --drawer-right-wide: 50vw;
+
+  /* Bottom drawer size tiers */
+  --drawer-bottom-compact: 50vh;
+  --drawer-bottom-standard: 70vh;
+  --drawer-bottom-full: 85vh;
+}

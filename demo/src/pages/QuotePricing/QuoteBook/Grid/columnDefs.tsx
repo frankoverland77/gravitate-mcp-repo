@@ -240,6 +240,30 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
     exceptionCols = [buildExceptionGroup('Exceptions', null)]
   }
 
+  // Price Info columns — read-only Tier Group and Tier Level
+  const priceInfoCols: (ColDef | ColGroupDef)[] = [
+  {
+    field: 'tierGroup',
+    headerName: 'Tier Group',
+    width: 120,
+    valueFormatter: ({ value }) => value ?? '',
+    cellRenderer: (params: ICellRendererParams) => {
+      if (!params.data || params.data.tierGroup == null) return <span style={{ display: 'flex', alignItems: 'center', height: '100%', color: 'var(--gray-400)' }}>—</span>
+      return <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.data.tierGroup}</span>
+    },
+  },
+  {
+    field: 'tierLevel',
+    headerName: 'Tier Level',
+    width: 110,
+    valueFormatter: ({ value }) => value ?? '',
+    cellRenderer: (params: ICellRendererParams) => {
+      if (!params.data || params.data.tierLevel == null) return <span style={{ display: 'flex', alignItems: 'center', height: '100%', color: 'var(--gray-400)' }}>—</span>
+      return <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.data.tierLevel}</span>
+    },
+  },
+  ]
+
   const restCols: (ColDef | ColGroupDef)[] = [
   {
     field: 'prior_lastPrice',
@@ -313,6 +337,20 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
     ),
   },
   {
+    field: 'proposed_tierDiff',
+    headerName: 'Tier Diff',
+    width: 100,
+    valueFormatter: ({ value }) => value != null ? value.toFixed(4) : '',
+    cellRenderer: (params: ICellRendererParams) => renderViolationCell(
+      params, 'Tier Diff', options.evaluationMap,
+      () => {
+        const val = params.value
+        if (val == null) return null
+        return <span>{val.toFixed(4)}</span>
+      },
+    ),
+  },
+  {
     field: 'proposed_delta',
     headerName: 'Price Δ',
     width: 100,
@@ -370,5 +408,5 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
   },
   ]
 
-  return [...baseCols, ...exceptionCols, ...restCols]
+  return [...baseCols, ...exceptionCols, ...priceInfoCols, ...restCols]
 }

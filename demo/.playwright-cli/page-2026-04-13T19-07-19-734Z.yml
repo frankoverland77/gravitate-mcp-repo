@@ -1,0 +1,528 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "menu-unfold" [ref=e7] [cursor=pointer]:
+        - img "menu-unfold" [ref=e9]:
+          - img [ref=e10]
+      - strong [ref=e14]:
+        - img "book" [ref=e16]:
+          - img [ref=e17]
+        - text: Pattern Guide
+    - generic [ref=e20]:
+      - heading "Spacing & Tokens" [level=5] [ref=e22]:
+        - link "Spacing & Tokens" [ref=e23] [cursor=pointer]:
+          - /url: /PatternGuide/SpacingTokens
+      - heading "Forms" [level=5] [ref=e25]:
+        - link "Forms" [ref=e26] [cursor=pointer]:
+          - /url: /PatternGuide/Forms
+      - heading "Modals" [level=5] [ref=e28]:
+        - link "Modals" [ref=e29] [cursor=pointer]:
+          - /url: /PatternGuide/Modals
+      - heading "Sections & Content" [level=5] [ref=e31]:
+        - link "Sections & Content" [ref=e32] [cursor=pointer]:
+          - /url: /PatternGuide/Sections
+      - heading "Right Drawers" [level=5] [ref=e34]:
+        - link "Right Drawers" [ref=e35] [cursor=pointer]:
+          - /url: /PatternGuide/RightDrawers
+      - heading "Bottom Drawers" [level=5] [ref=e37]:
+        - link "Bottom Drawers" [ref=e38] [cursor=pointer]:
+          - /url: /PatternGuide/BottomDrawers
+      - heading "Page Layouts" [level=5] [ref=e40]:
+        - link "Page Layouts" [ref=e41] [cursor=pointer]:
+          - /url: /PatternGuide/PageLayouts
+      - heading "Panels" [level=5] [ref=e43]:
+        - link "Panels" [ref=e44] [cursor=pointer]:
+          - /url: /PatternGuide/Panels
+      - heading "Cards" [level=5] [ref=e46]:
+        - link "Cards" [ref=e47] [cursor=pointer]:
+          - /url: /PatternGuide/Cards
+      - heading "Button Groups" [level=5] [ref=e49]:
+        - link "Button Groups" [ref=e50] [cursor=pointer]:
+          - /url: /PatternGuide/ButtonGroups
+      - heading "Feedback & Messaging" [level=5] [ref=e52]:
+        - link "Feedback & Messaging" [ref=e53] [cursor=pointer]:
+          - /url: /PatternGuide/Feedback
+      - heading "Navigation" [level=5] [ref=e55]:
+        - link "Navigation" [ref=e56] [cursor=pointer]:
+          - /url: /PatternGuide/Navigation
+    - generic [ref=e58]:
+      - generic [ref=e60]: Demo User
+      - generic [ref=e63]: DE
+  - generic [ref=e64]:
+    - complementary [ref=e65]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - generic:
+            - img "search" [ref=e71]:
+              - img [ref=e72]
+            - text: Search
+            - img "mac-command" [ref=e76]:
+              - img [ref=e77]
+            - generic [ref=e80]: K
+        - generic [ref=e81]:
+          - link "smile Sandbox" [ref=e83] [cursor=pointer]:
+            - /url: /Sandbox
+            - img "smile" [ref=e85]:
+              - img [ref=e86]
+            - paragraph [ref=e88]: Sandbox
+          - link "appstore Project Hub" [ref=e90] [cursor=pointer]:
+            - /url: /ProjectHub
+            - img "appstore" [ref=e92]:
+              - img [ref=e93]
+            - paragraph [ref=e95]: Project Hub
+          - generic [ref=e96]:
+            - generic [ref=e97] [cursor=pointer]:
+              - img "bg-colors" [ref=e99]:
+                - img [ref=e100]
+              - paragraph [ref=e102]: Design System
+            - generic:
+              - link "Typography" [ref=e105] [cursor=pointer]:
+                - /url: /DesignSystem/Typography
+                - paragraph: Typography
+              - link "Buttons" [ref=e107] [cursor=pointer]:
+                - /url: /DesignSystem/Buttons
+                - paragraph: Buttons
+              - link "Tags" [ref=e109] [cursor=pointer]:
+                - /url: /DesignSystem/Tags
+                - paragraph: Tags
+              - link "Data Display" [ref=e111] [cursor=pointer]:
+                - /url: /DesignSystem/DataDisplay
+                - paragraph: Data Display
+              - link "Headers" [ref=e113] [cursor=pointer]:
+                - /url: /DesignSystem/Headers
+                - paragraph: Headers
+              - link "Layout" [ref=e115] [cursor=pointer]:
+                - /url: /DesignSystem/Layout
+                - paragraph: Layout
+              - link "Date & Time" [ref=e117] [cursor=pointer]:
+                - /url: /DesignSystem/DateTime
+                - paragraph: Date & Time
+              - link "Form Controls" [ref=e119] [cursor=pointer]:
+                - /url: /DesignSystem/FormControls
+                - paragraph: Form Controls
+              - link "Feedback" [ref=e121] [cursor=pointer]:
+                - /url: /DesignSystem/Feedback
+                - paragraph: Feedback
+              - link "Navigation" [ref=e123] [cursor=pointer]:
+                - /url: /DesignSystem/DSNavigation
+                - paragraph: Navigation
+              - link "Cell Renderers" [ref=e125] [cursor=pointer]:
+                - /url: /DesignSystem/CellRenderers
+                - paragraph: Cell Renderers
+              - link "Grid" [ref=e127] [cursor=pointer]:
+                - /url: /DesignSystem/Grid
+                - paragraph: Grid
+              - link "Colors" [ref=e129] [cursor=pointer]:
+                - /url: /DesignSystem/Colors
+                - paragraph: Colors
+          - generic [ref=e130]:
+            - generic [ref=e131] [cursor=pointer]:
+              - img "book" [ref=e133]:
+                - img [ref=e134]
+              - paragraph [ref=e136]: Pattern Guide
+            - generic:
+              - link "Spacing & Tokens" [ref=e139] [cursor=pointer]:
+                - /url: /PatternGuide/SpacingTokens
+                - paragraph: Spacing & Tokens
+              - link "Forms" [ref=e141] [cursor=pointer]:
+                - /url: /PatternGuide/Forms
+                - paragraph: Forms
+              - link "Modals" [ref=e143] [cursor=pointer]:
+                - /url: /PatternGuide/Modals
+                - paragraph: Modals
+              - link "Sections & Content" [ref=e145] [cursor=pointer]:
+                - /url: /PatternGuide/Sections
+                - paragraph: Sections & Content
+              - link "Right Drawers" [ref=e147] [cursor=pointer]:
+                - /url: /PatternGuide/RightDrawers
+                - paragraph: Right Drawers
+              - link "Bottom Drawers" [ref=e149] [cursor=pointer]:
+                - /url: /PatternGuide/BottomDrawers
+                - paragraph: Bottom Drawers
+              - link "Page Layouts" [ref=e151] [cursor=pointer]:
+                - /url: /PatternGuide/PageLayouts
+                - paragraph: Page Layouts
+              - link "Panels" [ref=e153] [cursor=pointer]:
+                - /url: /PatternGuide/Panels
+                - paragraph: Panels
+              - link "Cards" [ref=e155] [cursor=pointer]:
+                - /url: /PatternGuide/Cards
+                - paragraph: Cards
+              - link "Button Groups" [ref=e157] [cursor=pointer]:
+                - /url: /PatternGuide/ButtonGroups
+                - paragraph: Button Groups
+              - link "Feedback & Messaging" [ref=e159] [cursor=pointer]:
+                - /url: /PatternGuide/Feedback
+                - paragraph: Feedback & Messaging
+              - link "Navigation" [ref=e161] [cursor=pointer]:
+                - /url: /PatternGuide/Navigation
+                - paragraph: Navigation
+          - generic [ref=e162]:
+            - generic [ref=e163] [cursor=pointer]:
+              - img "shop" [ref=e165]:
+                - img [ref=e166]
+              - paragraph [ref=e168]: Bakery
+            - generic:
+              - link "Bakery Products" [ref=e171] [cursor=pointer]:
+                - /url: /Bakery/BakeryProducts
+                - paragraph: Bakery Products
+              - link "Formula Manager" [ref=e173] [cursor=pointer]:
+                - /url: /Bakery/FormulaManager
+                - paragraph: Formula Manager
+              - link "Delivery Management" [ref=e175] [cursor=pointer]:
+                - /url: /Bakery/DeliveryManagement
+                - paragraph: Delivery Management
+              - link "Competitor Price Analysis" [ref=e177] [cursor=pointer]:
+                - /url: /Bakery/SupplierAnalysis
+                - paragraph: Competitor Price Analysis
+              - link "Competitor Details" [ref=e179] [cursor=pointer]:
+                - /url: /Bakery/SupplierDetails
+                - paragraph: Competitor Details
+              - link "Contract Measurement" [ref=e181] [cursor=pointer]:
+                - /url: /Bakery/ContractMeasurementGrid
+                - paragraph: Contract Measurement
+              - link "Measurement Details" [ref=e183] [cursor=pointer]:
+                - /url: /Bakery/ContractMeasurementDetails
+                - paragraph: Measurement Details
+              - link "Delivered Pricing" [ref=e185] [cursor=pointer]:
+                - /url: /Bakery/DeliveredPricingQuoteBook
+                - paragraph: Delivered Pricing
+              - link "Quotebook Wholesale" [ref=e187] [cursor=pointer]:
+                - /url: /Bakery/QuotebookWholesale
+                - paragraph: Quotebook Wholesale
+              - link "Ad-Hoc Valuation (Story 1)" [ref=e189] [cursor=pointer]:
+                - /url: /Bakery/QuotebookQoLAdHoc
+                - paragraph: Ad-Hoc Valuation (Story 1)
+              - link "Row Refresh (Story 2)" [ref=e191] [cursor=pointer]:
+                - /url: /Bakery/QuotebookQoLRowRefresh
+                - paragraph: Row Refresh (Story 2)
+              - link "Price Entry (Story 4)" [ref=e193] [cursor=pointer]:
+                - /url: /Bakery/QuotebookQoLPriceEntry
+                - paragraph: Price Entry (Story 4)
+          - link "table Bulk Change Test" [ref=e195] [cursor=pointer]:
+            - /url: /BulkChangeTest
+            - img "table" [ref=e197]:
+              - img [ref=e198]
+            - paragraph [ref=e200]: Bulk Change Test
+          - link "edit Customer Form" [ref=e202] [cursor=pointer]:
+            - /url: /CustomerForm
+            - img "edit" [ref=e204]:
+              - img [ref=e205]
+            - paragraph [ref=e207]: Customer Form
+          - generic [ref=e208]:
+            - generic [ref=e209] [cursor=pointer]:
+              - img "calculator" [ref=e211]:
+                - img [ref=e212]
+              - paragraph [ref=e214]: Contract Management
+            - generic:
+              - link "Contracts" [ref=e217] [cursor=pointer]:
+                - /url: /ContractFormulas/PromptsGrid
+                - paragraph: Contracts
+              - link "Formula Templates" [ref=e219] [cursor=pointer]:
+                - /url: /ContractFormulas/FormulaTemplates
+                - paragraph: Formula Templates
+              - link "Contract Details" [ref=e221] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractDetails
+                - paragraph: Contract Details
+              - link "RFP Management" [ref=e223] [cursor=pointer]:
+                - /url: /ContractFormulas/RFPManagement
+                - paragraph: RFP Management
+              - link "Seller RFP Response" [ref=e225] [cursor=pointer]:
+                - /url: /ContractFormulas/SellerRFPResponse
+                - paragraph: Seller RFP Response
+              - link "Measurements" [ref=e227] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractMeasurementGrid
+                - paragraph: Measurements
+              - link "Measurement Details" [ref=e229] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractMeasurementDetails
+                - paragraph: Measurement Details
+              - link "Contracts - New" [ref=e231] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractsList
+                - paragraph: Contracts - New
+              - link "Create Contract - New" [ref=e233] [cursor=pointer]:
+                - /url: /ContractFormulas/CreateContract
+                - paragraph: Create Contract - New
+              - link "Edit Contract - New" [ref=e235] [cursor=pointer]:
+                - /url: /ContractFormulas/EditContract
+                - paragraph: Edit Contract - New
+          - generic [ref=e236]:
+            - generic [ref=e237] [cursor=pointer]:
+              - img "shop" [ref=e239]:
+                - img [ref=e240]
+              - paragraph [ref=e242]: Online Selling Platform
+            - generic:
+              - link "Buy Now" [ref=e245] [cursor=pointer]:
+                - /url: /MarketPlatform/OnlineSellingPlatform
+                - paragraph: Buy Now
+              - link "Index Offer Management" [ref=e247] [cursor=pointer]:
+                - /url: /MarketPlatform/IndexOfferManagement
+                - paragraph: Index Offer Management
+              - link "Index Offer Buy Now" [ref=e249] [cursor=pointer]:
+                - /url: /MarketPlatform/IndexOfferBuyNow
+                - paragraph: Index Offer Buy Now
+              - link "Negotiation Mode" [ref=e251] [cursor=pointer]:
+                - /url: /MarketPlatform/NegotiationMode
+                - paragraph: Negotiation Mode
+          - generic [ref=e252]:
+            - generic [ref=e253] [cursor=pointer]:
+              - img "dashboard" [ref=e255]:
+                - img [ref=e256]
+              - paragraph [ref=e258]: Competitor Profile
+            - generic:
+              - link "Competitor Price Analysis" [ref=e261] [cursor=pointer]:
+                - /url: /SupplierAnalysis/SupplierProfileAnalysis
+                - paragraph: Competitor Price Analysis
+              - link "Competitor Details" [ref=e263] [cursor=pointer]:
+                - /url: /SupplierAnalysis/SupplierDetails
+                - paragraph: Competitor Details
+          - link "table Global Tiered Diff" [ref=e265] [cursor=pointer]:
+            - /url: /GlobalTieredPricing
+            - img "table" [ref=e267]:
+              - img [ref=e268]
+            - paragraph [ref=e270]: Global Tiered Diff
+          - link "credit-card Price Notifications" [ref=e272] [cursor=pointer]:
+            - /url: /SubscriptionManagement
+            - img "credit-card" [ref=e274]:
+              - img [ref=e275]
+            - paragraph [ref=e277]: Price Notifications
+          - generic [ref=e278]:
+            - generic [ref=e279] [cursor=pointer]:
+              - img "dollar" [ref=e281]:
+                - img [ref=e282]
+              - paragraph [ref=e284]: Delivered Pricing
+            - generic:
+              - link "Quote Book" [ref=e287] [cursor=pointer]:
+                - /url: /DeliveredPricing/DeliveredPricingQuoteBook
+                - paragraph: Quote Book
+              - link "Freight Management" [ref=e289] [cursor=pointer]:
+                - /url: /DeliveredPricing/FreightManagement
+                - paragraph: Freight Management
+              - link "Tax Management" [ref=e291] [cursor=pointer]:
+                - /url: /DeliveredPricing/TaxManagement
+                - paragraph: Tax Management
+          - link "line-chart Price Elasticity - Needs work" [ref=e293] [cursor=pointer]:
+            - /url: /PriceElasticity
+            - img "line-chart" [ref=e295]:
+              - img [ref=e296]
+            - paragraph [ref=e298]: Price Elasticity - Needs work
+          - generic [ref=e299]:
+            - generic [ref=e300] [cursor=pointer]:
+              - img "book" [ref=e302]:
+                - img [ref=e303]
+              - paragraph [ref=e305]: Pricing Engine (exceptions)
+            - generic:
+              - link "Quote Book Exceptions" [ref=e308] [cursor=pointer]:
+                - /url: /QuotePricing/QuoteBook
+                - paragraph: Quote Book Exceptions
+              - link "Quote Rows" [ref=e310] [cursor=pointer]:
+                - /url: /QuotePricing/ManageQuoteRows
+                - paragraph: Quote Rows
+              - link "Quotebook Wholesale" [ref=e312] [cursor=pointer]:
+                - /url: /QuotePricing/QuotebookWholesale
+                - paragraph: Quotebook Wholesale
+          - generic [ref=e313]:
+            - generic [ref=e314] [cursor=pointer]:
+              - img "sync" [ref=e316]:
+                - img [ref=e317]
+              - paragraph [ref=e319]: Valuation, Refresh, Entry
+            - generic:
+              - link "Ad-Hoc Valuation (Story 1)" [ref=e322] [cursor=pointer]:
+                - /url: /QuotebookQoL/QuotebookQoLAdHoc
+                - paragraph: Ad-Hoc Valuation (Story 1)
+              - link "Row Refresh (Story 2)" [ref=e324] [cursor=pointer]:
+                - /url: /QuotebookQoL/QuotebookQoLRowRefresh
+                - paragraph: Row Refresh (Story 2)
+              - link "Price Entry (Story 4)" [ref=e326] [cursor=pointer]:
+                - /url: /QuotebookQoL/QuotebookQoLPriceEntry
+                - paragraph: Price Entry (Story 4)
+          - generic [ref=e327]:
+            - generic [ref=e328] [cursor=pointer]:
+              - img "dollar" [ref=e330]:
+                - img [ref=e331]
+              - paragraph [ref=e333]: Price Management
+            - generic:
+              - link "All Prices" [ref=e336] [cursor=pointer]:
+                - /url: /PriceManagement/AllPrices
+                - paragraph: All Prices
+              - link "Contract Values" [ref=e338] [cursor=pointer]:
+                - /url: /PriceManagement/ContractValues
+                - paragraph: Contract Values
+              - link "Quotebook" [ref=e340] [cursor=pointer]:
+                - /url: /PriceManagement/Quotebook
+                - paragraph: Quotebook
+              - link "Contract Detail" [ref=e342] [cursor=pointer]:
+                - /url: /PriceManagement/ContractDetail
+                - paragraph: Contract Detail
+              - link "Contract Revaluation" [ref=e344] [cursor=pointer]:
+                - /url: /PriceManagement/ContractReval
+                - paragraph: Contract Revaluation
+          - link "shop Manage Offers" [ref=e346] [cursor=pointer]:
+            - /url: /ManageOffers
+            - img "shop" [ref=e348]:
+              - img [ref=e349]
+            - paragraph [ref=e351]: Manage Offers
+          - link "dollar Price Management UI" [ref=e353] [cursor=pointer]:
+            - /url: /PriceManagementUI
+            - img "dollar" [ref=e355]:
+              - img [ref=e356]
+            - paragraph [ref=e358]: Price Management UI
+    - main [ref=e359]:
+      - generic [ref=e360]:
+        - generic [ref=e364]:
+          - heading "Cards" [level=1] [ref=e365]
+          - paragraph [ref=e366]: Two standard card types replace the three ad-hoc implementations (Ant Card, styled divs, custom wrappers). Every card uses the same border, radius, and spacing tokens.
+        - navigation [ref=e367]:
+          - generic [ref=e368]: On this page
+          - list [ref=e369]:
+            - listitem [ref=e370]:
+              - link "Card Types" [ref=e371] [cursor=pointer]:
+                - /url: "#types"
+            - listitem [ref=e372]:
+              - link "Section Card" [ref=e373] [cursor=pointer]:
+                - /url: "#section-card"
+            - listitem [ref=e374]:
+              - link "Stat / Metric Card" [ref=e375] [cursor=pointer]:
+                - /url: "#stat-card"
+            - listitem [ref=e376]:
+              - link "Multi-Counter Card" [ref=e377] [cursor=pointer]:
+                - /url: "#multi-counter"
+            - listitem [ref=e378]:
+              - link "Do's & Don'ts" [ref=e379] [cursor=pointer]:
+                - /url: "#dos-donts"
+        - generic [ref=e380]:
+          - generic [ref=e381]:
+            - generic [ref=e382]:
+              - heading "Card Types" [level=2] [ref=e383]
+              - paragraph [ref=e384]: Choose the card type based on content purpose, not visual preference.
+            - generic [ref=e386]:
+              - generic [ref=e387]:
+                - heading "Section Card" [level=5] [ref=e388]
+                - generic [ref=e389]: Grouped content with a header bar. Use for forms, detail panels, and settings groups.
+                - generic [ref=e390]:
+                  - generic [ref=e391]: When to use
+                  - generic [ref=e392]: Content has a clear title and belongs to a named group.
+              - generic [ref=e393]:
+                - heading "Stat / Metric Card" [level=5] [ref=e394]
+                - generic [ref=e395]: Single value display with label and optional delta. Use for KPIs and counters.
+                - generic [ref=e396]:
+                  - generic [ref=e397]: When to use
+                  - generic [ref=e398]: Displaying 1 key number or metric prominently.
+              - generic [ref=e399]:
+                - heading "Multi-Counter Card" [level=5] [ref=e400]
+                - generic [ref=e401]: Multiple metrics in columns with vertical dividers. Use for dashboards and summaries.
+                - generic [ref=e402]:
+                  - generic [ref=e403]: When to use
+                  - generic [ref=e404]: Showing 2-4 related metrics side by side.
+          - generic [ref=e405]:
+            - generic [ref=e406]:
+              - heading "Section Card" [level=2] [ref=e407]
+              - paragraph [ref=e408]: "Grouped content with a header. border-radius: 8px, border: 1px solid #e8e8e8."
+            - generic [ref=e410]:
+              - generic [ref=e411]:
+                - generic [ref=e412]: Section Card Anatomy
+                - button "Show code" [ref=e413] [cursor=pointer]
+              - generic [ref=e415]:
+                - generic [ref=e416]:
+                  - heading "Contract Details" [level=5] [ref=e417]
+                  - generic [ref=e418]: 3 fields
+                - generic [ref=e419]:
+                  - generic [ref=e420]:
+                    - generic [ref=e421]:
+                      - generic [ref=e422]: Contract ID
+                      - generic [ref=e423]: CTR-2024-001
+                    - generic [ref=e424]:
+                      - generic [ref=e425]: Status
+                      - generic [ref=e426]: Active
+                  - generic [ref=e427]:
+                    - generic [ref=e428]: Description
+                    - generic [ref=e429]: Annual supply agreement for commodity XYZ
+              - generic [ref=e430]: "Header: #fafafa background, 16px padding. Body: 24px padding, 16px gap between children."
+          - generic [ref=e431]:
+            - generic [ref=e432]:
+              - heading "Stat / Metric Card" [level=2] [ref=e433]
+              - paragraph [ref=e434]: Single prominent value with label. 24px padding, no header bar.
+            - generic [ref=e436]:
+              - generic [ref=e438]: Stat Card Anatomy
+              - generic [ref=e440]:
+                - generic [ref=e441]:
+                  - generic [ref=e442]: Total Volume
+                  - generic [ref=e443]:
+                    - heading "12,450" [level=2] [ref=e444]
+                    - generic [ref=e445]: MT
+                - generic [ref=e446]:
+                  - generic [ref=e447]: Avg Price
+                  - heading "$84.20" [level=2] [ref=e449]
+                  - generic [ref=e450]: +2.3%
+                - generic [ref=e451]:
+                  - generic [ref=e452]: Open Contracts
+                  - heading "37" [level=2] [ref=e454]
+                - generic [ref=e455]:
+                  - generic [ref=e456]: Exceptions
+                  - heading "5" [level=2] [ref=e458]
+                  - generic [ref=e459]: "-3"
+              - generic [ref=e460]: "Padding: 24px (space-5). Label: p2 medium. Value: h2 weight 700. Optional delta below."
+          - generic [ref=e461]:
+            - generic [ref=e462]:
+              - heading "Multi-Counter Card" [level=2] [ref=e463]
+              - paragraph [ref=e464]: 2-4 metrics in columns with vertical dividers. Single border, shared padding.
+            - generic [ref=e466]:
+              - generic [ref=e468]: Multi-Counter Card
+              - generic [ref=e470]:
+                - generic [ref=e471]:
+                  - generic [ref=e472]: Quotes
+                  - heading "142" [level=2] [ref=e473]
+                - generic [ref=e475]:
+                  - generic [ref=e476]: Awarded
+                  - heading "89" [level=2] [ref=e477]
+                - generic [ref=e479]:
+                  - generic [ref=e480]: Pending
+                  - heading "38" [level=2] [ref=e481]
+                - generic [ref=e483]:
+                  - generic [ref=e484]: Rejected
+                  - heading "15" [level=2] [ref=e485]
+              - generic [ref=e486]: "Columns: flex children with vertical 1px dividers. No gap between columns — divider provides visual separation."
+          - generic [ref=e487]:
+            - heading "Do's & Don'ts" [level=2] [ref=e489]
+            - generic [ref=e490]:
+              - generic [ref=e491]:
+                - generic [ref=e492]:
+                  - generic [ref=e493]:
+                    - generic [ref=e494]: ✓
+                    - text: Do
+                  - generic [ref=e497]:
+                    - heading "Settings" [level=5] [ref=e499]
+                    - generic [ref=e501]: Content area
+                  - generic [ref=e502]: "Use the standard Section Card: consistent border, radius, header with background, token-based padding."
+                - generic [ref=e503]:
+                  - generic [ref=e504]:
+                    - generic [ref=e505]: ✗
+                    - text: Don't
+                  - generic [ref=e508]:
+                    - generic [ref=e509]: Settings
+                    - generic [ref=e510]: Content area
+                  - generic [ref=e511]: Don't build cards with inline styles, arbitrary shadows, hard-coded font sizes, and non-token spacing.
+              - generic [ref=e512]:
+                - generic [ref=e513]:
+                  - generic [ref=e514]:
+                    - generic [ref=e515]: ✓
+                    - text: Do
+                  - generic [ref=e517]:
+                    - generic [ref=e518]:
+                      - generic [ref=e519]: Total
+                      - heading "250" [level=2] [ref=e521]
+                    - generic [ref=e522]:
+                      - generic [ref=e523]: Active
+                      - heading "180" [level=2] [ref=e525]
+                  - generic [ref=e526]: "Stat cards use identical structure: same padding (24px), same label style (p2 medium), same value style (h2 700)."
+                - generic [ref=e527]:
+                  - generic [ref=e528]:
+                    - generic [ref=e529]: ✗
+                    - text: Don't
+                  - generic [ref=e531]:
+                    - generic [ref=e532]:
+                      - generic [ref=e533]: Total
+                      - generic [ref=e534]: "250"
+                    - generic [ref=e535]:
+                      - generic [ref=e536]: Active
+                      - generic [ref=e537]: "180"
+                  - generic [ref=e538]: Different padding (20px vs 18px), different borders, different label sizes, different value weights — every card looks different.

@@ -5,6 +5,7 @@ import { App } from "./App";
 import { LicenseManager } from "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import "./tokens.css";
 
 const agGridLicenseKey = import.meta.env.VITE_AG_GRID_LICENSE_KEY;
 if (agGridLicenseKey) {

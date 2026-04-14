@@ -1,6 +1,8 @@
 import { ColDef } from 'ag-grid-community'
 import { DeleteOutlined } from '@ant-design/icons'
 import { BBDTag, GraviButton, Texto } from '@gravitate-js/excalibrr'
+import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
+import { tierGroupOptions, tierLevelOptions } from './mockData'
 
 export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
   {
@@ -50,6 +52,50 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
       ),
   },
   { field: 'strategy', headerName: 'Strategy', minWidth: 130 },
+  {
+    field: 'tierGroup',
+    headerName: 'Tier Group',
+    width: 130,
+    editable: true,
+    isBulkEditable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: {
+      values: [null, ...tierGroupOptions.map(o => o.Value)],
+    },
+    bulkCellEditor: BulkSelectEditor,
+    bulkCellEditorParams: {
+      propKey: 'tierGroup',
+      options: tierGroupOptions,
+    },
+    cellRenderer: ({ value }: { value: string | null }) =>
+      value ? (
+        <BBDTag theme1 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
+      ) : (
+        <Texto appearance="medium">—</Texto>
+      ),
+  },
+  {
+    field: 'tierLevel',
+    headerName: 'Tier Level',
+    width: 120,
+    editable: true,
+    isBulkEditable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: {
+      values: [null, ...tierLevelOptions.map(o => o.Value)],
+    },
+    bulkCellEditor: BulkSelectEditor,
+    bulkCellEditorParams: {
+      propKey: 'tierLevel',
+      options: tierLevelOptions,
+    },
+    cellRenderer: ({ value }: { value: string | null }) =>
+      value ? (
+        <BBDTag theme3 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
+      ) : (
+        <Texto appearance="medium">—</Texto>
+      ),
+  },
   {
     field: 'usesMarketMove',
     headerName: 'Market Move',

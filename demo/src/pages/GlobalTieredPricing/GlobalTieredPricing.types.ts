@@ -7,6 +7,30 @@ import type { GeneratedTieredPricingRow } from '../../shared/data'
 /** Row data type used throughout the grid */
 export type TieredPricingRow = GeneratedTieredPricingRow
 
+/** A Tier Group (e.g., Group A, Group B) */
+export interface TierGroup {
+  id: string
+  label: string
+  description?: string
+  order: number
+}
+
+/** A Tier Level within the system (e.g., Tier 1, or "Diamond") */
+export interface TierLevel {
+  id: string
+  label: string
+  order: number
+  isDefault: boolean
+}
+
+/** State for the assigned-rows drawer */
+export interface AssignedRowsDrawerState {
+  isOpen: boolean
+  mode: 'empty' | 'group' | 'cell'
+  selectedGroupId: string | null
+  selectedLevelId: string | null
+}
+
 /** Spread configuration for tier calculations */
 export interface SpreadConfig {
   tier2Spread: number

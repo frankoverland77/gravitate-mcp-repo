@@ -7,6 +7,8 @@ export type QuoteRow = {
   terminal: string
   isSpread: boolean
   spreadParentId?: number
+  tierGroup: string | null
+  tierLevel: string | null
   prior_lastPrice: number
   benchmark_ulsd: number
   proposed_price: number
@@ -14,6 +16,8 @@ export type QuoteRow = {
   proposed_margin: number
   proposed_marketMove: number
   proposed_adjustment: number
+  proposed_tierDiff: number | null
+  current_tierDiff: number | null
   exceptions: string[]
   profileKey?: string
   exceptionType?: ExceptionType
@@ -21,7 +25,30 @@ export type QuoteRow = {
   overrides?: ThresholdOverride[]
 }
 
-export const quoteBookData: QuoteRow[] = [
+const tierAssignments: Record<number, { tierGroup: string | null; tierLevel: string | null; proposed_tierDiff: number | null; current_tierDiff: number | null }> = {
+  1:  { tierGroup: 'Group A', tierLevel: 'Tier 1', proposed_tierDiff: 0.0025, current_tierDiff: 0.0025 },
+  2:  { tierGroup: 'Group A', tierLevel: 'Tier 2', proposed_tierDiff: 0.0050, current_tierDiff: 0.0050 },
+  3:  { tierGroup: 'Group A', tierLevel: 'Tier 3', proposed_tierDiff: 0.0075, current_tierDiff: 0.0075 },
+  4:  { tierGroup: 'Group B', tierLevel: 'Tier 1', proposed_tierDiff: 0.0030, current_tierDiff: 0.0030 },
+  5:  { tierGroup: 'Group B', tierLevel: 'Tier 2', proposed_tierDiff: 0.0055, current_tierDiff: 0.0055 },
+  6:  { tierGroup: 'Group A', tierLevel: 'Tier 1', proposed_tierDiff: 0.0025, current_tierDiff: 0.0025 },
+  7:  { tierGroup: 'Group B', tierLevel: 'Tier 3', proposed_tierDiff: 0.0080, current_tierDiff: 0.0080 },
+  8:  { tierGroup: 'Group C', tierLevel: 'Tier 1', proposed_tierDiff: 0.0020, current_tierDiff: 0.0020 },
+  9:  { tierGroup: 'Group C', tierLevel: 'Tier 2', proposed_tierDiff: 0.0045, current_tierDiff: 0.0045 },
+  10: { tierGroup: null, tierLevel: null, proposed_tierDiff: null, current_tierDiff: null },
+  11: { tierGroup: 'Group C', tierLevel: 'Tier 1', proposed_tierDiff: 0.0020, current_tierDiff: 0.0020 },
+  12: { tierGroup: 'Group A', tierLevel: 'Tier 2', proposed_tierDiff: 0.0050, current_tierDiff: 0.0050 },
+  13: { tierGroup: 'Group A', tierLevel: 'Tier 1', proposed_tierDiff: 0.0025, current_tierDiff: 0.0025 },
+  14: { tierGroup: 'Group B', tierLevel: 'Tier 1', proposed_tierDiff: 0.0030, current_tierDiff: 0.0030 },
+  15: { tierGroup: null, tierLevel: null, proposed_tierDiff: null, current_tierDiff: null },
+  16: { tierGroup: 'Group A', tierLevel: 'Tier 1', proposed_tierDiff: 0.0025, current_tierDiff: 0.0025 },
+  17: { tierGroup: 'Group C', tierLevel: 'Tier 3', proposed_tierDiff: 0.0070, current_tierDiff: 0.0070 },
+  18: { tierGroup: null, tierLevel: null, proposed_tierDiff: null, current_tierDiff: null },
+  19: { tierGroup: 'Group B', tierLevel: 'Tier 2', proposed_tierDiff: 0.0055, current_tierDiff: 0.0055 },
+  20: { tierGroup: 'Group A', tierLevel: 'Tier 3', proposed_tierDiff: 0.0075, current_tierDiff: 0.0075 },
+}
+
+const rawQuoteBookData: Omit<QuoteRow, 'tierGroup' | 'tierLevel' | 'proposed_tierDiff' | 'current_tierDiff'>[] = [
   // Wholesale (6 rows)
   {
     id: 1,
@@ -413,6 +440,11 @@ export const quoteBookData: QuoteRow[] = [
     overrides: [],
   },
 ]
+
+export const quoteBookData: QuoteRow[] = rawQuoteBookData.map(row => ({
+  ...row,
+  ...tierAssignments[row.id],
+}))
 
 export const quoteGroups = [
   { id: 'wholesale', label: 'Wholesale' },

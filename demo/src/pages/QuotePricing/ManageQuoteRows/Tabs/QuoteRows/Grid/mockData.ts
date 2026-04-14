@@ -13,7 +13,21 @@ export type QuoteConfigRow = {
   allocation: number
   counterparty: string
   competitorCount: number
+  tierGroup: string | null
+  tierLevel: string | null
 }
+
+export const tierGroupOptions = [
+  { Value: 'Group A', Text: 'Group A' },
+  { Value: 'Group B', Text: 'Group B' },
+  { Value: 'Group C', Text: 'Group C' },
+]
+
+export const tierLevelOptions = [
+  { Value: 'Tier 1', Text: 'Tier 1' },
+  { Value: 'Tier 2', Text: 'Tier 2' },
+  { Value: 'Tier 3', Text: 'Tier 3' },
+]
 
 export const quoteConfigData: QuoteConfigRow[] = [
   // Wholesale Config (5 rows)
@@ -32,6 +46,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 85,
     counterparty: 'Acme Corp',
     competitorCount: 3,
+    tierGroup: 'Group A',
+    tierLevel: 'Tier 1',
   },
   {
     id: 2,
@@ -48,6 +64,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 70,
     counterparty: 'Big Fuel Co',
     competitorCount: 5,
+    tierGroup: 'Group A',
+    tierLevel: 'Tier 2',
   },
   {
     id: 3,
@@ -64,6 +82,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 50,
     counterparty: 'PetroChem Inc',
     competitorCount: 2,
+    tierGroup: 'Group B',
+    tierLevel: 'Tier 1',
   },
   {
     id: 4,
@@ -80,6 +100,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 100,
     counterparty: 'Gulf Energy',
     competitorCount: 0,
+    tierGroup: null,
+    tierLevel: null,
   },
   {
     id: 5,
@@ -96,6 +118,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 90,
     counterparty: 'SunCoast Fuels',
     competitorCount: 4,
+    tierGroup: 'Group A',
+    tierLevel: 'Tier 3',
   },
   // Industrial Config (5 rows)
   {
@@ -113,6 +137,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 60,
     counterparty: 'Midwest Mfg',
     competitorCount: 1,
+    tierGroup: 'Group B',
+    tierLevel: 'Tier 2',
   },
   {
     id: 7,
@@ -129,6 +155,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 45,
     counterparty: 'Atlas Industries',
     competitorCount: 3,
+    tierGroup: null,
+    tierLevel: null,
   },
   {
     id: 8,
@@ -145,6 +173,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 75,
     counterparty: 'Sterling Chemical',
     competitorCount: 0,
+    tierGroup: 'Group A',
+    tierLevel: 'Tier 1',
   },
   {
     id: 9,
@@ -161,6 +191,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 80,
     counterparty: 'Heartland Power',
     competitorCount: 2,
+    tierGroup: 'Group B',
+    tierLevel: 'Tier 3',
   },
   {
     id: 10,
@@ -177,6 +209,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 55,
     counterparty: 'Forge Manufacturing',
     competitorCount: 1,
+    tierGroup: null,
+    tierLevel: null,
   },
   // Retail Config (5 rows)
   {
@@ -194,6 +228,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 95,
     counterparty: 'QuikStop Stations',
     competitorCount: 6,
+    tierGroup: 'Group A',
+    tierLevel: 'Tier 2',
   },
   {
     id: 12,
@@ -210,6 +246,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 100,
     counterparty: 'FuelMart LLC',
     competitorCount: 4,
+    tierGroup: null,
+    tierLevel: null,
   },
   {
     id: 13,
@@ -226,6 +264,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 40,
     counterparty: 'Corner Gas Co',
     competitorCount: 2,
+    tierGroup: 'Group B',
+    tierLevel: 'Tier 1',
   },
   {
     id: 14,
@@ -242,6 +282,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 65,
     counterparty: 'Roadside Energy',
     competitorCount: 3,
+    tierGroup: 'Group C',
+    tierLevel: 'Tier 2',
   },
   {
     id: 15,
@@ -258,6 +300,8 @@ export const quoteConfigData: QuoteConfigRow[] = [
     allocation: 88,
     counterparty: 'Express Petroleum',
     competitorCount: 5,
+    tierGroup: 'Group C',
+    tierLevel: 'Tier 3',
   },
 ]
 

@@ -18,14 +18,16 @@ import { getManageQuoteRowsColumnDefs } from './Grid/columnDefs'
 export function QuoteRowsTab() {
   const [isGroupsDrawerOpen, setIsGroupsDrawerOpen] = useState(false)
   const [isBulkChangeVisible, setIsBulkChangeVisible] = useState(false)
-  const [rowData] = useState(quoteConfigData)
+  const [rowData, setRowData] = useState(quoteConfigData)
 
   const columnDefs = useMemo(() => getManageQuoteRowsColumnDefs(), [])
 
   const handleSelectionChanged = useCallback((_event: any) => {}, [])
 
-  const handleBulkUpdate = useCallback(async (_rows: any | any[]) => {
-    return Promise.resolve()
+  const handleBulkUpdate = useCallback(async (rows: any | any[]) => {
+    const updatedRows = Array.isArray(rows) ? rows : [rows]
+    const updatedMap = new Map(updatedRows.map((u: any) => [u.id, u]))
+    setRowData(prev => prev.map(row => updatedMap.get(row.id) || row))
   }, [])
 
   return (

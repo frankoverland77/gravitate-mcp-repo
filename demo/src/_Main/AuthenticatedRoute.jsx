@@ -15,6 +15,8 @@ const DEFAULT_SCOPES = {
   ProjectHub: true,
   Welcome: true,
   DesignSystem: true,
+  PatternGuide: true,
+  PatternExamples: true,
   Bakery: true,
   CustomerForm: true,
   Dashboards: true,

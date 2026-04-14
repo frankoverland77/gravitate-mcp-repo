@@ -1,0 +1,674 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "menu-unfold" [ref=e7] [cursor=pointer]:
+        - img "menu-unfold" [ref=e9]:
+          - img [ref=e10]
+      - strong [ref=e14]:
+        - img "book" [ref=e16]:
+          - img [ref=e17]
+        - text: Pattern Guide
+    - generic [ref=e20]:
+      - heading "Spacing & Tokens" [level=5] [ref=e22]:
+        - link "Spacing & Tokens" [ref=e23] [cursor=pointer]:
+          - /url: /PatternGuide/SpacingTokens
+      - heading "Forms" [level=5] [ref=e25]:
+        - link "Forms" [ref=e26] [cursor=pointer]:
+          - /url: /PatternGuide/Forms
+      - heading "Modals" [level=5] [ref=e28]:
+        - link "Modals" [ref=e29] [cursor=pointer]:
+          - /url: /PatternGuide/Modals
+      - heading "Sections & Content" [level=5] [ref=e31]:
+        - link "Sections & Content" [ref=e32] [cursor=pointer]:
+          - /url: /PatternGuide/Sections
+      - heading "Right Drawers" [level=5] [ref=e34]:
+        - link "Right Drawers" [ref=e35] [cursor=pointer]:
+          - /url: /PatternGuide/RightDrawers
+      - heading "Bottom Drawers" [level=5] [ref=e37]:
+        - link "Bottom Drawers" [ref=e38] [cursor=pointer]:
+          - /url: /PatternGuide/BottomDrawers
+      - heading "Page Layouts" [level=5] [ref=e40]:
+        - link "Page Layouts" [ref=e41] [cursor=pointer]:
+          - /url: /PatternGuide/PageLayouts
+      - heading "Panels" [level=5] [ref=e43]:
+        - link "Panels" [ref=e44] [cursor=pointer]:
+          - /url: /PatternGuide/Panels
+      - heading "Cards" [level=5] [ref=e46]:
+        - link "Cards" [ref=e47] [cursor=pointer]:
+          - /url: /PatternGuide/Cards
+      - heading "Button Groups" [level=5] [ref=e49]:
+        - link "Button Groups" [ref=e50] [cursor=pointer]:
+          - /url: /PatternGuide/ButtonGroups
+      - heading "Feedback & Messaging" [level=5] [ref=e52]:
+        - link "Feedback & Messaging" [ref=e53] [cursor=pointer]:
+          - /url: /PatternGuide/Feedback
+      - heading "Navigation" [level=5] [ref=e55]:
+        - link "Navigation" [ref=e56] [cursor=pointer]:
+          - /url: /PatternGuide/PGNavigation
+      - heading "Examples" [level=5] [ref=e58]:
+        - link "Examples" [ref=e59] [cursor=pointer]:
+          - /url: /PatternGuide/Examples
+      - 'heading "Example: Full Width" [level=5] [ref=e61]':
+        - 'link "Example: Full Width" [ref=e62] [cursor=pointer]':
+          - /url: /PatternGuide/ExFullWidth
+      - 'heading "Example: Sidebar + Main" [level=5] [ref=e64]':
+        - 'link "Example: Sidebar + Main" [ref=e65] [cursor=pointer]':
+          - /url: /PatternGuide/ExSidebarMain
+      - 'heading "Example: Dashboard" [level=5] [ref=e67]':
+        - 'link "Example: Dashboard" [ref=e68] [cursor=pointer]':
+          - /url: /PatternGuide/ExDashboard
+      - 'heading "Example: Grid Page" [level=5] [ref=e70]':
+        - 'link "Example: Grid Page" [ref=e71] [cursor=pointer]':
+          - /url: /PatternGuide/ExGridPage
+    - generic [ref=e73]:
+      - generic [ref=e75]: Demo User
+      - generic [ref=e78]: DE
+  - generic [ref=e79]:
+    - complementary [ref=e80]:
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - generic:
+            - img "search" [ref=e86]:
+              - img [ref=e87]
+            - text: Search
+            - img "mac-command" [ref=e91]:
+              - img [ref=e92]
+            - generic [ref=e95]: K
+        - generic [ref=e96]:
+          - link "smile Sandbox" [ref=e98] [cursor=pointer]:
+            - /url: /Sandbox
+            - img "smile" [ref=e100]:
+              - img [ref=e101]
+            - paragraph [ref=e103]: Sandbox
+          - link "appstore Project Hub" [ref=e105] [cursor=pointer]:
+            - /url: /ProjectHub
+            - img "appstore" [ref=e107]:
+              - img [ref=e108]
+            - paragraph [ref=e110]: Project Hub
+          - generic [ref=e111]:
+            - generic [ref=e112] [cursor=pointer]:
+              - img "bg-colors" [ref=e114]:
+                - img [ref=e115]
+              - paragraph [ref=e117]: Design System
+            - generic:
+              - link "Typography" [ref=e120] [cursor=pointer]:
+                - /url: /DesignSystem/Typography
+                - paragraph: Typography
+              - link "Buttons" [ref=e122] [cursor=pointer]:
+                - /url: /DesignSystem/Buttons
+                - paragraph: Buttons
+              - link "Tags" [ref=e124] [cursor=pointer]:
+                - /url: /DesignSystem/Tags
+                - paragraph: Tags
+              - link "Data Display" [ref=e126] [cursor=pointer]:
+                - /url: /DesignSystem/DataDisplay
+                - paragraph: Data Display
+              - link "Headers" [ref=e128] [cursor=pointer]:
+                - /url: /DesignSystem/Headers
+                - paragraph: Headers
+              - link "Layout" [ref=e130] [cursor=pointer]:
+                - /url: /DesignSystem/Layout
+                - paragraph: Layout
+              - link "Date & Time" [ref=e132] [cursor=pointer]:
+                - /url: /DesignSystem/DateTime
+                - paragraph: Date & Time
+              - link "Form Controls" [ref=e134] [cursor=pointer]:
+                - /url: /DesignSystem/FormControls
+                - paragraph: Form Controls
+              - link "Feedback" [ref=e136] [cursor=pointer]:
+                - /url: /DesignSystem/Feedback
+                - paragraph: Feedback
+              - link "Navigation" [ref=e138] [cursor=pointer]:
+                - /url: /DesignSystem/DSNavigation
+                - paragraph: Navigation
+              - link "Cell Renderers" [ref=e140] [cursor=pointer]:
+                - /url: /DesignSystem/CellRenderers
+                - paragraph: Cell Renderers
+              - link "Grid" [ref=e142] [cursor=pointer]:
+                - /url: /DesignSystem/Grid
+                - paragraph: Grid
+              - link "Colors" [ref=e144] [cursor=pointer]:
+                - /url: /DesignSystem/Colors
+                - paragraph: Colors
+          - generic [ref=e145]:
+            - generic [ref=e146] [cursor=pointer]:
+              - img "book" [ref=e148]:
+                - img [ref=e149]
+              - paragraph [ref=e151]: Pattern Guide
+            - generic:
+              - link "Spacing & Tokens" [ref=e154] [cursor=pointer]:
+                - /url: /PatternGuide/SpacingTokens
+                - paragraph: Spacing & Tokens
+              - link "Forms" [ref=e156] [cursor=pointer]:
+                - /url: /PatternGuide/Forms
+                - paragraph: Forms
+              - link "Modals" [ref=e158] [cursor=pointer]:
+                - /url: /PatternGuide/Modals
+                - paragraph: Modals
+              - link "Sections & Content" [ref=e160] [cursor=pointer]:
+                - /url: /PatternGuide/Sections
+                - paragraph: Sections & Content
+              - link "Right Drawers" [ref=e162] [cursor=pointer]:
+                - /url: /PatternGuide/RightDrawers
+                - paragraph: Right Drawers
+              - link "Bottom Drawers" [ref=e164] [cursor=pointer]:
+                - /url: /PatternGuide/BottomDrawers
+                - paragraph: Bottom Drawers
+              - link "Page Layouts" [ref=e166] [cursor=pointer]:
+                - /url: /PatternGuide/PageLayouts
+                - paragraph: Page Layouts
+              - link "Panels" [ref=e168] [cursor=pointer]:
+                - /url: /PatternGuide/Panels
+                - paragraph: Panels
+              - link "Cards" [ref=e170] [cursor=pointer]:
+                - /url: /PatternGuide/Cards
+                - paragraph: Cards
+              - link "Button Groups" [ref=e172] [cursor=pointer]:
+                - /url: /PatternGuide/ButtonGroups
+                - paragraph: Button Groups
+              - link "Feedback & Messaging" [ref=e174] [cursor=pointer]:
+                - /url: /PatternGuide/Feedback
+                - paragraph: Feedback & Messaging
+              - link "Navigation" [ref=e176] [cursor=pointer]:
+                - /url: /PatternGuide/PGNavigation
+                - paragraph: Navigation
+              - link "Examples" [ref=e178] [cursor=pointer]:
+                - /url: /PatternGuide/Examples
+                - paragraph: Examples
+              - 'link "Example: Full Width" [ref=e180] [cursor=pointer]':
+                - /url: /PatternGuide/ExFullWidth
+                - paragraph: "Example: Full Width"
+              - 'link "Example: Sidebar + Main" [ref=e182] [cursor=pointer]':
+                - /url: /PatternGuide/ExSidebarMain
+                - paragraph: "Example: Sidebar + Main"
+              - 'link "Example: Dashboard" [ref=e184] [cursor=pointer]':
+                - /url: /PatternGuide/ExDashboard
+                - paragraph: "Example: Dashboard"
+              - 'link "Example: Grid Page" [ref=e186] [cursor=pointer]':
+                - /url: /PatternGuide/ExGridPage
+                - paragraph: "Example: Grid Page"
+          - generic [ref=e187]:
+            - generic [ref=e188] [cursor=pointer]:
+              - img "shop" [ref=e190]:
+                - img [ref=e191]
+              - paragraph [ref=e193]: Bakery
+            - generic:
+              - link "Bakery Products" [ref=e196] [cursor=pointer]:
+                - /url: /Bakery/BakeryProducts
+                - paragraph: Bakery Products
+              - link "Formula Manager" [ref=e198] [cursor=pointer]:
+                - /url: /Bakery/FormulaManager
+                - paragraph: Formula Manager
+              - link "Delivery Management" [ref=e200] [cursor=pointer]:
+                - /url: /Bakery/DeliveryManagement
+                - paragraph: Delivery Management
+              - link "Competitor Price Analysis" [ref=e202] [cursor=pointer]:
+                - /url: /Bakery/SupplierAnalysis
+                - paragraph: Competitor Price Analysis
+              - link "Competitor Details" [ref=e204] [cursor=pointer]:
+                - /url: /Bakery/SupplierDetails
+                - paragraph: Competitor Details
+              - link "Contract Measurement" [ref=e206] [cursor=pointer]:
+                - /url: /Bakery/ContractMeasurementGrid
+                - paragraph: Contract Measurement
+              - link "Measurement Details" [ref=e208] [cursor=pointer]:
+                - /url: /Bakery/ContractMeasurementDetails
+                - paragraph: Measurement Details
+              - link "Delivered Pricing" [ref=e210] [cursor=pointer]:
+                - /url: /Bakery/DeliveredPricingQuoteBook
+                - paragraph: Delivered Pricing
+              - link "Quotebook Wholesale" [ref=e212] [cursor=pointer]:
+                - /url: /Bakery/QuotebookWholesale
+                - paragraph: Quotebook Wholesale
+              - link "Ad-Hoc Valuation (Story 1)" [ref=e214] [cursor=pointer]:
+                - /url: /Bakery/QuotebookQoLAdHoc
+                - paragraph: Ad-Hoc Valuation (Story 1)
+              - link "Row Refresh (Story 2)" [ref=e216] [cursor=pointer]:
+                - /url: /Bakery/QuotebookQoLRowRefresh
+                - paragraph: Row Refresh (Story 2)
+              - link "Price Entry (Story 4)" [ref=e218] [cursor=pointer]:
+                - /url: /Bakery/QuotebookQoLPriceEntry
+                - paragraph: Price Entry (Story 4)
+          - link "table Bulk Change Test" [ref=e220] [cursor=pointer]:
+            - /url: /BulkChangeTest
+            - img "table" [ref=e222]:
+              - img [ref=e223]
+            - paragraph [ref=e225]: Bulk Change Test
+          - link "edit Customer Form" [ref=e227] [cursor=pointer]:
+            - /url: /CustomerForm
+            - img "edit" [ref=e229]:
+              - img [ref=e230]
+            - paragraph [ref=e232]: Customer Form
+          - generic [ref=e233]:
+            - generic [ref=e234] [cursor=pointer]:
+              - img "calculator" [ref=e236]:
+                - img [ref=e237]
+              - paragraph [ref=e239]: Contract Management
+            - generic:
+              - link "Contracts" [ref=e242] [cursor=pointer]:
+                - /url: /ContractFormulas/PromptsGrid
+                - paragraph: Contracts
+              - link "Formula Templates" [ref=e244] [cursor=pointer]:
+                - /url: /ContractFormulas/FormulaTemplates
+                - paragraph: Formula Templates
+              - link "Contract Details" [ref=e246] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractDetails
+                - paragraph: Contract Details
+              - link "RFP Management" [ref=e248] [cursor=pointer]:
+                - /url: /ContractFormulas/RFPManagement
+                - paragraph: RFP Management
+              - link "Seller RFP Response" [ref=e250] [cursor=pointer]:
+                - /url: /ContractFormulas/SellerRFPResponse
+                - paragraph: Seller RFP Response
+              - link "Measurements" [ref=e252] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractMeasurementGrid
+                - paragraph: Measurements
+              - link "Measurement Details" [ref=e254] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractMeasurementDetails
+                - paragraph: Measurement Details
+              - link "Contracts - New" [ref=e256] [cursor=pointer]:
+                - /url: /ContractFormulas/ContractsList
+                - paragraph: Contracts - New
+              - link "Create Contract - New" [ref=e258] [cursor=pointer]:
+                - /url: /ContractFormulas/CreateContract
+                - paragraph: Create Contract - New
+              - link "Edit Contract - New" [ref=e260] [cursor=pointer]:
+                - /url: /ContractFormulas/EditContract
+                - paragraph: Edit Contract - New
+          - generic [ref=e261]:
+            - generic [ref=e262] [cursor=pointer]:
+              - img "shop" [ref=e264]:
+                - img [ref=e265]
+              - paragraph [ref=e267]: Online Selling Platform
+            - generic:
+              - link "Buy Now" [ref=e270] [cursor=pointer]:
+                - /url: /MarketPlatform/OnlineSellingPlatform
+                - paragraph: Buy Now
+              - link "Index Offer Management" [ref=e272] [cursor=pointer]:
+                - /url: /MarketPlatform/IndexOfferManagement
+                - paragraph: Index Offer Management
+              - link "Index Offer Buy Now" [ref=e274] [cursor=pointer]:
+                - /url: /MarketPlatform/IndexOfferBuyNow
+                - paragraph: Index Offer Buy Now
+              - link "Negotiation Mode" [ref=e276] [cursor=pointer]:
+                - /url: /MarketPlatform/NegotiationMode
+                - paragraph: Negotiation Mode
+          - generic [ref=e277]:
+            - generic [ref=e278] [cursor=pointer]:
+              - img "dashboard" [ref=e280]:
+                - img [ref=e281]
+              - paragraph [ref=e283]: Competitor Profile
+            - generic:
+              - link "Competitor Price Analysis" [ref=e286] [cursor=pointer]:
+                - /url: /SupplierAnalysis/SupplierProfileAnalysis
+                - paragraph: Competitor Price Analysis
+              - link "Competitor Details" [ref=e288] [cursor=pointer]:
+                - /url: /SupplierAnalysis/SupplierDetails
+                - paragraph: Competitor Details
+          - link "table Global Tiered Diff" [ref=e290] [cursor=pointer]:
+            - /url: /GlobalTieredPricing
+            - img "table" [ref=e292]:
+              - img [ref=e293]
+            - paragraph [ref=e295]: Global Tiered Diff
+          - link "credit-card Price Notifications" [ref=e297] [cursor=pointer]:
+            - /url: /SubscriptionManagement
+            - img "credit-card" [ref=e299]:
+              - img [ref=e300]
+            - paragraph [ref=e302]: Price Notifications
+          - generic [ref=e303]:
+            - generic [ref=e304] [cursor=pointer]:
+              - img "dollar" [ref=e306]:
+                - img [ref=e307]
+              - paragraph [ref=e309]: Delivered Pricing
+            - generic:
+              - link "Quote Book" [ref=e312] [cursor=pointer]:
+                - /url: /DeliveredPricing/DeliveredPricingQuoteBook
+                - paragraph: Quote Book
+              - link "Freight Management" [ref=e314] [cursor=pointer]:
+                - /url: /DeliveredPricing/FreightManagement
+                - paragraph: Freight Management
+              - link "Tax Management" [ref=e316] [cursor=pointer]:
+                - /url: /DeliveredPricing/TaxManagement
+                - paragraph: Tax Management
+          - link "line-chart Price Elasticity - Needs work" [ref=e318] [cursor=pointer]:
+            - /url: /PriceElasticity
+            - img "line-chart" [ref=e320]:
+              - img [ref=e321]
+            - paragraph [ref=e323]: Price Elasticity - Needs work
+          - generic [ref=e324]:
+            - generic [ref=e325] [cursor=pointer]:
+              - img "book" [ref=e327]:
+                - img [ref=e328]
+              - paragraph [ref=e330]: Pricing Engine (exceptions)
+            - generic:
+              - link "Quote Book Exceptions" [ref=e333] [cursor=pointer]:
+                - /url: /QuotePricing/QuoteBook
+                - paragraph: Quote Book Exceptions
+              - link "Quote Rows" [ref=e335] [cursor=pointer]:
+                - /url: /QuotePricing/ManageQuoteRows
+                - paragraph: Quote Rows
+              - link "Quotebook Wholesale" [ref=e337] [cursor=pointer]:
+                - /url: /QuotePricing/QuotebookWholesale
+                - paragraph: Quotebook Wholesale
+          - generic [ref=e338]:
+            - generic [ref=e339] [cursor=pointer]:
+              - img "sync" [ref=e341]:
+                - img [ref=e342]
+              - paragraph [ref=e344]: Valuation, Refresh, Entry
+            - generic:
+              - link "Ad-Hoc Valuation (Story 1)" [ref=e347] [cursor=pointer]:
+                - /url: /QuotebookQoL/QuotebookQoLAdHoc
+                - paragraph: Ad-Hoc Valuation (Story 1)
+              - link "Row Refresh (Story 2)" [ref=e349] [cursor=pointer]:
+                - /url: /QuotebookQoL/QuotebookQoLRowRefresh
+                - paragraph: Row Refresh (Story 2)
+              - link "Price Entry (Story 4)" [ref=e351] [cursor=pointer]:
+                - /url: /QuotebookQoL/QuotebookQoLPriceEntry
+                - paragraph: Price Entry (Story 4)
+          - generic [ref=e352]:
+            - generic [ref=e353] [cursor=pointer]:
+              - img "dollar" [ref=e355]:
+                - img [ref=e356]
+              - paragraph [ref=e358]: Price Management
+            - generic:
+              - link "All Prices" [ref=e361] [cursor=pointer]:
+                - /url: /PriceManagement/AllPrices
+                - paragraph: All Prices
+              - link "Contract Values" [ref=e363] [cursor=pointer]:
+                - /url: /PriceManagement/ContractValues
+                - paragraph: Contract Values
+              - link "Quotebook" [ref=e365] [cursor=pointer]:
+                - /url: /PriceManagement/Quotebook
+                - paragraph: Quotebook
+              - link "Contract Detail" [ref=e367] [cursor=pointer]:
+                - /url: /PriceManagement/ContractDetail
+                - paragraph: Contract Detail
+              - link "Contract Revaluation" [ref=e369] [cursor=pointer]:
+                - /url: /PriceManagement/ContractReval
+                - paragraph: Contract Revaluation
+          - link "shop Manage Offers" [ref=e371] [cursor=pointer]:
+            - /url: /ManageOffers
+            - img "shop" [ref=e373]:
+              - img [ref=e374]
+            - paragraph [ref=e376]: Manage Offers
+          - link "dollar Price Management UI" [ref=e378] [cursor=pointer]:
+            - /url: /PriceManagementUI
+            - img "dollar" [ref=e380]:
+              - img [ref=e381]
+            - paragraph [ref=e383]: Price Management UI
+    - main [ref=e384]:
+      - generic [ref=e385]:
+        - navigation [ref=e386]:
+          - generic [ref=e387]: Pattern Guide
+          - generic [ref=e388]:
+            - generic [ref=e389]: Patterns
+            - button "Spacing & Tokens" [ref=e390] [cursor=pointer]
+            - button "Forms" [ref=e391] [cursor=pointer]
+            - button "Modals" [ref=e392] [cursor=pointer]
+            - button "Sections & Content" [ref=e393] [cursor=pointer]
+            - button "Right Drawers" [ref=e394] [cursor=pointer]
+            - button "Bottom Drawers" [ref=e395] [cursor=pointer]
+            - button "Page Layouts" [ref=e396] [cursor=pointer]
+            - button "Panels" [ref=e397] [cursor=pointer]
+            - button "Cards" [ref=e398] [cursor=pointer]
+            - button "Button Groups" [ref=e399] [cursor=pointer]
+            - button "Feedback & Messaging" [ref=e400] [cursor=pointer]
+            - button "Navigation" [ref=e401] [cursor=pointer]
+          - generic [ref=e403]:
+            - generic [ref=e404]: Examples
+            - button "Overview" [ref=e405] [cursor=pointer]
+            - button "Full-Width Page" [ref=e406] [cursor=pointer]
+            - button "Sidebar + Main" [ref=e407] [cursor=pointer]
+            - button "Dashboard" [ref=e408] [cursor=pointer]
+            - button "Grid Page" [ref=e409] [cursor=pointer]
+        - generic [ref=e411]:
+          - generic [ref=e415]:
+            - heading "Spacing & Tokens" [level=1] [ref=e416]
+            - paragraph [ref=e417]: A single spacing scale used everywhere. 9 tokens replace the 15+ arbitrary pixel values scattered across the codebase. Parent container padding is always at least one step larger than child gaps.
+          - navigation [ref=e418]:
+            - generic [ref=e419]: On this page
+            - list [ref=e420]:
+              - listitem [ref=e421]:
+                - link "The Scale" [ref=e422] [cursor=pointer]:
+                  - /url: "#scale"
+              - listitem [ref=e423]:
+                - link "Visual Reference" [ref=e424] [cursor=pointer]:
+                  - /url: "#swatches"
+              - listitem [ref=e425]:
+                - link "Nesting Hierarchy" [ref=e426] [cursor=pointer]:
+                  - /url: "#nesting"
+              - listitem [ref=e427]:
+                - link "Where Each Token Lives" [ref=e428] [cursor=pointer]:
+                  - /url: "#usage"
+              - listitem [ref=e429]:
+                - link "Do's & Don'ts" [ref=e430] [cursor=pointer]:
+                  - /url: "#dos-donts"
+          - generic [ref=e431]:
+            - generic [ref=e432]:
+              - generic [ref=e433]:
+                - heading "The Scale" [level=2] [ref=e434]
+                - paragraph [ref=e435]: 8-based scale with 4px and 12px half-steps. Every spacing value in the app maps to one of these tokens.
+              - table [ref=e438]:
+                - rowgroup [ref=e439]:
+                  - row "Token Value CSS Variable Usage" [ref=e440]:
+                    - columnheader "Token" [ref=e441]
+                    - columnheader "Value" [ref=e442]
+                    - columnheader "CSS Variable" [ref=e443]
+                    - columnheader "Usage" [ref=e444]
+                - rowgroup [ref=e445]:
+                  - row "space-0 0px --space-0 Flush / zero spacing" [ref=e446]:
+                    - cell "space-0" [ref=e447]
+                    - cell "0px" [ref=e448]
+                    - cell "--space-0" [ref=e449]:
+                      - code [ref=e450]: "--space-0"
+                    - cell "Flush / zero spacing" [ref=e451]
+                  - 'row "space-1 4px --space-1 Tight: icon-to-text, label-to-input" [ref=e452]':
+                    - cell "space-1" [ref=e453]
+                    - cell "4px" [ref=e454]
+                    - cell "--space-1" [ref=e455]:
+                      - code [ref=e456]: "--space-1"
+                    - 'cell "Tight: icon-to-text, label-to-input" [ref=e457]'
+                  - 'row "space-2 8px --space-2 Compact: button group gaps, inline pairs" [ref=e458]':
+                    - cell "space-2" [ref=e459]
+                    - cell "8px" [ref=e460]
+                    - cell "--space-2" [ref=e461]:
+                      - code [ref=e462]: "--space-2"
+                    - 'cell "Compact: button group gaps, inline pairs" [ref=e463]'
+                  - 'row "space-3 12px --space-3 Snug: card inner padding, footer bars" [ref=e464]':
+                    - cell "space-3" [ref=e465]
+                    - cell "12px" [ref=e466]
+                    - cell "--space-3" [ref=e467]:
+                      - code [ref=e468]: "--space-3"
+                    - 'cell "Snug: card inner padding, footer bars" [ref=e469]'
+                  - 'row "space-4 16px --space-4 Default: form field gaps, section inner padding" [ref=e470]':
+                    - cell "space-4" [ref=e471]
+                    - cell "16px" [ref=e472]
+                    - cell "--space-4" [ref=e473]:
+                      - code [ref=e474]: "--space-4"
+                    - 'cell "Default: form field gaps, section inner padding" [ref=e475]'
+                  - 'row "space-5 24px --space-5 Comfortable: section gaps, card padding, page content" [ref=e476]':
+                    - cell "space-5" [ref=e477]
+                    - cell "24px" [ref=e478]
+                    - cell "--space-5" [ref=e479]:
+                      - code [ref=e480]: "--space-5"
+                    - 'cell "Comfortable: section gaps, card padding, page content" [ref=e481]'
+                  - 'row "space-6 32px --space-6 Spacious: major section breaks, page dividers" [ref=e482]':
+                    - cell "space-6" [ref=e483]
+                    - cell "32px" [ref=e484]
+                    - cell "--space-6" [ref=e485]:
+                      - code [ref=e486]: "--space-6"
+                    - 'cell "Spacious: major section breaks, page dividers" [ref=e487]'
+                  - 'row "space-7 40px --space-7 Page: top-level padding, hero spacing" [ref=e488]':
+                    - cell "space-7" [ref=e489]
+                    - cell "40px" [ref=e490]
+                    - cell "--space-7" [ref=e491]:
+                      - code [ref=e492]: "--space-7"
+                    - 'cell "Page: top-level padding, hero spacing" [ref=e493]'
+                  - 'row "space-8 48px --space-8 Canvas: showcase-level page wrapper" [ref=e494]':
+                    - cell "space-8" [ref=e495]
+                    - cell "48px" [ref=e496]
+                    - cell "--space-8" [ref=e497]:
+                      - code [ref=e498]: "--space-8"
+                    - 'cell "Canvas: showcase-level page wrapper" [ref=e499]'
+            - generic [ref=e500]:
+              - generic [ref=e501]:
+                - heading "Visual Reference" [level=2] [ref=e502]
+                - paragraph [ref=e503]: Relative sizes of each token at actual pixel width.
+              - generic [ref=e505]:
+                - generic [ref=e506]: Token widths at 1:1 scale
+                - generic [ref=e508]:
+                  - generic [ref=e509]:
+                    - generic [ref=e511]: space-1
+                    - generic [ref=e512]: 4px
+                  - generic [ref=e513]:
+                    - generic [ref=e515]: space-2
+                    - generic [ref=e516]: 8px
+                  - generic [ref=e517]:
+                    - generic [ref=e519]: space-3
+                    - generic [ref=e520]: 12px
+                  - generic [ref=e521]:
+                    - generic [ref=e523]: space-4
+                    - generic [ref=e524]: 16px
+                  - generic [ref=e525]:
+                    - generic [ref=e527]: space-5
+                    - generic [ref=e528]: 24px
+                  - generic [ref=e529]:
+                    - generic [ref=e531]: space-6
+                    - generic [ref=e532]: 32px
+                  - generic [ref=e533]:
+                    - generic [ref=e535]: space-7
+                    - generic [ref=e536]: 40px
+                  - generic [ref=e537]:
+                    - generic [ref=e539]: space-8
+                    - generic [ref=e540]: 48px
+            - generic [ref=e541]:
+              - generic [ref=e542]:
+                - heading "Nesting Hierarchy" [level=2] [ref=e543]
+                - paragraph [ref=e544]: Parent padding is always >= 1 step above child gaps. This creates visual hierarchy — content feels contained, not crowded.
+              - generic [ref=e545]:
+                - generic [ref=e546]:
+                  - generic [ref=e547]: Page > Section > Card > Fields > Label
+                  - generic [ref=e549]:
+                    - generic [ref=e550]: "Page (space-8: 48px)"
+                    - generic [ref=e551]:
+                      - generic [ref=e552]: "Section gap (space-6: 32px)"
+                      - generic [ref=e553]:
+                        - generic [ref=e554]: "Card padding (space-5: 24px)"
+                        - generic [ref=e555]:
+                          - generic [ref=e556]: "Field gap (space-4: 16px)"
+                          - generic [ref=e557]:
+                            - generic [ref=e558]: "Label-input (space-1: 4px)"
+                            - generic [ref=e559]: Content
+                - generic [ref=e560]:
+                  - generic [ref=e562]: The Rule
+                  - generic [ref=e565]:
+                    - generic [ref=e566]:
+                      - generic [ref=e567]: "Correct hierarchy:"
+                      - generic [ref=e568]:
+                        - text: "Page padding: 48px (space-8)"
+                        - text: "Section gap: 32px (space-6)"
+                        - text: "Card padding: 24px (space-5)"
+                        - text: "Field gap: 16px (space-4)"
+                        - text: "Label-input: 4px (space-1)"
+                    - generic [ref=e569]:
+                      - generic [ref=e570]: "Anti-pattern:"
+                      - generic [ref=e571]:
+                        - text: "Page padding: 20px"
+                        - text: "Section gap: 20px (= parent!)"
+                        - text: "Card padding: 12px"
+                        - text: "Field gap: 16px"
+                        - generic [ref=e572]: (> parent!)
+                        - text: "Label-input: 8px"
+                  - generic [ref=e573]: If a card has space-5 (24px) padding, its children should be spaced at space-4 (16px) or smaller. Never equal to or larger than the parent.
+            - generic [ref=e574]:
+              - generic [ref=e575]:
+                - heading "Where Each Token Lives" [level=2] [ref=e576]
+                - paragraph [ref=e577]: Quick reference for which token to use in common situations.
+              - generic [ref=e579]:
+                - generic [ref=e580]:
+                  - generic [ref=e581]: Layout
+                  - generic [ref=e582]:
+                    - generic [ref=e583]:
+                      - generic [ref=e584]: Page wrapper padding
+                      - code [ref=e585]: space-8 (48px)
+                    - generic [ref=e586]:
+                      - generic [ref=e587]: Between major sections
+                      - code [ref=e588]: space-6 (32px)
+                    - generic [ref=e589]:
+                      - generic [ref=e590]: Page content area
+                      - code [ref=e591]: space-5 (24px)
+                - generic [ref=e592]:
+                  - generic [ref=e593]: Cards & Panels
+                  - generic [ref=e594]:
+                    - generic [ref=e595]:
+                      - generic [ref=e596]: Card body padding
+                      - code [ref=e597]: space-5 (24px)
+                    - generic [ref=e598]:
+                      - generic [ref=e599]: Card header padding
+                      - code [ref=e600]: space-4 (16px)
+                    - generic [ref=e601]:
+                      - generic [ref=e602]: Footer bar padding
+                      - code [ref=e603]: space-3 (12px)
+                - generic [ref=e604]:
+                  - generic [ref=e605]: Forms
+                  - generic [ref=e606]:
+                    - generic [ref=e607]:
+                      - generic [ref=e608]: Between form sections
+                      - code [ref=e609]: space-5 (24px)
+                    - generic [ref=e610]:
+                      - generic [ref=e611]: Between form fields
+                      - code [ref=e612]: space-4 (16px)
+                    - generic [ref=e613]:
+                      - generic [ref=e614]: Label to input
+                      - code [ref=e615]: space-1 (4px)
+                - generic [ref=e616]:
+                  - generic [ref=e617]: Buttons & Inline
+                  - generic [ref=e618]:
+                    - generic [ref=e619]:
+                      - generic [ref=e620]: Button group gap
+                      - code [ref=e621]: space-2 (8px)
+                    - generic [ref=e622]:
+                      - generic [ref=e623]: Icon to text
+                      - code [ref=e624]: space-1 (4px)
+                    - generic [ref=e625]:
+                      - generic [ref=e626]: Inline element pairs
+                      - code [ref=e627]: space-2 (8px)
+            - generic [ref=e628]:
+              - heading "Do's & Don'ts" [level=2] [ref=e630]
+              - generic [ref=e631]:
+                - generic [ref=e632]:
+                  - generic [ref=e633]:
+                    - generic [ref=e634]:
+                      - generic [ref=e635]: ✓
+                      - text: Do
+                    - generic [ref=e639]:
+                      - generic [ref=e641]: First Name
+                      - generic [ref=e644]: Email
+                    - generic [ref=e646]: "Use token-based spacing: card padding (24px) > field gap (16px) > label gap (4px). Consistent label styling."
+                  - generic [ref=e647]:
+                    - generic [ref=e648]:
+                      - generic [ref=e649]: ✗
+                      - text: Don't
+                    - generic [ref=e653]:
+                      - generic [ref=e655]: First Name
+                      - generic [ref=e658]: Email
+                    - generic [ref=e660]: Arbitrary values (10px padding, 20px gap, mixed label margins of 6px and 8px). Field gap exceeds card padding — hierarchy collapses.
+                - generic [ref=e661]:
+                  - generic [ref=e662]:
+                    - generic [ref=e663]:
+                      - generic [ref=e664]: ✓
+                      - text: Do
+                    - generic [ref=e666]:
+                      - generic [ref=e667]: "gap: var(--space-4)"
+                      - generic [ref=e668]: "padding: var(--space-5)"
+                      - generic [ref=e669]: "margin-bottom: var(--space-2)"
+                    - generic [ref=e670]: Use CSS variables from tokens.css. Values are meaningful and maintainable.
+                  - generic [ref=e671]:
+                    - generic [ref=e672]:
+                      - generic [ref=e673]: ✗
+                      - text: Don't
+                    - generic [ref=e675]:
+                      - generic [ref=e676]: "gap: 20px"
+                      - generic [ref=e677]: "padding: 18px"
+                      - generic [ref=e678]: "margin-bottom: 6px"
+                    - generic [ref=e679]: Hardcoded pixel values that don't align to any scale. 20px and 18px aren't in the token system.

@@ -58,6 +58,7 @@ export interface GeneratedTieredPricingRow {
   id: number
   location: string
   product: string
+  group: string
   tier1: number
   tier2: number | null
   tier3: number | null
@@ -76,6 +77,7 @@ export function generateTieredPricingData(maxRows = 50, locationsPerProduct = 5)
 
   const rows: GeneratedTieredPricingRow[] = []
   let id = 1
+  const groupIds = ['group-a', 'group-b', 'group-c']
 
   // Use seeded randomness for consistent results
   const seededShuffle = <T>(arr: T[], seed: number): T[] => {
@@ -99,6 +101,7 @@ export function generateTieredPricingData(maxRows = 50, locationsPerProduct = 5)
         id: id++,
         location: terminal.Name,
         product: product.Name,
+        group: groupIds[(id - 1) % groupIds.length],
         tier1: generateSeededPrice(product.ProductId, terminal.LocationId, product.ProductGroup),
         tier2: null,
         tier3: null,
