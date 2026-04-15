@@ -1,0 +1,32 @@
+# Column Defs Memoization Rule
+
+## Rule: Column definitions MUST be memoized with useMemo
+
+### Why
+Without memoization, GraviGrid re-initializes on every parent render — resetting column widths, sort state, filter state, and scroll position. This is the #1 performance bug in generated grid code.
+
+### Required Pattern
+```tsx
+// CORRECT — grid stays stable across renders
+const columnDefs = useMemo(() => getColumnDefs(handlers), [])
+
+const controlBarProps = useMemo(() => ({
+  title: 'Contracts',
+  actionButtons: <GraviButton buttonText='New' theme1 icon={<PlusOutlined />} />,
+}), [])
+
+<GraviGrid columnDefs={columnDefs} controlBarProps={controlBarProps} ... />
+```
+
+### Anti-Pattern
+```tsx
+// WRONG — grid re-initializes every render
+<GraviGrid columnDefs={getColumnDefs()} ... />
+
+// ALSO WRONG — new array reference every render
+<GraviGrid columnDefs={[{ field: 'name' }, { field: 'status' }]} ... />
+```
+
+### Also Memoize
+- `controlBarProps` — same issue, new object reference causes re-render
+- Handlers passed to column defs via `useCallback` if the column defs depend on them

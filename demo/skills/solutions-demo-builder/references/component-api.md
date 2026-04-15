@@ -160,6 +160,18 @@ import { GraviButton } from '@gravitate-js/excalibrr'
 - Use `buttonText` prop, not children
 - No `htmlType` prop — use `onClick={() => form.submit()}` for form submission
 - Use `appearance="outlined"` not `appearance="outline"` (note the 'd')
+- Never use `type='primary'` — that's the AntD `<Button>` prop, not GraviButton
+- Never override button colors with inline styles — use semantic theme props
+
+### Semantic Action Mapping
+
+| Action Type | Prop | Example Labels |
+|-------------|------|----------------|
+| Create / Add / Save | `theme1` | New Contract, Save Changes, Add Item |
+| Delete / Remove | `danger` | Delete, Remove, Discard |
+| Cancel / Dismiss | *(no theme — default gray)* | Cancel, Close, Back |
+| Success / Approve | `success` | Approve, Confirm, Accept |
+| Secondary / Export | `appearance='outlined'` | Export, Import, Download |
 
 ```tsx
 // Primary action
@@ -468,6 +480,14 @@ This is the full list of things that will break or look wrong. Check your code a
 | Style | BEM naming (`__`, `--`) | Kebab-case (`-`) | No BEM convention |
 | Exports | `export default function` | `export function Name()` | Named exports only |
 | Exports | `const Name = () =>` | `export function Name()` | Function declarations |
+| Grid | `valueGetter` without `valueSetter` on editable column | Add matching `valueSetter` | Edits silently lost |
+| Grid | Inline arrow functions in `agPropOverrides` handlers | `useCallback` wrapper | Causes grid re-render |
+| Grid | `cellRenderer` for simple text/number formatting | `valueFormatter` | Performance — no React mount per cell |
+| Grid | Editable grid without `stopEditingWhenCellsLoseFocus` | Add to `agPropOverrides` | Cells stay in edit mode on blur |
+| Grid | Unmemoized `columnDefs={getColumnDefs()}` | `useMemo(() => getColumnDefs(), [])` | Grid resets on every render |
+| Button | `type='primary'` on GraviButton | `theme1` | Wrong prop (AntD Button, not GraviButton) |
+| Form | Missing `form.resetFields()` on modal/drawer close | Reset on close AND after submit | Stale data appears in form |
+| Form | Submit button without `loading` + `disabled` during save | Both `loading` and `disabled` while submitting | Double-submit possible |
 
 ---
 
@@ -476,7 +496,8 @@ This is the full list of things that will break or look wrong. Check your code a
 When reviewing code, check for these in order of severity:
 
 **Errors (must fix):**
-All anti-patterns in the table above.
+- All anti-patterns in the table above
+- Unmemoized column definitions or controlBarProps (grid resets on every render)
 
 **Warnings (should fix):**
 - GraviGrid missing `storageKey` (column state won't persist)
@@ -484,7 +505,5 @@ All anti-patterns in the table above.
 - Alignment via className instead of component props
 
 **Best practices:**
-- Memoize column definitions with `useMemo`
-- Memoize `controlBarProps` with `useMemo`
 - Keep mock data in separate `.data.ts` files
 - Column definitions in separate `.columnDefs.tsx` files

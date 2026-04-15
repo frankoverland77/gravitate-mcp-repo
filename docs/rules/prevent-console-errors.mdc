@@ -53,16 +53,16 @@ import { ProductForm } from './ProductForm';
 ```
 
 #### 4. Modal/Drawer Wrong Prop
-**Problem**: Using `open` instead of `visible`
+**Problem**: Using deprecated `visible` instead of `open`
 ```tsx
-// ❌ BAD - Wrong prop name
-<Modal open={isOpen}>
+// ❌ BAD - Deprecated v4 prop
+<Modal visible={isOpen}>
 ```
 
-**Solution**: Use `visible` prop
+**Solution**: Use `open` prop (AntD v5)
 ```tsx
-// ✅ GOOD - Correct prop name
-<Modal visible={isOpen}>
+// ✅ GOOD - Correct v5 prop
+<Modal open={isOpen}>
 ```
 
 ### Prevention Checklist

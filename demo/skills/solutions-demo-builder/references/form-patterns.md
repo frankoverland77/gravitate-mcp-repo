@@ -412,3 +412,19 @@ const steps = [
 5. **`form.setFieldsValue()` for edit mode.** Call this in a `useEffect` when the edit record changes.
 
 6. **Form.Item `style={{ flex: 1 }}`** works for controlling width in horizontal layouts. Wrap side-by-side fields in `<Horizontal gap={16}>`.
+
+7. **Type your form.** Always provide a type parameter: `const [form] = Form.useForm<ContractFormValues>()`. Define a `FormValues` interface matching your form field names.
+
+8. **Use `Form.useWatch` for reactive field dependencies.** When one field's visibility or options depend on another field's value, use `Form.useWatch` — not `form.getFieldValue()` in the render body (it doesn't trigger re-renders):
+   ```tsx
+   const contractType = Form.useWatch('type', form)
+   // contractType updates reactively when the user changes the Type field
+   {contractType === 'formula' && <FormulaFields />}
+   ```
+
+9. **Reset on close AND after submit.** `form.resetFields()` must be called in both `onCancel`/`onClose` and after a successful save in `handleFinish`. The "Form in Modal" example above shows this correctly — but it's the most commonly forgotten step.
+
+10. **Disable submit button during save.** When the save handler is async (even simulated), set both `loading` and `disabled` on the submit button to prevent double-submission:
+    ```tsx
+    <GraviButton buttonText='Save' theme1 loading={saving} disabled={saving} onClick={() => form.submit()} />
+    ```

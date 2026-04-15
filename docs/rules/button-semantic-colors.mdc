@@ -1,0 +1,27 @@
+# GraviButton Semantic Colors
+
+## Rule: Map button actions to the correct theme props
+
+### Semantic Action Mapping
+
+| Action Type | Prop | Example Labels |
+|-------------|------|----------------|
+| Create / Add / Save | `theme1` | New Contract, Save Changes, Add Item |
+| Delete / Remove | `danger` | Delete, Remove, Discard |
+| Cancel / Dismiss | *(no theme — default gray)* | Cancel, Close, Back |
+| Success / Approve | `success` | Approve, Confirm, Accept |
+| Secondary actions | `appearance='outlined'` | Export, Import, Download |
+
+### Examples
+```tsx
+<GraviButton buttonText='New Contract' theme1 icon={<PlusOutlined />} />
+<GraviButton buttonText='Delete' danger icon={<DeleteOutlined />} />
+<GraviButton buttonText='Cancel' onClick={onClose} />
+<GraviButton buttonText='Export' appearance='outlined' icon={<DownloadOutlined />} />
+```
+
+### Never Do
+- `type='primary'` — this is AntD's `<Button>` prop, not GraviButton
+- `theme="success"` as a string — theme props are booleans (`success`, `danger`, `theme1`)
+- Inline color overrides (`style={{ backgroundColor: '...' }}`) — use semantic theme props
+- `theme2`, `theme3`, `theme4` — deprecated, use `theme1` for primary actions

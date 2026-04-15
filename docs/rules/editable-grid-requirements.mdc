@@ -1,0 +1,54 @@
+# Editable Grid Requirements
+
+## Rule: Editable grids need specific configuration to work correctly
+
+### 1. stopEditingWhenCellsLoseFocus
+Always add this to `agPropOverrides` for editable grids. Without it, cells stay in edit mode when the user clicks elsewhere, and bulk operations can fail silently.
+
+```tsx
+<GraviGrid
+  agPropOverrides={{
+    stopEditingWhenCellsLoseFocus: true,
+  }}
+/>
+```
+
+### 2. valueGetter Requires valueSetter
+If you use `valueGetter` on an editable column, you MUST also provide `valueSetter`. Without it, the grid accepts edits visually but **never updates the data** — a silent data loss bug.
+
+```tsx
+// WRONG — edits appear to work but data never changes
+{ headerName: 'Location', valueGetter: (p) => p.data?.location?.name, editable: true }
+
+// CORRECT — valueSetter writes the edit back
+{
+  headerName: 'Location',
+  valueGetter: (p) => p.data?.location?.name,
+  valueSetter: (p) => { p.data.location.name = p.newValue; return true },
+  editable: true,
+}
+```
+
+### 3. Stable Event Handler References
+Use `useCallback` for event handlers in `agPropOverrides`. Inline arrow functions create a new reference every render, causing unnecessary grid re-initialization.
+
+```tsx
+// WRONG
+agPropOverrides={{ onCellValueChanged: (e) => handleChange(e) }}
+
+// CORRECT
+const onCellValueChanged = useCallback((e) => { ... }, [])
+agPropOverrides={{ onCellValueChanged }}
+```
+
+### 4. valueFormatter + Filter Pairing
+When using `valueFormatter`, the filter dropdown will show raw unformatted values unless you also set `filterParams.valueFormatter`:
+
+```tsx
+{
+  headerName: 'Price',
+  field: 'price',
+  valueFormatter: (p) => `$${p.value?.toFixed(2)}`,
+  filterParams: { valueFormatter: (p) => `$${p.value?.toFixed(2)}` },
+}
+```

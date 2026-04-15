@@ -86,12 +86,14 @@ import { ContractModal } from './components/ContractModal'
 import { Contract } from './types'
 
 export function ContractManagementPage() {
-  // State — mock data lives in component state for demos
+  // 1. State (useState)
   const [data, setData] = useState<Contract[]>(initialContracts)
   const [modalOpen, setModalOpen] = useState(false)
   const [editRecord, setEditRecord] = useState<Contract | null>(null)
 
-  // Handlers
+  // 2. Derived/computed values (useMemo) — see below for columnDefs and controlBarProps
+
+  // 3. Event handlers
   const handleCreate = () => {
     setEditRecord(null)
     setModalOpen(true)

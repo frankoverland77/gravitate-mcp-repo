@@ -89,6 +89,10 @@ Before presenting the code:
 4. Ensure `agPropOverrides={{}}` is present on every GraviGrid
 5. Verify Modal/Drawer use `open` prop (not `visible`)
 6. Run `yarn quality:check` if available
+7. Verify column definitions are wrapped in `useMemo` (unmemoized = grid resets on every render)
+8. Verify editable grids have `stopEditingWhenCellsLoseFocus: true` in `agPropOverrides`
+9. Verify `valueGetter` columns that are editable also have a matching `valueSetter`
+10. Verify GraviButton uses semantic theme props (`theme1`, `danger`, `success`) not string `type`
 
 ## Quick Anti-Pattern Reference
 
@@ -107,6 +111,9 @@ These are the most common mistakes. The full list is in `component-api.md`.
 | `<Tabs.TabPane>` children | `<Tabs items={[...]}>` |
 | `<GraviButton htmlType="submit">` | `<GraviButton onClick={() => form.submit()}>` |
 | `<GraviGrid />` without agPropOverrides | `<GraviGrid agPropOverrides={{}} />` |
+| `columnDefs={getColumnDefs()}` (unmemoized) | `useMemo(() => getColumnDefs(), [])` |
+| `cellRenderer` for `$${value.toFixed(2)}` | `valueFormatter` (no React mount per cell) |
+| `type='primary'` on GraviButton | `theme1` (boolean prop) |
 
 ## Import Order
 

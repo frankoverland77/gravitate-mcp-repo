@@ -38,6 +38,11 @@ git hook run pre-commit
 | `<Tabs.TabPane>` children | `<Tabs items={[...]}/>` |
 | `editable: true` without `isBulkEditable` | Add `isBulkEditable: true` to columns that need bulk editing |
 | `updateEP` as a no-op (`Promise.resolve()`) | Must call `setRowData` to merge updated rows back into state |
+| `<GraviGrid columnDefs={getColumnDefs()}>` (unmemoized) | `const cols = useMemo(() => getColumnDefs(), []); <GraviGrid columnDefs={cols}>` |
+| `type='primary'` on GraviButton | `theme1` (boolean prop) |
+| `valueGetter` without `valueSetter` on editable column | Add matching `valueSetter` or edits silently fail |
+| `cellRenderer` for simple text/number formatting | `valueFormatter` (better performance, no React mount per cell) |
+| `form.getFieldValue('x')` in render for reactive deps | `Form.useWatch('x', form)` (getFieldValue doesn't trigger re-renders) |
 
 ---
 
