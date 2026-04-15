@@ -4,7 +4,7 @@
 
 import type { ColDef, ValueFormatterParams, ValueGetterParams, ValueParserParams, CellClassParams } from 'ag-grid-community'
 import { message } from 'antd'
-import { CheckboxColumn } from '../../components/shared/Grid/sharedColumnDefs/CheckboxColumn'
+import { BulkTierDiffEditor } from './components/BulkTierDiffEditor'
 import type { TieredPricingRow } from './GlobalTieredPricing.types'
 
 function formatPrice(value: number): string {
@@ -22,17 +22,17 @@ interface TierColumnConfig {
   calculateTier3: (tier2: number) => number
 }
 
-export function getColumnDefs(config: TierColumnConfig): ColDef<TieredPricingRow>[] {
+export function getColumnDefs(config: TierColumnConfig): any[] {
   const { autoCalculate, calculateTier2, calculateTier3 } = config
 
   return [
-    CheckboxColumn('checkbox'),
     {
       field: 'location',
       headerName: 'LOCATION',
       width: 200,
       sortable: true,
       filter: true,
+      editable: false,
     },
     {
       field: 'product',
@@ -40,6 +40,7 @@ export function getColumnDefs(config: TierColumnConfig): ColDef<TieredPricingRow
       width: 250,
       sortable: true,
       filter: true,
+      editable: false,
     },
     {
       field: 'tier1',
@@ -49,6 +50,13 @@ export function getColumnDefs(config: TierColumnConfig): ColDef<TieredPricingRow
       filter: true,
       type: 'rightAligned',
       editable: true,
+      isBulkEditable: true,
+      bulkCellEditor: BulkTierDiffEditor,
+      bulkCellEditorParams: {
+        propKey: 'tier1',
+        precision: 4,
+        step: 0.0001,
+      },
       cellEditor: 'agNumberCellEditor',
       cellEditorParams: {
         precision: 4,
@@ -73,6 +81,13 @@ export function getColumnDefs(config: TierColumnConfig): ColDef<TieredPricingRow
       filter: true,
       type: 'rightAligned',
       editable: true,
+      isBulkEditable: true,
+      bulkCellEditor: BulkTierDiffEditor,
+      bulkCellEditorParams: {
+        propKey: 'tier2',
+        precision: 4,
+        step: 0.0001,
+      },
       cellEditor: 'agNumberCellEditor',
       cellEditorParams: {
         precision: 4,
@@ -116,6 +131,13 @@ export function getColumnDefs(config: TierColumnConfig): ColDef<TieredPricingRow
       filter: true,
       type: 'rightAligned',
       editable: true,
+      isBulkEditable: true,
+      bulkCellEditor: BulkTierDiffEditor,
+      bulkCellEditorParams: {
+        propKey: 'tier3',
+        precision: 4,
+        step: 0.0001,
+      },
       cellEditor: 'agNumberCellEditor',
       cellEditorParams: {
         precision: 4,

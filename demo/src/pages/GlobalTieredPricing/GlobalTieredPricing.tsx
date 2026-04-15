@@ -1,25 +1,24 @@
 /**
  * Global Tiered Pricing
  *
- * Editable pricing grid with auto-calculated tier spreads, bulk editing,
- * and undo/redo support. Tier 2 and Tier 3 auto-calculate from Tier 1
- * using configurable spreads (default 0.0025).
+ * Editable pricing grid with auto-calculated tier spreads and bulk change
+ * (increment/decrement/replace). Tier 2 and Tier 3 auto-calculate from
+ * Tier 1 using configurable spreads (default 0.0025).
  */
 
 import { useMemo, useState, useCallback } from 'react'
-import { GraviGrid, Horizontal, Vertical, GraviButton } from '@gravitate-js/excalibrr'
+import { GraviGrid, Vertical } from '@gravitate-js/excalibrr'
 import { Alert, message } from 'antd'
-import { EditOutlined, UndoOutlined, RedoOutlined, WarningOutlined, UnorderedListOutlined } from '@ant-design/icons'
-import type { GridApi, CellValueChangedEvent, GridReadyEvent, SelectionChangedEvent } from 'ag-grid-community'
+import { WarningOutlined } from '@ant-design/icons'
+import type { GridApi, CellValueChangedEvent, GridReadyEvent } from 'ag-grid-community'
 
-import { tieredPricingData, defaultTierGroups } from './GlobalTieredPricing.data'
+import { tieredPricingData, defaultTierGroups, counterpartyAssignments } from './GlobalTieredPricing.data'
 import { getColumnDefs } from './GlobalTieredPricing.columnDefs'
-import { BulkEditModal } from './components/BulkEditModal'
 import { SpreadConfigPanel } from './components/SpreadConfigPanel'
 import { TierGroupTabs } from './components/TierGroupTabs'
-import { AssignedRowsDrawer } from './components/AssignedRowsDrawer'
+import { CounterpartyPanel } from './components/CounterpartyPanel'
 import { loadPersistedRows, persistRows, loadPersistedGroups } from './GlobalTieredPricing.persistence'
-import type { TieredPricingRow, AssignedRowsDrawerState } from './GlobalTieredPricing.types'
+import type { TieredPricingRow } from './GlobalTieredPricing.types'
 import './GlobalTieredPricing.css'
 
 export function GlobalTieredPricing() {
@@ -29,18 +28,10 @@ export function GlobalTieredPricing() {
   const [tier2Spread, setTier2Spread] = useState(0.0025)
   const [tier3Spread, setTier3Spread] = useState(0.0025)
   const [autoCalculate, setAutoCalculate] = useState(true)
-  const [selectedRows, setSelectedRows] = useState<TieredPricingRow[]>([])
-  const [bulkEditModalOpen, setBulkEditModalOpen] = useState(false)
+  const [isBulkChangeVisible, setIsBulkChangeVisible] = useState(false)
   const [gridApi, setGridApi] = useState<GridApi | null>(null)
-  const [history, setHistory] = useState<TieredPricingRow[][]>(() => [loadPersistedRows() ?? tieredPricingData])
-  const [historyIndex, setHistoryIndex] = useState(0)
   const [validationWarnings, setValidationWarnings] = useState<string[]>([])
-  const [drawerState, setDrawerState] = useState<AssignedRowsDrawerState>({
-    isOpen: false,
-    mode: 'empty',
-    selectedGroupId: null,
-    selectedLevelId: null,
-  })
+  const [selectedRow, setSelectedRow] = useState<TieredPricingRow | null>(null)
 
   const filteredRows = useMemo(
     () => rowData.filter(r => r.group === activeGroupTab),
@@ -54,19 +45,6 @@ export function GlobalTieredPricing() {
     }
     return counts
   }, [rowData])
-
-  const handleCountClick = useCallback((groupId: string) => {
-    setDrawerState({
-      isOpen: true,
-      mode: 'group',
-      selectedGroupId: groupId,
-      selectedLevelId: null,
-    })
-  }, [])
-
-  const handleCloseDrawer = useCallback(() => {
-    setDrawerState(prev => ({ ...prev, isOpen: false }))
-  }, [])
 
   const calculateTier2 = useCallback((tier1: number) => tier1 + tier2Spread, [tier2Spread])
   const calculateTier3 = useCallback((tier2: number) => tier2 + tier3Spread, [tier3Spread])
@@ -89,45 +67,11 @@ export function GlobalTieredPricing() {
     return warnings
   }, [calculateTier2, calculateTier3])
 
-  const addToHistory = useCallback((newData: TieredPricingRow[]) => {
-    const newHistory = history.slice(0, historyIndex + 1)
-    newHistory.push(newData)
-    if (newHistory.length > 50) {
-      newHistory.shift()
-    } else {
-      setHistoryIndex(historyIndex + 1)
-    }
-    setHistory(newHistory)
-  }, [history, historyIndex])
-
   const applyData = useCallback((newData: TieredPricingRow[]) => {
-    addToHistory(newData)
     setValidationWarnings(validateRowData(newData))
     setRowData(newData)
     persistRows(newData)
-  }, [addToHistory, validateRowData])
-
-  const handleUndo = useCallback(() => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1
-      setHistoryIndex(newIndex)
-      setRowData(history[newIndex])
-      setValidationWarnings(validateRowData(history[newIndex]))
-      persistRows(history[newIndex])
-      message.info('Undo applied')
-    }
-  }, [historyIndex, history, validateRowData])
-
-  const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1
-      setHistoryIndex(newIndex)
-      setRowData(history[newIndex])
-      setValidationWarnings(validateRowData(history[newIndex]))
-      persistRows(history[newIndex])
-      message.info('Redo applied')
-    }
-  }, [historyIndex, history, validateRowData])
+  }, [validateRowData])
 
   const handleSpreadChange = useCallback((tier: 'tier2' | 'tier3', value: number | null) => {
     if (value === null || value < 0) {
@@ -157,19 +101,12 @@ export function GlobalTieredPricing() {
     }
   }, [rowData, tier2Spread, tier3Spread, applyData])
 
-  const handleBulkApply = useCallback((tier1Value: number) => {
-    const selectedIds = new Set(selectedRows.map(row => row.id))
-    const newData = rowData.map(row =>
-      selectedIds.has(row.id)
-        ? { ...row, tier1: tier1Value, tier2Override: false, tier3Override: false }
-        : row
-    )
+  const handleBulkUpdate = useCallback(async (rows: any | any[]) => {
+    const updatedRows = Array.isArray(rows) ? rows : [rows]
+    const updatedMap = new Map(updatedRows.map((u: any) => [u.id, u]))
+    const newData = rowData.map(row => updatedMap.get(row.id) || row)
     applyData(newData)
-    setBulkEditModalOpen(false)
-    gridApi?.deselectAll()
-    setSelectedRows([])
-    message.success(`Updated Tier 1 for ${selectedIds.size} rows`)
-  }, [selectedRows, rowData, applyData, gridApi])
+  }, [rowData, applyData])
 
   const columnDefs = useMemo(
     () => getColumnDefs({ autoCalculate, calculateTier2, calculateTier3 }),
@@ -183,12 +120,9 @@ export function GlobalTieredPricing() {
     suppressRowClickSelection: true,
     enterNavigatesVertically: true,
     enterNavigatesVerticallyAfterEdit: true,
-    singleClickEdit: true,
     stopEditingWhenCellsLoseFocus: true,
     onGridReady: (event: GridReadyEvent) => { setGridApi(event.api) },
-    onSelectionChanged: (event: SelectionChangedEvent) => {
-      setSelectedRows(event.api.getSelectedRows())
-    },
+    onRowClicked: (event: any) => { if (event.data) setSelectedRow(event.data) },
     onCellValueChanged: (event: CellValueChangedEvent<TieredPricingRow>) => {
       const field = event.colDef.field as keyof TieredPricingRow
       if (!event.data) return
@@ -213,38 +147,7 @@ export function GlobalTieredPricing() {
     title: 'Tier Diff Entry',
     subtitle: 'Tier 2 and Tier 3 auto-calculate with 25-point (0.0025) spreads. Click any calculated cell to override manually.',
     hideActiveFilters: false,
-    actionButtons: (
-      <Horizontal gap={8}>
-        <GraviButton
-          buttonText='Undo'
-          icon={<UndoOutlined />}
-          appearance='outlined'
-          disabled={historyIndex <= 0}
-          onClick={handleUndo}
-        />
-        <GraviButton
-          buttonText='Redo'
-          icon={<RedoOutlined />}
-          appearance='outlined'
-          disabled={historyIndex >= history.length - 1}
-          onClick={handleRedo}
-        />
-        <GraviButton
-          buttonText={`Bulk Edit Tier 1 (${selectedRows.length} selected)`}
-          icon={<EditOutlined />}
-          success={selectedRows.length > 0}
-          disabled={selectedRows.length === 0}
-          onClick={() => setBulkEditModalOpen(true)}
-        />
-        <GraviButton
-          buttonText='View Rows'
-          icon={<UnorderedListOutlined />}
-          appearance='outlined'
-          onClick={() => handleCountClick(activeGroupTab)}
-        />
-      </Horizontal>
-    ),
-  }), [selectedRows.length, historyIndex, history.length, handleUndo, handleRedo, handleCountClick, activeGroupTab])
+  }), [])
 
   return (
     <Vertical height='100%'>
@@ -271,9 +174,8 @@ export function GlobalTieredPricing() {
       <TierGroupTabs
         groups={tierGroups}
         activeTab={activeGroupTab}
-        onTabChange={setActiveGroupTab}
+        onTabChange={(tab) => { setActiveGroupTab(tab); setSelectedRow(null) }}
         rowCounts={rowCountsByGroup}
-        onCountClick={handleCountClick}
       />
 
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
@@ -284,23 +186,20 @@ export function GlobalTieredPricing() {
             columnDefs={columnDefs}
             agPropOverrides={agPropOverrides}
             controlBarProps={controlBarProps}
+            isBulkChangeVisible={isBulkChangeVisible}
+            setIsBulkChangeVisible={setIsBulkChangeVisible}
+            updateEP={handleBulkUpdate}
+            isBulkChangeCompactMode
           />
         </Vertical>
 
-        <AssignedRowsDrawer
-          drawerState={drawerState}
-          allRows={rowData}
-          groups={tierGroups}
-          onClose={handleCloseDrawer}
+        <CounterpartyPanel
+          selectedRow={selectedRow}
+          activeGroupId={activeGroupTab}
+          assignments={counterpartyAssignments}
         />
       </div>
 
-      <BulkEditModal
-        open={bulkEditModalOpen}
-        selectedCount={selectedRows.length}
-        onApply={handleBulkApply}
-        onCancel={() => setBulkEditModalOpen(false)}
-      />
     </Vertical>
   )
 }

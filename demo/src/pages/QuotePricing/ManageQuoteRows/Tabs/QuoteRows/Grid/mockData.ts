@@ -23,11 +23,26 @@ export const tierGroupOptions = [
   { Value: 'Group C', Text: 'Group C' },
 ]
 
-export const tierLevelOptions = [
-  { Value: 'Tier 1', Text: 'Tier 1' },
-  { Value: 'Tier 2', Text: 'Tier 2' },
-  { Value: 'Tier 3', Text: 'Tier 3' },
-]
+/** Tier levels are owned by their parent group — each group can have different names and quantities */
+export const tierLevelOptionsByGroup: Record<string, { Value: string; Text: string }[]> = {
+  'Group A': [
+    { Value: 'Tier 1', Text: 'Tier 1' },
+    { Value: 'Tier 2', Text: 'Tier 2' },
+    { Value: 'Tier 3', Text: 'Tier 3' },
+  ],
+  'Group B': [
+    { Value: 'Platinum', Text: 'Platinum' },
+    { Value: 'Gold', Text: 'Gold' },
+    { Value: 'Silver', Text: 'Silver' },
+  ],
+  'Group C': [
+    { Value: 'Primary', Text: 'Primary' },
+    { Value: 'Secondary', Text: 'Secondary' },
+  ],
+}
+
+/** Flat list for bulk change (all levels across all groups) */
+export const allTierLevelOptions = Object.values(tierLevelOptionsByGroup).flat()
 
 export const quoteConfigData: QuoteConfigRow[] = [
   // Wholesale Config (5 rows)
@@ -83,7 +98,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     counterparty: 'PetroChem Inc',
     competitorCount: 2,
     tierGroup: 'Group B',
-    tierLevel: 'Tier 1',
+    tierLevel: 'Platinum',
   },
   {
     id: 4,
@@ -138,7 +153,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     counterparty: 'Midwest Mfg',
     competitorCount: 1,
     tierGroup: 'Group B',
-    tierLevel: 'Tier 2',
+    tierLevel: 'Gold',
   },
   {
     id: 7,
@@ -192,7 +207,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     counterparty: 'Heartland Power',
     competitorCount: 2,
     tierGroup: 'Group B',
-    tierLevel: 'Tier 3',
+    tierLevel: 'Silver',
   },
   {
     id: 10,
@@ -265,7 +280,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     counterparty: 'Corner Gas Co',
     competitorCount: 2,
     tierGroup: 'Group B',
-    tierLevel: 'Tier 1',
+    tierLevel: 'Platinum',
   },
   {
     id: 14,
@@ -283,7 +298,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     counterparty: 'Roadside Energy',
     competitorCount: 3,
     tierGroup: 'Group C',
-    tierLevel: 'Tier 2',
+    tierLevel: 'Primary',
   },
   {
     id: 15,
@@ -301,7 +316,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     counterparty: 'Express Petroleum',
     competitorCount: 5,
     tierGroup: 'Group C',
-    tierLevel: 'Tier 3',
+    tierLevel: 'Secondary',
   },
 ]
 

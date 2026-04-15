@@ -1,10 +1,9 @@
-import { ColDef } from 'ag-grid-community'
 import { DeleteOutlined } from '@ant-design/icons'
 import { BBDTag, GraviButton, Texto } from '@gravitate-js/excalibrr'
 import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
-import { tierGroupOptions, tierLevelOptions } from './mockData'
+import { tierGroupOptions, tierLevelOptionsByGroup, allTierLevelOptions } from './mockData'
 
-export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
+export const getManageQuoteRowsColumnDefs = (): any[] => [
   {
     field: 'competitorCount',
     headerName: 'Competitors',
@@ -67,6 +66,12 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
       propKey: 'tierGroup',
       options: tierGroupOptions,
     },
+    onCellValueChanged: ({ data, api, node }: any) => {
+      if (data) {
+        data.tierLevel = null
+        api.refreshCells({ rowNodes: [node], columns: ['tierLevel'], force: true })
+      }
+    },
     cellRenderer: ({ value }: { value: string | null }) =>
       value ? (
         <BBDTag theme1 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
@@ -81,20 +86,27 @@ export const getManageQuoteRowsColumnDefs = (): ColDef[] => [
     editable: true,
     isBulkEditable: true,
     cellEditor: 'agSelectCellEditor',
-    cellEditorParams: {
-      values: [null, ...tierLevelOptions.map(o => o.Value)],
+    cellEditorParams: (params: any) => {
+      const group = params.data?.tierGroup
+      const groupLevels = group ? (tierLevelOptionsByGroup[group] ?? []) : []
+      return { values: [null, ...groupLevels.map((o: { Value: string }) => o.Value)] }
     },
     bulkCellEditor: BulkSelectEditor,
     bulkCellEditorParams: {
       propKey: 'tierLevel',
-      options: tierLevelOptions,
+      options: allTierLevelOptions,
     },
-    cellRenderer: ({ value }: { value: string | null }) =>
-      value ? (
-        <BBDTag theme3 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
-      ) : (
-        <Texto appearance="medium">—</Texto>
-      ),
+    cellStyle: (params: any) => {
+      if (params.data?.tierGroup && !params.data?.tierLevel) {
+        return { backgroundColor: 'rgba(220, 38, 38, 0.08)' }
+      }
+      return null
+    },
+    cellRenderer: ({ value, data }: { value: string | null; data: any }) => {
+      if (value) return <BBDTag theme3 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
+      if (data?.tierGroup) return <Texto style={{ color: 'var(--theme-error)', fontStyle: 'italic' }}>Required</Texto>
+      return <Texto appearance="medium">—</Texto>
+    },
   },
   {
     field: 'usesMarketMove',

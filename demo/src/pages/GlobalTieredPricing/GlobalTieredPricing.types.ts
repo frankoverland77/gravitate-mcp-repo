@@ -15,20 +15,22 @@ export interface TierGroup {
   order: number
 }
 
-/** A Tier Level within the system (e.g., Tier 1, or "Diamond") */
+/** A Tier Level belonging to a specific Tier Group (e.g., Group A → Platinum/Gold/Silver) */
 export interface TierLevel {
   id: string
+  groupId: string
   label: string
   order: number
   isDefault: boolean
 }
 
-/** State for the assigned-rows drawer */
-export interface AssignedRowsDrawerState {
-  isOpen: boolean
-  mode: 'empty' | 'group' | 'cell'
-  selectedGroupId: string | null
-  selectedLevelId: string | null
+/** A counterparty assigned to a product-location within a tier group */
+export interface CounterpartyAssignment {
+  counterparty: string
+  tierLevel: string
+  location: string
+  product: string
+  groupId: string
 }
 
 /** Spread configuration for tier calculations */
@@ -36,14 +38,6 @@ export interface SpreadConfig {
   tier2Spread: number
   tier3Spread: number
   autoCalculate: boolean
-}
-
-/** Props for the BulkEditModal component */
-export interface BulkEditModalProps {
-  open: boolean
-  selectedCount: number
-  onApply: (tier1Value: number) => void
-  onCancel: () => void
 }
 
 /** Props for the SpreadConfigPanel component */

@@ -27,7 +27,14 @@ export function QuoteRowsTab() {
   const handleBulkUpdate = useCallback(async (rows: any | any[]) => {
     const updatedRows = Array.isArray(rows) ? rows : [rows]
     const updatedMap = new Map(updatedRows.map((u: any) => [u.id, u]))
-    setRowData(prev => prev.map(row => updatedMap.get(row.id) || row))
+    setRowData(prev => prev.map(row => {
+      const updated = updatedMap.get(row.id)
+      if (!updated) return row
+      if (updated.tierGroup !== row.tierGroup) {
+        return { ...updated, tierLevel: null }
+      }
+      return updated
+    }))
   }, [])
 
   return (
