@@ -162,7 +162,7 @@ export function RevaluationWizardModal({ open, onClose, context, skipStep1 = tru
           <Texto appearance="medium" style={{ fontSize: 13 }}>
             An error occurred during revaluation. Please try again or contact support.
           </Texto>
-          <GraviButton type="primary" onClick={handleRetry} style={{ marginTop: 8 }}>
+          <GraviButton theme1 onClick={handleRetry} style={{ marginTop: 8 }}>
             Retry
           </GraviButton>
         </>

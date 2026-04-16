@@ -1,6 +1,6 @@
-# Example Designer Prompts for Excalibrr MCP Server
+# Example Designer Prompts
 
-These are example prompts you can use with Claude Code to create demos and work with the Excalibrr component library effectively.
+Example prompts for working with Claude Code to create demos using the Excalibrr component library.
 
 ## 🚀 Demo Creation
 
@@ -176,21 +176,10 @@ These are example prompts you can use with Claude Code to create demos and work 
 
 ---
 
-## 🔧 Available MCP Tools
+## Available Claude Code Skills
 
-### Component Registry Tools
-- **list_components** - Browse all components, filter by category/complexity/tags
-- **search_components** - Search by name, description, or tags
-- **get_component** - Get full documentation, props, and examples
-- **install_component** - Get usage instructions and check dependencies
-
-### Demo Creation Tools
-- **create_demo** - Creates grid/form demos from natural language
-- **create_form_demo** - Creates form components with validation
-
-### Demo Management Tools
-- **change_theme** - Switches themes (OSP, PE, BP)
-- **modify_grid** - Adds columns and makes grids editable
-- **cleanup_demo** - Removes demos and cleans up references
-
-**Happy demo building! 🎨**
+- `/excalibrr` - Main development assistant for Excalibrr demos
+- `/start-feature` - Scaffold a new feature with project context
+- `/excalibrr-create` - Create a new component demo
+- `/excalibrr-patterns` - Reference Excalibrr design patterns
+- `/bulk-change` - GraviGrid bulk change reference

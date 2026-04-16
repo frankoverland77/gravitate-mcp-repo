@@ -1,179 +1,91 @@
-# Excalibrr MCP Server
+# Excalibrr Demo Builder
 
-**Component Registry & Demo Generator for Excalibrr**
+AI-assisted demo environment for building Gravitate Selling Solutions feature prototypes using the [Excalibrr](https://github.com/gravitate-js/excalibrr) component library.
 
-An MCP (Model Context Protocol) server that provides AI assistants with direct access to the Excalibrr component library. Browse components, generate demos, and build production-quality UIs using natural language.
-
-**Key Features:**
-- 📦 **Component Registry** - Browse and search 9+ Excalibrr components
-- 🎨 **Demo Generation** - Create working demos instantly
-- 🔍 **Smart Search** - Find components by name, category, or tags
-- 💡 **Usage Examples** - Every component includes multiple examples
-- 🎯 **Like shadcn/ui** - Similar workflow, built for Excalibrr
-
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
-# One-time setup
-./setup.sh
-
-# Start using the MCP server
-claude --chat
-
-# Try these commands in Claude Code:
-"List all available components"
-"Search for grid components"
-"Show me how to use GraviGrid"
-"Create a product inventory demo"
+yarn install    # Install dependencies
+yarn dev        # Start the demo app (Vite dev server)
 ```
 
-## 💬 Natural Language Usage
+Then open the URL shown in your terminal (usually `http://localhost:5173`).
 
-The MCP server understands natural language. Try:
+## What This Is
 
-- **Browse Components:** "What components are available?" or "List all form components"
-- **Search:** "Find button components" or "Search for data grids"
-- **Get Details:** "Show me GraviGrid documentation" or "How do I use the Modal component?"
-- **Install/Use:** "Add a button to my project" or "Show me button examples"
-- **Generate Demos:** "Create a product grid" or "Make a customer form"
+This repo is a **demo application** that showcases Gravitate product features built with Excalibrr components. It serves as:
 
-## 📂 Structure
+- A **living reference** for how features should look and behave
+- A **prototyping environment** for new feature designs
+- A **training ground** for Claude Code to learn Excalibrr patterns and generate quality demos
+
+The demo app contains 20 feature areas covering Online Selling Platform, Pricing Engine, Contract Management, RFP workflows, and more.
+
+## Project Structure
 
 ```
-excalibrr-workspace/
-├── mcp-server/            # MCP server with tools
+excalibrr-demo-builder/
+├── demo/                        # React/Vite demo application
 │   ├── src/
-│   │   ├── tools/         # Demo generation tools
-│   │   ├── knowledge/     # Production patterns
-│   │   └── templates/     # Code templates
+│   │   ├── pages/               # 20 feature demo pages
+│   │   ├── components/shared/   # Shared components and theme system
+│   │   └── _Main/               # App shell and routing
+│   ├── skills/                  # Claude Code skill definitions
+│   │   └── solutions-demo-builder/
 │   └── package.json
 │
-├── demo/                  # Demo project (user works here)
+├── evals/                       # Evaluation framework
 │   ├── src/
-│   │   ├── components/shared/  # Theme system from production
-│   │   └── pages/demos/        # Generated demos
-│   ├── vite.config.js     # Production Vite config
-│   └── package.json       # Production dependencies
+│   │   ├── cases/               # Test case definitions
+│   │   ├── graders/             # Code quality + visual fidelity scoring
+│   │   ├── runners/             # Eval orchestration
+│   │   └── reporters/           # Console + HTML report output
+│   └── reference-solutions/     # Ideal implementations for comparison
 │
-└── docs/                  # Rules and conventions
-    ├── rules/             # .mdc rule files
-    └── development/       # Coding conventions
+├── docs/                        # Documentation
+│   ├── rules/                   # 15 code convention rules (.mdc)
+│   ├── development/             # Component development guides
+│   └── superpowers/specs/       # Full-build design specifications
+│
+├── .claude/                     # Claude Code configuration
+│   ├── agents/                  # 9 specialized agents
+│   ├── commands/                # 5 slash commands
+│   └── skills/                  # 2 registered skills
+│
+└── CLAUDE.md                    # Development workflow and conventions
 ```
 
-## 🎯 How It Works (Like shadcn/ui)
+## Claude Code Integration
 
-The Excalibrr MCP Server works just like shadcn/ui's MCP server:
+This repo is designed to work with [Claude Code](https://docs.anthropic.com/en/docs/claude-code). The AI tooling includes:
 
-1. **Registry Connection** - MCP connects to the Excalibrr component registry
-2. **Natural Language** - You describe what you need in plain English
-3. **AI Processing** - Claude translates your request into registry commands
-4. **Component Delivery** - Components, examples, and docs are provided instantly
+- **Skills** - `/excalibrr`, `/start-feature`, `/excalibrr-create`, `/excalibrr-patterns`, `/bulk-change`
+- **Agents** - Specialized agents for component resolution, pattern retrieval, UI review, and more
+- **Rules** - 15 `.mdc` rule files that enforce Excalibrr conventions during code generation
+- **Evals** - Automated grading for code quality and visual fidelity
 
-**Two Modes of Operation:**
-
-### 1. Component Registry (New! 🎉)
-Browse and install individual components:
-- `list_components` - Browse all Excalibrr components
-- `search_components` - Find specific components
-- `get_component` - Get full documentation and examples
-- `install_component` - Add components to your project
-
-### 2. Demo Generation (Original)
-Generate complete demo applications:
-- `create_demo` - Create grid/form/dashboard demos
-- `modify_grid` - Modify existing demos
-- `change_theme` - Switch themes (OSP, PE, BP)
-- `run_dev_server` - Start development server
-
-## 🛠 Commands
+## Evals
 
 ```bash
-# Workspace commands
-yarn setup              # One-time setup
-yarn dev                # Start demo project  
-yarn build:mcp          # Build MCP server
-
-# Demo project commands (in demo/)
-yarn dev                # Start dev server
-yarn dev:clean          # Kill existing + start fresh
-yarn dev:check          # Check server status
-yarn stop               # Stop dev server
+yarn eval:quick    # Fast code quality check (no screenshots)
+yarn eval          # Full eval suite with screenshots
+yarn eval:report   # Generate HTML report with scores and screenshots
 ```
 
-## 📦 Available Components
+## Key Dependencies
 
-The registry includes 9 core Excalibrr components:
+| Package | Version |
+|---------|---------|
+| @gravitate-js/excalibrr | ^5.2.7 |
+| antd | ^5.23.0 |
+| ag-grid-react | ^30.2.1 |
+| React | ^18.2.0 |
+| Vite | 7.1.11 |
 
-### Data Components
-- **GraviGrid** - Powerful AG Grid-based data grid with editing, grouping, and filtering
+## Development Workflow
 
-### Form Components
-- **GraviButton** - Themed button with variants and loading states
-- **Form** - Form container with validation support
-- **Select** - Dropdown with search and multi-select
+Before generating any Excalibrr component code with Claude Code:
 
-### Layout Components
-- **Horizontal** - Flexbox horizontal layout
-- **Vertical** - Flexbox vertical layout
-- **Texto** - Themed text with typography options
-
-### Overlay Components
-- **Modal** - Dialog/modal overlays
-- **Popover** - Floating content popovers
-
-Each component includes:
-- ✅ Full prop documentation
-- ✅ Multiple usage examples
-- ✅ TypeScript types
-- ✅ Dependency information
-- ✅ Theme support
-
-## 📋 Rules Integration
-
-The MCP server automatically applies rules from `docs/rules/`:
-- ✅ Use Excalibrr components (no HTML elements)
-- ✅ Apply theme variables (no hardcoded colors)
-- ✅ Follow production patterns
-- ✅ Generate realistic mock data
-
-## ⚙️ Configuration
-
-Projects can use `components.json` (like shadcn/ui) to configure the registry:
-
-```json
-{
-  "registries": {
-    "excalibrr": {
-      "name": "Excalibrr Component Registry",
-      "url": "mcp://excalibrr",
-      "description": "Official Excalibrr component library"
-    }
-  },
-  "aliases": {
-    "components": "@components",
-    "utils": "@lib/utils"
-  }
-}
-```
-
-The demo project includes this configuration by default.
-
-## 🎨 Themes
-
-Supports all production themes:
-- **OSP** - Blue theme
-- **PE** - Teal/Green theme  
-- **BP** - Green theme
-- Plus 10+ others from production
-
-## 🔧 Development
-
-```bash
-# MCP server development
-cd mcp-server
-yarn dev                # Watch mode
-
-# Add new tools in mcp-server/src/tools/
-# Add new templates in mcp-server/src/templates/
-# Add new knowledge in mcp-server/src/knowledge/
-```
+1. Read `demo/skills/solutions-demo-builder/SKILL.md`
+2. Follow the conventions in `CLAUDE.md`
+3. Run the pre-commit hook before presenting: `git add <files> && git hook run pre-commit`

@@ -116,7 +116,7 @@ export function GraviButtonExample() {
             icon={<CheckOutlined />}
           />
 
-          <GraviButton buttonText="Primary Theme2" theme2 type="primary" />
+          <GraviButton buttonText="Primary Theme2" theme2 />
           <GraviButton buttonText="Processing" warning shape="round" loading />
           <GraviButton
             buttonText="Error"

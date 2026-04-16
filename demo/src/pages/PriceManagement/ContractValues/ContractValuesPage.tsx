@@ -107,7 +107,7 @@ function getGridColumnDefs(onViewBuildup: (id: number) => void): ColDef[] {
           <Tooltip title={`Open Contract ${data.TradeEntryId}, Detail ${data.TradeEntryDetailId} in a new tab`}>
             <GraviButton
               size="small"
-              appearance="outline"
+              appearance="outlined"
               icon={<ExportOutlined />}
               onClick={() => {
                 window.open(

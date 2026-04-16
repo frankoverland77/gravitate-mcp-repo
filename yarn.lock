@@ -1036,9 +1036,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gravitate-js/excalibrr@npm:^5.2.7":
-  version: 5.2.7
-  resolution: "@gravitate-js/excalibrr@npm:5.2.7"
+"@gravitate-js/excalibrr@npm:^5.2.10":
+  version: 5.2.10
+  resolution: "@gravitate-js/excalibrr@npm:5.2.10"
   dependencies:
     "@ag-grid-community/locale": "npm:^35.1.0"
     "@tolgee/format-icu": "npm:^6.3.0"
@@ -1071,7 +1071,7 @@ __metadata:
     react-lottie: ^1.2.3
     react-router-dom: 6.28.1
     zustand: ^5.0.1
-  checksum: 10/4e5bd7fe0fed029ff0f490f220c78c8a3cce7b3c10c45294ccd47a52ae8e88176ededc6e353ff65b20f1805efc2caeeb986082289a557dcbf009c0b548ea3f88
+  checksum: 10/c73e9ae6692ab036f467b43a923d566e437c2595865572dd533d59ff68e88ca0a039c4a4903ee7a9ea2b4723b97dbab15fd2186fc4b87fe765fd0135c1c29c25
   languageName: node
   linkType: hard
 
@@ -7949,7 +7949,7 @@ __metadata:
     "@ant-design/colors": "npm:^7.1.0"
     "@ant-design/icons": "npm:5.5.2"
     "@eslint/js": "npm:^9.39.1"
-    "@gravitate-js/excalibrr": "npm:^5.2.7"
+    "@gravitate-js/excalibrr": "npm:^5.2.10"
     "@nivo/bar": "npm:0.79.1"
     "@nivo/core": "npm:0.79.0"
     "@nivo/line": "npm:0.79.1"

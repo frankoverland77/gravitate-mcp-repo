@@ -26,7 +26,7 @@ export function RevaluationConfirmModal({ open, onDismiss, onCheckImpacted }: Re
         </Texto>
         <Horizontal gap={8} horizontalCenter>
           <GraviButton onClick={onDismiss}>No Thanks</GraviButton>
-          <GraviButton type="primary" onClick={onCheckImpacted}>Revalue</GraviButton>
+          <GraviButton theme1 onClick={onCheckImpacted}>Revalue</GraviButton>
         </Horizontal>
       </div>
     </Modal>
