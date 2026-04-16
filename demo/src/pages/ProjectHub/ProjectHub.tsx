@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, useRef, createElement } from 'react';
-import { Texto, GraviButton } from '@gravitate-js/excalibrr';
+import { Texto, GraviButton, Vertical, Horizontal } from '@gravitate-js/excalibrr';
 import { SaveOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import {
@@ -188,7 +188,7 @@ export function ProjectHub() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Vertical height="100%">
       <ProjectHubHeader
         activeCount={activeCount}
         draftCount={draftCount}
@@ -199,23 +199,24 @@ export function ProjectHub() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <Horizontal flex="1" style={{ overflow: 'hidden' }}>
         {/* Main list area */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 24px',
-            borderBottom: '2px solid var(--gray-200)',
-            flexShrink: 0,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Vertical flex="1" style={{ overflow: 'hidden' }}>
+          <Horizontal
+            verticalCenter
+            justifyContent="space-between"
+            style={{
+              padding: '0 24px',
+              borderBottom: '2px solid var(--gray-200)',
+              flexShrink: 0,
+            }}
+          >
+            <Horizontal verticalCenter>
               {([
                 { key: 'active-draft' as const, label: 'Active & Draft' },
                 { key: 'archived' as const, label: `Archived (${archivedCount})` },
               ]).map(tab => (
-                <span
+                <Texto
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   style={{
@@ -229,20 +230,20 @@ export function ProjectHub() {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <Texto>{tab.label}</Texto>
-                </span>
+                  {tab.label}
+                </Texto>
               ))}
-            </div>
+            </Horizontal>
             {isDirty && (
               <GraviButton size="small" success onClick={handleSave}>
                 <SaveOutlined /> Save Changes
               </GraviButton>
             )}
-          </div>
+          </Horizontal>
 
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <Vertical flex="1" style={{ overflowY: 'auto' }}>
             {displayedProjects.length === 0 ? (
-              <div style={{ padding: '40px 24px', textAlign: 'center' }}>
+              <Vertical style={{ padding: '40px 24px', textAlign: 'center' }}>
                 <Texto appearance="medium">
                   {search || statusFilter !== 'all'
                     ? 'No projects match your filters'
@@ -250,7 +251,7 @@ export function ProjectHub() {
                     ? 'No archived projects'
                     : 'No projects found'}
                 </Texto>
-              </div>
+              </Vertical>
             ) : (
               displayedProjects.map((entry) => (
                 <ProjectHubListRow
@@ -273,8 +274,8 @@ export function ProjectHub() {
                 />
               ))
             )}
-          </div>
-        </div>
+          </Vertical>
+        </Vertical>
 
         {/* Detail drawer */}
         <ProjectHubDetailDrawer
@@ -294,7 +295,7 @@ export function ProjectHub() {
           onRestore={() => selectedKey && handleRestore(selectedKey)}
           onAddActivity={(msg, author) => selectedKey && handleAddActivity(selectedKey, msg, author)}
         />
-      </div>
-    </div>
+      </Horizontal>
+    </Vertical>
   );
 }
