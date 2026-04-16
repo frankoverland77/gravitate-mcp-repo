@@ -147,7 +147,7 @@ function QuotebookActionButtons({
 
       <Horizontal className="mr-4">
         {lastSaveDate && (
-          <Texto appearance="secondary">
+          <Texto appearance="medium">
             Last Save: {lastSaveDate}
           </Texto>
         )}

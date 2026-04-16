@@ -51,11 +51,13 @@ body {
   font-family: 'Lato', sans-serif;
 }
 
+/* Vertically center AG Grid cell content (including custom cellRenderers like Texto).
+   AG Grid's default uses line-height for plain text centering, but block-level elements
+   from custom renderers need flex alignment. */
 .ag-theme-alpine .ag-ltr .ag-cell,
 .ag-theme-alpine-dark .ag-ltr .ag-cell {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
   padding: 8px;
   line-height: 1.5;
 }
