@@ -17,10 +17,12 @@ export type PeriodData = {
   benchmarks: BenchmarkValue[]
 }
 
+export type InventoryRecordType = 'actual' | 'estimate'
+
 export type InventoryForecastPoint = {
   date: string
   inventory: number
-  isForecast: boolean
+  recordType: InventoryRecordType
 }
 
 export type InventoryQuoteRow = {
@@ -55,14 +57,12 @@ export type InventoryQuoteRow = {
   afterBatchInventory: number
   afterBatchInventoryPct: number
   afterBatchBarrels: number
-  afterBatchDaysOfSupply: number
-  averageSalesDays: number
+  lastUpdated: string
   barrels: number
   refineryBreakdown: boolean
   tankTop: number
   tankBottom: number
   inventoryForecast: InventoryForecastPoint[]
-  daysOfSupply: number
   reorderPoint: number
   inventoryStatus: 'healthy' | 'low' | 'critical' | 'overstock'
   isSpread: boolean
@@ -71,7 +71,7 @@ export type InventoryQuoteRow = {
 
 export type AnalyticsViewType =
   | 'inventory'
-  | 'volumes'
+  | 'unified_view'
   | 'liftings_vs_benchmark'
   | 'liftings_vs_margin'
   | 'customer_liftings'

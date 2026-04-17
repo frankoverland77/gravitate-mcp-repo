@@ -114,15 +114,15 @@ function BurndownChart({ row }: { row: InventoryQuoteRow }) {
   const chartData = row.inventoryForecast.map(p => ({
     date: p.date.slice(5),
     inventory: p.inventory,
-    actual: p.isForecast ? null : p.inventory,
-    forecast: p.isForecast ? p.inventory : null,
+    actual: p.recordType === 'estimate' ? null : p.inventory,
+    forecast: p.recordType === 'estimate' ? p.inventory : null,
   }))
 
   const todayLabel = new Date().toISOString().split('T')[0].slice(5)
 
   return (
     <div style={{ height: '100%', padding: '8px 4px' }}>
-      <Texto weight="600" style={{ fontSize: 12, marginBottom: 4, paddingLeft: 8 }}>Inventory Burndown</Texto>
+      <Texto weight="600" style={{ fontSize: 12, marginBottom: 4, paddingLeft: 8 }}>Rolling Inventory</Texto>
       <ResponsiveContainer width="100%" height="90%">
         <ComposedChart data={chartData}>
           <XAxis dataKey="date" tick={{ fontSize: 10 }} interval={3} />

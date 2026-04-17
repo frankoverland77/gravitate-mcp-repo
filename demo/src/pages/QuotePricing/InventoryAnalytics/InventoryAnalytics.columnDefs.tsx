@@ -118,7 +118,6 @@ export function getInventoryAnalyticsColumnDefs(): (ColDef<InventoryQuoteRow> | 
       headerName: 'Inventory',
       children: [
         { field: 'currentInventory', headerName: 'Inventory', width: 100, valueFormatter: p => numberFmt(p.value) },
-        { field: 'daysOfSupply', headerName: 'Days Supply', width: 90 },
         { field: 'reorderPoint', headerName: 'Reorder Pt', width: 100, valueFormatter: p => numberFmt(p.value) },
         {
           field: 'inventoryStatus',

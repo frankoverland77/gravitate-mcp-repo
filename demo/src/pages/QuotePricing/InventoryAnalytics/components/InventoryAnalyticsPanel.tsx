@@ -1,14 +1,13 @@
-import { useState } from 'react'
 import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { Select } from 'antd'
 import { ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { InventorySummaryCard } from './InventorySummaryCard'
-import { VolumesView } from './VolumesView'
+import { UnifiedView } from './UnifiedView'
 import type { InventoryQuoteRow, AnalyticsViewType } from '../InventoryAnalytics.types'
 
 const viewOptions: { value: AnalyticsViewType; label: string }[] = [
   { value: 'inventory', label: 'Inventory' },
-  { value: 'volumes', label: 'Volumes' },
+  { value: 'unified_view', label: 'Unified View' },
   { value: 'liftings_vs_benchmark', label: 'Liftings vs Benchmark' },
   { value: 'liftings_vs_margin', label: 'Liftings vs Margin' },
   { value: 'customer_liftings', label: 'Customer Liftings' },
@@ -52,15 +51,27 @@ function InventoryChart({ row }: { row: InventoryQuoteRow }) {
   const chartData = row.inventoryForecast.map(p => ({
     date: p.date.slice(5),
     inventory: p.inventory,
-    actual: p.isForecast ? null : p.inventory,
-    forecast: p.isForecast ? p.inventory : null,
+    actual: p.recordType === 'estimate' ? null : p.inventory,
+    forecast: p.recordType === 'estimate' ? p.inventory : null,
   }))
 
   const todayLabel = new Date().toISOString().split('T')[0].slice(5)
 
   return (
     <div style={{ flex: 1, padding: '4px 8px' }}>
-      <Texto weight="600" style={{ fontSize: 12, marginBottom: 4 }}>30-Day Inventory Forecast</Texto>
+      <Horizontal gap={8} alignItems="center" style={{ marginBottom: 4 }}>
+        <Texto weight="600" style={{ fontSize: 12 }}>Rolling Inventory</Texto>
+        <Horizontal gap={12} alignItems="center">
+          <Horizontal gap={4} alignItems="center">
+            <div style={{ width: 16, height: 2, background: '#64D28D' }} />
+            <Texto appearance="medium" style={{ fontSize: 10 }}>Actual</Texto>
+          </Horizontal>
+          <Horizontal gap={4} alignItems="center">
+            <div style={{ width: 16, height: 2, background: '#64D28D', borderTop: '2px dashed #64D28D' }} />
+            <Texto appearance="medium" style={{ fontSize: 10 }}>Projected</Texto>
+          </Horizontal>
+        </Horizontal>
+      </Horizontal>
       <ResponsiveContainer width="100%" height={280}>
         <ComposedChart data={chartData}>
           <XAxis dataKey="date" tick={{ fontSize: 10 }} interval={3} />
@@ -163,8 +174,8 @@ export function InventoryAnalyticsPanel({
               <InventorySummaryCard row={selectedRow} fillHeight />
               <InventoryChart row={selectedRow} />
             </Horizontal>
-          ) : selectedView === 'volumes' ? (
-            <VolumesView row={selectedRow} />
+          ) : selectedView === 'unified_view' ? (
+            <UnifiedView row={selectedRow} />
           ) : (
             <Vertical justifyContent="center" alignItems="center" height="100%">
               <Texto appearance="medium">

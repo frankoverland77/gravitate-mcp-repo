@@ -67,26 +67,26 @@ function generateForecast(rand: () => number, currentInventory: number, tankTop:
   const points: InventoryForecastPoint[] = []
   const today = new Date()
   const dailyUsage = randomBetween(rand, 800, 2500)
-  let inv = currentInventory + dailyUsage * 14
+  let inv = currentInventory + dailyUsage * 30
 
-  // 14 days of trailing actuals
-  for (let i = -14; i <= 0; i++) {
+  // 30 days of trailing actuals
+  for (let i = -30; i <= 0; i++) {
     const d = new Date(today)
     d.setDate(d.getDate() + i)
     inv = Math.max(tankBottom, inv - dailyUsage + (rand() > 0.85 ? randomBetween(rand, 5000, 15000) : 0))
     points.push({
       date: d.toISOString().split('T')[0],
       inventory: Math.round(inv),
-      isForecast: false,
+      recordType: 'actual',
     })
   }
 
   // Reset to current inventory at today
   inv = currentInventory
 
-  // 16 days forecast with gradual decline and 2 batch spikes
-  const batchDays = [5, 12]
-  for (let i = 1; i <= 16; i++) {
+  // 30 days of projected estimates with gradual decline and batch spikes
+  const batchDays = [5, 12, 22]
+  for (let i = 1; i <= 30; i++) {
     const d = new Date(today)
     d.setDate(d.getDate() + i)
     inv = Math.max(tankBottom, inv - dailyUsage * (0.8 + rand() * 0.4))
@@ -96,7 +96,7 @@ function generateForecast(rand: () => number, currentInventory: number, tankTop:
     points.push({
       date: d.toISOString().split('T')[0],
       inventory: Math.round(inv),
-      isForecast: true,
+      recordType: 'estimate',
     })
   }
 
@@ -121,7 +121,6 @@ function generateRows(): InventoryQuoteRow[] {
     const currentBarrels = Math.round(currentInventory / 42)
 
     const dailyUsage = randomBetween(rand, 800, 2000)
-    const daysOfSupply = Math.round((currentInventory - tankBottom) / dailyUsage)
     const reorderPoint = Math.round(tankBottom + dailyUsage * 7)
     const nextBatchSize = Math.round(randomBetween(rand, 15000, 40000))
     const batchDays = Math.round(randomBetween(rand, 3, 8))
@@ -176,14 +175,12 @@ function generateRows(): InventoryQuoteRow[] {
       afterBatchInventory,
       afterBatchInventoryPct: +afterBatchPct.toFixed(2),
       afterBatchBarrels: Math.round(afterBatchInventory / 42),
-      afterBatchDaysOfSupply: Math.round((afterBatchInventory - tankBottom) / dailyUsage),
-      averageSalesDays: Math.round(dailyUsage),
+      lastUpdated: new Date(Date.now() - Math.round(randomBetween(rand, 300000, 7200000))).toISOString(),
       barrels: currentBarrels,
       refineryBreakdown: rand() > 0.6,
       tankTop,
       tankBottom,
       inventoryForecast: forecast,
-      daysOfSupply,
       reorderPoint,
       inventoryStatus: pickInventoryStatus(inventoryPct),
       isSpread: i >= 27,

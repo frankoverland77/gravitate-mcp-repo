@@ -65,23 +65,37 @@ export function InventorySummaryCard({ row, fillHeight }: InventorySummaryCardPr
         {row.productName} @ {row.locationName}
       </Texto>
 
-      <GroupLabel>Current State</GroupLabel>
+      <GroupLabel>Current Inventory</GroupLabel>
       <SummaryRow label="Inventory" value={`${(row.currentInventoryPct * 100).toFixed(0)}%`} />
       <SummaryRow label="Barrels" value={row.currentBarrels.toLocaleString()} unit="bbl" />
       <Horizontal justifyContent="space-between" alignItems="center" style={{ padding: '3px 0' }}>
         <Texto appearance="medium" style={{ fontSize: 12 }}>Status</Texto>
         <StatusBadge status={row.currentStatus} />
       </Horizontal>
-      <SummaryRow label="Days of Supply" value={row.daysOfSupply} unit="days" />
+      <Texto appearance="medium" style={{ fontSize: 10, color: 'var(--gray-400)', marginTop: 2 }}>
+        As of {new Date(row.lastUpdated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      </Texto>
 
-      <GroupLabel>After Next Batch &mdash; {row.nextBatchDate}</GroupLabel>
+      <Horizontal gap={6} alignItems="center" style={{ marginTop: 8 }}>
+        <GroupLabel>Upcoming Inventory</GroupLabel>
+        <span style={{
+          fontSize: 9,
+          fontWeight: 600,
+          padding: '1px 6px',
+          borderRadius: 4,
+          background: 'var(--gray-100)',
+          color: 'var(--gray-500)',
+          textTransform: 'uppercase',
+          letterSpacing: 0.3,
+        }}>Projected</span>
+      </Horizontal>
+      <SummaryRow label="After Next Batch" value={row.nextBatchDate} />
       <SummaryRow label="Inventory" value={`${(row.afterBatchInventoryPct * 100).toFixed(0)}%`} />
       <SummaryRow label="Barrels" value={row.afterBatchBarrels.toLocaleString()} unit="bbl" />
       <Horizontal justifyContent="space-between" alignItems="center" style={{ padding: '3px 0' }}>
         <Texto appearance="medium" style={{ fontSize: 12 }}>Status</Texto>
         <StatusBadge status={row.afterNextBatchStatus} />
       </Horizontal>
-      <SummaryRow label="Days of Supply" value={row.afterBatchDaysOfSupply} unit="days" />
     </Vertical>
   )
 }
