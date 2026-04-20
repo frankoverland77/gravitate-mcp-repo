@@ -36,6 +36,8 @@ import { IndexOfferManagement } from './pages/OnlineSellingPlatform/IndexOfferMa
 import { IndexOfferBuyNow } from './pages/OnlineSellingPlatform/IndexOfferBuyNow';
 import { SupplierAnalysis } from './pages/OnlineSellingPlatform/SupplierAnalysis';
 import { SupplierDetails } from './pages/OnlineSellingPlatform/SupplierDetails';
+import { CompetitorPriceProfiling } from './pages/CompetitorPriceProfiling/CompetitorPriceProfiling';
+import { CompetitorDetails } from './pages/CompetitorPriceProfiling/CompetitorDetails';
 import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
 import { TierGroupManagement } from './pages/GlobalTieredPricing/TierGroupManagement';
 import { ContractMeasurementGrid } from './pages/ContractMeasurement/ContractMeasurementGrid';
@@ -511,6 +513,35 @@ const getContractManagementRoutes = (): RouteConfig[] => [
   },
 ];
 
+// Competitor Price Profiling routes configuration
+const getCompetitorPriceProfilingRoutes = (): RouteConfig[] => [
+  {
+    hasPermission: () => true,
+    key: 'CompetitorPriceProfilingGrid',
+    title: 'Profiles Grid',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <CompetitorPriceProfiling />
+      </ThemeRouteWrapper>
+    ),
+    path: '/CompetitorPriceProfiling/CompetitorPriceProfilingGrid',
+    description: 'Competitor price profiling grid',
+  },
+  {
+    hasPermission: () => true,
+    key: 'CompetitorPriceProfilingDetails',
+    title: 'Profile Details',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <CompetitorDetails />
+      </ThemeRouteWrapper>
+    ),
+    path: '/CompetitorPriceProfiling/CompetitorPriceProfilingDetails',
+    description: 'Detailed competitor price profile',
+    hidden: true,
+  },
+];
+
 // Supplier Analysis routes configuration
 const getSupplierAnalysisRoutes = (): RouteConfig[] => [
   {
@@ -817,6 +848,14 @@ export const createPageConfig = (): PageConfig => {
     icon: <DashboardOutlined />,
     title: 'Competitor Profile',
     routes: getSupplierAnalysisRoutes(),
+  };
+
+  config.CompetitorPriceProfiling = {
+    hasPermission: () => true,
+    key: 'CompetitorPriceProfiling',
+    icon: <LineChartOutlined />,
+    title: 'Competitor Price Profiling',
+    routes: getCompetitorPriceProfilingRoutes(),
   };
 
   config.GlobalTieredPricing = {

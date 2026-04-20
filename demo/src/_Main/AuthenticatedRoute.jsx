@@ -24,6 +24,7 @@ const DEFAULT_SCOPES = {
 
   MarketPlatform: true,
   SupplierAnalysis: true,
+  CompetitorPriceProfiling: true,
   GlobalTieredPricing: true,
 
   SubscriptionManagement: true,
