@@ -15,7 +15,16 @@ export type QuoteConfigRow = {
   competitorCount: number
   tierGroup: string | null
   tierLevel: string | null
+  rankCategory: string | null
 }
+
+export const rankCategoryOptions = [
+  { Value: 'Branded Rack', Text: 'Branded Rack' },
+  { Value: 'Unbranded Rack', Text: 'Unbranded Rack' },
+  { Value: 'Wholesale', Text: 'Wholesale' },
+  { Value: 'Retail', Text: 'Retail' },
+  { Value: 'DTW', Text: 'DTW' },
+]
 
 export const tierGroupOptions = [
   { Value: 'Group A', Text: 'Group A' },
@@ -63,6 +72,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 3,
     tierGroup: 'Group A',
     tierLevel: 'Tier 1',
+    rankCategory: 'Branded Rack',
   },
   {
     id: 2,
@@ -81,6 +91,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 5,
     tierGroup: 'Group A',
     tierLevel: 'Tier 2',
+    rankCategory: 'Unbranded Rack',
   },
   {
     id: 3,
@@ -99,6 +110,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 2,
     tierGroup: 'Group B',
     tierLevel: 'Platinum',
+    rankCategory: 'Wholesale',
   },
   {
     id: 4,
@@ -117,6 +129,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 0,
     tierGroup: null,
     tierLevel: null,
+    rankCategory: null,
   },
   {
     id: 5,
@@ -135,6 +148,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 4,
     tierGroup: 'Group A',
     tierLevel: 'Tier 3',
+    rankCategory: 'Retail',
   },
   // Industrial Config (5 rows)
   {
@@ -154,6 +168,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 1,
     tierGroup: 'Group B',
     tierLevel: 'Gold',
+    rankCategory: 'Branded Rack',
   },
   {
     id: 7,
@@ -172,6 +187,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 3,
     tierGroup: null,
     tierLevel: null,
+    rankCategory: null,
   },
   {
     id: 8,
@@ -190,6 +206,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 0,
     tierGroup: 'Group A',
     tierLevel: 'Tier 1',
+    rankCategory: 'Wholesale',
   },
   {
     id: 9,
@@ -208,6 +225,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 2,
     tierGroup: 'Group B',
     tierLevel: 'Silver',
+    rankCategory: null,
   },
   {
     id: 10,
@@ -226,6 +244,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 1,
     tierGroup: null,
     tierLevel: null,
+    rankCategory: 'Retail',
   },
   // Retail Config (5 rows)
   {
@@ -245,6 +264,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 6,
     tierGroup: 'Group A',
     tierLevel: 'Tier 2',
+    rankCategory: 'Retail',
   },
   {
     id: 12,
@@ -263,6 +283,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 4,
     tierGroup: null,
     tierLevel: null,
+    rankCategory: null,
   },
   {
     id: 13,
@@ -281,6 +302,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 2,
     tierGroup: 'Group B',
     tierLevel: 'Platinum',
+    rankCategory: 'DTW',
   },
   {
     id: 14,
@@ -299,6 +321,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 3,
     tierGroup: 'Group C',
     tierLevel: 'Primary',
+    rankCategory: 'Branded Rack',
   },
   {
     id: 15,
@@ -317,6 +340,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     competitorCount: 5,
     tierGroup: 'Group C',
     tierLevel: 'Secondary',
+    rankCategory: null,
   },
 ]
 

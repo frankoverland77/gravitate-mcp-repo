@@ -5,6 +5,7 @@ import { PlusOutlined, SaveOutlined } from '@ant-design/icons'
 import {
   competitorSelectOptions,
   publisherOptions,
+  rankCategoryOptions,
   getLocationName,
   getProductName,
 } from './Grid/mockData'
@@ -15,6 +16,7 @@ type NewRowForm = {
   publisher: string | undefined
   product: string | undefined
   terminal: string | undefined
+  rankCategory: string | undefined
 }
 
 const emptyForm: NewRowForm = {
@@ -22,6 +24,7 @@ const emptyForm: NewRowForm = {
   publisher: undefined,
   product: undefined,
   terminal: undefined,
+  rankCategory: undefined,
 }
 
 export function CompetitorDetailPanel({
@@ -64,6 +67,7 @@ export function CompetitorDetailPanel({
     if (!form.publisher) newErrors.publisher = true
     if (!form.product) newErrors.product = true
     if (!form.terminal) newErrors.terminal = true
+    if (!form.rankCategory) newErrors.rankCategory = true
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -79,6 +83,7 @@ export function CompetitorDetailPanel({
       terminal: form.terminal!,
       region: '',
       productGroup: parentProduct.includes('10%') ? 'Diesel' : 'Diesel',
+      rankCategory: form.rankCategory!,
       visibility: 'Show',
     }
 
@@ -219,6 +224,21 @@ export function CompetitorDetailPanel({
                 { value: parentTerminal, label: parentTerminal },
               ]}
               status={errors.terminal ? 'error' : undefined}
+              style={{ width: '100%' }}
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+            />
+          </div>
+          <div className="add-row-field">
+            <span className={`field-label${errors.rankCategory ? ' has-error' : ''}`}>Rank Category</span>
+            <Select
+              showSearch
+              placeholder="Select rank category"
+              value={form.rankCategory}
+              onChange={(val) => { setForm((f) => ({ ...f, rankCategory: val })); setErrors((e) => ({ ...e, rankCategory: false })) }}
+              options={rankCategoryOptions}
+              status={errors.rankCategory ? 'error' : undefined}
               style={{ width: '100%' }}
               filterOption={(input, option) =>
                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())

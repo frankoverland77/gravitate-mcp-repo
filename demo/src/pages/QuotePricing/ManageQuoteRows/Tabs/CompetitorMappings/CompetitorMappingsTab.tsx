@@ -19,11 +19,13 @@ import {
   competitorQuoteRows as initialQuoteRows,
   generateMatchResults,
   setAssociationVisibility,
+  setAssociationRankCategory,
   addAssociationToRow,
   bulkSetVisibilityAcrossRows,
   publisherOptions,
   productHierarchyOptions,
   locationHierarchyOptions,
+  rankCategoryOptions,
   getLocationName,
   getProductName,
 } from './Grid/mockData'
@@ -44,6 +46,7 @@ export function CompetitorMappingsTab() {
   const [publisher, setPublisher] = useState<string | undefined>(undefined)
   const [productHierarchy, setProductHierarchy] = useState<string | undefined>(undefined)
   const [locationHierarchy, setLocationHierarchy] = useState<string | undefined>(undefined)
+  const [rankCategory, setRankCategory] = useState<string | undefined>(undefined)
   const [previewVisible, setPreviewVisible] = useState(false)
   const [matchResults, setMatchResults] = useState<MatchResult[]>([])
   const [searchText, setSearchText] = useState('')
@@ -96,14 +99,14 @@ export function CompetitorMappingsTab() {
     }
   }, [])
 
-  const canFindMatches = publisher && productHierarchy && locationHierarchy
+  const canFindMatches = publisher && productHierarchy && locationHierarchy && rankCategory
 
   const handleFindMatches = useCallback(() => {
-    if (!publisher) return
-    const results = generateMatchResults(selectedRows, publisher)
+    if (!publisher || !rankCategory) return
+    const results = generateMatchResults(selectedRows, publisher, rankCategory)
     setMatchResults(results)
     setPreviewVisible(true)
-  }, [selectedRows, publisher])
+  }, [selectedRows, publisher, rankCategory])
 
   const handleConfirm = useCallback(() => {
     // Build new associations from match results and add them to quote rows
@@ -130,6 +133,7 @@ export function CompetitorMappingsTab() {
             terminal: inst.terminal,
             productGroup: '',
             product: inst.product,
+            rankCategory: inst.rankCategory,
             visibility: 'Show' as const,
           }
         })
@@ -150,6 +154,7 @@ export function CompetitorMappingsTab() {
     setPublisher(undefined)
     setProductHierarchy(undefined)
     setLocationHierarchy(undefined)
+    setRankCategory(undefined)
     message.success(`Successfully created ${totalNew} new competitor mappings`)
 
     // Highlight the new child association rows
@@ -191,6 +196,14 @@ export function CompetitorMappingsTab() {
   const handleSetVisibility = useCallback(
     (quoteRowId: number, associationId: number, value: 'Show' | 'Hide' | 'Highlight') => {
       setQuoteRows((prev) => setAssociationVisibility(prev, quoteRowId, associationId, value))
+    },
+    [],
+  )
+
+  // Set rank category on a single association
+  const handleSetRankCategory = useCallback(
+    (quoteRowId: number, associationId: number, value: string) => {
+      setQuoteRows((prev) => setAssociationRankCategory(prev, quoteRowId, associationId, value))
     },
     [],
   )
@@ -254,6 +267,7 @@ export function CompetitorMappingsTab() {
         publisher: inst.publisher,
         terminal: inst.terminal,
         product: inst.product,
+        rankCategory: inst.rankCategory,
       }))
     })
   }, [matchResults, quoteRows])
@@ -265,8 +279,9 @@ export function CompetitorMappingsTab() {
       if (!parentRow) return null
       const associations = parentRow.competitorAssociations ?? []
 
-      const detailColDefs = getCompetitorDetailColumnDefs((associationId, value) =>
-        handleSetVisibility(parentRow.id, associationId, value),
+      const detailColDefs = getCompetitorDetailColumnDefs(
+        (associationId, value) => handleSetVisibility(parentRow.id, associationId, value),
+        (associationId, value) => handleSetRankCategory(parentRow.id, associationId, value),
       )
 
       return <CompetitorDetailPanel
@@ -277,7 +292,7 @@ export function CompetitorMappingsTab() {
         highlightedAssocIds={highlightedAssocIdsRef.current}
       />
     },
-    [handleSetVisibility, handleAddAssociation],
+    [handleSetVisibility, handleSetRankCategory, handleAddAssociation],
   )
 
   // Compute stats for selected rows
@@ -306,6 +321,8 @@ export function CompetitorMappingsTab() {
     productHierarchyOptions.find((o) => o.value === val)?.label ?? '—'
   const getLocationHierarchyLabel = (val?: string) =>
     locationHierarchyOptions.find((o) => o.value === val)?.label ?? '—'
+  const getRankCategoryLabel = (val?: string) =>
+    rankCategoryOptions.find((o) => o.value === val)?.label ?? '—'
 
   // Existing mappings total for selected rows
   const existingMappingsTotal = selectedRows.reduce(
@@ -749,6 +766,22 @@ export function CompetitorMappingsTab() {
                   />
                 </div>
 
+                {/* Rank Category */}
+                <div className="config-section">
+                  <div className="config-label">Rank Category</div>
+                  <div className="config-desc">
+                    Tags the created mappings. Does not filter which competitors
+                    are returned — every match is tagged with this category.
+                  </div>
+                  <Select
+                    placeholder="Select rank category..."
+                    value={rankCategory}
+                    onChange={setRankCategory}
+                    options={rankCategoryOptions}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+
                 {/* Find button */}
                 <div className="config-section" style={{ borderBottom: 'none' }}>
                   <GraviButton
@@ -773,7 +806,8 @@ export function CompetitorMappingsTab() {
                         Searches for price instruments within{' '}
                         <strong>{getPublisherLabel(publisher)}</strong> matching by{' '}
                         <strong>{getProductHierarchyLabel(productHierarchy)}</strong>{' '}
-                        and <strong>{getLocationHierarchyLabel(locationHierarchy)}</strong>
+                        and <strong>{getLocationHierarchyLabel(locationHierarchy)}</strong>.
+                        Results will be tagged <strong>{getRankCategoryLabel(rankCategory)}</strong>.
                       </>
                     ) : (
                       'Select all options above to search for matching competitors.'
@@ -914,6 +948,7 @@ export function CompetitorMappingsTab() {
               { field: 'publisher', headerName: 'Publisher', minWidth: 160 },
               { field: 'terminal', headerName: 'Terminal', minWidth: 160 },
               { field: 'product', headerName: 'Product', minWidth: 140 },
+              { field: 'rankCategory', headerName: 'Rank Category', minWidth: 140 },
             ]}
             agPropOverrides={{
               groupDisplayType: 'groupRows',

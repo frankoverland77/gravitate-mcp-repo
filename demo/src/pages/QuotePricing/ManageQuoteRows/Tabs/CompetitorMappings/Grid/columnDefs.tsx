@@ -1,7 +1,7 @@
 import { ColDef } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
 import { Tooltip } from 'antd'
-import { getLocationName, getProductName } from './mockData'
+import { getLocationName, getProductName, rankCategoryOptions } from './mockData'
 import type { CompetitorQuoteRow, CompetitorAssociation } from './mockData'
 
 export const getCompetitorMappingsColumnDefs = (): ColDef[] => [
@@ -88,6 +88,7 @@ const visibilityOptions = [
 
 export const getCompetitorDetailColumnDefs = (
   onSetVisibility?: (associationId: number, value: 'Show' | 'Hide' | 'Highlight') => void,
+  onSetRankCategory?: (associationId: number, value: string) => void,
 ): ColDef<CompetitorAssociation>[] => [
   {
     field: 'name',
@@ -120,6 +121,19 @@ export const getCompetitorDetailColumnDefs = (
     field: 'product',
     headerName: 'Product',
     minWidth: 200,
+  },
+  {
+    field: 'rankCategory',
+    headerName: 'Rank Category',
+    minWidth: 140,
+    editable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: {
+      values: rankCategoryOptions.map((o) => o.value),
+    },
+    onCellValueChanged: ({ data, newValue }: any) => {
+      onSetRankCategory?.(data.id, newValue)
+    },
   },
   {
     field: 'visibility',

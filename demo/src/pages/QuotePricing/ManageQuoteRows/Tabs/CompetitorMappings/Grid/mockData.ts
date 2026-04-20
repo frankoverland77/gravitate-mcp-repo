@@ -8,6 +8,7 @@ export type CompetitorAssociation = {
   terminal: string
   productGroup: string
   product: string
+  rankCategory: string
   visibility: 'Show' | 'Hide' | 'Highlight'
 }
 
@@ -29,6 +30,7 @@ export type CompetitorInstrument = {
   publisher: string
   terminal: string
   product: string
+  rankCategory: string
 }
 
 export type MatchResult = {
@@ -228,11 +230,14 @@ export const allCompetitors: { name: string; fullName: string; publisher: string
 
 /** Generate competitor associations for a quote row based on its existing competitors */
 function generateAssociations(
-  row: { id: number; existingCompetitors: string[]; locationId: number; productId: number },
+  row: { id: number; configurationName: string; existingCompetitors: string[]; locationId: number; productId: number },
 ): CompetitorAssociation[] {
   const terminalName = getLocationName(row.locationId)
   const productName = getProductName(row.productId)
   const productGroup = productName.includes('10%') ? 'Diesel' : 'Diesel'
+  const defaultCategory = row.configurationName.toLowerCase().includes('unbranded')
+    ? 'Unbranded Rack'
+    : 'Branded Rack'
 
   return row.existingCompetitors.map((name, idx) => {
     const comp = allCompetitors.find(
@@ -246,6 +251,7 @@ function generateAssociations(
       terminal: terminalName,
       productGroup,
       product: productName,
+      rankCategory: defaultCategory,
       visibility: idx === row.existingCompetitors.length - 2 ? 'Hide' as const : 'Show' as const,
     }
   })
@@ -259,6 +265,7 @@ export const competitorQuoteRows: CompetitorQuoteRow[] = _rawQuoteRows.map((row)
 export function generateMatchResults(
   selectedRows: CompetitorQuoteRow[],
   publisher: string,
+  rankCategory: string,
 ): MatchResult[] {
   const publisherLabel =
     publisher === 'opis-br'
@@ -287,7 +294,12 @@ export function generateMatchResults(
       publisher: publisherLabel,
       terminal: terminalName,
       product: productName,
-      alreadyExists: row.existingCompetitors.includes(c.name),
+      rankCategory,
+      alreadyExists:
+        row.existingCompetitors.includes(c.name) &&
+        row.competitorAssociations.some(
+          (a) => a.name === c.fullName && a.rankCategory === rankCategory,
+        ),
     }))
 
     return { quoteRowId: row.id, instruments }
@@ -308,6 +320,25 @@ export function setAssociationVisibility(
       competitorAssociations: row.competitorAssociations.map((a) => {
         if (a.id !== associationId) return a
         return { ...a, visibility: value }
+      }),
+    }
+  })
+}
+
+/** Set a single association's rank category (immutable update) */
+export function setAssociationRankCategory(
+  rows: CompetitorQuoteRow[],
+  quoteRowId: number,
+  associationId: number,
+  value: string,
+): CompetitorQuoteRow[] {
+  return rows.map((row) => {
+    if (row.id !== quoteRowId) return row
+    return {
+      ...row,
+      competitorAssociations: row.competitorAssociations.map((a) => {
+        if (a.id !== associationId) return a
+        return { ...a, rankCategory: value }
       }),
     }
   })
@@ -338,6 +369,14 @@ export const publisherOptions = [
   { value: 'opis-ub', label: 'OPIS Competitor Unbranded' },
   { value: 'platts', label: 'Platts' },
   { value: 'argus', label: 'Argus' },
+]
+
+export const rankCategoryOptions = [
+  { value: 'Branded Rack', label: 'Branded Rack' },
+  { value: 'Unbranded Rack', label: 'Unbranded Rack' },
+  { value: 'Wholesale', label: 'Wholesale' },
+  { value: 'Retail', label: 'Retail' },
+  { value: 'DTW', label: 'DTW' },
 ]
 
 export const productHierarchyOptions = [

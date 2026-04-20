@@ -1,7 +1,8 @@
 import { DeleteOutlined } from '@ant-design/icons'
 import { BBDTag, GraviButton, Texto } from '@gravitate-js/excalibrr'
 import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
-import { tierGroupOptions, tierLevelOptionsByGroup, allTierLevelOptions } from './mockData'
+import { Tooltip } from 'antd'
+import { tierGroupOptions, tierLevelOptionsByGroup, allTierLevelOptions, rankCategoryOptions } from './mockData'
 
 export const getManageQuoteRowsColumnDefs = (): any[] => [
   {
@@ -48,6 +49,32 @@ export const getManageQuoteRowsColumnDefs = (): any[] => [
         <BBDTag theme3 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
       ) : (
         <Texto appearance="medium">—</Texto>
+      ),
+  },
+  {
+    field: 'rankCategory',
+    headerName: 'Rank Category',
+    width: 150,
+    editable: true,
+    isBulkEditable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: {
+      values: [null, ...rankCategoryOptions.map((o) => o.Value)],
+    },
+    bulkCellEditor: BulkSelectEditor,
+    bulkCellEditorParams: {
+      propKey: 'rankCategory',
+      options: rankCategoryOptions,
+    },
+    cellRenderer: ({ value }: { value: string | null }) =>
+      value ? (
+        <BBDTag theme1 style={{ margin: 0, width: 'fit-content' }}>{value}</BBDTag>
+      ) : (
+        <Tooltip title="Blank = applies to all rank categories">
+          <span>
+            <Texto appearance="medium">All</Texto>
+          </span>
+        </Tooltip>
       ),
   },
   { field: 'strategy', headerName: 'Strategy', minWidth: 130 },
