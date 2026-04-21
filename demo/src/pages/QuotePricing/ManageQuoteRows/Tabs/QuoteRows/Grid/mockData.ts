@@ -27,6 +27,7 @@ export const rankCategoryOptions = [
   { Value: 'DTW', Text: 'DTW' },
 ]
 
+
 export const mockReportingAttributes: { id: number; name: string }[] = [
   { id: 1, name: 'Gets Mid Days' },
   { id: 2, name: 'No Mid Days' },
