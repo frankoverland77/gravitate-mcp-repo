@@ -26,7 +26,9 @@
       "Bash(grep -oE \"BULK CHANGE[^\\\\\"]{0,200}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
       "Bash(grep -oE \"className:[^,]{0,100}[Bb]ulk[^,]{0,100}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
       "Bash(grep -oE \".{0,300}bulk-change-container.{0,600}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
-      "Bash(grep -oE \".{0,200}bulk-change-container.{0,400}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)"
+      "Bash(grep -oE \".{0,200}bulk-change-container.{0,400}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
+      "Bash(git stash *)",
+      "Bash(git check-ignore *)"
     ]
   }
 }

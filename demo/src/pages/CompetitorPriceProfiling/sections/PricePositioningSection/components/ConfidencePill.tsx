@@ -1,18 +1,69 @@
 import { BBDTag } from '@gravitate-js/excalibrr';
-import { Confidence } from '../../../CompetitorPriceProfiling.types';
+import { Confidence, InsightKey } from '../../../CompetitorPriceProfiling.types';
+import { HoverablePopover } from '../../../components/HoverablePopover';
+import { ConfidencePopoverContent } from '../../../components/popovers/ConfidencePopoverContent';
 
 interface ConfidencePillProps {
   confidence: Confidence;
+  cellId?: string;
+  rowCell?: InsightKey;
+  observations?: number;
 }
 
-function ConfidencePill({ confidence }: ConfidencePillProps) {
+function ConfidencePill({
+  confidence,
+  cellId,
+  rowCell,
+  observations = 18,
+}: ConfidencePillProps) {
+  const common = {
+    style: { width: 'fit-content' as const },
+    'data-conf': confidence.toLowerCase(),
+    'data-cell': cellId,
+    'data-row-cell': rowCell,
+  };
+
+  let pill;
   if (confidence === 'HIGH') {
-    return <BBDTag success style={{ width: 'fit-content' }}>HIGH</BBDTag>;
+    pill = (
+      <BBDTag success {...common}>
+        HIGH
+      </BBDTag>
+    );
+  } else if (confidence === 'MED') {
+    pill = (
+      <BBDTag warning {...common}>
+        MED
+      </BBDTag>
+    );
+  } else {
+    pill = (
+      <BBDTag error {...common}>
+        LOW
+      </BBDTag>
+    );
   }
-  if (confidence === 'MED') {
-    return <BBDTag warning style={{ width: 'fit-content' }}>MED</BBDTag>;
+
+  if (!cellId || !rowCell) {
+    return pill;
   }
-  return <BBDTag error style={{ width: 'fit-content' }}>LOW</BBDTag>;
+
+  return (
+    <HoverablePopover
+      popoverId={`pop-conf-${cellId}-${rowCell}`}
+      placement="left"
+      content={
+        <ConfidencePopoverContent
+          cellIdentity={`${cellId} · ${rowCell}`}
+          confidence={confidence}
+          insight={rowCell}
+          observations={observations}
+        />
+      }
+    >
+      {pill}
+    </HoverablePopover>
+  );
 }
 
 export default ConfidencePill;

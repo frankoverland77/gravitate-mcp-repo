@@ -2,6 +2,48 @@ export type Confidence = 'HIGH' | 'MED' | 'LOW';
 
 export type Classification = 'Premium' | 'Conformist' | 'Discount' | 'Independent';
 
+export type InsightKey =
+  | 'followers'
+  | 'leader'
+  | 'price-positioning'
+  | 'pass-through'
+  | 'rank';
+
+export type PopoverId =
+  | 'pop-followers'
+  | 'pop-leader'
+  | 'pop-strategy'
+  | 'pop-passthrough'
+  | 'pop-passthrough-cell'
+  | 'pop-rank'
+  | 'pop-conf-generic'
+  | 'pop-conf-low'
+  | 'pop-followers-full';
+
+export interface Follower {
+  name: string;
+  pValue: number;
+  lag: number;
+}
+
+export interface PassThrough {
+  up: number;
+  down: number;
+}
+
+export interface Rank {
+  avg90: number;
+  avg30: number;
+}
+
+export interface Confidences {
+  followers: Confidence;
+  leader: Confidence;
+  pricePositioning: Confidence;
+  passThrough: Confidence;
+  rank: Confidence;
+}
+
 export interface CompetitorProfile {
   id: string;
   competitor: string;
@@ -13,6 +55,11 @@ export interface CompetitorProfile {
   productGroup: string;
   classification: Classification;
   isLeader: boolean;
+  followers: Follower[];
+  passThrough: PassThrough;
+  rank: Rank;
+  confidences: Confidences;
+  observations: number;
 }
 
 export interface MetricTileData {
