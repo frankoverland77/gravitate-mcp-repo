@@ -16,6 +16,7 @@ export type QuoteConfigRow = {
   tierGroup: string | null
   tierLevel: string | null
   rankCategory: string | null
+  reportingAttributes: string[]
 }
 
 export const rankCategoryOptions = [
@@ -24,6 +25,17 @@ export const rankCategoryOptions = [
   { Value: 'Wholesale', Text: 'Wholesale' },
   { Value: 'Retail', Text: 'Retail' },
   { Value: 'DTW', Text: 'DTW' },
+]
+
+export const mockReportingAttributes: { id: number; name: string }[] = [
+  { id: 1, name: 'Gets Mid Days' },
+  { id: 2, name: 'No Mid Days' },
+  { id: 3, name: 'Strategic Account' },
+  { id: 4, name: 'Spot Deal' },
+  { id: 5, name: 'Index Priced' },
+  { id: 6, name: 'Fixed Priced' },
+  { id: 7, name: 'High Margin' },
+  { id: 8, name: 'Watchlist' },
 ]
 
 export const tierGroupOptions = [
@@ -73,6 +85,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group A',
     tierLevel: 'Tier 1',
     rankCategory: 'Branded Rack',
+    reportingAttributes: ['Strategic Account', 'Gets Mid Days', 'High Margin', 'Index Priced'],
   },
   {
     id: 2,
@@ -92,6 +105,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group A',
     tierLevel: 'Tier 2',
     rankCategory: 'Unbranded Rack',
+    reportingAttributes: ['Strategic Account', 'Index Priced'],
   },
   {
     id: 3,
@@ -111,6 +125,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group B',
     tierLevel: 'Platinum',
     rankCategory: 'Wholesale',
+    reportingAttributes: ['Watchlist'],
   },
   {
     id: 4,
@@ -130,6 +145,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: null,
     tierLevel: null,
     rankCategory: null,
+    reportingAttributes: [],
   },
   {
     id: 5,
@@ -149,6 +165,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group A',
     tierLevel: 'Tier 3',
     rankCategory: 'Retail',
+    reportingAttributes: ['Gets Mid Days', 'High Margin'],
   },
   // Industrial Config (5 rows)
   {
@@ -169,6 +186,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group B',
     tierLevel: 'Gold',
     rankCategory: 'Branded Rack',
+    reportingAttributes: ['Fixed Priced', 'No Mid Days'],
   },
   {
     id: 7,
@@ -188,6 +206,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: null,
     tierLevel: null,
     rankCategory: null,
+    reportingAttributes: [],
   },
   {
     id: 8,
@@ -207,6 +226,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group A',
     tierLevel: 'Tier 1',
     rankCategory: 'Wholesale',
+    reportingAttributes: ['Spot Deal'],
   },
   {
     id: 9,
@@ -226,6 +246,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group B',
     tierLevel: 'Silver',
     rankCategory: null,
+    reportingAttributes: ['Fixed Priced', 'No Mid Days', 'Strategic Account'],
   },
   {
     id: 10,
@@ -245,6 +266,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: null,
     tierLevel: null,
     rankCategory: 'Retail',
+    reportingAttributes: [],
   },
   // Retail Config (5 rows)
   {
@@ -265,6 +287,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group A',
     tierLevel: 'Tier 2',
     rankCategory: 'Retail',
+    reportingAttributes: ['Gets Mid Days', 'High Margin', 'Strategic Account'],
   },
   {
     id: 12,
@@ -284,6 +307,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: null,
     tierLevel: null,
     rankCategory: null,
+    reportingAttributes: ['Spot Deal'],
   },
   {
     id: 13,
@@ -303,6 +327,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group B',
     tierLevel: 'Platinum',
     rankCategory: 'DTW',
+    reportingAttributes: ['Watchlist', 'Index Priced'],
   },
   {
     id: 14,
@@ -322,6 +347,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group C',
     tierLevel: 'Primary',
     rankCategory: 'Branded Rack',
+    reportingAttributes: [],
   },
   {
     id: 15,
@@ -341,6 +367,7 @@ export const quoteConfigData: QuoteConfigRow[] = [
     tierGroup: 'Group C',
     tierLevel: 'Secondary',
     rankCategory: null,
+    reportingAttributes: ['Gets Mid Days', 'High Margin'],
   },
 ]
 

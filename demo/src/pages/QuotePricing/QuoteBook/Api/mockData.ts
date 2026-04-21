@@ -19,10 +19,34 @@ export type QuoteRow = {
   proposed_tierDiff: number | null
   current_tierDiff: number | null
   exceptions: string[]
+  reportingAttributes: string[]
   profileKey?: string
   exceptionType?: ExceptionType
   exceptionCount?: number
   overrides?: ThresholdOverride[]
+}
+
+const reportingAttributeAssignments: Record<number, string[]> = {
+  1:  ['Strategic Account', 'Gets Mid Days', 'High Margin', 'Index Priced'],
+  2:  ['Strategic Account', 'Index Priced'],
+  3:  ['Watchlist'],
+  4:  [],
+  5:  ['Gets Mid Days', 'High Margin'],
+  6:  ['Fixed Priced', 'No Mid Days'],
+  7:  [],
+  8:  ['Spot Deal'],
+  9:  ['Fixed Priced', 'No Mid Days', 'Strategic Account'],
+  10: [],
+  11: ['Gets Mid Days', 'High Margin', 'Strategic Account'],
+  12: ['Spot Deal'],
+  13: ['Watchlist', 'Index Priced'],
+  14: [],
+  15: ['Gets Mid Days', 'High Margin'],
+  16: ['Gets Mid Days'],
+  17: ['Watchlist', 'Strategic Account'],
+  18: [],
+  19: ['Fixed Priced'],
+  20: ['High Margin', 'Index Priced', 'Gets Mid Days', 'Strategic Account', 'Watchlist'],
 }
 
 const tierAssignments: Record<number, { tierGroup: string | null; tierLevel: string | null; proposed_tierDiff: number | null; current_tierDiff: number | null }> = {
@@ -48,7 +72,7 @@ const tierAssignments: Record<number, { tierGroup: string | null; tierLevel: str
   20: { tierGroup: 'Group A', tierLevel: 'Tier 3', proposed_tierDiff: 0.0075, current_tierDiff: 0.0075 },
 }
 
-const rawQuoteBookData: Omit<QuoteRow, 'tierGroup' | 'tierLevel' | 'proposed_tierDiff' | 'current_tierDiff'>[] = [
+const rawQuoteBookData: Omit<QuoteRow, 'tierGroup' | 'tierLevel' | 'proposed_tierDiff' | 'current_tierDiff' | 'reportingAttributes'>[] = [
   // Wholesale (6 rows)
   {
     id: 1,
@@ -444,6 +468,7 @@ const rawQuoteBookData: Omit<QuoteRow, 'tierGroup' | 'tierLevel' | 'proposed_tie
 export const quoteBookData: QuoteRow[] = rawQuoteBookData.map(row => ({
   ...row,
   ...tierAssignments[row.id],
+  reportingAttributes: reportingAttributeAssignments[row.id] ?? [],
 }))
 
 export const quoteGroups = [

@@ -2,9 +2,21 @@ import { DeleteOutlined } from '@ant-design/icons'
 import { BBDTag, GraviButton, Texto } from '@gravitate-js/excalibrr'
 import { BulkSelectEditor } from '@components/shared/Grid/bulkChange/bulkCellEditors'
 import { Tooltip } from 'antd'
+import { BulkAttributesEditor } from '@components/shared/Grid/bulkChange/BulkAttributesEditor'
+import { ReportingAttributesCell } from '@components/shared/Grid/ReportingAttributesCell'
+import { ReportingAttributesEditor } from '@components/shared/Grid/ReportingAttributesEditor'
 import { tierGroupOptions, tierLevelOptionsByGroup, allTierLevelOptions, rankCategoryOptions } from './mockData'
 
-export const getManageQuoteRowsColumnDefs = (): any[] => [
+type AttributeOption = { id: number | string; name: string }
+
+interface ManageQuoteRowsColumnDefsOpts {
+  reportingAttributeOptions: AttributeOption[]
+  onCreateAttribute?: (name: string) => void
+}
+
+export const getManageQuoteRowsColumnDefs = (
+  opts: ManageQuoteRowsColumnDefsOpts = { reportingAttributeOptions: [] }
+): any[] => [
   {
     field: 'competitorCount',
     headerName: 'Competitors',
@@ -76,6 +88,25 @@ export const getManageQuoteRowsColumnDefs = (): any[] => [
           </span>
         </Tooltip>
       ),
+  },
+  {
+    field: 'reportingAttributes',
+    headerName: 'Reporting Attributes',
+    width: 240,
+    editable: true,
+    isBulkEditable: true,
+    cellRenderer: ReportingAttributesCell,
+    cellEditor: ReportingAttributesEditor,
+    cellEditorPopup: true,
+    cellEditorParams: {
+      options: opts.reportingAttributeOptions,
+      onCreateAttribute: opts.onCreateAttribute,
+    },
+    bulkCellEditor: BulkAttributesEditor,
+    bulkCellEditorParams: {
+      propKey: 'reportingAttributes',
+      options: opts.reportingAttributeOptions,
+    },
   },
   { field: 'strategy', headerName: 'Strategy', minWidth: 130 },
   {

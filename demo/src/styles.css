@@ -128,3 +128,25 @@ body {
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+/* GraviGrid Bulk Change bar — vertical alignment fix.
+   The library wraps "Property:" label + its Select in a Vertical (stacked),
+   while the count text and Value editor render horizontally. That produces
+   three different vertical rhythms in one bar. Collapse the Property
+   wrapper to a single row so everything sits on one axis. */
+.bulk-change-container :has(> .ml-property) {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.bulk-change-container .ml-property {
+  margin-left: 0 !important;
+  line-height: 1 !important;
+}
+
+/* Match the Property Select's vertical rhythm to the rest of the bar */
+.bulk-change-container .bulk-change-select-container .ant-select-selector {
+  display: flex;
+  align-items: center;
+}

@@ -10,7 +10,23 @@
       "Bash(rm docs/figma-integration.md docs/prompt-for-examples.md)",
       "Bash(rmdir docs/conversations)",
       "Bash(yarn install *)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(yarn dev:*)",
+      "Bash(npx vite:*)",
+      "Bash(corepack enable:*)",
+      "Bash(corepack yarn:*)",
+      "Bash(ln -s /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules /Users/frankoverland/Documents/repos/excalibrr-mcp-server/.claude/worktrees/gracious-curie/demo/node_modules)",
+      "Bash(ln -s /Users/frankoverland/Documents/repos/excalibrr-mcp-server/node_modules /Users/frankoverland/Documents/repos/excalibrr-mcp-server/.claude/worktrees/gracious-curie/node_modules)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5174/)",
+      "Bash(grep -A8 '\"scripts\"' echo \"---\" ls /Users/frankoverland/Documents/repos/excalibrr-mcp-server/src)",
+      "Bash(head -5 echo \"---\" cat /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/vite.config.*)",
+      "Bash(find /Users/frankoverland/Documents/\"Gravitate Repo\"/Gravitate.Dotnet.Next/frontend/src/modules/SellingPlatform/BuyNow -name \"*.tsx\" -exec grep -l \"mode\\\\|Mode\" {} \\\\;)",
+      "Bash(grep -oE \"BULK CHANGE[^\\\\\"]{0,200}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
+      "Bash(grep -oE \"className:[^,]{0,100}[Bb]ulk[^,]{0,100}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
+      "Bash(grep -oE \".{0,300}bulk-change-container.{0,600}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)",
+      "Bash(grep -oE \".{0,200}bulk-change-container.{0,400}\" /Users/frankoverland/Documents/repos/excalibrr-mcp-server/demo/node_modules/@gravitate-js/excalibrr/dist/index.es.js)"
     ]
   }
 }

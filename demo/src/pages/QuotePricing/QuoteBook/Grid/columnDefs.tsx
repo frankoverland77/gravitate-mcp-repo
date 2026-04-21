@@ -1,7 +1,8 @@
-import { ColDef, ColGroupDef, ICellRendererParams } from 'ag-grid-community'
+import { ColDef, ColGroupDef, ICellRendererParams, IRowNode } from 'ag-grid-community'
 import { BBDTag } from '@gravitate-js/excalibrr'
 import { HistoryOutlined, StopFilled, WarningFilled } from '@ant-design/icons'
 import { Tooltip } from 'antd'
+import { ReportingAttributesCell } from '@components/shared/Grid/ReportingAttributesCell'
 import type { ExceptionProfile, EvaluationResult, ComponentViolation, PeriodDisplay, PeriodToggleValue } from '../Api/types.schema'
 import { PROPOSED_COMPONENTS, CURRENT_COMPONENTS } from '../Api/types.schema'
 
@@ -240,28 +241,87 @@ export const getQuoteBookColumnDefs = (options: ColumnOptions): (ColDef | ColGro
     exceptionCols = [buildExceptionGroup('Exceptions', null)]
   }
 
-  // Price Info columns — read-only Tier Group and Tier Level
+  // Price Info column group — read-only Tier Group, Tier Level, and Reporting Attributes
   const priceInfoCols: (ColDef | ColGroupDef)[] = [
-  {
-    field: 'tierGroup',
-    headerName: 'Tier Group',
-    width: 120,
-    valueFormatter: ({ value }) => value ?? '',
-    cellRenderer: (params: ICellRendererParams) => {
-      if (!params.data || params.data.tierGroup == null) return <span style={{ display: 'flex', alignItems: 'center', height: '100%', color: 'var(--gray-400)' }}>—</span>
-      return <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.data.tierGroup}</span>
+    {
+      headerName: 'Price Info',
+      marryChildren: true,
+      children: [
+        {
+          field: 'tierGroup',
+          headerName: 'Tier Group',
+          width: 120,
+          valueFormatter: ({ value }) => value ?? '',
+          cellRenderer: (params: ICellRendererParams) => {
+            if (!params.data || params.data.tierGroup == null) return <span style={{ display: 'flex', alignItems: 'center', height: '100%', color: 'var(--gray-400)' }}>—</span>
+            return <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.data.tierGroup}</span>
+          },
+        },
+        {
+          field: 'tierLevel',
+          headerName: 'Tier Level',
+          width: 110,
+          valueFormatter: ({ value }) => value ?? '',
+          cellRenderer: (params: ICellRendererParams) => {
+            if (!params.data || params.data.tierLevel == null) return <span style={{ display: 'flex', alignItems: 'center', height: '100%', color: 'var(--gray-400)' }}>—</span>
+            return <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.data.tierLevel}</span>
+          },
+        },
+        {
+          field: 'reportingAttributes',
+          headerName: 'Reporting Attributes',
+          width: 240,
+          cellRenderer: ReportingAttributesCell,
+          // Stable canonical serialization used for sort, filter, and group-by-exact-combination.
+          valueGetter: (p: { data?: { reportingAttributes?: string[] } }) => {
+            const arr = p.data?.reportingAttributes ?? []
+            return [...arr].sort().join(' · ')
+          },
+          // Keep the raw array available to the renderer (valueGetter above drives sort/filter/group).
+          cellRendererParams: {},
+          equals: (a: unknown, b: unknown) => a === b,
+          comparator: (a: string, b: string) => a.localeCompare(b),
+          enableRowGroup: true,
+          // agSetColumnFilter shows one entry per unique exact-combination string.
+          filter: 'agSetColumnFilter',
+          filterParams: {
+            valueFormatter: ({ value }: { value: string }) =>
+              value === '' ? '(No attributes)' : value.split(' · ').join(', '),
+          },
+          // Group-header rendering: re-split the serialized string back into chips.
+          cellRendererSelector: (params: ICellRendererParams) => {
+            if (params.node?.group) {
+              return {
+                component: (p: ICellRendererParams) => {
+                  const key = p.value as string
+                  if (!key) return <span style={{ fontStyle: 'italic', color: 'var(--gray-500)' }}>No attributes ({(p.node as IRowNode)?.allChildrenCount ?? 0})</span>
+                  const parts = key.split(' · ')
+                  return (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                      {parts.map((n) => (
+                        <BBDTag key={n} theme3 style={{ margin: 0 }}>{n}</BBDTag>
+                      ))}
+                      <span style={{ color: 'var(--gray-500)', marginLeft: 4 }}>
+                        ({(p.node as IRowNode)?.allChildrenCount ?? 0})
+                      </span>
+                    </span>
+                  )
+                },
+              }
+            }
+            // Rendered cells pass the raw array to ReportingAttributesCell.
+            return {
+              component: (p: ICellRendererParams) => (
+                <ReportingAttributesCell
+                  {...p}
+                  value={p.data?.reportingAttributes ?? []}
+                />
+              ),
+            }
+          },
+        },
+      ],
     },
-  },
-  {
-    field: 'tierLevel',
-    headerName: 'Tier Level',
-    width: 110,
-    valueFormatter: ({ value }) => value ?? '',
-    cellRenderer: (params: ICellRendererParams) => {
-      if (!params.data || params.data.tierLevel == null) return <span style={{ display: 'flex', alignItems: 'center', height: '100%', color: 'var(--gray-400)' }}>—</span>
-      return <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.data.tierLevel}</span>
-    },
-  },
   ]
 
   const restCols: (ColDef | ColGroupDef)[] = [
