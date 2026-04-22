@@ -111,3 +111,4 @@ local-setup.sh
 
 # Git worktrees
 .worktrees/
+.claude/worktrees/

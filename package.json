@@ -1,6 +1,6 @@
 {
   "name": "excalibrr-workspace",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Excalibrr MCP Server and Demo Workspace",
   "private": true,
   "workspaces": [
