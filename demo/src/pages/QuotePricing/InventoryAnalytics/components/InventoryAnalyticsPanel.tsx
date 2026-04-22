@@ -2,11 +2,13 @@ import { Vertical, Horizontal, Texto } from '@gravitate-js/excalibrr'
 import { Select } from 'antd'
 import { ComposedChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { InventorySummaryCard } from './InventorySummaryCard'
+import { TotalVolumeSummaryCard } from './TotalVolumeSummaryCard'
 import { UnifiedView } from './UnifiedView'
 import type { InventoryQuoteRow, AnalyticsViewType } from '../InventoryAnalytics.types'
 
 const viewOptions: { value: AnalyticsViewType; label: string }[] = [
   { value: 'inventory', label: 'Inventory' },
+  { value: 'total_volume', label: 'Total Volume' },
   { value: 'unified_view', label: 'Unified View' },
   { value: 'liftings_vs_benchmark', label: 'Liftings vs Benchmark' },
   { value: 'liftings_vs_margin', label: 'Liftings vs Margin' },
@@ -174,6 +176,8 @@ export function InventoryAnalyticsPanel({
               <InventorySummaryCard row={selectedRow} fillHeight />
               <InventoryChart row={selectedRow} />
             </Horizontal>
+          ) : selectedView === 'total_volume' ? (
+            <TotalVolumeSummaryCard row={selectedRow} fillHeight />
           ) : selectedView === 'unified_view' ? (
             <UnifiedView row={selectedRow} />
           ) : (

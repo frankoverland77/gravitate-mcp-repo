@@ -71,6 +71,7 @@ export type InventoryQuoteRow = {
 
 export type AnalyticsViewType =
   | 'inventory'
+  | 'total_volume'
   | 'unified_view'
   | 'liftings_vs_benchmark'
   | 'liftings_vs_margin'
