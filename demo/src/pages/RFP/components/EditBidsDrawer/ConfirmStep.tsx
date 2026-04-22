@@ -43,7 +43,7 @@ export function ConfirmStep({ changes, updatedDetails, onApply, onBack }: Confir
 
   if (isComplete) {
     return (
-      <Vertical className={styles.stepContent} alignItems='center' style={{ padding: '48px' }}>
+      <Vertical className={styles.stepContent} height="auto" alignItems='center' style={{ padding: '48px' }}>
         <CheckCircleOutlined
           style={{ fontSize: '64px', color: 'var(--theme-success-color)', marginBottom: '24px' }}
         />
@@ -59,7 +59,7 @@ export function ConfirmStep({ changes, updatedDetails, onApply, onBack }: Confir
 
   if (isApplying) {
     return (
-      <Vertical className={styles.stepContent} alignItems='center' style={{ padding: '48px' }}>
+      <Vertical className={styles.stepContent} height="auto" alignItems='center' style={{ padding: '48px' }}>
         <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
         <Texto category='h4' weight='600' className='mt-4'>
           Applying Changes...
@@ -72,7 +72,7 @@ export function ConfirmStep({ changes, updatedDetails, onApply, onBack }: Confir
   }
 
   return (
-    <Vertical className={styles.stepContent}>
+    <Vertical className={styles.stepContent} height="auto">
       <Texto category='h4' weight='600' className='mb-2'>
         Step 4: Apply Changes
       </Texto>

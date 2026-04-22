@@ -102,7 +102,7 @@ export function ValidationStep({ validationResult, onConfirm, onBack }: Validati
   ]
 
   return (
-    <Vertical className={styles.stepContent}>
+    <Vertical className={styles.stepContent} height="auto">
       <Texto category='h4' weight='600' className='mb-2'>
         Step 3: Review Changes
       </Texto>

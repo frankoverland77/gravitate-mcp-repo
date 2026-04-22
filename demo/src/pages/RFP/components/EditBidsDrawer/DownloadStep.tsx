@@ -38,7 +38,7 @@ export function DownloadStep({ rfp, round, suppliers, details, onNext }: Downloa
   }
 
   return (
-    <Vertical className={styles.stepContent}>
+    <Vertical className={styles.stepContent} height="auto">
       <Texto category='h4' weight='600' className='mb-2'>
         Step 1: Download Current Bids
       </Texto>

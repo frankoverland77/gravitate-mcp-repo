@@ -101,12 +101,14 @@ export function RFPListSection({ onRFPClick }: RFPListSectionProps) {
         field: 'supplierCount',
         width: 120,
         cellRenderer: suppliersRenderer,
+        cellStyle: { display: 'flex', alignItems: 'center' },
       },
       {
         headerName: 'Target',
         field: 'targetPrice',
         width: 130,
         cellRenderer: targetRenderer,
+        cellStyle: { display: 'flex', alignItems: 'center' },
       },
       {
         headerName: 'Created',

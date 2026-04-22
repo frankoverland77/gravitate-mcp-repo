@@ -1213,7 +1213,7 @@ export function RFPTab() {
         onClose={handleCloseInsightsPanel}
         mask={false}
       >
-        <Vertical gap={20}>
+        <Vertical gap={20} height="auto">
           {/* Top Recommendation - hero card */}
           <div style={{
             background: 'linear-gradient(135deg, #722ed1 0%, #1890ff 100%)',

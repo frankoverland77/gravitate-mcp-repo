@@ -350,7 +350,7 @@ function BidHistoryChart({ historicalData, round, onExport }: BidHistoryChartPro
       </Horizontal>
 
       {/* Legend */}
-      <Horizontal className={styles.legend}>
+      <Horizontal className={styles.legend} gap={24} alignItems='center'>
         <Horizontal gap={8} alignItems='center'>
           <div className={styles.legendDot} style={{ backgroundColor: chartColors.r1 }} />
           <Texto category='p2'>R1 Bid</Texto>
@@ -359,7 +359,7 @@ function BidHistoryChart({ historicalData, round, onExport }: BidHistoryChartPro
           <div className={styles.legendDot} style={{ backgroundColor: chartColors.r2 }} />
           <Texto category='p2'>R2 Bid</Texto>
         </Horizontal>
-        <Horizontal alignItems='center' gap={8} style={{ marginLeft: '16px' }}>
+        <Horizontal alignItems='center' gap={8}>
           <Tag color='blue' style={{ margin: 0 }}>
             INCUMBENT
           </Tag>
