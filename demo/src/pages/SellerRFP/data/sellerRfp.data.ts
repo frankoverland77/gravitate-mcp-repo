@@ -16,6 +16,7 @@ import type {
   PastBidReference,
   TerminalProductStats,
   MarginHistoryPoint,
+  DiffHistoryPoint,
   BenchmarkType,
 } from '../types/sellerRfp.types'
 import type { InventoryCapacity, DetailAvailability } from '../types/sellerRfp.types'
@@ -1217,6 +1218,53 @@ export function generateMarginHistory(
     })
 
     current.setDate(current.getDate() + 1)
+  }
+
+  return points
+}
+
+/**
+ * Generate weekly sale-differential history for the intelligence chart.
+ * Produces one point per week with diff values in the $0.0001 to $0.0565 range.
+ */
+export function generateDiffHistory(
+  product: string,
+  months: number = 6,
+): DiffHistoryPoint[] {
+  const points: DiffHistoryPoint[] = []
+  const endDate = new Date('2026-02-28')
+  const startDate = new Date(endDate)
+  startDate.setMonth(startDate.getMonth() - months)
+
+  // Snap start to Monday
+  const dayOfWeek = startDate.getDay()
+  const daysToMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek) % 7
+  startDate.setDate(startDate.getDate() + daysToMonday)
+
+  let seed = product.split('').reduce((acc, c) => acc + c.charCodeAt(0), 1)
+  const seededRandom = () => {
+    seed = (seed * 16807) % 2147483647
+    return (seed - 1) / 2147483646
+  }
+
+  const minDiff = 0.0001
+  const maxDiff = 0.0565
+  const current = new Date(startDate)
+  let diff = minDiff + (maxDiff - minDiff) * 0.35
+
+  while (current <= endDate) {
+    const weekIndex = Math.floor((current.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000))
+    const seasonalWave = Math.sin((weekIndex / 4) * Math.PI) * 0.006
+    const drift = (seededRandom() - 0.5) * 0.004
+    diff = diff + drift + seasonalWave * 0.15
+    diff = Math.max(minDiff, Math.min(maxDiff, diff))
+
+    points.push({
+      date: current.toISOString().split('T')[0],
+      diff: Math.round(diff * 10000) / 10000,
+    })
+
+    current.setDate(current.getDate() + 7)
   }
 
   return points

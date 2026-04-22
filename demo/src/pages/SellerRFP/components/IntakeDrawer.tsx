@@ -11,14 +11,14 @@ import { getCustomerOptions } from '../../../shared/data'
 import styles from './IntakeDrawer.module.css'
 
 interface IntakeDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onCreate: (rfp: SellerRFP) => void
   onDecline: (rfp: SellerRFP) => void
   rfps: SellerRFP[]
 }
 
-export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: IntakeDrawerProps) {
+export function IntakeDrawer({ open, onClose, onCreate, onDecline, rfps }: IntakeDrawerProps) {
   const [rfpName, setRfpName] = useState('')
   const [buyerId, setBuyerId] = useState<string | null>(null)
   const [buyerName, setBuyerName] = useState('')
@@ -200,7 +200,7 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
       title="New RFP Response"
       placement="right"
       width={520}
-      open={visible}
+      open={open}
       onClose={handleClose}
       footer={
         <Vertical gap={8}>
@@ -255,9 +255,9 @@ export function IntakeDrawer({ visible, onClose, onCreate, onDecline, rfps }: In
         </Vertical>
       }
     >
-      <Vertical gap={24}>
+      <Vertical gap={32}>
         {/* RFP Metadata */}
-        <Vertical gap={16}>
+        <Vertical gap={20}>
           <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
             RFP Information
           </Texto>

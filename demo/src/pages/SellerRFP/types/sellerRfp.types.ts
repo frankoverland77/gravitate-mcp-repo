@@ -442,6 +442,11 @@ export interface MarginHistoryPoint {
   marginCpg: number
 }
 
+export interface DiffHistoryPoint {
+  date: string
+  diff: number
+}
+
 // =============================================================================
 // INVENTORY CAPACITY & DETAIL AVAILABILITY
 // =============================================================================

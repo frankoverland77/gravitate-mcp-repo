@@ -32,7 +32,7 @@ interface ParsedRow {
 }
 
 interface UploadRFPModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onCreate: (rfp: SellerRFP) => void
 }
@@ -50,7 +50,7 @@ function generateParsedRows(): ParsedRow[] {
   ]
 }
 
-export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalProps) {
+export function UploadRFPModal({ open, onClose, onCreate }: UploadRFPModalProps) {
   const [stage, setStage] = useState<UploadStage>('upload')
   const [fileName, setFileName] = useState<string | null>(null)
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([])
@@ -318,7 +318,7 @@ export function UploadRFPModal({ visible, onClose, onCreate }: UploadRFPModalPro
 
   return (
     <Modal
-      open={visible}
+      open={open}
       onCancel={handleClose}
       width={600}
       centered

@@ -28,14 +28,14 @@ import {
 } from '../../RFP/rfp.types'
 
 interface SellerParametersModalProps {
-  visible: boolean
+  open: boolean
   parameters: ParameterConfig
   onClose: () => void
   onSave: (parameters: ParameterConfig) => void
 }
 
 export function SellerParametersModal({
-  visible,
+  open,
   parameters,
   onClose,
   onSave,
@@ -44,10 +44,10 @@ export function SellerParametersModal({
 
   // Sync local state when modal opens
   useEffect(() => {
-    if (visible) {
+    if (open) {
       setLocal(parameters)
     }
-  }, [visible, parameters])
+  }, [open, parameters])
 
   const handleSave = useCallback(() => {
     onSave(local)
@@ -59,7 +59,7 @@ export function SellerParametersModal({
 
   return (
     <Modal
-      open={visible}
+      open={open}
       title="Parameters"
       onCancel={onClose}
       width={480}

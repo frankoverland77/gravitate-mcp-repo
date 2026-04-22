@@ -58,31 +58,32 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
   }, [rfp.details])
 
   return (
-    <Vertical gap={32} style={{ overflow: 'visible' }}>
+    <Vertical gap={20} style={{ overflow: 'visible' }}>
       {/* Volume & Allocation */}
-      <Vertical gap={16} style={{ overflow: 'visible' }}>
-        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-          Volume & Allocation
-        </Texto>
+      <section className={styles['section-card']}>
+        <header className={styles['section-header']}>
+          <span className={styles['section-title']}>Volume & Allocation</span>
+        </header>
 
-        {/* Volume Summary Card */}
-        <div className={styles['volume-card']}>
-          <Horizontal alignItems="stretch" gap={1} style={{ backgroundColor: '#e8e8e8' }}>
+        <div className={styles['section-body']}>
+          <div className={styles['volume-summary']}>
             {/* Aggregated from details */}
-            <Vertical gap={6} style={{ flex: 1, padding: '20px', backgroundColor: '#fff' }}>
-              <Texto category="p3" appearance="medium">Detail Volume (sum)</Texto>
-              <Texto category="h5" weight="600">
+            <div className={styles['volume-cell']}>
+              <div className={styles['volume-label']}>Detail Volume (sum)</div>
+              <div className={styles['volume-value']}>
                 {detailVolumeTotal > 0 ? formatVolume(detailVolumeTotal) : '—'}
-              </Texto>
-              <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>
+              </div>
+              <div className={styles['volume-hint']}>
                 {detailsWithVolume} of {rfp.details.length} details have volume assigned
-              </Texto>
-            </Vertical>
+              </div>
+            </div>
 
             {/* RFP-level commitment */}
-            <Vertical gap={6} style={{ flex: 1, padding: '20px', backgroundColor: '#fff' }}>
-              <Horizontal alignItems="center" justifyContent="space-between">
-                <Texto category="p3" appearance="medium">RFP Volume Commitment</Texto>
+            <div className={styles['volume-cell']}>
+              <Horizontal alignItems="center" justifyContent="space-between" style={{ marginBottom: 6 }}>
+                <span className={styles['volume-label']} style={{ marginBottom: 0 }}>
+                  RFP Volume Commitment
+                </span>
                 <Segmented
                   size="small"
                   value={volumeMode}
@@ -95,7 +96,6 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
                       updateField('volumeCommitment', detailVolumeTotal || null)
                     }
                   }}
-                  style={{ fontSize: '10px' }}
                 />
               </Horizontal>
               {volumeMode === 'rfp-total' ? (
@@ -106,45 +106,43 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
                   parser={(value) => parseInt(value?.replace(/,/g, '') || '0')}
                   style={{ width: '100%' }}
                   placeholder="Total gal/mo"
-                  size="small"
                 />
               ) : (
-                <Texto category="h5" weight="600">
+                <div className={styles['volume-value']}>
                   {detailVolumeTotal > 0 ? formatVolume(detailVolumeTotal) : '—'}
-                </Texto>
+                </div>
               )}
               {volumeMode === 'rfp-total' && terms.volumeCommitment && detailVolumeTotal > 0 && (
-                <Texto
-                  category="p3"
-                  style={{
-                    fontSize: '11px',
-                    color: terms.volumeCommitment > detailVolumeTotal ? '#faad14' : '#52c41a',
-                  }}
+                <div
+                  className={
+                    terms.volumeCommitment > detailVolumeTotal
+                      ? styles['volume-warn']
+                      : styles['volume-ok']
+                  }
                 >
                   {terms.volumeCommitment > detailVolumeTotal
                     ? `${formatVolume(terms.volumeCommitment - detailVolumeTotal)} unassigned to details`
                     : 'Detail volumes cover commitment'}
-                </Texto>
+                </div>
               )}
-            </Vertical>
+            </div>
 
             {/* Allocation Period */}
-            <Vertical gap={6} style={{ flex: 1, padding: '20px', backgroundColor: '#fff' }}>
-              <Texto category="p3" appearance="medium">Allocation Period</Texto>
+            <div className={styles['volume-cell']}>
+              <div className={styles['volume-label']}>Allocation Period</div>
               <Select
                 value={terms.allocationPeriod}
                 onChange={(v) => updateField('allocationPeriod', v)}
                 options={allocationOptions}
                 placeholder="Select..."
                 allowClear
-                size="small"
                 style={{ width: '100%' }}
               />
-              <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>
+              <div className={styles['volume-hint']}>
                 Applies to all details unless overridden below
-              </Texto>
-            </Vertical>
-          </Horizontal>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Per-Detail Volume & Allocation Table */}
@@ -156,7 +154,7 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
                 <th>Product</th>
                 <th>Volume (gal/mo)</th>
                 <th>Allocation</th>
-                <th style={{ textAlign: 'center', width: '36px' }}></th>
+                <th style={{ textAlign: 'center', width: '52px' }}></th>
               </tr>
             </thead>
             <tbody>
@@ -176,19 +174,17 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
                     >
                       {isFirstInGroup ? (
                         <td rowSpan={details.length} className={styles['terminal-cell']}>
-                          <Vertical gap={2}>
-                            <Texto category="p2" weight="500">{terminal.replace(' Terminal', '')}</Texto>
-                            <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>
-                              {formatVolume(terminalTotal)}
-                            </Texto>
-                          </Vertical>
+                          <div className={styles['terminal-name']}>{terminal.replace(' Terminal', '')}</div>
+                          <div className={styles['terminal-volume']}>{formatVolume(terminalTotal)}</div>
                         </td>
                       ) : null}
                       <td><Texto category="p2">{detail.product}</Texto></td>
                       <td>
-                        <Texto category="p2">
-                          {detail.volume ? detail.volume.toLocaleString() : <span style={{ color: '#bfbfbf' }}>—</span>}
-                        </Texto>
+                        {detail.volume ? (
+                          <Texto category="p2">{detail.volume.toLocaleString()}</Texto>
+                        ) : (
+                          <span className={styles['muted-cell']}>—</span>
+                        )}
                       </td>
                       <td>
                         {allocationOverride ? (
@@ -213,106 +209,108 @@ export function TermsTab({ rfp, onTermsUpdate }: TermsTabProps) {
             </tbody>
           </table>
         </div>
-      </Vertical>
+      </section>
 
       {/* Contract & Payment Terms */}
-      <Vertical gap={16} style={{ overflow: 'visible' }}>
-        <Texto category="h5" weight="600" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>
-          Contract & Payment Terms
-        </Texto>
+      <section className={styles['section-card']}>
+        <header className={styles['section-header']}>
+          <span className={styles['section-title']}>Contract & Payment Terms</span>
+        </header>
 
-        <div className={styles['form-grid']}>
-          {/* Contract Period */}
-          <Vertical gap={4}>
-            <Texto category="p2" weight="500">Contract Period</Texto>
-            <RangePicker
-              value={
-                terms.contractStart && terms.contractEnd
-                  ? [dayjs(terms.contractStart), dayjs(terms.contractEnd)]
-                  : null
-              }
-              onChange={(dates) => {
-                if (dates && dates[0] && dates[1]) {
-                  onTermsUpdate({
-                    ...terms,
-                    contractStart: dates[0].format('YYYY-MM-DD'),
-                    contractEnd: dates[1].format('YYYY-MM-DD'),
-                  })
-                } else {
-                  onTermsUpdate({ ...terms, contractStart: null, contractEnd: null })
+        <div className={styles['section-body']}>
+          <div className={styles['form-grid']}>
+            {/* Contract Period */}
+            <div>
+              <div className={styles['field-label']}>Contract Period</div>
+              <RangePicker
+                value={
+                  terms.contractStart && terms.contractEnd
+                    ? [dayjs(terms.contractStart), dayjs(terms.contractEnd)]
+                    : null
                 }
-              }}
-              style={{ width: '100%' }}
-            />
-          </Vertical>
-
-          {/* Payment Terms */}
-          <Vertical gap={4}>
-            <Texto category="p2" weight="500">Payment Terms</Texto>
-            <Select
-              value={terms.paymentTerms}
-              onChange={(v) => updateField('paymentTerms', v)}
-              options={PAYMENT_TERMS_OPTIONS}
-              placeholder="Select..."
-              allowClear
-              style={{ width: '100%' }}
-            />
-          </Vertical>
-
-          {/* Ratability Range */}
-          <Vertical gap={4}>
-            <Texto category="p2" weight="500">Ratability (% range)</Texto>
-            <Horizontal gap={8} alignItems="center">
-              <InputNumber
-                value={terms.ratabilityMin}
-                onChange={(v) => updateField('ratabilityMin', v)}
-                min={0}
-                max={100}
+                onChange={(dates) => {
+                  if (dates && dates[0] && dates[1]) {
+                    onTermsUpdate({
+                      ...terms,
+                      contractStart: dates[0].format('YYYY-MM-DD'),
+                      contractEnd: dates[1].format('YYYY-MM-DD'),
+                    })
+                  } else {
+                    onTermsUpdate({ ...terms, contractStart: null, contractEnd: null })
+                  }
+                }}
                 style={{ width: '100%' }}
-                placeholder="Min %"
-                addonAfter="%"
               />
-              <Texto appearance="medium">to</Texto>
-              <InputNumber
-                value={terms.ratabilityMax}
-                onChange={(v) => updateField('ratabilityMax', v)}
-                min={0}
-                max={200}
-                style={{ width: '100%' }}
-                placeholder="Max %"
-                addonAfter="%"
-              />
-            </Horizontal>
-          </Vertical>
+            </div>
 
-          {/* Deficiency Penalty */}
-          <Vertical gap={4}>
-            <Texto category="p2" weight="500">Deficiency Penalty</Texto>
-            <InputNumber
-              value={terms.penaltyCpg}
-              onChange={(v) => updateField('penaltyCpg', v)}
-              min={0}
-              step={0.0001}
-              precision={4}
-              style={{ width: '100%' }}
-              placeholder="e.g., 0.0200"
-              addonBefore="$"
-              addonAfter="/gal"
+            {/* Payment Terms */}
+            <div>
+              <div className={styles['field-label']}>Payment Terms</div>
+              <Select
+                value={terms.paymentTerms}
+                onChange={(v) => updateField('paymentTerms', v)}
+                options={PAYMENT_TERMS_OPTIONS}
+                placeholder="Select..."
+                allowClear
+                style={{ width: '100%' }}
+              />
+            </div>
+
+            {/* Ratability Range */}
+            <div>
+              <div className={styles['field-label']}>Ratability (% range)</div>
+              <Horizontal gap={8} alignItems="center">
+                <InputNumber
+                  value={terms.ratabilityMin}
+                  onChange={(v) => updateField('ratabilityMin', v)}
+                  min={0}
+                  max={100}
+                  style={{ width: '100%' }}
+                  placeholder="Min"
+                  addonAfter="%"
+                />
+                <Texto appearance="medium">to</Texto>
+                <InputNumber
+                  value={terms.ratabilityMax}
+                  onChange={(v) => updateField('ratabilityMax', v)}
+                  min={0}
+                  max={200}
+                  style={{ width: '100%' }}
+                  placeholder="Max"
+                  addonAfter="%"
+                />
+              </Horizontal>
+            </div>
+
+            {/* Deficiency Penalty */}
+            <div>
+              <div className={styles['field-label']}>Deficiency Penalty</div>
+              <InputNumber
+                value={terms.penaltyCpg}
+                onChange={(v) => updateField('penaltyCpg', v)}
+                min={0}
+                step={0.0001}
+                precision={4}
+                style={{ width: '100%' }}
+                placeholder="e.g., 0.0200"
+                addonBefore="$"
+                addonAfter="/gal"
+              />
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div style={{ marginTop: 20 }}>
+            <div className={styles['field-label']}>Notes</div>
+            <TextArea
+              value={terms.notes || ''}
+              onChange={(e) => updateField('notes', e.target.value || null)}
+              rows={3}
+              placeholder="Additional terms, buyer requirements, special conditions..."
             />
-          </Vertical>
+          </div>
         </div>
-
-        {/* Notes */}
-        <Vertical gap={4}>
-          <Texto category="p2" weight="500">Notes</Texto>
-          <TextArea
-            value={terms.notes || ''}
-            onChange={(e) => updateField('notes', e.target.value || null)}
-            rows={3}
-            placeholder="Additional terms, buyer requirements, special conditions..."
-          />
-        </Vertical>
-      </Vertical>
+      </section>
     </Vertical>
   )
 }

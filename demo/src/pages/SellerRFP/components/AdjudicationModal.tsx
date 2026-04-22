@@ -8,13 +8,13 @@ import styles from './AdjudicationModal.module.css'
 const { TextArea } = Input
 
 interface AdjudicationModalProps {
-  visible: boolean
+  open: boolean
   rfp: SellerRFP
   onClose: () => void
   onResult: (result: AdjudicationResult, reason?: string, notes?: string, detailAdjudications?: DetailAdjudication[]) => void
 }
 
-export function AdjudicationModal({ visible, rfp, onClose, onResult }: AdjudicationModalProps) {
+export function AdjudicationModal({ open, rfp, onClose, onResult }: AdjudicationModalProps) {
   const [result, setResult] = useState<AdjudicationResult | null>(null)
   const [reason, setReason] = useState<string | null>(null)
   const [notes, setNotes] = useState('')
@@ -84,7 +84,7 @@ export function AdjudicationModal({ visible, rfp, onClose, onResult }: Adjudicat
   return (
     <Modal
       title={`Round ${rfp.currentRound} Result`}
-      open={visible}
+      open={open}
       onOk={handleOk}
       onCancel={handleCancel}
       okText="Confirm"

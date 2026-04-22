@@ -20,13 +20,13 @@ import styles from './CopyResponseModal.module.css'
 type CopyStep = 'select' | 'metadata'
 
 interface CopyResponseModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onCreate: (rfp: SellerRFP) => void
   rfps: SellerRFP[]
 }
 
-export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResponseModalProps) {
+export function CopyResponseModal({ open, onClose, onCreate, rfps }: CopyResponseModalProps) {
   const [step, setStep] = useState<CopyStep>('select')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedRfpId, setSelectedRfpId] = useState<string | null>(null)
@@ -266,7 +266,7 @@ export function CopyResponseModal({ visible, onClose, onCreate, rfps }: CopyResp
 
   return (
     <Modal
-      open={visible}
+      open={open}
       onCancel={handleClose}
       width={600}
       centered

@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Vertical, Horizontal, Texto, GraviButton } from '@gravitate-js/excalibrr'
 import { CaretDownOutlined, CloseOutlined, CopyOutlined, SnippetsOutlined, FileTextOutlined } from '@ant-design/icons'
 import { Drawer, Input, InputNumber, Segmented } from 'antd'
-import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable, PastBidReference, TerminalProductStats, MarginHistoryPoint } from '../types/sellerRfp.types'
+import type { SellerRFP, SellerRFPDetail, Formula, FormulaVariable, PastBidReference, TerminalProductStats, DiffHistoryPoint } from '../types/sellerRfp.types'
 import {
   COST_TYPE_LABELS,
   COST_TYPE_COLORS,
@@ -14,7 +14,7 @@ import {
 import {
   getPastBidsAtTerminalProduct,
   computeTerminalProductStats,
-  generateMarginHistory,
+  generateDiffHistory,
 } from '../data/sellerRfp.data'
 import { VariablesTable } from '../../ContractManagement/quick-entry/components/formula/VariablesTable'
 import { TemplateChooser } from '../../../components/shared/TemplateChooser'
@@ -24,7 +24,7 @@ import type { TemplateComponent } from '../../demos/grids/FormulaTemplates.data'
 import styles from './SaleFormulaDrawer.module.css'
 
 interface SaleFormulaDrawerProps {
-  visible: boolean
+  open: boolean
   detail: SellerRFPDetail | null
   onClose: () => void
   onApply: (detail: SellerRFPDetail) => void
@@ -119,8 +119,8 @@ function buildFormulaExpression(variables: FormulaVariable[], mode: FormulaMode)
   return `MIN(${groupExprs.join(', ')})`
 }
 
-// Enlarged Sparkline with current margin reference line and axis labels
-function MarginSparkline({ data, currentMargin }: { data: MarginHistoryPoint[]; currentMargin: number | null }) {
+// Weekly margin history chart with labeled axes.
+function DiffSparkline({ data }: { data: DiffHistoryPoint[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -133,102 +133,114 @@ function MarginSparkline({ data, currentMargin }: { data: MarginHistoryPoint[]; 
     if (!ctx) return
 
     const dpr = window.devicePixelRatio || 1
-    const width = container.clientWidth
-    const height = 72
-    canvas.width = width * dpr
-    canvas.height = height * dpr
-    canvas.style.width = `${width}px`
-    canvas.style.height = `${height}px`
-    ctx.scale(dpr, dpr)
+    const cssWidth = container.clientWidth
+    const cssHeight = 180
+    canvas.width = cssWidth * dpr
+    canvas.height = cssHeight * dpr
+    canvas.style.width = `${cssWidth}px`
+    canvas.style.height = `${cssHeight}px`
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.clearRect(0, 0, cssWidth, cssHeight)
 
-    ctx.clearRect(0, 0, width, height)
+    // Plot area insets: leave room for Y axis title + labels, X axis title + labels, and the Current label.
+    const padLeft = 58
+    const padRight = 16
+    const padTop = 22
+    const padBottom = 42
+    const plotW = cssWidth - padLeft - padRight
+    const plotH = cssHeight - padTop - padBottom
+    const plotX = padLeft
+    const plotY = padTop
 
-    const margins = data.map((d) => d.marginCpg)
-    const allValues = [...margins]
-    if (currentMargin !== null) allValues.push(currentMargin)
-    const maxMargin = Math.max(...allValues, 0.5)
-    const minMargin = Math.min(...allValues, -0.5)
-    const range = maxMargin - minMargin || 1
+    const diffs = data.map((d) => d.diff)
+    // Keep Y scale fixed to the simulation range so the chart reads consistently across modes.
+    const yMin = Math.min(0.0001, ...diffs)
+    const yMax = Math.max(0.0565, ...diffs)
+    const range = yMax - yMin || 1
 
-    const toY = (val: number) => height - ((val - minMargin) / range) * height
-    const zeroY = toY(0)
+    const toX = (i: number) => plotX + (plotW * i) / Math.max(1, data.length - 1)
+    const toY = (val: number) => plotY + plotH - ((val - yMin) / range) * plotH
 
-    // Draw zero line
-    ctx.strokeStyle = '#d9d9d9'
-    ctx.lineWidth = 0.5
-    ctx.setLineDash([2, 2])
-    ctx.beginPath()
-    ctx.moveTo(0, zeroY)
-    ctx.lineTo(width, zeroY)
-    ctx.stroke()
-    ctx.setLineDash([])
-
-    const stepX = width / (data.length - 1 || 1)
-
-    // Draw filled areas
-    for (let i = 0; i < data.length - 1; i++) {
-      const x1 = i * stepX
-      const x2 = (i + 1) * stepX
-      const y1 = toY(margins[i])
-      const y2 = toY(margins[i + 1])
-
-      const avgMargin = (margins[i] + margins[i + 1]) / 2
-      const fillColor = avgMargin >= 0 ? 'rgba(82, 196, 26, 0.15)' : 'rgba(255, 77, 79, 0.15)'
-
-      ctx.fillStyle = fillColor
+    // Horizontal gridlines + Y axis tick labels
+    const yTickCount = 4
+    ctx.font = '10px sans-serif'
+    ctx.textBaseline = 'middle'
+    for (let i = 0; i <= yTickCount; i++) {
+      const val = yMin + ((yMax - yMin) * i) / yTickCount
+      const y = toY(val)
+      ctx.strokeStyle = '#f0f0f0'
+      ctx.lineWidth = 1
       ctx.beginPath()
-      ctx.moveTo(x1, y1)
-      ctx.lineTo(x2, y2)
-      ctx.lineTo(x2, zeroY)
-      ctx.lineTo(x1, zeroY)
-      ctx.closePath()
-      ctx.fill()
+      ctx.moveTo(plotX, y)
+      ctx.lineTo(plotX + plotW, y)
+      ctx.stroke()
+      ctx.fillStyle = '#8c8c8c'
+      ctx.textAlign = 'right'
+      ctx.fillText(`$${val.toFixed(4)}`, plotX - 6, y)
     }
 
-    // Draw margin line
-    ctx.strokeStyle = '#595959'
-    ctx.lineWidth = 1
+    // "Margin ($)" axis title above the Y axis column
+    ctx.fillStyle = '#595959'
+    ctx.font = '600 11px sans-serif'
+    ctx.textAlign = 'right'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillText('Margin ($)', plotX - 6, plotY - 8)
+
+    // Filled area under the line
+    ctx.fillStyle = 'rgba(24, 144, 255, 0.12)'
+    ctx.beginPath()
+    ctx.moveTo(toX(0), plotY + plotH)
+    for (let i = 0; i < data.length; i++) ctx.lineTo(toX(i), toY(diffs[i]))
+    ctx.lineTo(toX(data.length - 1), plotY + plotH)
+    ctx.closePath()
+    ctx.fill()
+
+    // Diff line
+    ctx.strokeStyle = '#1f4e96'
+    ctx.lineWidth = 1.5
     ctx.beginPath()
     for (let i = 0; i < data.length; i++) {
-      const x = i * stepX
-      const y = toY(margins[i])
+      const x = toX(i)
+      const y = toY(diffs[i])
       if (i === 0) ctx.moveTo(x, y)
       else ctx.lineTo(x, y)
     }
     ctx.stroke()
 
-    // Draw current margin reference line
-    if (currentMargin !== null) {
-      const refY = toY(currentMargin)
-      ctx.strokeStyle = '#1890ff'
-      ctx.lineWidth = 1
-      ctx.setLineDash([4, 3])
+    // Data point markers
+    ctx.fillStyle = '#1f4e96'
+    for (let i = 0; i < data.length; i++) {
       ctx.beginPath()
-      ctx.moveTo(0, refY)
-      ctx.lineTo(width - 60, refY)
-      ctx.stroke()
-      ctx.setLineDash([])
-
-      // Label
-      ctx.font = '9px sans-serif'
-      ctx.fillStyle = '#1890ff'
-      ctx.textAlign = 'left'
-      ctx.fillText(`Current: ${currentMargin.toFixed(1)}¢`, width - 58, refY + 3)
+      ctx.arc(toX(i), toY(diffs[i]), 2, 0, Math.PI * 2)
+      ctx.fill()
     }
 
-    // Axis labels
-    ctx.font = '9px sans-serif'
-    ctx.fillStyle = '#bfbfbf'
-    ctx.textAlign = 'left'
-    ctx.fillText(`${maxMargin.toFixed(1)}¢`, 2, 10)
-    ctx.fillText(`${minMargin.toFixed(1)}¢`, 2, height - 3)
-  }, [data, currentMargin])
+    // X axis weekly tick labels — skip points to avoid crowding, clamp edge labels so
+    // the first/last don't bleed past the plot boundary.
+    const labelStep = Math.max(1, Math.ceil(data.length / 6))
+    ctx.font = '10px sans-serif'
+    ctx.fillStyle = '#8c8c8c'
+    ctx.textBaseline = 'top'
+    for (let i = 0; i < data.length; i += labelStep) {
+      const d = new Date(data[i].date)
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      const isFirst = i === 0
+      const isLast = i >= data.length - labelStep
+      ctx.textAlign = isFirst ? 'left' : isLast ? 'right' : 'center'
+      ctx.fillText(label, toX(i), plotY + plotH + 6)
+    }
+    // X axis title — centered under the plot, on its own line below tick labels
+    ctx.font = '600 11px sans-serif'
+    ctx.fillStyle = '#595959'
+    ctx.textAlign = 'center'
+    ctx.fillText('Weekly', plotX + plotW / 2, plotY + plotH + 24)
+  }, [data])
 
   if (data.length === 0) return null
 
   return (
     <div ref={containerRef} style={{ width: '100%' }}>
-      <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '72px' }} />
+      <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '180px' }} />
     </div>
   )
 }
@@ -275,7 +287,7 @@ function WinRateBar({ stats }: { stats: TerminalProductStats }) {
   )
 }
 
-export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, currentRfpId }: SaleFormulaDrawerProps) {
+export function SaleFormulaDrawer({ open, detail, onClose, onApply, rfps, currentRfpId }: SaleFormulaDrawerProps) {
   const [mode, setMode] = useState<FormulaMode>('formula')
   const [variables, setVariables] = useState<FormulaVariable[]>([createEmptyVariable()])
   const [showTemplateChooser, setShowTemplateChooser] = useState(false)
@@ -341,32 +353,24 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     return computeTerminalProductStats(rfps, detail.terminal, detail.product, currentRfpId)
   }, [rfps, detail, currentRfpId])
 
-  // Debounced margin history for sparkline
-  const [debouncedDiff, setDebouncedDiff] = useState<number>(0)
-  useEffect(() => {
-    const saleDiff = variables.length > 0 ? variables[0].differential : 0
-    const timer = setTimeout(() => setDebouncedDiff(saleDiff), 300)
-    return () => clearTimeout(timer)
-  }, [variables])
-
-  const marginHistory = useMemo<MarginHistoryPoint[]>(() => {
-    if (!detail || !detail.costFormula || detail.costFormula.variables.length === 0) return []
+  const diffHistory = useMemo<DiffHistoryPoint[]>(() => {
+    if (!detail) return []
     if (variables.length === 0) return []
-    const costDiff = detail.costFormula.variables[0].differential
-    return generateMarginHistory(detail.product, costDiff, debouncedDiff, 6)
-  }, [detail, debouncedDiff, variables.length])
+    return generateDiffHistory(detail.product, 6)
+  }, [detail, variables.length])
 
-  const marginHistoryStats = useMemo(() => {
-    if (marginHistory.length === 0) return null
-    const avgMargin = marginHistory.reduce((s, p) => s + p.marginCpg, 0) / marginHistory.length
-    const negativeDays = marginHistory.filter((p) => p.marginCpg < 0).length
+  const diffHistoryStats = useMemo(() => {
+    if (diffHistory.length === 0) return null
+    const avg = diffHistory.reduce((s, p) => s + p.diff, 0) / diffHistory.length
+    const min = Math.min(...diffHistory.map((p) => p.diff))
+    const max = Math.max(...diffHistory.map((p) => p.diff))
     return {
-      avgMarginCpg: Math.round(avgMargin * 100) / 100,
-      negativeDays,
-      totalDays: marginHistory.length,
-      negativePct: Math.round((negativeDays / marginHistory.length) * 100),
+      avgDiff: Math.round(avg * 10000) / 10000,
+      minDiff: Math.round(min * 10000) / 10000,
+      maxDiff: Math.round(max * 10000) / 10000,
+      totalWeeks: diffHistory.length,
     }
-  }, [marginHistory])
+  }, [diffHistory])
 
   // ID-based variable update (for VariablesTable)
   const handleVariableUpdate = useCallback((variableId: string, updates: Partial<FormulaVariable>) => {
@@ -474,7 +478,7 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
     <Drawer
       placement="bottom"
       height={720}
-      open={visible}
+      open={open}
       closable={false}
       headerStyle={{ display: 'none' }}
       styles={{ body: { padding: 0 } }}
@@ -631,39 +635,24 @@ export function SaleFormulaDrawer({ visible, detail, onClose, onApply, rfps, cur
                   </Vertical>
                 )}
 
-                {/* §5 — Enlarged Sparkline with Current Margin Reference */}
-                <Vertical gap={4}>
-                  <Texto category="p3" weight="500" appearance="medium">Historical Margin (6mo)</Texto>
-                  {!detail.costFormula ? (
-                    <Texto category="p3" appearance="medium">Set cost to see historical margin.</Texto>
-                  ) : variables.length === 0 ? (
+                {/* §5 — Weekly Margin history */}
+                <Vertical gap={6}>
+                  <Texto category="p3" weight="500" appearance="medium">Historical Margin (6mo, weekly)</Texto>
+                  {variables.length === 0 ? (
                     <Texto category="p3" appearance="medium">Configure formula to see historical margin.</Texto>
-                  ) : marginHistory.length > 0 ? (
+                  ) : diffHistory.length > 0 ? (
                     <>
-                      <MarginSparkline data={marginHistory} currentMargin={currentMargin} />
-                      {marginHistoryStats && (
-                        <Vertical gap={2}>
-                          <Horizontal gap={4} alignItems="center">
-                            <Texto category="p3" style={{ fontSize: '11px' }}>6mo avg: {marginHistoryStats.avgMarginCpg.toFixed(1)}¢/gal</Texto>
-                            <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>&middot;</Texto>
-                            <Texto category="p3" style={{ fontSize: '11px' }}>
-                              {marginHistoryStats.negativeDays === 0
-                                ? 'No negative margin days'
-                                : `Negative: ${marginHistoryStats.negativeDays}d (${marginHistoryStats.negativePct}%)`}
-                            </Texto>
-                          </Horizontal>
-                          {currentMargin !== null && (
-                            <Texto
-                              category="p3"
-                              style={{
-                                fontSize: '11px',
-                                color: currentMargin >= marginHistoryStats.avgMarginCpg ? '#52c41a' : '#ff4d4f',
-                              }}
-                            >
-                              Current vs avg: {currentMargin >= marginHistoryStats.avgMarginCpg ? '+' : ''}{(currentMargin - marginHistoryStats.avgMarginCpg).toFixed(1)}¢
-                            </Texto>
-                          )}
-                        </Vertical>
+                      <DiffSparkline data={diffHistory} />
+                      {diffHistoryStats && (
+                        <Horizontal gap={4} alignItems="center" style={{ flexWrap: 'wrap' }}>
+                          <Texto category="p3" style={{ fontSize: '11px' }}>
+                            6mo avg: ${diffHistoryStats.avgDiff.toFixed(4)}
+                          </Texto>
+                          <Texto category="p3" appearance="medium" style={{ fontSize: '11px' }}>&middot;</Texto>
+                          <Texto category="p3" style={{ fontSize: '11px' }}>
+                            Range: ${diffHistoryStats.minDiff.toFixed(4)} – ${diffHistoryStats.maxDiff.toFixed(4)}
+                          </Texto>
+                        </Horizontal>
                       )}
                     </>
                   ) : (

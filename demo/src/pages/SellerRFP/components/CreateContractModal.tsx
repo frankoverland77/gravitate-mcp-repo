@@ -7,13 +7,13 @@ import { formatPrice, formatVolume } from '../types/sellerRfp.types'
 import styles from './CreateContractModal.module.css'
 
 interface CreateContractModalProps {
-  visible: boolean
+  open: boolean
   rfp: SellerRFP
   onClose: () => void
   onConfirm: (wonDetails: SellerRFPDetail[]) => void
 }
 
-export function CreateContractModal({ visible, rfp, onClose, onConfirm }: CreateContractModalProps) {
+export function CreateContractModal({ open, rfp, onClose, onConfirm }: CreateContractModalProps) {
   // Filter to won details only (all details for 'won', only won details for 'partial-win')
   const wonDetails = useMemo(() => {
     if (rfp.status === 'won') return rfp.details
@@ -47,7 +47,7 @@ export function CreateContractModal({ visible, rfp, onClose, onConfirm }: Create
           <span>Create Contract from RFP</span>
         </Horizontal>
       }
-      open={visible}
+      open={open}
       onOk={() => onConfirm(wonDetails)}
       onCancel={onClose}
       okText="Create Contract"

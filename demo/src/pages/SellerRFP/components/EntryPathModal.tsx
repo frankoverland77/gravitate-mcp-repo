@@ -20,7 +20,7 @@ import type { EntryPath } from '../types/sellerRfp.types'
 import styles from './EntryPathModal.module.css'
 
 interface EntryPathModalProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onSelect: (path: EntryPath) => void
 }
@@ -44,10 +44,10 @@ function PathCard({ icon, label, subtitle, onClick }: PathCardProps) {
   )
 }
 
-export function EntryPathModal({ visible, onClose, onSelect }: EntryPathModalProps) {
+export function EntryPathModal({ open, onClose, onSelect }: EntryPathModalProps) {
   return (
     <Modal
-      open={visible}
+      open={open}
       onCancel={onClose}
       footer={null}
       width={480}

@@ -24,7 +24,7 @@ interface ManualRow {
 }
 
 interface ManualEntryDrawerProps {
-  visible: boolean
+  open: boolean
   onClose: () => void
   onCreate: (rfp: SellerRFP) => void
 }
@@ -37,7 +37,7 @@ function newRow(): ManualRow {
   return { id: `mr-${rowIdCounter++}`, product: null, terminal: null }
 }
 
-export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDrawerProps) {
+export function ManualEntryDrawer({ open, onClose, onCreate }: ManualEntryDrawerProps) {
   const [rfpName, setRfpName] = useState('')
   const [buyerId, setBuyerId] = useState<string | null>(null)
   const [buyerName, setBuyerName] = useState('')
@@ -166,7 +166,7 @@ export function ManualEntryDrawer({ visible, onClose, onCreate }: ManualEntryDra
       title="Add Rows Manually"
       placement="right"
       width={520}
-      open={visible}
+      open={open}
       onClose={handleClose}
       footer={
         <Horizontal justifyContent="space-between" alignItems="center">
