@@ -293,15 +293,19 @@ export function ContractMeasurementGrid() {
     rowHeight: 50,
   }), []);
 
+  const columnDefaultOverrides = useMemo(() => ({
+    cellStyle: { display: 'flex', alignItems: 'center' },
+  }), []);
+
   const updateEP = async () => {
     return Promise.resolve();
   };
 
   return (
-    <Vertical padding="24px" gap={24} style={{ minHeight: '100%' }}>
+    <Vertical padding="24px" gap={24} height="100%">
       {/* Page Header */}
-      <Horizontal justifyContent="space-between" alignItems="flex-start">
-        <Vertical gap={8}>
+      <Horizontal justifyContent="space-between" alignItems="flex-start" flex="0 0 auto">
+        <Vertical gap={8} flex="0 0 auto">
           <Texto category="h3" weight="600">
             Contract Measurement
           </Texto>
@@ -320,7 +324,7 @@ export function ContractMeasurementGrid() {
       </Horizontal>
 
       {/* Tiles Section */}
-      <Horizontal gap={20} className={styles.tilesContainer}>
+      <Horizontal gap={20} className={styles.tilesContainer} flex="0 0 auto">
         {/* Tile 1: Total Contracts */}
         <Vertical className={styles.tile}>
           <Vertical gap={12}>
@@ -392,7 +396,7 @@ export function ContractMeasurementGrid() {
 
       {/* Active / Archived Toggle (Future State only) */}
       {isFutureMode && (
-        <Vertical alignItems="flex-start">
+        <Vertical alignItems="flex-start" flex="0 0 auto" height="auto">
           <Segmented
             size='large'
             options={[
@@ -406,10 +410,11 @@ export function ContractMeasurementGrid() {
       )}
 
       {/* Grid Section */}
-      <Vertical height="500px">
+      <Vertical flex="1 1 auto" style={{ minHeight: 500 }}>
         <GraviGrid
           rowData={filteredData}
           columnDefs={columnDefs}
+          columnDefaultOverrides={columnDefaultOverrides}
           agPropOverrides={agPropOverrides}
           controlBarProps={controlBarProps}
           updateEP={updateEP}
