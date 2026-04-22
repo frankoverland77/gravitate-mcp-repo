@@ -21,19 +21,20 @@ import {
   message,
   Tabs,
   DatePicker,
+  Tooltip,
 } from 'antd';
 import {
   PlusOutlined,
   CloseOutlined,
   SettingOutlined,
   EyeOutlined,
-  EyeInvisibleOutlined,
   EditOutlined,
   DeleteOutlined,
   UndoOutlined,
   ReloadOutlined,
   LeftOutlined,
   SendOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import { Popconfirm } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -55,10 +56,128 @@ import {
 } from './IndexOfferManagement.data';
 import { generateIndexOfferData } from '../../shared/data';
 import { MarketContextPanel } from './components/MarketContextPanel';
-import { RankBadge } from './components/RankBadge';
+import { BulkProposedDiffEditor } from './components/BulkProposedDiffEditor';
 import { useFeatureMode } from '../../contexts/FeatureModeContext';
 
 const { TextArea } = Input;
+
+type AnalyticsPaneView = 'panel' | 'analytics';
+
+interface AnalyticsPaneProps {
+  open: boolean;
+  view: AnalyticsPaneView;
+  onViewChange: (view: AnalyticsPaneView) => void;
+  selectedRow: any;
+  onClearSelection: () => void;
+  marketData: MarketContextData | null;
+  analyticsRowData: any[];
+  analyticsColumnDefs: any[];
+  storageKey: string;
+}
+
+const ANALYTICS_VIEW_OPTIONS: { value: AnalyticsPaneView; label: string }[] = [
+  { value: 'analytics', label: 'Analytics Grid' },
+  { value: 'panel', label: 'Analytics Panel' },
+];
+
+function AnalyticsPane({
+  open,
+  view,
+  onViewChange,
+  selectedRow,
+  onClearSelection,
+  marketData,
+  analyticsRowData,
+  analyticsColumnDefs,
+  storageKey,
+}: AnalyticsPaneProps) {
+  if (!open) return null;
+
+  const contextLabel = selectedRow
+    ? `${selectedRow.product ?? ''}${selectedRow.location ? ` @ ${selectedRow.location}` : ''}`
+    : '';
+
+  return (
+    <div
+      style={{
+        height: '420px',
+        minHeight: '420px',
+        flexShrink: 0,
+        overflow: 'hidden',
+        borderBottom: '1px solid #e8e8e8',
+      }}
+    >
+      <Vertical
+        style={{ padding: '12px 16px', height: '100%', boxSizing: 'border-box', gap: 8 }}
+      >
+        <Horizontal
+          gap={12}
+          style={{ alignItems: 'center', flexShrink: 0, justifyContent: 'space-between' }}
+        >
+          <Horizontal gap={12} style={{ alignItems: 'center' }}>
+            <Texto category="h5" weight="600">
+              Quote Analytics
+            </Texto>
+            <Select
+              style={{ width: 200 }}
+              value={view}
+              onChange={onViewChange}
+              options={ANALYTICS_VIEW_OPTIONS}
+            />
+            {contextLabel && (
+              <>
+                <div style={{ width: 1, height: 20, background: '#e8e8e8' }} />
+                <Texto appearance="medium" style={{ fontSize: 13 }}>
+                  {contextLabel}
+                </Texto>
+              </>
+            )}
+          </Horizontal>
+          {selectedRow && (
+            <Button size="small" onClick={onClearSelection}>
+              Clear
+            </Button>
+          )}
+        </Horizontal>
+
+        <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+          {!selectedRow ? (
+            <Vertical
+              style={{ height: '100%', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Texto appearance="medium">Select a row to view analytics</Texto>
+            </Vertical>
+          ) : view === 'analytics' ? (
+            <div style={{ height: '100%' }}>
+              <GraviGrid
+                storageKey={storageKey}
+                rowData={analyticsRowData}
+                columnDefs={analyticsColumnDefs}
+                agPropOverrides={{
+                  getRowId: (params: any) => params.data.id,
+                  domLayout: 'normal',
+                  headerHeight: 40,
+                  rowHeight: 44,
+                  suppressRowClickSelection: true,
+                  enableCellTextSelection: true,
+                  rowGroupPanelShow: 'never',
+                  suppressDragLeaveHidesColumns: true,
+                }}
+                controlBarProps={{
+                  title: 'Competitive Analysis',
+                  hideActiveFilters: true,
+                  hideFilterRow: true,
+                }}
+              />
+            </div>
+          ) : (
+            <MarketContextPanel marketData={marketData} />
+          )}
+        </div>
+      </Vertical>
+    </div>
+  );
+}
 
 export function IndexOfferManagement() {
   const navigate = useNavigate();
@@ -73,9 +192,19 @@ export function IndexOfferManagement() {
   // View mode state with localStorage persistence
   const [viewMode, setViewMode] = useState<'panel' | 'columns' | 'rank' | 'analytics'>(() => {
     const saved = localStorage.getItem('index-offer-view-mode');
-    return (saved as 'panel' | 'columns' | 'rank' | 'analytics') || 'panel';
+    return (saved as 'panel' | 'columns' | 'rank' | 'analytics') || 'analytics';
   });
   const [selectedRowForContext, setSelectedRowForContext] = useState<any>(null);
+
+  // Analytics panel toggle (show/hide the collapsible analytics panel above the grid)
+  const [showAnalytics, setShowAnalytics] = useState<boolean>(() => {
+    const saved = localStorage.getItem('index-offer-show-analytics');
+    return saved === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('index-offer-show-analytics', String(showAnalytics));
+  }, [showAnalytics]);
 
   // Tab state for Future State mode
   const [activeTab, setActiveTab] = useState('offer-management');
@@ -329,78 +458,92 @@ export function IndexOfferManagement() {
       {
         id: 1,
         competitor: 'Your Offer (Selected)',
-        currentPrice: '$2.4500',
-        rank: 'Position 4',
-        trendIndicator: 'normal',
-        lastRevalueDate: '2025-11-02',
-        changeFromPrevious: '+$0.02',
-        differenceToSelected: '$0.00',
+        publisher: 'Internal',
+        location: 'Houston',
+        price: 2.45,
+        change: 0.02,
+        changeDate: '2025-11-02',
+        rank: 4,
+        rolling30Rank: 4,
+        deltaToRow: 0.0,
         isSelected: true,
       },
       {
         id: 2,
         competitor: 'Platts USGC Index',
-        currentPrice: '$2.4800',
-        rank: 'Position 1',
-        trendIndicator: 'above',
-        lastRevalueDate: '2025-11-03',
-        changeFromPrevious: '+$0.01',
-        differenceToSelected: '+$0.03',
+        publisher: 'Platts',
+        location: 'USGC',
+        price: 2.48,
+        change: 0.01,
+        changeDate: '2025-11-03',
+        rank: 1,
+        rolling30Rank: 2,
+        deltaToRow: 0.03,
         isSelected: false,
       },
       {
         id: 3,
         competitor: 'Argus CBOB Index',
-        currentPrice: '$2.4700',
-        rank: 'Position 2',
-        trendIndicator: 'above',
-        lastRevalueDate: '2025-11-03',
-        changeFromPrevious: '-$0.01',
-        differenceToSelected: '+$0.02',
+        publisher: 'Argus',
+        location: 'USGC',
+        price: 2.47,
+        change: -0.01,
+        changeDate: '2025-11-03',
+        rank: 2,
+        rolling30Rank: 3,
+        deltaToRow: 0.02,
         isSelected: false,
       },
       {
         id: 4,
         competitor: 'Competitor A Rack Post',
-        currentPrice: '$2.4600',
-        rank: 'Position 3',
-        trendIndicator: 'above',
-        lastRevalueDate: '2025-11-02',
-        changeFromPrevious: '$0.00',
-        differenceToSelected: '+$0.01',
+        publisher: 'OPIS',
+        location: 'Houston',
+        price: 2.46,
+        change: 0.0,
+        changeDate: '2025-11-02',
+        rank: 3,
+        rolling30Rank: 5,
+        deltaToRow: 0.01,
         isSelected: false,
       },
       {
         id: 5,
         competitor: 'Competitor B Rack Post',
-        currentPrice: '$2.4400',
-        rank: 'Position 5',
-        trendIndicator: 'below',
-        lastRevalueDate: '2025-11-01',
-        changeFromPrevious: '-$0.02',
-        differenceToSelected: '-$0.01',
+        publisher: 'OPIS',
+        location: 'Houston',
+        price: 2.44,
+        change: -0.02,
+        changeDate: '2025-11-01',
+        rank: 5,
+        rolling30Rank: 4,
+        deltaToRow: -0.01,
         isSelected: false,
       },
       {
         id: 6,
         competitor: 'Bottom Line Average',
-        currentPrice: '$2.4200',
-        rank: 'Position 6',
-        trendIndicator: 'below',
-        lastRevalueDate: '2025-11-03',
-        changeFromPrevious: '+$0.03',
-        differenceToSelected: '-$0.03',
+        publisher: 'Internal',
+        location: 'Houston',
+        price: 2.42,
+        change: 0.03,
+        changeDate: '2025-11-03',
+        rank: 6,
+        rolling30Rank: 6,
+        deltaToRow: -0.03,
         isSelected: false,
       },
       {
         id: 7,
         competitor: 'Internal Contract Low',
-        currentPrice: '$2.4000',
-        rank: 'Position 7',
-        trendIndicator: 'below',
-        lastRevalueDate: '2025-11-01',
-        changeFromPrevious: '+$0.01',
-        differenceToSelected: '-$0.05',
+        publisher: 'Internal',
+        location: 'Houston',
+        price: 2.40,
+        change: 0.01,
+        changeDate: '2025-11-01',
+        rank: 7,
+        rolling30Rank: 7,
+        deltaToRow: -0.05,
         isSelected: false,
       },
     ],
@@ -579,8 +722,11 @@ export function IndexOfferManagement() {
         headerName: 'PROPOSED DIFF',
         width: 140,
         sortable: true,
-        filter: true,
+        filter: 'agNumberColumnFilter',
         editable: true,
+        isBulkEditable: true,
+        bulkCellEditor: BulkProposedDiffEditor,
+        bulkCellEditorParams: { isBulkChangeCompactMode: true },
         type: 'numericColumn',
         valueFormatter: (params: any) => (params.value != null ? params.value.toFixed(4) : ''),
         cellStyle: { textAlign: 'right' },
@@ -590,7 +736,7 @@ export function IndexOfferManagement() {
         headerName: 'PROPOSED PRICE',
         width: 150,
         sortable: true,
-        filter: true,
+        filter: 'agNumberColumnFilter',
         editable: true,
         type: 'numericColumn',
         valueFormatter: (params: any) =>
@@ -628,159 +774,126 @@ export function IndexOfferManagement() {
 
   // Analytics Grid Column Definitions
   const analyticsColumnDefs = useMemo(
-    () => [
-      {
-        field: 'competitor',
-        headerName: 'COMPETITOR / SOURCE',
-        width: 220,
-        sortable: true,
-        filter: true,
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return { backgroundColor: '#000000', color: '#ffffff', fontWeight: 600 };
-          }
-          return {};
+    () => {
+      const selectedCellStyle = {
+        backgroundColor: '#000000',
+        color: '#ffffff',
+        fontWeight: 600,
+      };
+      const signedCellStyle = (params: any) => {
+        if (params.data?.isSelected) {
+          return { ...selectedCellStyle, textAlign: 'right' };
+        }
+        const value = params.value ?? 0;
+        let color = '#262626';
+        if (value > 0) color = '#cf1322';
+        else if (value < 0) color = '#389e0d';
+        return { color, textAlign: 'right', fontWeight: 600 };
+      };
+      const formatSigned4 = (params: any) => {
+        const v = params.value;
+        if (v == null) return '';
+        const sign = v > 0 ? '+' : v < 0 ? '-' : '';
+        return `${sign}$${Math.abs(v).toFixed(4)}`;
+      };
+
+      return [
+        {
+          field: 'rank',
+          headerName: 'RANK',
+          width: 100,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          type: 'numericColumn',
+          cellStyle: (params: any) =>
+            params.data?.isSelected
+              ? { ...selectedCellStyle, textAlign: 'right' }
+              : { textAlign: 'right' },
         },
-      },
-      {
-        field: 'currentPrice',
-        headerName: 'CURRENT PRICE',
-        width: 140,
-        sortable: true,
-        filter: true,
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return {
-              backgroundColor: '#000000',
-              color: '#ffffff',
-              fontWeight: 600,
-              textAlign: 'right',
-            };
-          }
-          return { textAlign: 'right' };
+        {
+          field: 'competitor',
+          headerName: 'COMPETITOR / SOURCE',
+          width: 220,
+          sortable: true,
+          filter: true,
+          cellStyle: (params: any) =>
+            params.data?.isSelected ? selectedCellStyle : {},
         },
-      },
-      {
-        field: 'rank',
-        headerName: 'RANK',
-        width: 120,
-        sortable: true,
-        filter: true,
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return { backgroundColor: '#000000', color: '#ffffff', fontWeight: 600 };
-          }
-          return {};
+        {
+          field: 'publisher',
+          headerName: 'PUBLISHER',
+          width: 130,
+          sortable: true,
+          filter: true,
+          cellStyle: (params: any) =>
+            params.data?.isSelected ? selectedCellStyle : {},
         },
-      },
-      {
-        field: 'trendIndicator',
-        headerName: 'TREND',
-        width: 100,
-        sortable: true,
-        filter: true,
-        cellRenderer: (params: any) => {
-          if (params.data?.isSelected) {
-            return (
-              <BBDTag
-                style={{
-                  backgroundColor: '#000000',
-                  color: '#ffffff',
-                  border: 'none',
-                  width: 'fit-content',
-                }}
-              >
-                Current
-              </BBDTag>
-            );
-          }
-          if (params.value === 'above') {
-            return (
-              <BBDTag error style={{ width: 'fit-content' }}>
-                Above
-              </BBDTag>
-            );
-          }
-          if (params.value === 'below') {
-            return (
-              <BBDTag success style={{ width: 'fit-content' }}>
-                Below
-              </BBDTag>
-            );
-          }
-          return <BBDTag style={{ width: 'fit-content' }}>Normal</BBDTag>;
+        {
+          field: 'price',
+          headerName: 'PRICE',
+          width: 130,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          type: 'numericColumn',
+          valueFormatter: (params: any) =>
+            params.value != null ? `$${params.value.toFixed(4)}` : '',
+          cellStyle: (params: any) =>
+            params.data?.isSelected
+              ? { ...selectedCellStyle, textAlign: 'right' }
+              : { textAlign: 'right' },
         },
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return { backgroundColor: '#000000', color: '#ffffff' };
-          }
-          return {};
+        {
+          field: 'change',
+          headerName: 'CHANGE',
+          width: 120,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          type: 'numericColumn',
+          valueFormatter: formatSigned4,
+          cellStyle: signedCellStyle,
         },
-      },
-      {
-        field: 'lastRevalueDate',
-        headerName: 'LAST REVALUE',
-        width: 140,
-        sortable: true,
-        filter: true,
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return { backgroundColor: '#000000', color: '#ffffff', fontWeight: 600 };
-          }
-          return {};
+        {
+          field: 'deltaToRow',
+          headerName: 'DELTA TO ROW',
+          width: 140,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          type: 'numericColumn',
+          valueFormatter: formatSigned4,
+          cellStyle: signedCellStyle,
         },
-      },
-      {
-        field: 'changeFromPrevious',
-        headerName: 'CHANGE',
-        width: 120,
-        sortable: true,
-        filter: true,
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return {
-              backgroundColor: '#000000',
-              color: '#ffffff',
-              fontWeight: 600,
-              textAlign: 'right',
-            };
-          }
-          const value = params.value || '';
-          let color = '#262626';
-          if (value.startsWith('+')) {
-            color = '#cf1322';
-          } else if (value.startsWith('-')) {
-            color = '#389e0d';
-          }
-          return { color, textAlign: 'right', fontWeight: 600 };
+        {
+          field: 'changeDate',
+          headerName: 'CHANGE DATE',
+          width: 140,
+          sortable: true,
+          filter: 'agDateColumnFilter',
+          cellStyle: (params: any) =>
+            params.data?.isSelected ? selectedCellStyle : {},
         },
-      },
-      {
-        field: 'differenceToSelected',
-        headerName: 'DIFF TO SELECTED',
-        width: 160,
-        sortable: true,
-        filter: true,
-        cellStyle: (params: any) => {
-          if (params.data?.isSelected) {
-            return {
-              backgroundColor: '#000000',
-              color: '#ffffff',
-              fontWeight: 600,
-              textAlign: 'right',
-            };
-          }
-          const value = params.value || '';
-          let color = '#262626';
-          if (value.startsWith('+')) {
-            color = '#cf1322';
-          } else if (value.startsWith('-')) {
-            color = '#389e0d';
-          }
-          return { color, textAlign: 'right', fontWeight: 600 };
+        {
+          field: 'location',
+          headerName: 'LOCATION',
+          width: 140,
+          sortable: true,
+          filter: true,
+          cellStyle: (params: any) =>
+            params.data?.isSelected ? selectedCellStyle : {},
         },
-      },
-    ],
+        {
+          field: 'rolling30Rank',
+          headerName: 'ROLLING 30 RANK',
+          width: 150,
+          sortable: true,
+          filter: 'agNumberColumnFilter',
+          type: 'numericColumn',
+          cellStyle: (params: any) =>
+            params.data?.isSelected
+              ? { ...selectedCellStyle, textAlign: 'right' }
+              : { textAlign: 'right' },
+        },
+      ];
+    },
     []
   );
 
@@ -980,18 +1093,13 @@ export function IndexOfferManagement() {
           headerName: 'RANK',
           width: 100,
           sortable: true,
-          filter: true,
-          cellRenderer: (params: any) => {
+          filter: 'agNumberColumnFilter',
+          type: 'numericColumn',
+          valueGetter: (params: any) => {
             const context = marketContextData.find((m) => m.offerId === params.data.id);
-            if (!context) return null;
-            return (
-              <RankBadge
-                rank={context.marketRank}
-                totalCompetitors={context.totalCompetitors}
-                size="small"
-              />
-            );
+            return context?.marketRank ?? null;
           },
+          cellStyle: { textAlign: 'right' },
         }
       );
     } else if (isFutureMode && viewMode === 'rank') {
@@ -1001,18 +1109,13 @@ export function IndexOfferManagement() {
         headerName: 'MARKET RANK',
         width: 140,
         sortable: true,
-        filter: true,
-        cellRenderer: (params: any) => {
+        filter: 'agNumberColumnFilter',
+        type: 'numericColumn',
+        valueGetter: (params: any) => {
           const context = marketContextData.find((m) => m.offerId === params.data.id);
-          if (!context) return null;
-          return (
-            <RankBadge
-              rank={context.marketRank}
-              totalCompetitors={context.totalCompetitors}
-              size="medium"
-            />
-          );
+          return context?.marketRank ?? null;
         },
+        cellStyle: { textAlign: 'right' },
       });
     }
 
@@ -1102,20 +1205,32 @@ export function IndexOfferManagement() {
       title: 'Index Offer Management',
       hideActiveFilters: false,
       actionButtons: (
-        <GraviButton
-          buttonText="Create New Offer"
-          icon={<PlusOutlined />}
-          appearance="solid"
-          onClick={handleCreateOffer}
-          style={{
-            fontWeight: 'bold',
-            backgroundColor: '#51b073',
-            color: 'white',
-          }}
-        />
+        <Horizontal gap={12} style={{ alignItems: 'center' }}>
+          {isFutureMode && (
+            <Tooltip title="Toggle analytics panel">
+              <Switch
+                checked={showAnalytics}
+                onChange={setShowAnalytics}
+                checkedChildren={<BarChartOutlined />}
+                unCheckedChildren={<BarChartOutlined />}
+              />
+            </Tooltip>
+          )}
+          <GraviButton
+            buttonText="Create New Offer"
+            icon={<PlusOutlined />}
+            appearance="solid"
+            onClick={handleCreateOffer}
+            style={{
+              fontWeight: 'bold',
+              backgroundColor: '#51b073',
+              color: 'white',
+            }}
+          />
+        </Horizontal>
       ),
     }),
-    [handleCreateOffer]
+    [handleCreateOffer, isFutureMode, showAnalytics]
   );
 
   const updateEP = async (_params: any) => {
@@ -1513,11 +1628,14 @@ export function IndexOfferManagement() {
                         flex: 1;
                         min-height: 0;
                     }
-                    .index-offer-tabs .ant-tabs-tabpane {
+                    .index-offer-tabs .ant-tabs-tabpane-active {
                         display: flex;
                         flex-direction: column;
                         flex: 1;
                         min-height: 0;
+                    }
+                    .index-offer-tabs .ant-tabs-tabpane[aria-hidden="true"] {
+                        display: none;
                     }
                 `}</style>
           <Tabs
@@ -1530,16 +1648,35 @@ export function IndexOfferManagement() {
                 key: 'offer-management',
                 label: 'Offer Management',
                 children: (
-                  <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <GraviGrid
-                      key="offer-management-grid"
-                      storageKey="index-offer-management-grid"
-                      rowData={rowData}
-                      columnDefs={columnDefs}
-                      agPropOverrides={agPropOverrides}
-                      controlBarProps={controlBarProps}
-                      updateEP={updateEP}
+                  <div
+                    style={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <AnalyticsPane
+                      open={showAnalytics}
+                      view={viewMode === 'analytics' ? 'analytics' : 'panel'}
+                      onViewChange={(v) => setViewMode(v)}
+                      selectedRow={selectedRowForContext}
+                      onClearSelection={() => setSelectedRowForContext(null)}
+                      marketData={selectedMarketContext ?? null}
+                      analyticsRowData={analyticsRowData}
+                      analyticsColumnDefs={analyticsColumnDefs}
+                      storageKey="offer-management-analytics-grid"
                     />
+                    <div style={{ flex: 1, minHeight: 0 }}>
+                      <GraviGrid
+                        key="offer-management-grid"
+                        storageKey="index-offer-management-grid"
+                        rowData={rowData}
+                        columnDefs={columnDefs}
+                        agPropOverrides={agPropOverrides}
+                        controlBarProps={controlBarProps}
+                        updateEP={updateEP}
+                      />
+                    </div>
                   </div>
                 ),
               },
@@ -1552,94 +1689,26 @@ export function IndexOfferManagement() {
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '16px',
-                      padding: '16px',
                     }}
                   >
-                    {/* Competitive Analysis Grid - Hidden during bulk change mode, collapses when empty */}
-                    {!isBulkChangeVisible && selectedPricingRow ? (
-                      <div style={{ height: '400px' }}>
-                        <GraviGrid
-                          storageKey="offer-pricing-competitive-grid"
-                          rowData={analyticsRowData}
-                          columnDefs={analyticsColumnDefs}
-                          agPropOverrides={{
-                            getRowId: (params: any) => params.data.id,
-                            domLayout: 'normal',
-                            headerHeight: 40,
-                            rowHeight: 48,
-                            suppressRowClickSelection: true,
-                            enableCellTextSelection: true,
-                            rowGroupPanelShow: 'never',
-                            suppressDragLeaveHidesColumns: true,
-                          }}
-                          controlBarProps={{
-                            title: (
-                              <Horizontal gap={16} style={{ alignItems: 'baseline' }}>
-                                <Texto category="h5" weight="600">
-                                  Competitive Analysis
-                                </Texto>
-                                <Texto category="p1" appearance="medium">
-                                  Selected: {selectedPricingRow?.product} -{' '}
-                                  {selectedPricingRow?.location}
-                                </Texto>
-                              </Horizontal>
-                            ),
-                            hideActiveFilters: true,
-                            hideFilterRow: true,
-                            actionButtons: (
-                              <Button size="small" onClick={() => setSelectedPricingRow(null)}>
-                                Close
-                              </Button>
-                            ),
-                          }}
-                        />
-                      </div>
-                    ) : !isBulkChangeVisible ? (
-                      <div
-                        style={{
-                          height: '80px',
-                          backgroundColor: '#fafafa',
-                          border: '1px dashed #d9d9d9',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '16px',
-                        }}
-                      >
-                        <Horizontal gap={12} style={{ alignItems: 'center' }}>
-                          <EyeOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
-                          <Texto category="p2" appearance="medium">
-                            Click any row in the Price Offers table below to view competitive analysis
-                          </Texto>
-                        </Horizontal>
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          height: '80px',
-                          backgroundColor: '#f5f5f5',
-                          border: '1px dashed #d9d9d9',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '16px',
-                          opacity: 0.7,
-                        }}
-                      >
-                        <Horizontal gap={12} style={{ alignItems: 'center' }}>
-                          <EyeInvisibleOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
-                          <Texto category="p2" appearance="medium">
-                            Competitive analysis disabled while in Bulk Change mode
-                          </Texto>
-                        </Horizontal>
-                      </div>
-                    )}
+                    <AnalyticsPane
+                      open={showAnalytics}
+                      view={viewMode === 'analytics' ? 'analytics' : 'panel'}
+                      onViewChange={(v) => setViewMode(v)}
+                      selectedRow={selectedPricingRow}
+                      onClearSelection={() => setSelectedPricingRow(null)}
+                      marketData={
+                        selectedPricingRow
+                          ? getMarketContextForOffer(selectedPricingRow.id) ?? null
+                          : null
+                      }
+                      analyticsRowData={analyticsRowData}
+                      analyticsColumnDefs={analyticsColumnDefs}
+                      storageKey="offer-pricing-analytics-grid"
+                    />
 
                     {/* Price Offers Grid with Built-in Bulk Change Mode */}
-                    <div style={{ flex: 1, minHeight: '300px' }}>
+                    <div style={{ flex: 1, minHeight: 0 }}>
                       <GraviGrid
                         externalRef={pricingGridApiRef}
                         rowData={samplePricingRowData}
@@ -1649,24 +1718,34 @@ export function IndexOfferManagement() {
                           title: 'Price Offers',
                           hideActiveFilters: false,
                           actionButtons: (
-                            <GraviButton
-                              buttonText="Publish"
-                              icon={<SendOutlined />}
-                              appearance="solid"
-                              onClick={() => {
-                                if (isBulkChangeVisible) {
-                                  // In bulk change mode: publish only selected rows
-                                  const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
-                                  const selectedRows = gridApi?.getSelectedRows?.() || [];
-                                  setSelectedRowsToPublish(selectedRows);
-                                } else {
-                                  // Not in bulk change mode: publish all rows
-                                  setSelectedRowsToPublish(samplePricingRowData);
-                                }
-                                setPublishDrawerVisible(true);
-                              }}
-                              style={{ backgroundColor: '#51b073', color: 'white', borderColor: '#51b073' }}
-                            />
+                            <Horizontal gap={12} style={{ alignItems: 'center' }}>
+                              <Tooltip title="Toggle analytics panel">
+                                <Switch
+                                  checked={showAnalytics}
+                                  onChange={setShowAnalytics}
+                                  checkedChildren={<BarChartOutlined />}
+                                  unCheckedChildren={<BarChartOutlined />}
+                                />
+                              </Tooltip>
+                              <GraviButton
+                                buttonText="Publish"
+                                icon={<SendOutlined />}
+                                appearance="solid"
+                                onClick={() => {
+                                  if (isBulkChangeVisible) {
+                                    // In bulk change mode: publish only selected rows
+                                    const gridApi = pricingGridApiRef.current?.api || pricingGridApiRef.current;
+                                    const selectedRows = gridApi?.getSelectedRows?.() || [];
+                                    setSelectedRowsToPublish(selectedRows);
+                                  } else {
+                                    // Not in bulk change mode: publish all rows
+                                    setSelectedRowsToPublish(samplePricingRowData);
+                                  }
+                                  setPublishDrawerVisible(true);
+                                }}
+                                style={{ backgroundColor: '#51b073', color: 'white', borderColor: '#51b073' }}
+                              />
+                            </Horizontal>
                           ),
                         }}
                         isBulkChangeVisible={isBulkChangeVisible}
