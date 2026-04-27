@@ -38,7 +38,7 @@ function FormLabel({ children, required }: { children: string; required?: boolea
   return (
     <Texto category="p2" weight="500" style={labelStyle}>
       {children}
-      {required && <span style={{ color: '#ff4d4f', marginLeft: 2 }}>*</span>}
+      {required && <span style={{ color: 'var(--status-danger-solid)', marginLeft: 2 }}>*</span>}
     </Texto>
   )
 }
@@ -240,7 +240,7 @@ export function FormsPattern() {
               <div style={{
                 height: 32,
                 padding: '0 16px',
-                background: '#722ed1',
+                background: 'var(--theme-color-1)',
                 color: '#fff',
                 borderRadius: 6,
                 display: 'flex',
@@ -357,13 +357,13 @@ export function FormsPattern() {
               <Vertical gap={16}>
                 <Vertical gap={4}>
                   <Texto category="p2" weight="500" style={labelStyle}>
-                    First Name <span style={{ color: '#ff4d4f' }}>*</span>
+                    First Name <span style={{ color: 'var(--status-danger-solid)' }}>*</span>
                   </Texto>
                   <div style={inputStyle} />
                 </Vertical>
                 <Vertical gap={4}>
                   <Texto category="p2" weight="500" style={labelStyle}>
-                    Email Address <span style={{ color: '#ff4d4f' }}>*</span>
+                    Email Address <span style={{ color: 'var(--status-danger-solid)' }}>*</span>
                   </Texto>
                   <div style={inputStyle} />
                 </Vertical>

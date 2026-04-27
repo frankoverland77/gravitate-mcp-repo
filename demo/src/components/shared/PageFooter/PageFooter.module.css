@@ -1,0 +1,136 @@
+/* ------------------------------------------------------------------ */
+/* ActionFooter                                                        */
+/* Bottom bar for single-page commit flows: optional title on the left,*/
+/* an optional notice slot, and action buttons on the right.           */
+/* ------------------------------------------------------------------ */
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  min-height: 48px;
+  flex: none;
+  background: var(--bg-1);
+  border-top: 1px solid var(--gray-200, var(--border-default));
+  font-family: 'Lato', sans-serif;
+}
+
+.actionLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.actionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-color-1);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.actionTitle {
+  color: var(--theme-color-1);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.actionNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--gray-600, #595959);
+  font-size: 13px;
+}
+
+.actionRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* Emphasis variants — pick one to accent the title with a brand rule. */
+
+.emphasisTitle .actionLeft {
+  align-self: stretch;
+  padding-right: var(--space-3);
+  border-bottom: 2px solid var(--theme-color-1);
+  margin-bottom: -1px; /* overlap the top border */
+}
+
+/* Compact density — 40px instead of 48px — for grids and dense pages. */
+.compact {
+  min-height: 40px;
+  padding: var(--space-1) var(--space-4);
+}
+
+/* ------------------------------------------------------------------ */
+/* StepFooter                                                          */
+/* Wizard footer: Previous on the left, step indicator + Next on       */
+/* the right. Step indicator uses dots + count so it stays quiet       */
+/* until the wizard advances.                                          */
+/* ------------------------------------------------------------------ */
+
+.step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  min-height: 56px;
+  flex: none;
+  background: var(--bg-1);
+  border-top: 1px solid var(--gray-200, var(--border-default));
+  font-family: 'Lato', sans-serif;
+}
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.stepDots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-default);
+  transition: background 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stepDotActive {
+  background: var(--theme-color-1);
+}
+
+.stepDotComplete {
+  background: var(--theme-color-1);
+  opacity: 0.4;
+}
+
+.stepLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-600, #595959);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

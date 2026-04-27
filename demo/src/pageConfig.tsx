@@ -38,6 +38,7 @@ import { SupplierAnalysis } from './pages/OnlineSellingPlatform/SupplierAnalysis
 import { SupplierDetails } from './pages/OnlineSellingPlatform/SupplierDetails';
 import { CompetitorPriceProfiling } from './pages/CompetitorPriceProfiling/CompetitorPriceProfiling';
 import { CompetitorDetails } from './pages/CompetitorPriceProfiling/CompetitorDetails';
+import { PPTagManager } from './pages/CompetitorPriceProfiling/TagManager/PPTagManager';
 import { GlobalTieredPricing } from './pages/GlobalTieredPricing/GlobalTieredPricing';
 import { TierGroupManagement } from './pages/GlobalTieredPricing/TierGroupManagement';
 import { ContractMeasurementGrid } from './pages/ContractMeasurement/ContractMeasurementGrid';
@@ -539,6 +540,18 @@ const getCompetitorPriceProfilingRoutes = (): RouteConfig[] => [
     path: '/CompetitorPriceProfiling/CompetitorPriceProfilingDetails',
     description: 'Detailed competitor price profile',
     hidden: true,
+  },
+  {
+    hasPermission: () => true,
+    key: 'CompetitorPriceProfilingTagManager',
+    title: 'PP Manager',
+    element: (
+      <ThemeRouteWrapper theme="PE_LIGHT">
+        <PPTagManager />
+      </ThemeRouteWrapper>
+    ),
+    path: '/CompetitorPriceProfiling/CompetitorPriceProfilingTagManager',
+    description: 'Price Positioning Tag Manager — configure classification thresholds',
   },
 ];
 

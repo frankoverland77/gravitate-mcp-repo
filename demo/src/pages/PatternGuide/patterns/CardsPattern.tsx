@@ -1,8 +1,12 @@
-import { Vertical, Texto } from '@gravitate-js/excalibrr'
+import { Vertical, Texto, GraviButton } from '@gravitate-js/excalibrr'
+import { ArrowUpOutlined, ArrowDownOutlined, FileTextOutlined } from '@ant-design/icons'
 import { PatternShell } from '../PatternShell'
 import { PatternSection } from '../components/PatternSection'
 import { DosDonts } from '../components/DosDonts'
 import { PatternExample } from '../components/PatternExample'
+import { MetricCard } from '@components/shared/MetricCard'
+import { StatusBadge } from '@components/shared/StatusBadge'
+import { Section } from '@components/shared/Section'
 
 const SECTIONS = [
   { id: 'types', title: 'Card Types' },
@@ -42,45 +46,258 @@ export function CardsPattern() {
         </div>
       </PatternSection>
 
-      <PatternSection id="section-card" title="Section Card" description="Grouped content with a header. border-radius: 8px, border: 1px solid #e8e8e8.">
+      <PatternSection
+        id='section-card'
+        title='Section Card'
+        description="Grouped content with a header. Use the Section component instead of hand-rolling the border + header + body structure — before it existed, ContractHeaderSidebar, ExampleDashboard, and a few others each shipped their own near-identical CSS module for the same shape."
+      >
         <PatternExample
-          label="Section Card Anatomy"
-          caption="Header: #fafafa background, 16px padding. Body: 24px padding, 16px gap between children."
-          code={`<Vertical style={{ borderRadius: 8, border: '1px solid var(--gray-200)', overflow: 'hidden' }}>
-  <div style={{ padding: 'var(--space-4)', background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
-    <Texto category="h5" weight="600">Section Title</Texto>
-  </div>
-  <Vertical style={{ padding: 'var(--space-5)' }} gap={16}>
-    {children}
-  </Vertical>
-</Vertical>`}
+          label='Default — title + subtitle + actions'
+          caption='Title on the left, optional subtitle next to it, optional action slot on the right. Body default padding is 16/20px.'
+          code={`import { Section } from '@components/shared/Section'
+
+<Section title='Contract Details' subtitle='3 fields' actions={<GraviButton buttonText='Edit' />}>
+  <FieldRow label='Contract ID' value='CTR-2024-001' />
+  <FieldRow label='Status' value='Active' />
+  <FieldRow label='Description' value='Annual supply agreement for commodity XYZ' />
+</Section>`}
         >
-          <div style={{ borderRadius: 8, border: cardBorder, overflow: 'hidden' }}>
-            <div style={{ padding: 'var(--space-4)', background: '#fafafa', borderBottom: cardBorder, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Texto category="h5" weight="600">Contract Details</Texto>
-              <Texto category="p2" appearance="medium">3 fields</Texto>
-            </div>
-            <Vertical style={{ padding: 'var(--space-5)' }} gap={16}>
+          <Section
+            title='Contract Details'
+            subtitle='3 fields'
+            actions={<GraviButton buttonText='Edit' appearance='outlined' />}
+          >
+            <Vertical gap={12}>
               <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
-                <FieldPlaceholder label="Contract ID" value="CTR-2024-001" />
-                <FieldPlaceholder label="Status" value="Active" />
+                <FieldPlaceholder label='Contract ID' value='CTR-2024-001' />
+                <FieldPlaceholder label='Status' value='Active' />
               </div>
-              <FieldPlaceholder label="Description" value="Annual supply agreement for commodity XYZ" />
+              <FieldPlaceholder label='Description' value='Annual supply agreement for commodity XYZ' />
             </Vertical>
+          </Section>
+        </PatternExample>
+
+        <PatternExample
+          label='With icon + status actions'
+          caption="The icon uses --theme-color-1 (brand teal) so it matches ActionFooter's accent. Put a StatusBadge in the actions slot to surface section state without a banner."
+          code={`<Section
+  icon={<FileTextOutlined />}
+  title='Pricing Terms'
+  actions={<StatusBadge tone='success' label='Complete' />}
+>
+  ...
+</Section>`}
+        >
+          <Section
+            icon={<FileTextOutlined />}
+            title='Pricing Terms'
+            actions={<StatusBadge tone='success' label='Complete' />}
+          >
+            <Vertical gap={12}>
+              <FieldPlaceholder label='Base Price' value='$3.42 / gal' />
+              <FieldPlaceholder label='Differential' value='+0.15 / gal' />
+            </Vertical>
+          </Section>
+        </PatternExample>
+
+        <PatternExample
+          label='Compact density — sidebars & drawers'
+          caption='Tighter header padding (8/12px) and a body that auto-stacks its children with an 8px gap. Matches the ContractHeaderSidebar pattern used throughout quick-entry flows.'
+          code={`<Section title='Quick Info' density='compact' bodyPadding='compact'>
+  <FieldRow label='Customer' value='Acme Fuel Co.' />
+  <FieldRow label='Region' value='Midwest' />
+</Section>`}
+        >
+          <div style={{ maxWidth: 320 }}>
+            <Section title='Quick Info' density='compact' bodyPadding='compact'>
+              <FieldPlaceholder label='Customer' value='Acme Fuel Co.' />
+              <FieldPlaceholder label='Region' value='Midwest' />
+              <FieldPlaceholder label='Contract' value='CTR-2024-001' />
+            </Section>
           </div>
+        </PatternExample>
+
+        <PatternExample
+          label='No title — bordered container'
+          caption='Omit the title to get a bordered, rounded container with no header bar. Use to wrap a grid, chart, or embedded widget without a redundant title.'
+          code={`<Section bodyPadding='flush'>
+  <GraviGrid {...} />
+</Section>`}
+        >
+          <Section bodyPadding='flush'>
+            <div style={{ padding: 'var(--space-5)', textAlign: 'center', color: 'var(--gray-600)' }}>
+              <Texto category='p2' appearance='medium'>Grid, chart, or embedded widget sits here</Texto>
+            </div>
+          </Section>
+        </PatternExample>
+
+        <PatternExample
+          label="flush body — when the child owns its own padding"
+          caption="bodyPadding='flush' removes body padding entirely. Use when the child is a GraviGrid, a table, or a nested Section."
+        >
+          <Section title='Recent Activity' subtitle='last 7 days' bodyPadding='flush'>
+            <div style={{ background: 'var(--surface-muted)' }}>
+              {['Price updated by Analyst A', 'Publish queued', 'Publish completed'].map((row, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '10px 16px',
+                    borderBottom: i < 2 ? '1px solid var(--border-subtle)' : 'none',
+                    background: 'var(--bg-1)',
+                    fontSize: 13,
+                  }}
+                >
+                  <span>{row}</span>
+                  <span style={{ color: 'var(--gray-600)' }}>{i + 2}h ago</span>
+                </div>
+              ))}
+            </div>
+          </Section>
         </PatternExample>
       </PatternSection>
 
-      <PatternSection id="stat-card" title="Stat / Metric Card" description="Single prominent value with label. 24px padding, no header bar.">
+      <PatternSection
+        id='stat-card'
+        title='Stat / Metric Card'
+        description="One primary number with a short label. Use MetricCard for pipeline stats, dashboard KPIs, summary headers — anywhere a single value needs to read at a glance. Before this component existed, SellerRFP and SummaryExportTab had their own near-identical CSS modules for the same pattern."
+      >
         <PatternExample
-          label="Stat Card Anatomy"
-          caption="Padding: 24px (space-5). Label: p2 medium. Value: h2 weight 700. Optional delta below."
+          label='Default — valueFirst, left-aligned'
+          caption="The dashboard default. Big number on top, muted label below, left-aligned for scannable rows. Tabular-numeric digits keep values vertically aligned when stacked side by side."
+          code={`import { MetricCard } from '@components/shared/MetricCard'
+
+<MetricCard label='Active Deals' value='142' />
+<MetricCard label='Won This Q' value='$2.4M' />
+<MetricCard label='Avg Cycle' value='11d' />`}
         >
-          <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
-            <StatCardExample label="Total Volume" value="12,450" unit="MT" />
-            <StatCardExample label="Avg Price" value="$84.20" delta="+2.3%" deltaUp />
-            <StatCardExample label="Open Contracts" value="37" />
-            <StatCardExample label="Exceptions" value="5" delta="-3" deltaUp={false} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-3)' }}>
+            <MetricCard label='Active Deals' value='142' />
+            <MetricCard label='Won This Quarter' value='$2.4M' />
+            <MetricCard label='Avg Cycle' value='11d' />
+            <MetricCard label='Pipeline Value' value='$8.1M' />
+          </div>
+        </PatternExample>
+
+        <PatternExample
+          label='With sub and trend slots'
+          caption='Add a sub line for denominator context and a trend slot for a StatusBadge or delta chip. Keep these quiet — a metric card that tries to say four things well says none of them.'
+          code={`<MetricCard
+  label='On-Track Deliveries'
+  value='238'
+  sub='of 254 scheduled this week'
+  trend={<StatusBadge tone='success' variant='quiet' label='+4 vs last week' />}
+/>`}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-3)' }}>
+            <MetricCard
+              label='On-Track Deliveries'
+              value='238'
+              sub='of 254 scheduled'
+              trend={<StatusBadge tone='success' variant='quiet' label='+4 vs last week' />}
+            />
+            <MetricCard
+              label='Behind Schedule'
+              value='12'
+              sub='routes needing action'
+              trend={<StatusBadge tone='warning' variant='quiet' label='+3 vs last week' />}
+            />
+            <MetricCard
+              label='Avg Fill Rate'
+              value='94.2%'
+              sub='last 30 days'
+              trend={
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--status-success-text)' }}>
+                  <ArrowUpOutlined style={{ fontSize: 11 }} /> 1.1pp
+                </span>
+              }
+            />
+          </div>
+        </PatternExample>
+
+        <PatternExample
+          label='Highlight — currently filtered or primary metric'
+          caption="Gives a card a teal border to mark the currently selected filter state or the metric the page is about. Use at most one per row — highlight loses meaning when every card wears it."
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-3)' }}>
+            <MetricCard label='All Deals' value='248' />
+            <MetricCard label='In Progress' value='94' highlight />
+            <MetricCard label='Won' value='42' />
+            <MetricCard label='Lost' value='18' />
+          </div>
+        </PatternExample>
+
+        <PatternExample
+          label='Interactive — drill-through'
+          caption="Pass onClick to make a card clickable. It renders as a button with keyboard focus, hover accent, and screen-reader affordance. Pair with ariaLabel when the visible copy alone isn't enough."
+          code={`<MetricCard
+  label='At Risk'
+  value='7'
+  highlight
+  onClick={() => navigate('/deliveries?status=at-risk')}
+/>`}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-3)' }}>
+            <MetricCard
+              label='At Risk'
+              value='7'
+              highlight
+              onClick={() => undefined}
+              trend={<StatusBadge tone='danger' variant='quiet' label='Needs review' />}
+              ariaLabel='At risk — click to view 7 at-risk deliveries'
+            />
+            <MetricCard label='On Hold' value='3' onClick={() => undefined} />
+            <MetricCard label='Completed' value='189' onClick={() => undefined} />
+          </div>
+        </PatternExample>
+
+        <PatternExample
+          label='Alignment variants'
+          caption="Left (default) for dense dashboards and summary rows. Center when a single metric is the hero of a section — sparingly; the left-aligned version scans better next to others."
+        >
+          <Vertical gap={16}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)' }}>
+              <MetricCard label='Left' value='$12,450' />
+              <MetricCard label='Center' value='$12,450' align='center' />
+              <MetricCard label='Label first' value='$12,450' order='labelFirst' />
+            </div>
+          </Vertical>
+        </PatternExample>
+
+        <PatternExample
+          label='Size — sm / md / lg'
+          caption="Value scales with size; label stays constant. sm for inline summary strips, md (default) for page dashboards, lg when a single metric is the headline of the view."
+        >
+          <Vertical gap={12}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)' }}>
+              <MetricCard label='Small' value='$1,240' size='sm' />
+              <MetricCard label='Medium (default)' value='$1,240' size='md' />
+              <MetricCard label='Large' value='$1,240' size='lg' />
+            </div>
+          </Vertical>
+        </PatternExample>
+
+        <PatternExample
+          label='Negative trend — compose with tokens'
+          caption="There's no built-in 'negative' style. Compose with --status-* tokens or StatusBadge to keep the decision at the call site."
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-3)' }}>
+            <MetricCard
+              label='Exceptions'
+              value='5'
+              trend={
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--status-danger-text)' }}>
+                  <ArrowDownOutlined style={{ fontSize: 11 }} /> 3 resolved
+                </span>
+              }
+            />
+            <MetricCard
+              label='Overdue'
+              value='2'
+              sub='>24h past SLA'
+              trend={<StatusBadge tone='danger' variant='quiet' label='Action required' />}
+            />
           </div>
         </PatternExample>
       </PatternSection>

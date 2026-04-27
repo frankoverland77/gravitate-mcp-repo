@@ -16,21 +16,34 @@ export function PricePositioningSection({
   data = MOTIVA_PRICE_POSITIONING,
 }: PricePositioningSectionProps) {
   return (
-    <Vertical gap={16}>
+    <Vertical gap={12}>
       <SectionHeader
         title={data.title}
         description={data.description}
         confidence={data.confidence}
         cellId={data.cellId}
       />
-      <TakeawayCard takeaway={data.takeaway} />
-      <MetricTileRow tiles={data.tiles} />
-      <ChartPlaceholder
-        heading={data.chartPlaceholder.heading}
-        body={data.chartPlaceholder.body}
-        sub={data.chartPlaceholder.sub}
-      />
-      <StatFitGrid rows={data.statFit} />
+      {/* Single section card — wraps takeaway → metrics → chart → methodology. */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          border: '1px solid #e8e8e8',
+          borderRadius: 8,
+          padding: 24,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+        }}
+      >
+        <MetricTileRow tiles={data.tiles} />
+        <ChartPlaceholder
+          heading={data.chartPlaceholder.heading}
+          body={data.chartPlaceholder.body}
+          sub={data.chartPlaceholder.sub}
+        />
+        <TakeawayCard takeaway={data.takeaway} />
+        <StatFitGrid rows={data.statFit} />
+      </div>
       <LearnMoreDisclosure summary={data.learnMore.summary} rules={data.learnMore.rules} />
     </Vertical>
   );

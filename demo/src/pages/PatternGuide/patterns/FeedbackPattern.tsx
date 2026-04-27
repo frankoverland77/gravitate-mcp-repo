@@ -1,11 +1,13 @@
-import { Vertical, Texto, NothingMessage } from '@gravitate-js/excalibrr'
+import { Vertical, Horizontal, Texto, NothingMessage } from '@gravitate-js/excalibrr'
 import { PatternShell } from '../PatternShell'
 import { PatternSection } from '../components/PatternSection'
 import { DosDonts } from '../components/DosDonts'
 import { PatternExample } from '../components/PatternExample'
+import { StatusBadge } from '@components/shared/StatusBadge'
 
 const SECTIONS = [
   { id: 'overview', title: 'Feedback Types' },
+  { id: 'status-badges', title: 'Status Badges' },
   { id: 'toast', title: 'Toast Notifications' },
   { id: 'empty-state', title: 'Empty States' },
   { id: 'loading', title: 'Loading States' },
@@ -45,6 +47,98 @@ export function FeedbackPattern() {
             component='<Alert type="warning" message="..." />'
           />
         </div>
+      </PatternSection>
+
+      <PatternSection
+        id='status-badges'
+        title='Status Badges'
+        description="Use StatusBadge for state that lives inside a row, card, or header — lifecycle, deal flow, operational health. It's a thin pill that consumes the --status-* tokens and stays quiet by default. Before this component existed, there were at least five cousin implementations scattered across ProjectHub, ContractManagement, DeliveredPricing, SellerRFP, and InventoryAnalytics — each with its own color map."
+      >
+        <PatternExample
+          label='Tones — filled (default)'
+          caption='Subtle tinted chip. Use this everywhere by default. Never add a left-border stripe.'
+          code={`import { StatusBadge } from '@components/shared/StatusBadge'
+
+<StatusBadge tone='success' label='Active' />
+<StatusBadge tone='warning' label='Draft' />
+<StatusBadge tone='danger'  label='Blocked' />
+<StatusBadge tone='info'    label='In Progress' />
+<StatusBadge tone='neutral' label='Archived' />`}
+        >
+          <Horizontal gap={8}>
+            <StatusBadge tone='success' label='Active' />
+            <StatusBadge tone='warning' label='Draft' />
+            <StatusBadge tone='danger' label='Blocked' />
+            <StatusBadge tone='info' label='In Progress' />
+            <StatusBadge tone='neutral' label='Archived' />
+          </Horizontal>
+        </PatternExample>
+
+        <PatternExample
+          label='Variant — quiet'
+          caption='Dot + muted text, no chip. Use this in dense grids where a full pill per row would shout. The dot carries the state; the text stays quiet.'
+          code={`<StatusBadge tone='success' variant='quiet' label='On Track' />
+<StatusBadge tone='warning' variant='quiet' label='At Risk' />
+<StatusBadge tone='danger'  variant='quiet' label='Behind' />`}
+        >
+          <Vertical gap={6}>
+            <Horizontal gap={16} alignItems='center'>
+              <Texto category='p2' appearance='medium' style={{ width: 140 }}>Midwest Route 4A</Texto>
+              <StatusBadge tone='success' variant='quiet' label='On Track' />
+            </Horizontal>
+            <Horizontal gap={16} alignItems='center'>
+              <Texto category='p2' appearance='medium' style={{ width: 140 }}>Gulf Coast Spot</Texto>
+              <StatusBadge tone='warning' variant='quiet' label='At Risk' />
+            </Horizontal>
+            <Horizontal gap={16} alignItems='center'>
+              <Texto category='p2' appearance='medium' style={{ width: 140 }}>Rack 72 Delivery</Texto>
+              <StatusBadge tone='danger' variant='quiet' label='Behind' />
+            </Horizontal>
+          </Vertical>
+        </PatternExample>
+
+        <PatternExample
+          label='Variant — solid'
+          caption='Saturated chip with white text. Reserve for statuses that must demand attention — a blocked row in a hundred, a destructive state, a hard-stop.'
+          code={`<StatusBadge tone='danger' variant='solid' label='Blocked' />
+<StatusBadge tone='warning' variant='solid' label='Overdue' />`}
+        >
+          <Horizontal gap={8}>
+            <StatusBadge tone='danger' variant='solid' label='Blocked' />
+            <StatusBadge tone='warning' variant='solid' label='Overdue' />
+            <StatusBadge tone='info' variant='solid' label='New' />
+          </Horizontal>
+        </PatternExample>
+
+        <PatternExample
+          label='Sizes'
+          caption='sm (11px) for dense grids, md (12px, default) for most surfaces, lg (13px) for page headers where the status is the headline.'
+        >
+          <Horizontal gap={12} alignItems='center'>
+            <StatusBadge tone='success' size='sm' label='Active' />
+            <StatusBadge tone='success' size='md' label='Active' />
+            <StatusBadge tone='success' size='lg' label='Active' />
+          </Horizontal>
+        </PatternExample>
+
+        <PatternExample
+          label='Vocabulary presets'
+          caption="Import a preset map when your page uses a common vocabulary. StatusBadge ships with LIFECYCLE_STATUS, DEAL_STATUS, and HEALTH_STATUS. Define your own at call-site when the vocabulary is page-specific."
+          code={`import { StatusBadge, DEAL_STATUS } from '@components/shared/StatusBadge'
+
+const entry = DEAL_STATUS[row.status]
+<StatusBadge tone={entry.tone} label={entry.label} />`}
+        >
+          <Horizontal gap={8}>
+            <StatusBadge tone='neutral' label='Draft' />
+            <StatusBadge tone='info' label='In Progress' />
+            <StatusBadge tone='info' label='Submitted' />
+            <StatusBadge tone='success' label='Won' />
+            <StatusBadge tone='warning' label='Partial Win' />
+            <StatusBadge tone='danger' label='Lost' />
+            <StatusBadge tone='neutral' label='Declined' />
+          </Horizontal>
+        </PatternExample>
       </PatternSection>
 
       <PatternSection id="toast" title="Toast Notifications" description="Use NotificationMessage for transient confirmations. Appears top-right, auto-dismisses.">

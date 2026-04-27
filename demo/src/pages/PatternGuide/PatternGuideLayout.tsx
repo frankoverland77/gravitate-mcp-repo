@@ -25,7 +25,7 @@ import styles from './PatternGuideLayout.module.css'
 import gravLogo from '../../assets/SiteImages/grav-logo.svg'
 
 const PATTERN_PAGES = [
-  { path: '/PatternGuide/SpacingTokens', label: 'Spacing & Tokens', icon: <ColumnWidthOutlined /> },
+  { path: '/PatternGuide/SpacingTokens', label: 'Design Tokens', icon: <ColumnWidthOutlined /> },
   { path: '/PatternGuide/Forms', label: 'Forms', icon: <FormOutlined /> },
   { path: '/PatternGuide/Modals', label: 'Modals', icon: <ExpandOutlined /> },
   { path: '/PatternGuide/Sections', label: 'Sections & Content', icon: <LayoutOutlined /> },

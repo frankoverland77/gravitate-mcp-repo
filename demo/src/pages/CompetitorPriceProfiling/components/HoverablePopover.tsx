@@ -98,6 +98,7 @@ export function HoverablePopover({
       placement={placement}
       trigger={[]}
       overlayStyle={{ maxWidth: 360, ...overlayStyle }}
+      overlayInnerStyle={{ background: '#ffffff', color: 'var(--gray-700)' }}
       destroyOnHidden
     >
       <span

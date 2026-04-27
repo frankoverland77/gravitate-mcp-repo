@@ -169,17 +169,17 @@ export const SUMMARY_TILES: MetricTileData[] = [
   {
     label: 'Premium',
     value: '24',
-    sub: '≥ +1.0¢/gal above market · 60%+ of prices',
+    sub: '≥ +$0.0100/gal above market · 60%+ of prices',
   },
   {
     label: 'Discount',
     value: '31',
-    sub: '≤ −1.0¢/gal below market · 60%+ of prices',
+    sub: '≤ −$0.0100/gal below market · 60%+ of prices',
   },
   {
     label: 'Conformist',
     value: '68',
-    sub: 'within ±0.5¢ of market · 70%+ of prices',
+    sub: 'within ±$0.0050 of market · 70%+ of prices',
   },
   {
     label: 'Independent',

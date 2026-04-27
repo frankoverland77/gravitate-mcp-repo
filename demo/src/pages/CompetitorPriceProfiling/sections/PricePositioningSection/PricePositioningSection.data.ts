@@ -7,26 +7,26 @@ export const MOTIVA_PRICE_POSITIONING: PricePositioningData = {
     "How Motiva's price compares to the market average at this terminal-product over the selected window.",
   confidence: 'HIGH',
   takeaway:
-    'Consistently priced Premium over the last 90 days — averaging +1.4¢/gal above market, with 65 of 90 prices above the +1.0¢ threshold.',
+    'Consistently priced Premium over the last 90 days — averaging +$0.0140/gal above market, with 65 of 90 prices above the +$0.0100 threshold.',
   tiles: [
     {
       label: 'Avg spread vs. market',
-      value: '+1.4¢/gal',
+      value: '+$0.0140/gal',
       sub: 'Motiva − market average, 90d',
     },
     {
-      label: 'Prices above +1.0¢',
+      label: 'Prices above +$0.0100',
       value: '65 of 90',
       sub: '72% of prices published',
     },
     {
       label: 'Min / Max spread',
-      value: '+0.2¢ / +2.8¢',
+      value: '+$0.0020 / +$0.0280',
       sub: 'lowest / highest daily spread, 90d',
     },
     {
       label: 'Stability',
-      value: 'σ = 0.6¢',
+      value: 'σ = $0.0060',
       sub: 'std dev of daily spread',
     },
   ],
@@ -54,7 +54,7 @@ export const MOTIVA_PRICE_POSITIONING: PricePositioningData = {
     {
       label: 'Classification',
       value: 'Premium',
-      sub: '72% above +1.0¢ · ≥60% req.',
+      sub: '72% above +$0.0100 · ≥60% req.',
     },
   ],
   learnMore: {
@@ -62,22 +62,28 @@ export const MOTIVA_PRICE_POSITIONING: PricePositioningData = {
     rules: [
       {
         name: 'Premium',
-        description: 'Priced ≥ +1.0¢/gal above market avg on 60%+ of prices published.',
+        description: 'Priced ≥ +$0.0100/gal above market avg on 60%+ of prices published.',
         isCurrent: true,
       },
       {
         name: 'Discount',
-        description: 'Priced ≤ −1.0¢/gal below market avg on 60%+ of prices published.',
+        description: 'Priced ≤ −$0.0100/gal below market avg on 60%+ of prices published.',
         isCurrent: false,
       },
       {
         name: 'Conformist',
-        description: 'Within ±0.5¢ of market avg on 70%+ of prices published.',
+        description: 'Within ±$0.0050 of market avg on 70%+ of prices published.',
         isCurrent: false,
       },
       {
         name: 'Independent',
         description: 'High price variance, no persistent side of the market.',
+        isCurrent: false,
+      },
+      {
+        name: 'Methodology' as never,
+        description:
+          'Tags are based on the "Standard" preset, which uses market average as the baseline. A competitor is tagged Premium or Discount when they price at least $0.0100/gal off the baseline on 60%+ of days, and Conformist when they stay within ±$0.0050 on 70%+ of days. The baseline metric and the thresholds can be customized per terminal, region, or product group in the PP Manager.',
         isCurrent: false,
       },
     ],

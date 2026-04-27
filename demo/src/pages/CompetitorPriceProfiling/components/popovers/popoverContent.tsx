@@ -40,16 +40,19 @@ export const PopStrategy = () => (
   <PopoverShell title="Price Positioning">
     <Vertical gap={6}>
       <Texto category="p2">
-        <b>Premium</b> — Priced ≥ +1.0¢/gal above market avg on 60%+ of prices published.
+        <b>Premium</b> — Priced ≥ +$0.0100/gal above market avg on 60%+ of prices published.
       </Texto>
       <Texto category="p2">
-        <b>Discount</b> — Priced ≤ −1.0¢/gal below market avg on 60%+ of prices published.
+        <b>Discount</b> — Priced ≤ −$0.0100/gal below market avg on 60%+ of prices published.
       </Texto>
       <Texto category="p2">
-        <b>Conformist</b> — Within ±0.5¢ of market avg on 70%+ of prices published.
+        <b>Conformist</b> — Within ±$0.0050 of market avg on 70%+ of prices published.
       </Texto>
       <Texto category="p2">
         <b>Independent</b> — High price variance, no persistent side of the market.
+      </Texto>
+      <Texto category="p2" appearance="medium" style={{ fontStyle: 'italic', marginTop: 4 }}>
+        Using preset: <b>Standard</b>. Manage thresholds and baseline metric in the PP Manager.
       </Texto>
     </Vertical>
   </PopoverShell>

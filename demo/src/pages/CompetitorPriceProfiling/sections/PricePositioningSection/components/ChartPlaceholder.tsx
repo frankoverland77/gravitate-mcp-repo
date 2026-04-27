@@ -11,14 +11,11 @@ export const ChartPlaceholder = ({ heading, body, sub }: ChartPlaceholderProps) 
   return (
     <div
       style={{
-        backgroundColor: '#ffffff',
-        border: '1px solid #e8e8e8',
-        borderRadius: 8,
-        padding: 32,
-        minHeight: 360,
+        minHeight: 320,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: '24px 0',
       }}
     >
       {/* TODO (Phase 8): Price Positioning chart — replaces this placeholder once AG picks Option A or Option B */}

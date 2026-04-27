@@ -1,44 +1,48 @@
-import { BBDTag, Texto } from '@gravitate-js/excalibrr';
-import { Confidence, Follower } from '../../CompetitorPriceProfiling.types';
-import ConfidencePill from '../../sections/PricePositioningSection/components/ConfidencePill';
+import { Texto } from '@gravitate-js/excalibrr';
+import { Follower } from '../../CompetitorPriceProfiling.types';
 import { HoverablePopover } from '../HoverablePopover';
 import { PopFollowersFull } from '../popovers/popoverContent';
 
-interface FollowersCellProps {
+interface FollowersChildProps {
   competitor: string;
   followers: Follower[];
   cellId: string;
-  confidence: Confidence;
 }
 
-export function FollowersCell({ competitor, followers, cellId, confidence }: FollowersCellProps) {
-  const visible = followers.slice(0, 3);
-  const overflow = followers.length - visible.length;
+export function FollowersCountCell({ followers }: FollowersChildProps) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+      <Texto>{followers.length}</Texto>
+    </div>
+  );
+}
+
+export function FollowersTopCell({ competitor, followers, cellId }: FollowersChildProps) {
+  const sorted = [...followers].sort((a, b) => a.pValue - b.pValue);
+  const top = sorted[0];
+  const extra = followers.length - 1;
+
+  if (!top) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+        <Texto appearance="medium">—</Texto>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-      {followers.length === 0 ? (
-        <Texto appearance="medium">—</Texto>
-      ) : (
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
-          {visible.map((f) => (
-            <BBDTag key={f.name} style={{ width: 'fit-content' }}>
-              {f.name}
-            </BBDTag>
-          ))}
-          {overflow > 0 && (
-            <HoverablePopover
-              popoverId="pop-followers-full"
-              content={<PopFollowersFull competitor={competitor} followers={followers} />}
-            >
-              <Texto category="p2" style={{ color: '#1890ff', cursor: 'pointer' }}>
-                +{overflow} more
-              </Texto>
-            </HoverablePopover>
-          )}
-        </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: '100%' }}>
+      <Texto weight="600">{top.name}</Texto>
+      {extra > 0 && (
+        <HoverablePopover
+          popoverId={`pop-followers-top-${cellId}`}
+          content={<PopFollowersFull competitor={competitor} followers={sorted} />}
+        >
+          <span style={{ color: '#595959', cursor: 'pointer', textDecoration: 'underline', fontSize: 12 }}>
+            +{extra} more
+          </span>
+        </HoverablePopover>
       )}
-      <ConfidencePill confidence={confidence} cellId={cellId} rowCell="followers" />
     </div>
   );
 }

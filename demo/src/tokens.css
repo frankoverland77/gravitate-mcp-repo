@@ -25,4 +25,61 @@
   --drawer-bottom-compact: 50vh;
   --drawer-bottom-standard: 70vh;
   --drawer-bottom-full: 85vh;
+
+  /* ------------------------------------------------------------------ */
+  /* Semantic status tokens                                             */
+  /*                                                                    */
+  /* Use for state indicators — success, warning, danger, info, neutral.*/
+  /* Each tone has four channels:                                       */
+  /*   -solid   strong fill (icons, dots, primary surfaces)             */
+  /*   -text    foreground text against light bg (AA contrast on -bg)   */
+  /*   -bg      subtle tinted background                                */
+  /*   -border  subtle border (pairs with -bg)                          */
+  /*                                                                    */
+  /* Do NOT use raw hex for status. Hex codes like #52c41a, #ff4d4f,    */
+  /* #faad14 appearing in pages are a signal that these tokens are      */
+  /* missing from the call site.                                        */
+  /* ------------------------------------------------------------------ */
+
+  /* Success (positive, committed, on-track) */
+  --status-success-solid: #52c41a;
+  --status-success-text: #389e0d;
+  --status-success-bg: #f6ffed;
+  --status-success-border: #b7eb8f;
+
+  /* Warning (needs attention, at risk, behind) */
+  --status-warning-solid: #faad14;
+  --status-warning-text: #d48806;
+  --status-warning-bg: #fffbe6;
+  --status-warning-border: #ffe58f;
+
+  /* Danger (error, blocked, destructive) */
+  --status-danger-solid: #ff4d4f;
+  --status-danger-text: #cf1322;
+  --status-danger-bg: #fff2f0;
+  --status-danger-border: #ffa39e;
+
+  /* Info (neutral notice, in-progress, informational) */
+  --status-info-solid: #1890ff;
+  --status-info-text: #096dd9;
+  --status-info-bg: #e6f7ff;
+  --status-info-border: #91d5ff;
+
+  /* Neutral (draft, archived, inactive — quiet state) */
+  --status-neutral-solid: #8c8c8c;
+  --status-neutral-text: #595959;
+  --status-neutral-bg: #fafafa;
+  --status-neutral-border: #e8e8e8;
+
+  /* ------------------------------------------------------------------ */
+  /* Neutral surface + border tokens                                    */
+  /*                                                                    */
+  /* Use these in place of hard-coded greys like #e8e8e8, #f0f0f0,      */
+  /* #fafafa. --gray-* tokens are owned by Excalibrr theming; these     */
+  /* are layout-layer neutrals for dividers, card edges, muted backs.   */
+  /* ------------------------------------------------------------------ */
+  --border-subtle: #f0f0f0;   /* low-contrast divider (inside cards)    */
+  --border-default: #e8e8e8;  /* card edges, toolbar separators         */
+  --surface-muted: #fafafa;   /* footer bars, striped rows, code blocks */
+  --surface-sunken: #f5f5f5;  /* inset wells, disabled fields           */
 }

@@ -1,0 +1,107 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-1);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  min-width: 0;
+  transition: border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card.interactive {
+  cursor: pointer;
+}
+.card.interactive:hover {
+  border-color: var(--theme-color-1);
+  box-shadow: 0 1px 0 var(--theme-color-1);
+}
+.card.interactive:focus-visible {
+  outline: 2px solid var(--theme-color-1);
+  outline-offset: 2px;
+}
+
+.card.highlight {
+  border-color: var(--theme-color-1);
+}
+
+.alignCenter {
+  text-align: center;
+  align-items: center;
+}
+
+.alignLeft {
+  text-align: left;
+  align-items: flex-start;
+}
+
+/* Label: small, muted, all-caps for the compact size only — sentence case elsewhere
+   so it doesn't read like a marketing poster. */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-600, #595959);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.value {
+  font-weight: 600;
+  color: var(--gray-800, #262626);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.sub {
+  margin-top: var(--space-1);
+  font-size: 12px;
+  color: var(--gray-600, #595959);
+  line-height: 1.5;
+}
+
+.trend {
+  margin-top: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Sizes — scale the value. Label stays constant so the eye locks to the number. */
+.sizeSm {
+  padding: var(--space-3) var(--space-4);
+}
+.sizeSm .value {
+  font-size: 20px;
+}
+
+.sizeMd {
+  padding: var(--space-4) var(--space-5);
+}
+.sizeMd .value {
+  font-size: 28px;
+}
+
+.sizeLg {
+  padding: var(--space-5) var(--space-5);
+}
+.sizeLg .value {
+  font-size: 36px;
+}
+
+/* Order modifier — when label should sit ABOVE the value (dense summary tables). */
+.labelFirst .label {
+  order: 1;
+}
+.labelFirst .value {
+  order: 2;
+}

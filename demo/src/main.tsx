@@ -5,6 +5,11 @@ import { App } from "./App";
 import { LicenseManager } from "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+// Required for Excalibrr RangePicker — react-date-range ships its JS via
+// Excalibrr's bundle but not its CSS. Matches the production frontend pattern
+// at Gravitate.Dotnet.Next/frontend/src/modules/_Main/index.jsx:1-2.
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 import "./tokens.css";
 
 const agGridLicenseKey = import.meta.env.VITE_AG_GRID_LICENSE_KEY;

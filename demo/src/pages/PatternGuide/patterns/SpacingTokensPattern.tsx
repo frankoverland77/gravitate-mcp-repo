@@ -11,7 +11,31 @@ const SECTIONS = [
   { id: 'swatches', title: 'Visual Reference' },
   { id: 'nesting', title: 'Nesting Hierarchy' },
   { id: 'usage', title: 'Where Each Token Lives' },
+  { id: 'status-colors', title: 'Status Color Tokens' },
+  { id: 'neutrals', title: 'Neutral Surface Tokens' },
   { id: 'dos-donts', title: "Do's & Don'ts" },
+]
+
+const STATUS_TONES: Array<{
+  name: string
+  solid: string
+  text: string
+  bg: string
+  border: string
+  when: string
+}> = [
+  { name: 'success', solid: '#52c41a', text: '#389e0d', bg: '#f6ffed', border: '#b7eb8f', when: 'Positive, committed, on-track' },
+  { name: 'warning', solid: '#faad14', text: '#d48806', bg: '#fffbe6', border: '#ffe58f', when: 'Needs attention, at risk, behind' },
+  { name: 'danger', solid: '#ff4d4f', text: '#cf1322', bg: '#fff2f0', border: '#ffa39e', when: 'Error, blocked, destructive' },
+  { name: 'info', solid: '#1890ff', text: '#096dd9', bg: '#e6f7ff', border: '#91d5ff', when: 'Neutral notice, in-progress' },
+  { name: 'neutral', solid: '#8c8c8c', text: '#595959', bg: '#fafafa', border: '#e8e8e8', when: 'Draft, archived, quiet state' },
+]
+
+const NEUTRAL_TOKENS = [
+  { token: 'border-subtle', value: '#f0f0f0', usage: 'Low-contrast divider (inside cards)' },
+  { token: 'border-default', value: '#e8e8e8', usage: 'Card edges, toolbar separators' },
+  { token: 'surface-muted', value: '#fafafa', usage: 'Footer bars, striped rows, code blocks' },
+  { token: 'surface-sunken', value: '#f5f5f5', usage: 'Inset wells, disabled fields' },
 ]
 
 const TOKENS = [
@@ -48,9 +72,9 @@ const NESTING_LEVELS = [
 export function SpacingTokensPattern() {
   return (
     <PatternShell
-      title="Spacing & Tokens"
-      subtitle="A single spacing scale used everywhere. 9 tokens replace the 15+ arbitrary pixel values scattered across the codebase. Parent container padding is always at least one step larger than child gaps."
-      accentColor="#1890ff"
+      title="Design Tokens"
+      subtitle="Spacing, status colors, and neutral surfaces. These tokens replace the hundred-plus arbitrary values scattered across the codebase. If you find yourself typing a raw hex code or a pixel value, the right token probably exists — use it."
+      accentColor="#0C5A58"
       sections={SECTIONS}
     >
       <PatternSection id="scale" title="The Scale" description="8-based scale with 4px and 12px half-steps. Every spacing value in the app maps to one of these tokens.">
@@ -120,6 +144,140 @@ export function SpacingTokensPattern() {
         </div>
       </PatternSection>
 
+      <PatternSection
+        id="status-colors"
+        title="Status Color Tokens"
+        description="Five semantic tones — success, warning, danger, info, neutral — each with four channels (solid, text, bg, border). Pages that need to indicate state should pull from these tokens instead of typing raw hex. The StatusBadge component consumes all four channels automatically."
+      >
+        <div style={{ border: '1px solid var(--border-default)', borderRadius: 8, overflow: 'hidden' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '140px 1fr 1fr 1fr 1fr 1.5fr',
+              padding: '10px 16px',
+              background: 'var(--surface-muted)',
+              borderBottom: '1px solid var(--border-default)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#595959',
+              gap: 12,
+            }}
+          >
+            <div>Tone</div>
+            <div>Solid</div>
+            <div>Text</div>
+            <div>Background</div>
+            <div>Border</div>
+            <div>When</div>
+          </div>
+          {STATUS_TONES.map((t, i) => (
+            <div
+              key={t.name}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '140px 1fr 1fr 1fr 1fr 1.5fr',
+                padding: '12px 16px',
+                borderBottom: i < STATUS_TONES.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                gap: 12,
+                alignItems: 'center',
+                fontSize: 13,
+              }}
+            >
+              <code style={{ fontFamily: "'SF Mono', monospace", fontSize: 12 }}>--status-{t.name}-*</code>
+              <SwatchCell color={t.solid} suffix='solid' />
+              <SwatchCell color={t.text} suffix='text' />
+              <SwatchCell color={t.bg} suffix='bg' />
+              <SwatchCell color={t.border} suffix='border' />
+              <Texto category='p2' appearance='medium'>{t.when}</Texto>
+            </div>
+          ))}
+        </div>
+
+        <PatternExample
+          label='In CSS'
+          caption='Use the four channels together. Background + border + text form a readable pill at any size. Solid is for dots, filled chips, and accents.'
+          code={`.successChip {
+  background: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  color: var(--status-success-text);
+}
+
+.successDot {
+  background: var(--status-success-solid);
+}`}
+        >
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {STATUS_TONES.map((t) => (
+              <span
+                key={t.name}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  background: t.bg,
+                  border: `1px solid ${t.border}`,
+                  color: t.text,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: 'Lato, sans-serif',
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: t.solid }} />
+                {t.name}
+              </span>
+            ))}
+          </div>
+        </PatternExample>
+      </PatternSection>
+
+      <PatternSection
+        id='neutrals'
+        title='Neutral Surface Tokens'
+        description="The greys that aren't owned by the Excalibrr theme. Use these for dividers, card edges, and muted backgrounds instead of typing #e8e8e8 or #fafafa."
+      >
+        <div style={{ border: '1px solid var(--border-default)', borderRadius: 8, overflow: 'hidden' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '180px 80px 120px 1fr',
+              padding: '10px 16px',
+              background: 'var(--surface-muted)',
+              borderBottom: '1px solid var(--border-default)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#595959',
+              gap: 12,
+            }}
+          >
+            <div>Token</div>
+            <div>Swatch</div>
+            <div>Value</div>
+            <div>Where it lives</div>
+          </div>
+          {NEUTRAL_TOKENS.map((t, i) => (
+            <div
+              key={t.token}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '180px 80px 120px 1fr',
+                padding: '12px 16px',
+                borderBottom: i < NEUTRAL_TOKENS.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                gap: 12,
+                alignItems: 'center',
+                fontSize: 13,
+              }}
+            >
+              <code style={{ fontFamily: "'SF Mono', monospace", fontSize: 12 }}>--{t.token}</code>
+              <div style={{ width: 56, height: 20, background: t.value, border: '1px solid var(--border-default)', borderRadius: 3 }} />
+              <code style={{ fontFamily: "'SF Mono', monospace", fontSize: 12, color: '#8c8c8c' }}>{t.value}</code>
+              <Texto category='p2' appearance='medium'>{t.usage}</Texto>
+            </div>
+          ))}
+        </div>
+      </PatternSection>
+
       <PatternSection id="dos-donts" title="Do's & Don'ts">
         <DosDonts
           doExample={
@@ -176,8 +334,47 @@ export function SpacingTokensPattern() {
           doCaption="Use CSS variables from tokens.css. Values are meaningful and maintainable."
           dontCaption="Hardcoded pixel values that don't align to any scale. 20px and 18px aren't in the token system."
         />
+
+        <DosDonts
+          doExample={
+            <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, color: '#262626' }}>
+              <div>{'background: var(--status-success-bg);'}</div>
+              <div>{'border: 1px solid var(--status-success-border);'}</div>
+              <div>{'color: var(--status-success-text);'}</div>
+            </div>
+          }
+          dontExample={
+            <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, color: '#262626' }}>
+              <div>{'background: #f6ffed;'}</div>
+              <div>{'border: 1px solid #b7eb8f;'}</div>
+              <div>{'color: #389e0d;'}</div>
+            </div>
+          }
+          doCaption='Pull from the four-channel status tokens. When a designer tweaks the palette, every chip updates with it.'
+          dontCaption='Raw hex codes. These exact values appear in 113 files today — each copy is a tiny fork of the design system.'
+        />
       </PatternSection>
     </PatternShell>
+  )
+}
+
+function SwatchCell({ color, suffix }: { color: string; suffix: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      <div
+        style={{
+          width: 20,
+          height: 20,
+          background: color,
+          border: '1px solid var(--border-default)',
+          borderRadius: 3,
+          flexShrink: 0,
+        }}
+      />
+      <code style={{ fontFamily: "'SF Mono', monospace", fontSize: 11, color: '#8c8c8c', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        -{suffix}
+      </code>
+    </div>
   )
 }
 

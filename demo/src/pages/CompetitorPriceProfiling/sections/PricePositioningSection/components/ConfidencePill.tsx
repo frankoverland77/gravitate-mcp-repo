@@ -8,6 +8,10 @@ interface ConfidencePillProps {
   cellId?: string;
   rowCell?: InsightKey;
   observations?: number;
+  // When true, HIGH renders as a neutral tag instead of null. Used in columns
+  // where a tag slot must always be occupied (pass-through, 30-day rank) so
+  // the absence of a pill doesn't read as missing data.
+  alwaysShow?: boolean;
 }
 
 function ConfidencePill({
@@ -15,6 +19,7 @@ function ConfidencePill({
   cellId,
   rowCell,
   observations = 18,
+  alwaysShow = false,
 }: ConfidencePillProps) {
   const common = {
     style: { width: 'fit-content' as const },
@@ -23,26 +28,22 @@ function ConfidencePill({
     'data-row-cell': rowCell,
   };
 
-  let pill;
-  if (confidence === 'HIGH') {
-    pill = (
-      <BBDTag success {...common}>
-        HIGH
-      </BBDTag>
-    );
-  } else if (confidence === 'MED') {
-    pill = (
+  if (confidence === 'HIGH' && !alwaysShow) {
+    return null;
+  }
+
+  const pill =
+    confidence === 'HIGH' ? (
+      <BBDTag {...common}>HIGH</BBDTag>
+    ) : confidence === 'MED' ? (
       <BBDTag warning {...common}>
         MED
       </BBDTag>
-    );
-  } else {
-    pill = (
+    ) : (
       <BBDTag error {...common}>
         LOW
       </BBDTag>
     );
-  }
 
   if (!cellId || !rowCell) {
     return pill;

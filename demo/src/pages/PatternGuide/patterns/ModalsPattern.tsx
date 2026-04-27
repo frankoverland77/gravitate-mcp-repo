@@ -35,16 +35,18 @@ const SIZE_TIERS: { label: string; width: number; maxBarWidth: number }[] = [
 ]
 
 const wireframeColors = {
-  header: '#e6f7ff',
-  headerBorder: '#91d5ff',
+  header: 'var(--status-info-bg)',
+  headerBorder: 'var(--status-info-border)',
   body: '#ffffff',
-  bodyBorder: '#d9d9d9',
-  field: '#fafafa',
-  fieldBorder: '#d9d9d9',
-  footer: '#fafafa',
-  footerBorder: '#e8e8e8',
-  btnPrimary: '#1890ff',
-  btnSecondary: '#f0f0f0',
+  bodyBorder: 'var(--border-default)',
+  field: 'var(--surface-muted)',
+  fieldBorder: 'var(--border-default)',
+  footer: 'var(--surface-muted)',
+  footerBorder: 'var(--border-default)',
+  btnPrimary: 'var(--theme-color-1)',
+  btnSecondary: 'var(--border-subtle)',
+  // Annotation swatch — intentionally off-brand to distinguish pattern-doc
+  // callouts from product UI. Not a token.
   annotation: '#ff7a45',
   annotationBg: '#fff7e6',
 }
@@ -228,7 +230,7 @@ export function ModalsPattern() {
               <span style={{ fontSize: 10, color: '#8c8c8c' }}>
                 secondary (no theme)
               </span>
-              <span style={{ fontSize: 10, color: '#1890ff', fontWeight: 600 }}>
+              <span style={{ fontSize: 10, color: wireframeColors.btnPrimary, fontWeight: 600 }}>
                 primary (theme1)
               </span>
             </div>
@@ -406,14 +408,14 @@ export function ModalsPattern() {
                       style={{
                         width: item.width,
                         height: 28,
-                        border: '1px solid #b7eb8f',
-                        background: '#f6ffed',
+                        border: '1px solid var(--status-success-border)',
+                        background: 'var(--status-success-bg)',
                         borderRadius: 4,
                         display: 'flex',
                         alignItems: 'center',
                         paddingLeft: 8,
                         fontSize: 11,
-                        color: '#389e0d',
+                        color: 'var(--status-success-text)',
                       }}
                     >
                       {item.label}
@@ -440,19 +442,19 @@ export function ModalsPattern() {
                       style={{
                         width: item.width,
                         height: 28,
-                        border: '1px solid #ffccc7',
-                        background: '#fff2f0',
+                        border: '1px solid var(--status-danger-border)',
+                        background: 'var(--status-danger-bg)',
                         borderRadius: 4,
                         display: 'flex',
                         alignItems: 'center',
                         paddingLeft: 8,
                         fontSize: 11,
-                        color: '#cf1322',
+                        color: 'var(--status-danger-text)',
                       }}
                     >
                       {item.label}
                     </div>
-                    <span style={{ fontSize: 10, color: '#ff4d4f', fontFamily: 'monospace', textDecoration: 'line-through' }}>
+                    <span style={{ fontSize: 10, color: 'var(--status-danger-solid)', fontFamily: 'monospace', textDecoration: 'line-through' }}>
                       {item.w}
                     </span>
                   </div>
@@ -508,7 +510,7 @@ export function ModalsPattern() {
                   <MockButton label="Submit" variant="primary" size="small" />
                 </div>
               </div>
-              <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#ff4d4f', lineHeight: 1.6 }}>
+              <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--status-danger-solid)', lineHeight: 1.6 }}>
                 justify-content: space-between<br />
                 gap: 16px (inconsistent!)<br />
                 [Cancel] ..... [Draft] [Submit]
@@ -565,8 +567,8 @@ function MockButton({
         fontSize: size === 'small' ? 12 : 13,
         fontWeight: 500,
         cursor: 'default',
-        border: isPrimary ? '1px solid #1890ff' : '1px solid #d9d9d9',
-        background: isPrimary ? '#1890ff' : '#fff',
+        border: isPrimary ? '1px solid var(--theme-color-1)' : '1px solid var(--border-default)',
+        background: isPrimary ? 'var(--theme-color-1)' : '#fff',
         color: isPrimary ? '#fff' : '#595959',
       }}
     >

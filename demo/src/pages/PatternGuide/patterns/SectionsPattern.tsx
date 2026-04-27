@@ -1,4 +1,5 @@
 import { Vertical, Texto } from '@gravitate-js/excalibrr'
+import { StatusBadge } from '../../../components/shared/StatusBadge'
 import { PatternShell } from '../PatternShell'
 import { PatternSection } from '../components/PatternSection'
 import { DosDonts } from '../components/DosDonts'
@@ -535,19 +536,7 @@ function FieldMock({
       </Texto>
       <div style={{ marginTop: 4 }}>
         {tag ? (
-          <span
-            style={{
-              display: 'inline-block',
-              padding: '2px 10px',
-              background: '#f6ffed',
-              border: '1px solid #b7eb8f',
-              borderRadius: 4,
-              fontSize: 13,
-              color: '#52c41a',
-            }}
-          >
-            {value}
-          </span>
+          <StatusBadge tone="success" label={value} />
         ) : (
           <div
             style={{

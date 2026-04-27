@@ -98,3 +98,30 @@ export interface PricePositioningData {
     rules: ClassificationRule[];
   };
 }
+
+export interface LearnMoreCard {
+  title: string;
+  body: string;
+}
+
+export interface RankOverTimePoint {
+  date: string;
+  rank: number;
+}
+
+export interface RankPositionData {
+  cellId: string;
+  title: string;
+  description: string;
+  confidence: Confidence;
+  takeaway: string;
+  tiles: MetricTileData[];
+  chartSeries: RankOverTimePoint[];
+  avg90Rank: number;
+  avg30Rank: number;
+  statFit: StatFitRow[];
+  learnMore: {
+    summary: string;
+    cards: LearnMoreCard[];
+  };
+}

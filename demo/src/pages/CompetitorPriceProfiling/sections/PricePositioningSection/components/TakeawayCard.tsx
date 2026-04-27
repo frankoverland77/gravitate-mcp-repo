@@ -4,18 +4,14 @@ interface TakeawayCardProps {
   takeaway: string;
 }
 
+// Chromeless takeaway — sits between the chart and the Fit & methodology
+// collapse as a plain descriptive sentence (not a lead). Unbold so it reads as
+// a caption-style summary rather than a headline.
 function TakeawayCard({ takeaway }: TakeawayCardProps) {
   return (
-    <div
-      style={{
-        backgroundColor: '#ffffff',
-        border: '1px solid #e8e8e8',
-        borderRadius: 8,
-        padding: 16,
-      }}
-    >
-      <Texto category="p1" weight="500">{takeaway}</Texto>
-    </div>
+    <Texto category="p2" appearance="medium">
+      {takeaway}
+    </Texto>
   );
 }
 
